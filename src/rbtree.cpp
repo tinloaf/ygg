@@ -26,17 +26,20 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
     node._rbt_parent = nullptr;
     node._rbt_color = Base::Color::BLACK;
     this->root = &node;
-    return;
-  }
-
-  node._rbt_parent = parent;
-  node._rbt_color = Base::Color::RED;
-
-  if (Compare()(node, *parent)) {
-    parent->_rbt_left = &node;
   } else {
-    parent->_rbt_right = &node;
+    node._rbt_parent = parent;
+    node._rbt_color = Base::Color::RED;
+
+    if (Compare()(node, *parent)) {
+      parent->_rbt_left = &node;
+    } else {
+      parent->_rbt_right = &node;
+    }
   }
+
+  NodeTraits::leaf_inserted(node);
+
+  return;
 }
 
 template<class Node, class NodeTraits, class Compare>
@@ -66,6 +69,8 @@ RBTree<Node, NodeTraits, Compare>::rotate_left(Node * parent)
 
   // TODO FIXME DEBUG
   this->verify_tree();
+
+  NodeTraits::rotated_left(*parent);
 }
 
 template<class Node, class NodeTraits, class Compare>
@@ -95,6 +100,8 @@ RBTree<Node, NodeTraits, Compare>::rotate_right(Node * parent)
 
   // TODO FIXME DEBUG
   this->verify_tree();
+
+  NodeTraits::rotated_right(*parent);
 }
 
 template<class Node, class NodeTraits, class Compare>
@@ -340,6 +347,8 @@ RBTree<Node, NodeTraits, Compare>::verify_integrity() const
 
   assert(root_okay && paths_okay && children_okay && tree_okay);
 
+  (void)dummy;
+
   return root_okay && paths_okay && children_okay && tree_okay;
 }
 
@@ -394,6 +403,8 @@ RBTree<Node, NodeTraits, Compare>::swap_nodes(Node * n1, Node * n2, bool swap_co
   if (!swap_colors) {
     std::swap(n1->_rbt_color, n2->_rbt_color);
   }
+
+  NodeTraits::swapped(*n1, *n2);
 }
 
 template<class Node, class NodeTraits, class Compare>
@@ -513,6 +524,9 @@ RBTree<Node, NodeTraits, Compare>::remove_to_leaf(Node & node)
     right_child->_rbt_color = Base::Color::BLACK;
     right_child->_rbt_right = nullptr; // this stored the node to be deleted…
     // TODO null the pointers in node?
+
+    NodeTraits::deleted_below(*right_child);
+
     return; // no fixup necessary
   }
 
@@ -526,6 +540,8 @@ RBTree<Node, NodeTraits, Compare>::remove_to_leaf(Node & node)
       // TODO can this even happen?
       node._rbt_parent->_rbt_right = nullptr;
     }
+
+    NodeTraits::deleted_below(node);
   } else {
     this->root = nullptr; // Tree is now empty!
     return; // No fixup needed!

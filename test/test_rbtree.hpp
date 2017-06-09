@@ -30,6 +30,12 @@ public:
   static std::string get_id(const Node * node) {
     return std::to_string(node->data);
   }
+
+  static void leaf_inserted(Node & node) { (void)node ; };
+  static void rotated_left(Node & node) { (void)node ; };
+  static void rotated_right(Node & node) { (void)node ; };
+  static void deleted_below(Node & node) { (void)node ; };
+  static void swapped(Node & n1, Node & n2) { (void)n1 ; (void)n2 ; };
 };
 
 

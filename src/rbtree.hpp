@@ -42,7 +42,6 @@ public:
 
     const_iterator ();
     const_iterator (Node * n, bool reverse = false);
-    // TODO move constructor
     const_iterator (const const_iterator & other);
     ~const_iterator();
 
@@ -53,9 +52,9 @@ public:
     bool operator!=(const const_iterator & other) const;
 
     const_iterator& operator++();
-    const_iterator operator++(int); //optional
-    const_iterator& operator+=(size_t n); //optional
-    const_iterator operator+(size_t n) const; //optional
+    const_iterator  operator++(int);
+    const_iterator& operator+=(size_t n);
+    const_iterator  operator+(size_t n) const;
 
     const_reference operator*() const;
     const_pointer operator->() const;
@@ -72,6 +71,9 @@ public:
   // querying for contained elements
   template<class Comparable>
   const_iterator find(const Comparable & query) const;
+
+protected:
+  Node *root;
 
 private:
   using Path = std::vector<Node *>;
@@ -91,9 +93,6 @@ private:
   void swap_nodes(Node * n1, Node * n2, bool swap_colors = true);
   void swap_unrelated_nodes(Node * n1, Node * n2);
   void swap_neighbors(Node * parent, Node * child);
-
-  Node *root;
-
 
   bool verify_black_root() const;
   bool verify_black_paths(const Node * node, unsigned int * path_length) const;
