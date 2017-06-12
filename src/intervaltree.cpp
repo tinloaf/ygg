@@ -141,6 +141,7 @@ IntervalTree<Node, NodeTraits>::query(const Comparable & q) const
       cur = cur->_rbt_left;
   }
   // Everthing left of here ends too early.
+
   // If this overlaps, this is our first hit. otherwise, find the next one
   if ((NodeTraits::get_lower(q) <= NodeTraits::get_upper(*cur)) &&
       (NodeTraits::get_upper(q) >= NodeTraits::get_lower(*cur))) {
@@ -166,36 +167,34 @@ find_next_overlapping(Node * cur, const Comparable & q)
     // than the upper of q. Thus, we need to only check the upper to check for
     // overlap.
     if (cur->_rbt_right != nullptr) {
-      std::cout << "Going right…";
+      //std::cout << "Going right…";
       // go to smallest larger-or-equal child
       cur = cur->_rbt_right;
       if (cur->_it_max_upper < NodeTraits::get_lower(q)) {
-        std::cout << "Pruning 1…";
+        //std::cout << "Pruning 1…";
         // Prune!
         // Nothing starting from this node can overlap b/c of upper limit. Backtrack.
-        pruned = true;
         while ((cur->_rbt_parent != nullptr) && (cur->_rbt_parent->_rbt_right == cur)) { // these are the nodes which are smaller and were already visited
-          std::cout << "backtracking…";
+          //std::cout << "backtracking…";
           cur = cur->_rbt_parent;
         }
 
         // go one further up
         if (cur->_rbt_parent == nullptr) {
-          std::cout << "backtracked out of root.\n";
-          cur = nullptr;
-          break;
+          //std::cout << "backtracked out of root.\n";
+          return nullptr;
         } else {
           // go up
-          std::cout << "backtracking one more…";
+          //std::cout << "backtracking one more…";
           cur = cur->_rbt_parent;
         }
       } else {
-        std::cout << "searching for smallest…";
+        //std::cout << "searching for smallest…";
         while (cur->_rbt_left != nullptr) {
           cur = cur->_rbt_left;
-          std::cout << "descending…";
+          //std::cout << "descending…";
           if (cur->_it_max_upper < NodeTraits::get_lower(q)) {
-            std::cout << "Pruning 2…";
+            //std::cout << "Pruning 2…";
             // Prune!
             // Nothing starting from this node can overlap. Backtrack.
             // TODO WTF?
@@ -206,16 +205,16 @@ find_next_overlapping(Node * cur, const Comparable & q)
       }
     } else {
       // go up
-      std::cout << "going up…";
+      //std::cout << "going up…";
       // skip over the nodes already visited
       while ((cur->_rbt_parent != nullptr) && (cur->_rbt_parent->_rbt_right == cur)) { // these are the nodes which are smaller and were already visited
-        std::cout << "backtracking…";
+        //std::cout << "backtracking…";
         cur = cur->_rbt_parent;
       }
 
       // go one further up
       if (cur->_rbt_parent == nullptr) {
-        std::cout << "Backtracked into root.\n";
+        //std::cout << "Backtracked into root.\n";
         return nullptr;
       } else {
         // go up
@@ -223,15 +222,16 @@ find_next_overlapping(Node * cur, const Comparable & q)
       }
     }
 
+    if (NodeTraits::get_lower(*cur) > NodeTraits::get_upper(q)) {
+      // No larger node can be an overlap!
+      return nullptr;
+    }
+
     if (NodeTraits::get_upper(*cur) >= NodeTraits::get_lower(q)) {
       // Found!
       return cur;
     }
 
-    if (NodeTraits::get_lower(*cur) > NodeTraits::get_upper(q)) {
-      // No larger node can be an overlap!
-      return nullptr;
-    }
   } while (true);
 }
 
@@ -283,7 +283,7 @@ typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const
 IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator=(const typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator & other)
 {
   this->n = other.n;
-  this->upper_limit = other.upper_limit;
+  this->q = other.q;
   return *this;
 }
 
@@ -308,11 +308,23 @@ template<class Comparable>
 typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator &
 IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator++()
 {
-  std::cout << "Old n: " << this->n << "\n";
+  //std::cout << "Old n: " << this->n << "\n";
   this->n = iitree::utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(this->n, this->q);
-  std::cout << "New n: " << this->n << "\n";
+  //std::cout << "New n: " << this->n << "\n";
 
   return *this;
+}
+
+template<class Node, class NodeTraits>
+template<class Comparable>
+typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator++(int)
+{
+  typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator cpy(*this);
+
+  this->operator++();
+
+  return cpy;
 }
 
 template<class Node, class NodeTraits>

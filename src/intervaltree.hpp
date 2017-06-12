@@ -68,6 +68,7 @@ public:
       bool operator!=(const const_iterator & other) const;
 
       const_iterator& operator++();
+      const_iterator operator++(int);
 
       const_reference operator*() const;
       const_pointer operator->() const;
