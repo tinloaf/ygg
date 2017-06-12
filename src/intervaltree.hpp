@@ -20,6 +20,7 @@ public:
 template<class Node, class NodeTraits>
 class ExtendedNodeTraits : public NodeTraits {
 public:
+  // TODO these can probably made more efficient
   static void leaf_inserted(Node & node);
   static void fix_node(Node & node);
   static void rotated_left(Node & node);
@@ -41,7 +42,9 @@ class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, I
 public:
   using Key = typename NodeTraits::key_type;
   IntervalTree();
+
   bool verify_integrity() const;
+  void dump_to_dot(std::string & filename) const;
 
   // Iteration of sets of intervals
   template <class Comparable>
@@ -62,6 +65,7 @@ public:
       const_iterator& operator=(const const_iterator & other);
 
       bool operator==(const const_iterator & other) const;
+      bool operator!=(const const_iterator & other) const;
 
       const_iterator& operator++();
 

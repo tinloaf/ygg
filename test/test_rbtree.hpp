@@ -216,4 +216,7 @@ TEST(RBTreeTest, FindTest) {
     ASSERT_EQ(&(*it), &(nodes[i]));
   }
 }
+
+// TODO test equal elements
+
 #endif // TEST_RBTREE_HPP

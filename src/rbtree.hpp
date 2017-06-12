@@ -1,8 +1,11 @@
 #ifndef RBTREE_HPP
 #define RBTREE_HPP
 
+#include <cstddef>
+
 // Only for debugging purposes
 #include <fstream>
+#include <vector>
 
 template<class Node>
 class RBTreeNodeBase {
@@ -13,6 +16,17 @@ public:
   Node *                  _rbt_left = nullptr;
   Node *                  _rbt_right = nullptr;
   RBTreeNodeBase::Color   _rbt_color;
+};
+
+template<class Node>
+class RBDefaultNodeTraits {
+public:
+  static void leaf_inserted(Node & node) {};
+  static void fix_node(Node & node) {};
+  static void rotated_left(Node & node) {};
+  static void rotated_right(Node & node) {};
+  static void deleted_below(Node & node) {};
+  static void swapped(Node & n1, Node & n2) {};
 };
 
 template<class Node, class NodeTraits, class Compare = std::less<Node>>
@@ -29,7 +43,7 @@ public:
 
   // Mainly debugging methods
   bool verify_integrity() const;
-  void dump_to_dot(std::string filename) const;
+  void dump_to_dot(std::string & filename) const;
 
   // Iteration
   class const_iterator {
@@ -75,6 +89,12 @@ public:
 protected:
   Node *root;
 
+  template<class NodeNameGetter>
+  void dump_to_dot_base(std::string & filename, NodeNameGetter name_getter) const;
+
+  template<class NodeNameGetter>
+  void output_node_base(const Node * node, std::ofstream & out, NodeNameGetter name_getter) const;
+
 private:
   using Path = std::vector<Node *>;
 
@@ -98,8 +118,7 @@ private:
   bool verify_black_paths(const Node * node, unsigned int * path_length) const;
   bool verify_red_black(const Node * node) const;
   bool verify_tree() const;
-
-  void output_node(const Node * node, std::ofstream & out) const;
+  bool verify_order() const;
 };
 
 #include "rbtree.cpp"

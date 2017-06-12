@@ -11,7 +11,7 @@ using hrc = std::chrono::high_resolution_clock;
 
 #define BENCHMARK_SIZE 100000
 
-class Node : public IntervalTreeNodeBase<Node>, public boost::intrusive::set_base_hook<> {
+class Node : public RBTreeNodeBase<Node>, public boost::intrusive::set_base_hook<> {
 public:
   int data;
 
@@ -24,12 +24,8 @@ public:
   }
 };
 
-class NodeTraits {
+class NodeTraits : public RBDefaultNodeTraits<Node> {
 public:
-  static int get_lower(const Node * node) {
-    return node->data;
-  }
-
   static std::string get_id(const Node * node) {
     return std::to_string(node->data);
   }
@@ -37,7 +33,7 @@ public:
 
 class Benchmarker {
 public:
-  using Tree = IntervalTree<Node, NodeTraits>;
+  using Tree = RBTree<Node, NodeTraits>;
   using BoostSet = boost::intrusive::set< Node, boost::intrusive::compare<std::less<Node> > >;
 
   void run_all()

@@ -4,7 +4,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 find_package( Threads )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -Og -fprofile-arcs -ftest-coverage" )
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage" )
 SET(CMAKE_LDFLAGS  "${CMAKE_LDFLAGS} -fprofile-arcs -ftest-coverage")
 
 add_executable (run_tests main.cpp)

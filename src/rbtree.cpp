@@ -1,3 +1,6 @@
+#include <set>
+#include <cassert>
+
 template<class Node, class NodeTraits, class Compare>
 RBTree<Node, NodeTraits, Compare>::RBTree()
   : root(nullptr)
@@ -68,7 +71,7 @@ RBTree<Node, NodeTraits, Compare>::rotate_left(Node * parent)
   parent->_rbt_parent = right_child;
 
   // TODO FIXME DEBUG
-  this->verify_tree();
+  //this->verify_tree();
 
   NodeTraits::rotated_left(*parent);
 }
@@ -99,7 +102,7 @@ RBTree<Node, NodeTraits, Compare>::rotate_right(Node * parent)
   parent->_rbt_parent = left_child;
 
   // TODO FIXME DEBUG
-  this->verify_tree();
+  //this->verify_tree();
 
   NodeTraits::rotated_right(*parent);
 }
@@ -246,6 +249,27 @@ RBTree<Node, NodeTraits, Compare>::verify_red_black(const Node * node) const
 
 template<class Node, class NodeTraits, class Compare>
 bool
+RBTree<Node, NodeTraits, Compare>::verify_order() const
+{
+  for (const Node & n : *this) {
+    if (n._rbt_left != nullptr) {
+      if (!Compare()(*(n._rbt_left), n)) {
+        return false;
+      }
+    }
+
+    if (n._rbt_right != nullptr) {
+      if (Compare()(*(n._rbt_right), n)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+template<class Node, class NodeTraits, class Compare>
+bool
 RBTree<Node, NodeTraits, Compare>::verify_tree() const
 {
   if (this->root == nullptr) {
@@ -334,38 +358,47 @@ RBTree<Node, NodeTraits, Compare>::verify_integrity() const
   unsigned int dummy;
 
   bool tree_okay = this->verify_tree();
-  assert(tree_okay);
   //std::cout << "Tree1: " << tree_okay << "\n";
-  bool root_okay = true;
-  //bool root_okay = this->verify_black_root();
-  //bool paths_okay = (this->root == nullptr) || this->verify_black_paths(this->root, & dummy);
-  bool paths_okay = true;
-  //bool children_okay = this->verify_red_black(this->root);
-  bool children_okay = true;
+  bool root_okay = this->verify_black_root();
+  bool paths_okay = (this->root == nullptr) || this->verify_black_paths(this->root, & dummy);
+  bool children_okay = this->verify_red_black(this->root);
+
+  bool order_okay = this->verify_order();
 
   //std::cout << "Root: " << root_okay << " Paths: " << paths_okay << " Children: " << children_okay << " Tree: " << tree_okay << "\n";
 
-  assert(root_okay && paths_okay && children_okay && tree_okay);
+  assert(root_okay && paths_okay && children_okay && tree_okay && order_okay);
 
   (void)dummy;
 
-  return root_okay && paths_okay && children_okay && tree_okay;
+  return root_okay && paths_okay && children_okay && tree_okay && order_okay;
 }
 
 template<class Node, class NodeTraits, class Compare>
+template<class NodeNameGetter>
 void
-RBTree<Node, NodeTraits, Compare>::dump_to_dot(std::string filename) const
+RBTree<Node, NodeTraits, Compare>::dump_to_dot_base(std::string & filename, NodeNameGetter name_getter) const
 {
   std::ofstream dotfile;
   dotfile.open(filename);
   dotfile << "digraph G {\n";
-  this->output_node(this->root, dotfile);
+  this->output_node_base(this->root, dotfile, name_getter);
   dotfile << "}\n";
 }
 
 template<class Node, class NodeTraits, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::output_node(const Node * node, std::ofstream & out) const
+RBTree<Node, NodeTraits, Compare>::dump_to_dot(std::string & filename) const
+{
+  this->dump_to_dot_base(filename, [&](const Node * node) {
+    return NodeTraits::get_id(node);
+  });
+}
+
+template<class Node, class NodeTraits, class Compare>
+template<class NodeNameGetter>
+void
+RBTree<Node, NodeTraits, Compare>::output_node_base(const Node * node, std::ofstream & out, NodeNameGetter name_getter) const
 {
   if (node == nullptr) {
     return;
@@ -378,14 +411,14 @@ RBTree<Node, NodeTraits, Compare>::output_node(const Node * node, std::ofstream 
     color = "red";
   }
 
-  out << "  " << NodeTraits::get_id((Node *)node) << "[ color=" << color <<" ]\n";
+  out << "  " << NodeTraits::get_id((Node *)node) << "[ color=" << color <<" label=\"" << name_getter(node) << "\"]\n";
 
   if (node->_rbt_parent != nullptr) {
     out << "  " << NodeTraits::get_id(node->_rbt_parent) << " -> " << NodeTraits::get_id(node) << "\n";
   }
 
-  this->output_node(node->_rbt_left, out);
-  this->output_node(node->_rbt_right, out);
+  this->output_node_base(node->_rbt_left, out, name_getter);
+  this->output_node_base(node->_rbt_right, out, name_getter);
 }
 
 template<class Node, class NodeTraits, class Compare>
@@ -541,7 +574,7 @@ RBTree<Node, NodeTraits, Compare>::remove_to_leaf(Node & node)
       node._rbt_parent->_rbt_right = nullptr;
     }
 
-    NodeTraits::deleted_below(node);
+    NodeTraits::deleted_below(*node._rbt_parent);
   } else {
     this->root = nullptr; // Tree is now empty!
     return; // No fixup needed!
@@ -611,7 +644,7 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
     parent->_rbt_color = Base::Color::BLACK;
     sibling->_rbt_color = Base::Color::RED;
     // TODO FIXME DEBUG
-    this->verify_integrity();
+    //this->verify_integrity();
     return; // No further fixup necessary
   }
 

@@ -17,16 +17,39 @@ void
 ExtendedNodeTraits<Node, NodeTraits>::leaf_inserted(Node & node)
 {
   node._it_max_upper = NodeTraits::get_upper(node);
-  // TODO FIXME propagate up!
+
+  // Propagate up
+  Node * cur = node._rbt_parent;
+  while ((cur != nullptr) && (cur->_it_max_upper < node._it_max_upper)) {
+    cur->_it_max_upper = node._it_max_upper;
+    cur = cur->_rbt_parent;
+  }
 }
 
 template<class Node, class NodeTraits>
 void
 ExtendedNodeTraits<Node, NodeTraits>::fix_node(Node & node)
 {
-  node._it_max_upper = std::max({NodeTraits::get_upper(node),
-                                node._rbt_left->_it_max_upper,
-                                node._rbt_right->_it_max_upper});
+  auto old_val = node._it_max_upper;
+  node._it_max_upper = NodeTraits::get_upper(node);
+
+  if (node._rbt_left != nullptr) {
+    node._it_max_upper = std::max(node._it_max_upper, node._rbt_left->_it_max_upper);
+  }
+
+  if (node._rbt_right != nullptr) {
+    node._it_max_upper = std::max(node._it_max_upper, node._rbt_right->_it_max_upper);
+  }
+
+  if (old_val != node._it_max_upper) {
+    // propagate up
+    Node * cur = node._rbt_parent;
+    if (cur != nullptr) {
+      if ((cur->_it_max_upper < node._it_max_upper) || (cur->_it_max_upper == old_val)) {
+        fix_node(*cur);
+      }
+    }
+  }
 }
 
 template<class Node, class NodeTraits>
@@ -76,8 +99,9 @@ bool
 IntervalTree<Node, NodeTraits>::verify_integrity() const
 {
   bool base_verification = this->BaseTree::verify_integrity();
-
-  bool maxima_valid = this->verify_maxima(this->root);
+  assert(base_verification);
+  bool maxima_valid = this->root == nullptr ? true :  this->verify_maxima(this->root);
+  assert(maxima_valid);
 
   return base_verification && maxima_valid;
 }
@@ -108,17 +132,24 @@ template<class Comparable>
 IntervalTree<Node, NodeTraits>::QueryResult<Comparable>
 IntervalTree<Node, NodeTraits>::query(const Comparable & q) const
 {
-  Node * cur;
-  Node * start = nullptr;
+  Node * cur = this->root;
+  if (this->root == nullptr) {
+    return QueryResult<Comparable>(nullptr, q);
+  }
 
   while ((cur->_rbt_left != nullptr) && (cur->_rbt_left->_it_max_upper >= NodeTraits::get_lower(q))) {
       cur = cur->_rbt_left;
   }
-
-  // Everthing left of here ends too early. Find the next larger one.
-  return QueryResult<Comparable>(
-                     iitree::utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(cur, q),
-                     q);
+  // Everthing left of here ends too early.
+  // If this overlaps, this is our first hit. otherwise, find the next one
+  if ((NodeTraits::get_lower(q) <= NodeTraits::get_upper(*cur)) &&
+      (NodeTraits::get_upper(q) >= NodeTraits::get_lower(*cur))) {
+    return QueryResult<Comparable>(cur, q);
+  } else {
+    return QueryResult<Comparable>(
+                       iitree::utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(cur, q),
+                       q);
+  }
 }
 
 namespace iitree { namespace utilities {
@@ -134,42 +165,40 @@ find_next_overlapping(Node * cur, const Comparable & q)
     // We make sure that at the start of the loop, the lower of cur is smaller
     // than the upper of q. Thus, we need to only check the upper to check for
     // overlap.
-
-    if (!skipfirst) {
-      if (NodeTraits::get_upper(*cur) >= NodeTraits::get_lower(q)) {
-        // Found!
-        return cur;
-      }
-
-      if (NodeTraits::get_lower(*cur) > NodeTraits::get_upper(q)) {
-        // No larger node can be an overlap!
-        return nullptr;
-      }
-    }
-
     if (cur->_rbt_right != nullptr) {
+      std::cout << "Going right…";
       // go to smallest larger-or-equal child
       cur = cur->_rbt_right;
       if (cur->_it_max_upper < NodeTraits::get_lower(q)) {
+        std::cout << "Pruning 1…";
         // Prune!
         // Nothing starting from this node can overlap b/c of upper limit. Backtrack.
+        pruned = true;
         while ((cur->_rbt_parent != nullptr) && (cur->_rbt_parent->_rbt_right == cur)) { // these are the nodes which are smaller and were already visited
+          std::cout << "backtracking…";
           cur = cur->_rbt_parent;
         }
 
         // go one further up
         if (cur->_rbt_parent == nullptr) {
-          return nullptr;
+          std::cout << "backtracked out of root.\n";
+          cur = nullptr;
+          break;
         } else {
           // go up
+          std::cout << "backtracking one more…";
           cur = cur->_rbt_parent;
         }
       } else {
+        std::cout << "searching for smallest…";
         while (cur->_rbt_left != nullptr) {
           cur = cur->_rbt_left;
+          std::cout << "descending…";
           if (cur->_it_max_upper < NodeTraits::get_lower(q)) {
+            std::cout << "Pruning 2…";
             // Prune!
             // Nothing starting from this node can overlap. Backtrack.
+            // TODO WTF?
             cur = cur->_rbt_left;
             break;
           }
@@ -177,24 +206,33 @@ find_next_overlapping(Node * cur, const Comparable & q)
       }
     } else {
       // go up
-
+      std::cout << "going up…";
       // skip over the nodes already visited
       while ((cur->_rbt_parent != nullptr) && (cur->_rbt_parent->_rbt_right == cur)) { // these are the nodes which are smaller and were already visited
+        std::cout << "backtracking…";
         cur = cur->_rbt_parent;
       }
 
       // go one further up
       if (cur->_rbt_parent == nullptr) {
+        std::cout << "Backtracked into root.\n";
         return nullptr;
       } else {
         // go up
         cur = cur->_rbt_parent;
       }
     }
-  } while (cur != nullptr);
 
-  // Nothing found? :(
-  return nullptr;
+    if (NodeTraits::get_upper(*cur) >= NodeTraits::get_lower(q)) {
+      // Found!
+      return cur;
+    }
+
+    if (NodeTraits::get_lower(*cur) > NodeTraits::get_upper(q)) {
+      // No larger node can be an overlap!
+      return nullptr;
+    }
+  } while (true);
 }
 
 } // namespace utilities
@@ -254,7 +292,15 @@ template<class Comparable>
 bool
 IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator==(const typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator & other) const
 {
-  return (this->n == other.n) && (this->upper_limit == other.upper_limit);
+  return ((this->n == other.n) && (NodeTraits::get_lower(this->q) == NodeTraits::get_lower(other.q)) && (NodeTraits::get_upper(this->q) && NodeTraits::get_upper(other.q)));
+}
+
+template<class Node, class NodeTraits>
+template<class Comparable>
+bool
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator!=(const typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator & other) const
+{
+  return !(*this == other);
 }
 
 template<class Node, class NodeTraits>
@@ -262,7 +308,10 @@ template<class Comparable>
 typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator &
 IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator++()
 {
-  this->n = iitree::utilities::find_next_overlapping(this->n, this->q);
+  std::cout << "Old n: " << this->n << "\n";
+  this->n = iitree::utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(this->n, this->q);
+  std::cout << "New n: " << this->n << "\n";
+
   return *this;
 }
 
@@ -271,7 +320,7 @@ template<class Comparable>
 const Node &
 IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator*() const
 {
-  return *(this->cur);
+  return *(this->n);
 }
 
 template<class Node, class NodeTraits>
@@ -280,4 +329,20 @@ const Node *
 IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator->() const
 {
   return this->cur;
+}
+
+template<class Node, class NodeTraits>
+void
+IntervalTree<Node, NodeTraits>::dump_to_dot(std::string & filename) const
+{
+  this->dump_to_dot_base(filename, [&](const Node * node) {
+    return NodeTraits::get_id(node) +
+          std::string("\n[") +
+          std::to_string(NodeTraits::get_lower(*node)) +
+          std::string(", ") +
+          std::to_string(NodeTraits::get_upper(*node)) +
+          std::string("]\n") +
+          std::string("-> ") +
+          std::to_string(node->_it_max_upper);
+  });
 }
