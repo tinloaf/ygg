@@ -35,8 +35,11 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
 
     if (Compare()(node, *parent)) {
       parent->_rbt_left = &node;
-    } else {
+    } else if (Compare()(*parent, node)) {
       parent->_rbt_right = &node;
+    } else {
+      // TODO FIXME what shall we do?
+      assert(false);
     }
   }
 
@@ -358,14 +361,14 @@ RBTree<Node, NodeTraits, Compare>::verify_integrity() const
   unsigned int dummy;
 
   bool tree_okay = this->verify_tree();
-  std::cout << "Tree1: " << tree_okay << "\n";
+  //std::cout << "Tree1: " << tree_okay << "\n";
   bool root_okay = this->verify_black_root();
   bool paths_okay = (this->root == nullptr) || this->verify_black_paths(this->root, & dummy);
   bool children_okay = this->verify_red_black(this->root);
 
   bool order_okay = this->verify_order();
 
-  std::cout << "Root: " << root_okay << " Paths: " << paths_okay << " Children: " << children_okay << " Tree: " << tree_okay << "\n";
+  //std::cout << "Root: " << root_okay << " Paths: " << paths_okay << " Children: " << children_okay << " Tree: " << tree_okay << "\n";
 
   assert(root_okay && paths_okay && children_okay && tree_okay && order_okay);
 
@@ -414,7 +417,14 @@ RBTree<Node, NodeTraits, Compare>::output_node_base(const Node * node, std::ofst
   out << "  " << std::to_string((long unsigned int)node) << "[ color=" << color <<" label=\"" << name_getter(node) << "\"]\n";
 
   if (node->_rbt_parent != nullptr) {
-    out << "  " << std::to_string((long unsigned int)node->_rbt_parent) << " -> " << std::to_string((long unsigned int)node) << "\n";
+    std::string label;
+    if (node->_rbt_parent->_rbt_left == node) {
+      label = std::string("L");
+    } else {
+      label = std::string("R");
+    }
+
+    out << "  " << std::to_string((long unsigned int)node->_rbt_parent) << " -> " << std::to_string((long unsigned int)node) << "[ label=\"" << label << "\"]\n";
   }
 
   this->output_node_base(node->_rbt_left, out, name_getter);
@@ -546,7 +556,7 @@ RBTree<Node, NodeTraits, Compare>::remove_to_leaf(Node & node)
     child = child->_rbt_left;
   }
 
-  std::cout << "Selected Child has ID " << NodeTraits::get_id(child) << "…";
+  //std::cout << "Selected Child has ID " << NodeTraits::get_id(child) << "…";
 
   if (child != &node) {
     this->swap_nodes(&node, child, false);
@@ -587,8 +597,8 @@ RBTree<Node, NodeTraits, Compare>::remove_to_leaf(Node & node)
 
   if (node._rbt_color == Base::Color::BLACK) {
     // TODO FIXME DEBUG
-    std::string fname = std::string("/tmp/trees/before-fixup.dot");
-    this->dump_to_dot(fname);
+    //std::string fname = std::string("/tmp/trees/before-fixup.dot");
+    //this->dump_to_dot(fname);
 
     this->fixup_after_delete(node._rbt_parent, deleted_left);
   }
@@ -602,7 +612,7 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
   Node * sibling;
 
   while (propagating_up) {
-    std::cout << "=> Parent has ID " << NodeTraits::get_id(parent) << " <= ";
+    //std::cout << "=> Parent has ID " << NodeTraits::get_id(parent) << " <= ";
     // We just deleted a black node from under parent.
     if (deleted_left) {
       sibling = parent->_rbt_right;
@@ -616,7 +626,7 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
         ((sibling->_rbt_right == nullptr) || (sibling->_rbt_right->_rbt_color == Base::Color::BLACK))) {
 
       // We can recolor and propagate up! (Case 3)
-      std::cout << "Case 3… ";
+      //std::cout << "Case 3… ";
       sibling->_rbt_color = Base::Color::RED;
       // Now everything below parent is okay, but the branch started in parent lost a black!
       if (parent->_rbt_parent == nullptr) {
@@ -624,7 +634,7 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
         return;
       } else {
         // propagate up!
-        std::cout << "propagating up…";
+        //std::cout << "propagating up…";
         deleted_left = parent->_rbt_parent->_rbt_left == parent;
         parent = parent->_rbt_parent;
       }
@@ -635,7 +645,7 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
 
   if (sibling->_rbt_color == Base::Color::RED) {
     // Case 2
-    std::cout << "Case 2… ";
+    //std::cout << "Case 2… ";
     sibling->_rbt_color = Base::Color::BLACK;
     parent->_rbt_color = Base::Color::RED;
     if (deleted_left) {
@@ -651,7 +661,7 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
       ((sibling->_rbt_left == nullptr) || (sibling->_rbt_left->_rbt_color == Base::Color::BLACK)) &&
       ((sibling->_rbt_right == nullptr) || (sibling->_rbt_right->_rbt_color == Base::Color::BLACK))) {
     // case 4
-    std::cout << "Case 4… ";
+    //std::cout << "Case 4… ";
     parent->_rbt_color = Base::Color::BLACK;
     sibling->_rbt_color = Base::Color::RED;
     // TODO FIXME DEBUG
@@ -662,7 +672,7 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
   if (deleted_left) {
     if ((sibling->_rbt_right == nullptr) || (sibling->_rbt_right->_rbt_color == Base::Color::BLACK)) {
       // left child of sibling must be red! This is the folded case. (Case 5) Unfold!
-      std::cout << "Case 5… ";
+      //std::cout << "Case 5 (L)… ";
       this->rotate_right(sibling);
       sibling->_rbt_color = Base::Color::RED;
       // The new sibling is now the parent of the sibling
@@ -671,24 +681,28 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
     }
 
     // straight situation, case 6 applies!
-    std::cout << "Case 6…";
+    //std::cout << "Case 6 (L)…";
     this->rotate_left(parent);
     std::swap(parent->_rbt_color, sibling->_rbt_color);
     sibling->_rbt_right->_rbt_color = Base::Color::BLACK;
   } else {
     if ((sibling->_rbt_left == nullptr) || (sibling->_rbt_left->_rbt_color == Base::Color::BLACK)) {
       // right child of sibling must be red! This is the folded case. (Case 5) Unfold!
-      std::cout << "Case 5… ";
+      //std::cout << "Case 5 (R)… ";
 
       this->rotate_left(sibling);
       sibling->_rbt_color = Base::Color::RED;
       // The new sibling is now the parent of the sibling
       sibling = sibling->_rbt_parent;
       sibling->_rbt_color = Base::Color::BLACK;
+
+      // TODO FIXME DEBUG
+      //std::string fname = std::string("/tmp/trees/after-5r.dot");
+      //this->dump_to_dot(fname);
     }
 
     // straight situation, case 6 applies!
-    std::cout << "Case 6…";
+    //std::cout << "Case 6 (R)…";
     this->rotate_right(parent);
     std::swap(parent->_rbt_color, sibling->_rbt_color);
     sibling->_rbt_left->_rbt_color = Base::Color::BLACK;

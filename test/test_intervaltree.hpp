@@ -3,7 +3,7 @@
 
 #include "../src/intervaltree.hpp"
 
-#define IT_TESTSIZE 5000
+#define IT_TESTSIZE 2000
 
 template<class Node>
 class MyNodeTraits {
@@ -242,4 +242,77 @@ TEST(ITreeTest, SimpleQueryTest) {
   ASSERT_EQ(it, container.end());
 }
 
+TEST(ITreeTest, ComprehensiveTest) {
+  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
+
+  ITNode persistent_nodes[IT_TESTSIZE];
+  std::vector<unsigned int> indices;
+  std::mt19937 rng(4); // chosen by fair xkcd
+
+  for (unsigned int i = 0 ; i < IT_TESTSIZE ; ++i) {
+    unsigned int lower = 10 * i;
+    unsigned int upper = lower + 50;
+
+    persistent_nodes[i] = ITNode(lower, upper, i);
+    indices.push_back(i);
+  }
+
+  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+    std::uniform_int_distribution<unsigned int> uni(0,
+                                           i - 1);
+    return uni(rng);
+  });
+
+  for (auto index : indices) {
+    tree.insert(persistent_nodes[index]);
+  }
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  ITNode transient_nodes[IT_TESTSIZE];
+  for (unsigned int i = 0 ; i < IT_TESTSIZE ; ++i) {
+    std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IT_TESTSIZE / 2);
+    unsigned int lower = bounds_distr(rng);
+    unsigned int upper = lower + bounds_distr(rng);
+
+    transient_nodes[i] = ITNode(lower, upper, IT_TESTSIZE + i);
+  }
+
+  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+    std::uniform_int_distribution<unsigned int> uni(0,
+                                           i - 1);
+    return uni(rng);
+  });
+
+  for (auto index : indices) {
+    tree.insert(transient_nodes[index]);
+  }
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  for (int i = 0 ; i < IT_TESTSIZE ; ++i) {
+    tree.remove(transient_nodes[i]);
+  }
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  std::string fname = std::string("/tmp/trees/comprehensive.dot");
+  tree.dump_to_dot(fname);
+
+  // Query prefixes
+  for (int i = 0 ; i < IT_TESTSIZE ; ++i) {
+    ITNode query(0, ((i+1) * 10) - 1, 0);
+    auto container = tree.query(query);
+    auto it = container.begin();
+
+    for (int expected = 0 ; expected <= i ; ++expected) {
+      assert(&(*it) == &(persistent_nodes[expected]));
+      ASSERT_EQ(&(*it), &(persistent_nodes[expected]));
+      ++it;
+    }
+    assert(it == container.end());
+    ASSERT_EQ(it, container.end());
+  }
+
+}
 #endif // TEST_INTERVALTREE_HPP
