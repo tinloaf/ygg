@@ -141,7 +141,7 @@ EqualityListHelper<Node, true, Compare>::equality_list_swap_if_necessary(Node & 
       n1._rbt_next->_rbt_prev = &n1;
     }
     if (n2._rbt_prev != nullptr) {
-      n2._rbt_prev->_rbt_next = &n1;
+      n2._rbt_prev->_rbt_next = &n2;
     }
   } else if (n2._rbt_next == &n1) {
     // n2 predecessor of n1
@@ -156,7 +156,7 @@ EqualityListHelper<Node, true, Compare>::equality_list_swap_if_necessary(Node & 
       n2._rbt_next->_rbt_prev = &n2;
     }
     if (n1._rbt_prev != nullptr) {
-      n1._rbt_prev->_rbt_next = &n2;
+      n1._rbt_prev->_rbt_next = &n1;
     }
   } else {
     // unrelated
