@@ -25,6 +25,19 @@ public:
   }
 };
 
+class EqualityNode : public RBTreeNodeBase<EqualityNode, true> {
+public:
+  int data;
+
+  EqualityNode () : data(0) {};
+  explicit EqualityNode(int data_in) : data(data_in) {};
+  EqualityNode(const EqualityNode &other) : data(other.data) {};
+
+  bool operator<(const EqualityNode & other) const {
+    return this->data < other.data;
+  }
+};
+
 class NodeTraits {
 public:
   static std::string get_id(const Node * node) {
@@ -38,6 +51,18 @@ public:
   static void swapped(Node & n1, Node & n2) { (void)n1 ; (void)n2 ; };
 };
 
+class EqualityNodeTraits {
+public:
+  static std::string get_id(const EqualityNode * node) {
+    return std::to_string(node->data);
+  }
+
+  static void leaf_inserted(EqualityNode & node) { (void)node ; };
+  static void rotated_left(EqualityNode & node) { (void)node ; };
+  static void rotated_right(EqualityNode & node) { (void)node ; };
+  static void deleted_below(EqualityNode & node) { (void)node ; };
+  static void swapped(EqualityNode & n1, EqualityNode & n2) { (void)n1 ; (void)n2 ; };
+};
 
 TEST(RBTreeTest, TrivialInsertionTest) {
   auto tree = RBTree<Node, NodeTraits>();
@@ -179,6 +204,27 @@ TEST(RBTreeTest, LinearInsertionRandomDeletionTest) {
   }
 }
 
+TEST(RBTreeTest, LinearMultipleIterationTest) {
+  auto tree = RBTree<EqualityNode, EqualityNodeTraits, true>();
+
+  EqualityNode nodes[TESTSIZE*5];
+
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    for (unsigned j = 0 ; j < 5 ; ++j) {
+      nodes[5*i + j] = EqualityNode(i);
+      tree.insert(nodes[5*i + j]);
+    }
+  }
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  unsigned int i = 0;
+  for (auto & n : tree) {
+    ASSERT_EQ(n.data, nodes[i].data);
+    i++;
+  }
+}
+
 TEST(RBTreeTest, LinearIterationTest) {
   auto tree = RBTree<Node, NodeTraits>();
 
@@ -279,22 +325,21 @@ TEST(RBTreeTest, ComprehensiveTest) {
 
   ASSERT_TRUE(tree.verify_integrity());
 
-  std::string fname_before = std::string("/tmp/trees/rbt-comprehensive-before.dot");
-  tree.dump_to_dot(fname_before);
+  //std::string fname_before = std::string("/tmp/trees/rbt-comprehensive-before.dot");
+  //tree.dump_to_dot(fname_before);
 
   for (int i = 0 ; i < TESTSIZE ; ++i) {
     tree.remove(transient_nodes[i]);
 
 
-    std::string rem_fname = std::string("/tmp/trees/removed-") + std::to_string(i) + std::string(".dot");
+    //std::string rem_fname = std::string("/tmp/trees/removed-") + std::to_string(i) + std::string(".dot");
     //std::cout << "Step " << i << ": removing data " << transient_nodes[i].data << "\n";
-    tree.dump_to_dot(rem_fname);
+    //tree.dump_to_dot(rem_fname);
     ASSERT_TRUE(tree.verify_integrity());
   }
 
-
-  std::string fname = std::string("/tmp/trees/rbt-comprehensive.dot");
-  tree.dump_to_dot(fname);
+  //std::string fname = std::string("/tmp/trees/rbt-comprehensive.dot");
+  //tree.dump_to_dot(fname);
 
   // Query elements
   for (int i = 0 ; i < TESTSIZE ; ++i) {
@@ -305,6 +350,78 @@ TEST(RBTreeTest, ComprehensiveTest) {
 
 }
 
+
+TEST(RBTreeTest, ComprehensiveMultipleTest) {
+  auto tree = RBTree<EqualityNode, EqualityNodeTraits, true>();
+
+  EqualityNode persistent_nodes[TESTSIZE];
+  std::vector<unsigned int> indices;
+  std::mt19937 rng(4); // chosen by fair xkcd
+
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    unsigned int data = 10 * i;
+    persistent_nodes[i] = EqualityNode(data);
+    indices.push_back(i);
+  }
+
+  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+    std::uniform_int_distribution<unsigned int> uni(0,
+                                           i - 1);
+    return uni(rng);
+  });
+
+  for (auto index : indices) {
+    tree.insert(persistent_nodes[index]);
+  }
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  EqualityNode transient_nodes[TESTSIZE];
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    std::uniform_int_distribution<unsigned int> uni(0, 10 * (TESTSIZE + 1));
+    unsigned int data = uni(rng);
+
+    transient_nodes[i] = EqualityNode(data);
+    std::cout << "Inserting random value: " << data << "\n";
+  }
+
+  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+    std::uniform_int_distribution<unsigned int> uni(0,
+                                           i - 1);
+    return uni(rng);
+  });
+
+  for (auto index : indices) {
+    tree.insert(transient_nodes[index]);
+  }
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  //std::string fname_before = std::string("/tmp/trees/rbt-comprehensive-before.dot");
+  //tree.dump_to_dot(fname_before);
+
+  for (int i = 0 ; i < TESTSIZE ; ++i) {
+    tree.remove(transient_nodes[i]);
+
+    //std::string rem_fname = std::string("/tmp/trees/removed-") + std::to_string(i) + std::string(".dot");
+    std::cout << "Step " << i << ": removing data " << transient_nodes[i].data << "\n";
+    //tree.dump_to_dot(rem_fname);
+    ASSERT_TRUE(tree.verify_integrity());
+  }
+
+
+  //std::string fname = std::string("/tmp/trees/rbt-comprehensive.dot");
+  //tree.dump_to_dot(fname);
+
+  // Query elements
+  for (int i = 0 ; i < TESTSIZE ; ++i) {
+    std::cout << "Finding " << i << "\n";
+    auto it = tree.find(persistent_nodes[i]);
+    assert(&(*it) == &(persistent_nodes[i]));
+    ASSERT_EQ(&(*it), &(persistent_nodes[i]));
+  }
+
+}
 // TODO test equal elements
 
 #endif // TEST_RBTREE_HPP

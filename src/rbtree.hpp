@@ -7,8 +7,57 @@
 #include <fstream>
 #include <vector>
 
+namespace iitree {
+  namespace utilities {
+    template<class Node, bool multiple, class Compare>
+    class EqualityListHelper {};
+
+    template<class Node, class Compare>
+    class EqualityListHelper<Node, true, Compare> {
+    public:
+      static void equality_list_insert_node(Node & node, Node * predecessor);
+      static void equality_list_delete_node(Node & node);
+      static Node * equality_list_find_first(Node * node);
+      static Node * equality_list_next(Node * node);
+      static Node * equality_list_prev(Node * node);
+      static void equality_list_swap_if_necessary(Node & n1, Node & n2);
+      static bool verify(const Node & n);
+    };
+    template<class Node, class Compare>
+    class EqualityListHelper<Node, false, Compare> {
+    public:
+      static void equality_list_insert_node(Node & node, Node * predecessor);
+      static void equality_list_delete_node(Node & node);
+      static Node * equality_list_find_first(Node * node);
+      static Node * equality_list_next(Node * node);
+      static Node * equality_list_prev(Node * node);
+      static void equality_list_swap_if_necessary(Node & n1, Node & n2);
+      static bool verify(const Node & n);
+    };
+  }
+}
+
+
+
+template<class Node, bool multiple = false>
+class RBTreeNodeBase;
+
 template<class Node>
-class RBTreeNodeBase {
+class RBTreeNodeBase<Node, true> {
+public:
+  enum class Color { RED, BLACK };
+
+  Node *                  _rbt_parent = nullptr;
+  Node *                  _rbt_left = nullptr;
+  Node *                  _rbt_right = nullptr;
+  RBTreeNodeBase::Color   _rbt_color;
+
+  Node *                  _rbt_prev;
+  Node *                  _rbt_next;
+};
+
+template<class Node>
+class RBTreeNodeBase<Node, false> {
 public:
   enum class Color { RED, BLACK };
 
@@ -29,11 +78,12 @@ public:
   static void swapped(Node & n1, Node & n2) {};
 };
 
-template<class Node, class NodeTraits, class Compare = std::less<Node>>
+template<class Node, class NodeTraits, bool multiple = false, class Compare = std::less<Node>>
 class RBTree
 {
 public:
-  using Base = RBTreeNodeBase<Node>;
+  using Base = RBTreeNodeBase<Node, multiple>;
+  using EqualityList = iitree::utilities::EqualityListHelper<Node, multiple, Compare>;
 
   RBTree();
 
@@ -98,12 +148,11 @@ protected:
 private:
   using Path = std::vector<Node *>;
 
-  void add_path_to_smallest(Path & path, Node * root) const;
-
   void remove_to_leaf(Node & node);
   void fixup_after_delete(Node * parent, bool deleted_left);
 
   void insert_leaf(Node & node);
+
   void fix_upwards(Node * node);
   void rotate_left(Node * parent);
   void rotate_right(Node * parent);
@@ -119,6 +168,7 @@ private:
   bool verify_red_black(const Node * node) const;
   bool verify_tree() const;
   bool verify_order() const;
+  bool verify_equality() const;
 };
 
 #include "rbtree.cpp"

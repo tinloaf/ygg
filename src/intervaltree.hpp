@@ -29,15 +29,15 @@ public:
   static void swapped(Node & n1, Node & n2);
 };
 
-template<class Node, class NodeTraits>
-class ITreeNodeBase : public RBTreeNodeBase<Node> {
+template<class Node, class NodeTraits, bool multiple = false>
+class ITreeNodeBase : public RBTreeNodeBase<Node, multiple> {
 public:
   typename NodeTraits::key_type    _it_max_upper;
 };
 
 
-template<class Node, class NodeTraits>
-class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, IntervalCompare<Node, NodeTraits>>
+template<class Node, class NodeTraits, bool multiple = false>
+class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, multiple, IntervalCompare<Node, NodeTraits>>
 {
 public:
   using Key = typename NodeTraits::key_type;
@@ -93,7 +93,7 @@ public:
 private:
   bool verify_maxima(Node * n) const;
 
-  using BaseTree = RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, IntervalCompare<Node, NodeTraits>>;
+  using BaseTree = RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, multiple, IntervalCompare<Node, NodeTraits>>;
 };
 
 #include "intervaltree.cpp"

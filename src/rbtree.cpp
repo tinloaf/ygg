@@ -1,14 +1,241 @@
 #include <set>
 #include <cassert>
 
-template<class Node, class NodeTraits, class Compare>
-RBTree<Node, NodeTraits, Compare>::RBTree()
+namespace iitree {
+  namespace utilities {
+
+template<class Node, class Compare>
+void
+EqualityListHelper<Node, false, Compare>::equality_list_insert_node(Node & node, Node * predecessor)
+{
+  (void)node;
+  (void)predecessor;
+}
+
+template<class Node, class Compare>
+void
+EqualityListHelper<Node, true, Compare>::equality_list_insert_node(Node & node, Node * predecessor)
+{
+  if (predecessor == nullptr) {
+    node._rbt_next = nullptr;
+    node._rbt_prev = nullptr;
+  } else {
+    node._rbt_next = predecessor->_rbt_next;
+    node._rbt_prev = predecessor;
+
+    if (predecessor->_rbt_next != nullptr) {
+      predecessor->_rbt_next->_rbt_prev = &node;
+    }
+
+    predecessor->_rbt_next = &node;
+  }
+}
+
+
+template<class Node, class Compare>
+void
+EqualityListHelper<Node, false, Compare>::equality_list_delete_node(Node & node)
+{
+  (void)node;
+}
+
+template<class Node, class Compare>
+void
+EqualityListHelper<Node, true, Compare>::equality_list_delete_node(Node & node)
+{
+  if (node._rbt_next != nullptr) {
+    node._rbt_next->_rbt_prev = node._rbt_prev;
+  }
+
+  if (node._rbt_prev != nullptr) {
+    node._rbt_prev->_rbt_next = node._rbt_next;
+  }
+
+  // TODO FIXME DEBUG
+  node._rbt_prev = nullptr;
+  node._rbt_next = nullptr;
+}
+
+template<class Node, class Compare>
+Node *
+EqualityListHelper<Node, false, Compare>::equality_list_find_first(Node * node)
+{
+  return node;
+}
+
+template<class Node, class Compare>
+Node *
+EqualityListHelper<Node, true, Compare>::equality_list_find_first(Node * node)
+{
+  Node * res = node;
+  while (res->_rbt_prev != nullptr) {
+    res = res->_rbt_prev;
+  }
+
+  return res;
+}
+
+template<class Node, class Compare>
+Node *
+EqualityListHelper<Node, true, Compare>::equality_list_next(Node * node)
+{
+  return node->_rbt_next;
+}
+
+template<class Node, class Compare>
+Node *
+EqualityListHelper<Node, false, Compare>::equality_list_next(Node * node)
+{
+  (void)node;
+  return nullptr;
+}
+
+template<class Node, class Compare>
+Node *
+EqualityListHelper<Node, true, Compare>::equality_list_prev(Node * node)
+{
+  return node->_rbt_prev;
+}
+
+template<class Node, class Compare>
+Node *
+EqualityListHelper<Node, false, Compare>::equality_list_prev(Node * node)
+{
+  (void)node;
+  return nullptr;
+}
+
+template<class Node, class Compare>
+void
+EqualityListHelper<Node, false, Compare>::equality_list_swap_if_necessary(Node & n1, Node & n2)
+{
+  (void)n1;
+  (void)n2;
+}
+
+template<class Node, class Compare>
+void
+EqualityListHelper<Node, true, Compare>::equality_list_swap_if_necessary(Node & n1, Node & n2)
+{
+  auto c = Compare();
+
+  if (c(n1, n2) || c(n2, n1)) {
+    return; // elements are not equal
+  }
+
+  if (n1._rbt_next == &n2) {
+    // n1 predecessor of n2
+    n1._rbt_next = n2._rbt_next;
+    n2._rbt_prev = n1._rbt_prev;
+
+    n1._rbt_prev = &n2;
+    n2._rbt_next = &n1;
+
+    // fix neighbors
+    if (n1._rbt_next != nullptr) {
+      n1._rbt_next->_rbt_prev = &n1;
+    }
+    if (n2._rbt_prev != nullptr) {
+      n2._rbt_prev->_rbt_prev = &n1;
+    }
+  } else if (n2._rbt_next == &n1) {
+    // n2 predecessor of n1
+    n2._rbt_next = n1._rbt_next;
+    n1._rbt_prev = n2._rbt_prev;
+
+    n2._rbt_prev = &n1;
+    n1._rbt_next = &n2;
+
+    // fix neighbors
+    if (n2._rbt_next != nullptr) {
+      n2._rbt_next->_rbt_prev = &n2;
+    }
+    if (n1._rbt_prev != nullptr) {
+      n1._rbt_prev->_rbt_prev = &n2;
+    }
+  } else {
+    // unrelated
+    std::swap(n2._rbt_prev, n1._rbt_prev);
+    std::swap(n2._rbt_next, n1._rbt_next);
+
+    // fix neighbors
+    if (n1._rbt_next != nullptr) {
+      n1._rbt_next->_rbt_prev = &n1;
+    }
+    if (n1._rbt_prev != nullptr) {
+      n1._rbt_prev->_rbt_next = &n1;
+    }
+    if (n2._rbt_next != nullptr) {
+      n2._rbt_next->_rbt_prev = &n2;
+    }
+    if (n2._rbt_prev != nullptr) {
+      n2._rbt_prev->_rbt_next = &n2;
+    }
+  }
+}
+
+
+template<class Node, class Compare>
+bool
+EqualityListHelper<Node, false, Compare>::verify(const Node & node)
+{
+  (void)node;
+  return true;
+}
+
+template<class Node, class Compare>
+bool
+EqualityListHelper<Node, true, Compare>::verify(const Node & node)
+{
+  std::set<const Node *> seen;
+
+  // go left
+  const Node * cur = &node;
+  seen.insert(cur);
+  while (cur->_rbt_prev != nullptr) {
+    if (cur->_rbt_prev->_rbt_next != cur) {
+      assert(false);
+      return false;
+    }
+    cur = cur->_rbt_prev;
+    if (seen.find(cur) != seen.end()) {
+      assert(false);
+      return false;
+    }
+  }
+
+  // go right
+  cur = &node;
+  while (cur->_rbt_next != nullptr) {
+    if (cur->_rbt_next->_rbt_prev != cur) {
+      assert(false);
+      return false;
+    }
+    cur = cur->_rbt_next;
+    if (seen.find(cur) != seen.end()) {
+      assert(false);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+} // namespace iitree::utilities
+} // namespace iitree
+
+
+
+
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+RBTree<Node, NodeTraits, multiple, Compare>::RBTree()
   : root(nullptr)
 {}
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
+RBTree<Node, NodeTraits, multiple, Compare>::insert_leaf(Node & node)
 {
   node._rbt_right = nullptr;
   node._rbt_left = nullptr;
@@ -19,7 +246,7 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
     parent = cur;
     if (Compare()(node, *cur)) {
       cur = cur->_rbt_left;
-    } else {
+    } else { // todo equality!
       cur = cur->_rbt_right;
     }
   }
@@ -29,17 +256,21 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
     node._rbt_parent = nullptr;
     node._rbt_color = Base::Color::BLACK;
     this->root = &node;
+    EqualityList::equality_list_insert_node(node, nullptr);
   } else {
     node._rbt_parent = parent;
     node._rbt_color = Base::Color::RED;
 
     if (Compare()(node, *parent)) {
       parent->_rbt_left = &node;
+      EqualityList::equality_list_insert_node(node, nullptr);
     } else if (Compare()(*parent, node)) {
       parent->_rbt_right = &node;
+      EqualityList::equality_list_insert_node(node, nullptr);
     } else {
-      // TODO FIXME what shall we do?
-      assert(false);
+      assert(multiple);
+      parent->_rbt_right = &node;
+      EqualityList::equality_list_insert_node(node, parent);
     }
   }
 
@@ -48,9 +279,9 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
   return;
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::rotate_left(Node * parent)
+RBTree<Node, NodeTraits, multiple, Compare>::rotate_left(Node * parent)
 {
   Node * right_child = parent->_rbt_right;
   parent->_rbt_right = right_child->_rbt_left;
@@ -79,9 +310,9 @@ RBTree<Node, NodeTraits, Compare>::rotate_left(Node * parent)
   NodeTraits::rotated_left(*parent);
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::rotate_right(Node * parent)
+RBTree<Node, NodeTraits, multiple, Compare>::rotate_right(Node * parent)
 {
   Node * left_child = parent->_rbt_left;
   parent->_rbt_left = left_child->_rbt_right;
@@ -110,9 +341,9 @@ RBTree<Node, NodeTraits, Compare>::rotate_right(Node * parent)
   NodeTraits::rotated_right(*parent);
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::fix_upwards(Node * node)
+RBTree<Node, NodeTraits, multiple, Compare>::fix_upwards(Node * node)
 {
   if (node->_rbt_parent == nullptr) {
     node->_rbt_color = Base::Color::BLACK;
@@ -164,17 +395,17 @@ RBTree<Node, NodeTraits, Compare>::fix_upwards(Node * node)
   grandparent->_rbt_color = Base::Color::RED;
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::insert(Node & node)
+RBTree<Node, NodeTraits, multiple, Compare>::insert(Node & node)
 {
   this->insert_leaf(node);
   this->fix_upwards(&node);
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 Node *
-RBTree<Node, NodeTraits, Compare>::get_uncle(Node * node) const
+RBTree<Node, NodeTraits, multiple, Compare>::get_uncle(Node * node) const
 {
   Node * parent = node->_rbt_parent;
   Node * grandparent = parent->_rbt_parent;
@@ -186,16 +417,16 @@ RBTree<Node, NodeTraits, Compare>::get_uncle(Node * node) const
   }
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 bool
-RBTree<Node, NodeTraits, Compare>::verify_black_root() const
+RBTree<Node, NodeTraits, multiple, Compare>::verify_black_root() const
 {
   return ((this->root == nullptr) || (this->root->_rbt_color == Base::Color::BLACK));
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 bool
-RBTree<Node, NodeTraits, Compare>::verify_black_paths(const Node * node,
+RBTree<Node, NodeTraits, multiple, Compare>::verify_black_paths(const Node * node,
                                                        unsigned int  * path_length) const
 {
   unsigned int left_length, right_length;
@@ -229,9 +460,9 @@ RBTree<Node, NodeTraits, Compare>::verify_black_paths(const Node * node,
   return true;
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 bool
-RBTree<Node, NodeTraits, Compare>::verify_red_black(const Node * node) const
+RBTree<Node, NodeTraits, multiple, Compare>::verify_red_black(const Node * node) const
 {
   if (node == nullptr) {
     return true;
@@ -250,18 +481,37 @@ RBTree<Node, NodeTraits, Compare>::verify_red_black(const Node * node) const
   return this->verify_red_black(node->_rbt_left) && this->verify_red_black(node->_rbt_right);
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 bool
-RBTree<Node, NodeTraits, Compare>::verify_order() const
+RBTree<Node, NodeTraits, multiple, Compare>::verify_equality() const
+{
+  if (!multiple) {
+    return true;
+  }
+
+  for (const auto & n : *this) {
+    if (!EqualityList::verify(n)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+bool
+RBTree<Node, NodeTraits, multiple, Compare>::verify_order() const
 {
   for (const Node & n : *this) {
     if (n._rbt_left != nullptr) {
-      if (!Compare()(*(n._rbt_left), n)) {
+      // left may not be larger
+      if (Compare()(n, *(n._rbt_left))) {
         return false;
       }
     }
 
     if (n._rbt_right != nullptr) {
+      // right may not be smaller
       if (Compare()(*(n._rbt_right), n)) {
         return false;
       }
@@ -271,9 +521,9 @@ RBTree<Node, NodeTraits, Compare>::verify_order() const
   return true;
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 bool
-RBTree<Node, NodeTraits, Compare>::verify_tree() const
+RBTree<Node, NodeTraits, multiple, Compare>::verify_tree() const
 {
   if (this->root == nullptr) {
     return true;
@@ -282,6 +532,10 @@ RBTree<Node, NodeTraits, Compare>::verify_tree() const
   Node * cur = this->root;
   while (cur->_rbt_left != nullptr) {
     cur = cur->_rbt_left;
+    if (cur->_rbt_left == cur) {
+      assert(false);
+      return(false);
+    }
   }
 
   std::set<Node *> seen;
@@ -298,12 +552,20 @@ RBTree<Node, NodeTraits, Compare>::verify_tree() const
         assert(false);
         return false;
      }
+     if (cur->_rbt_right == cur) {
+        assert(false);
+        return false;
+     }
    }
 
     if (cur->_rbt_right != nullptr) {
       if (cur->_rbt_right->_rbt_parent != cur) {
         assert(false);
         return false;
+      }
+      if (cur->_rbt_right == cur) {
+         assert(false);
+         return false;
       }
     }
 
@@ -342,21 +604,9 @@ RBTree<Node, NodeTraits, Compare>::verify_tree() const
   return true;
 }
 
-template<class Node, class NodeTraits, class Compare>
-void
-RBTree<Node, NodeTraits, Compare>::add_path_to_smallest(Path & path, Node * root) const
-{
-  Node * cur = root;
-
-  while (cur != nullptr) {
-    path.push_back(cur);
-    cur = cur->_rbt_left;
-  }
-}
-
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 bool
-RBTree<Node, NodeTraits, Compare>::verify_integrity() const
+RBTree<Node, NodeTraits, multiple, Compare>::verify_integrity() const
 {
   unsigned int dummy;
 
@@ -368,19 +618,21 @@ RBTree<Node, NodeTraits, Compare>::verify_integrity() const
 
   bool order_okay = this->verify_order();
 
+  bool equality_okay = this->verify_equality();
+
   //std::cout << "Root: " << root_okay << " Paths: " << paths_okay << " Children: " << children_okay << " Tree: " << tree_okay << "\n";
 
-  assert(root_okay && paths_okay && children_okay && tree_okay && order_okay);
+  assert(root_okay && paths_okay && children_okay && tree_okay && order_okay && equality_okay);
 
   (void)dummy;
 
-  return root_okay && paths_okay && children_okay && tree_okay && order_okay;
+  return root_okay && paths_okay && children_okay && tree_okay && order_okay && equality_okay;
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 template<class NodeNameGetter>
 void
-RBTree<Node, NodeTraits, Compare>::dump_to_dot_base(std::string & filename, NodeNameGetter name_getter) const
+RBTree<Node, NodeTraits, multiple, Compare>::dump_to_dot_base(std::string & filename, NodeNameGetter name_getter) const
 {
   std::ofstream dotfile;
   dotfile.open(filename);
@@ -389,19 +641,19 @@ RBTree<Node, NodeTraits, Compare>::dump_to_dot_base(std::string & filename, Node
   dotfile << "}\n";
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::dump_to_dot(std::string & filename) const
+RBTree<Node, NodeTraits, multiple, Compare>::dump_to_dot(std::string & filename) const
 {
   this->dump_to_dot_base(filename, [&](const Node * node) {
     return NodeTraits::get_id(node);
   });
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 template<class NodeNameGetter>
 void
-RBTree<Node, NodeTraits, Compare>::output_node_base(const Node * node, std::ofstream & out, NodeNameGetter name_getter) const
+RBTree<Node, NodeTraits, multiple, Compare>::output_node_base(const Node * node, std::ofstream & out, NodeNameGetter name_getter) const
 {
   if (node == nullptr) {
     return;
@@ -431,9 +683,9 @@ RBTree<Node, NodeTraits, Compare>::output_node_base(const Node * node, std::ofst
   this->output_node_base(node->_rbt_right, out, name_getter);
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::swap_nodes(Node * n1, Node * n2, bool swap_colors)
+RBTree<Node, NodeTraits, multiple, Compare>::swap_nodes(Node * n1, Node * n2, bool swap_colors)
 {
   if (n1->_rbt_parent == n2) {
     this->swap_neighbors(n2, n1);
@@ -443,6 +695,11 @@ RBTree<Node, NodeTraits, Compare>::swap_nodes(Node * n1, Node * n2, bool swap_co
     this->swap_unrelated_nodes(n1, n2);
   }
 
+  // TODO FIXME DEBUG
+  this->verify_equality();
+  EqualityList::equality_list_swap_if_necessary(*n1, *n2);
+  this->verify_equality();
+
   if (!swap_colors) {
     std::swap(n1->_rbt_color, n2->_rbt_color);
   }
@@ -450,9 +707,9 @@ RBTree<Node, NodeTraits, Compare>::swap_nodes(Node * n1, Node * n2, bool swap_co
   NodeTraits::swapped(*n1, *n2);
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::swap_neighbors(Node * parent, Node * child)
+RBTree<Node, NodeTraits, multiple, Compare>::swap_neighbors(Node * parent, Node * child)
 {
   child->_rbt_parent = parent->_rbt_parent;
   parent->_rbt_parent = child;
@@ -497,9 +754,9 @@ RBTree<Node, NodeTraits, Compare>::swap_neighbors(Node * parent, Node * child)
   }
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::swap_unrelated_nodes(Node * n1, Node * n2)
+RBTree<Node, NodeTraits, multiple, Compare>::swap_unrelated_nodes(Node * n1, Node * n2)
 {
   std::swap(n1->_rbt_left, n2->_rbt_left);
   if (n1->_rbt_left != nullptr) {
@@ -538,12 +795,17 @@ RBTree<Node, NodeTraits, Compare>::swap_unrelated_nodes(Node * n1, Node * n2)
   }
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::remove_to_leaf(Node & node)
+RBTree<Node, NodeTraits, multiple, Compare>::remove_to_leaf(Node & node)
 {
   Node * cur = &node;
   Node * child = &node;
+
+  // TODO FIXME DEBUG
+  this->verify_integrity();
+  EqualityList::equality_list_delete_node(node);
+  this->verify_integrity();
 
   if ((cur->_rbt_right != nullptr) && (cur->_rbt_left != nullptr)) {
     // Find the minimum of the larger-or-equal childs
@@ -604,9 +866,9 @@ RBTree<Node, NodeTraits, Compare>::remove_to_leaf(Node & node)
   }
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool deleted_left)
+RBTree<Node, NodeTraits, multiple, Compare>::fixup_after_delete(Node * parent, bool deleted_left)
 {
   bool propagating_up = true;
   Node * sibling;
@@ -709,68 +971,70 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
   }
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::remove(Node & node)
+RBTree<Node, NodeTraits, multiple, Compare>::remove(Node & node)
 {
+  // TODO collapse this method
   this->remove_to_leaf(node);
   //this->verify_integrity();
 }
 
-template<class Node, class NodeTraits, class Compare>
-RBTree<Node, NodeTraits, Compare>::const_iterator::const_iterator()
+template<class Node, class NodeTraits, bool multiple, class Compare>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_iterator()
   : reverse(false)
 {}
 
-template<class Node, class NodeTraits, class Compare>
-RBTree<Node, NodeTraits, Compare>::const_iterator::const_iterator(Node * n_in, bool reverse_in)
+template<class Node, class NodeTraits, bool multiple, class Compare>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_iterator(Node * n_in, bool reverse_in)
   : n(n_in), reverse(reverse_in)
 {}
 
-template<class Node, class NodeTraits, class Compare>
-RBTree<Node, NodeTraits, Compare>::const_iterator::const_iterator(const const_iterator & other)
+template<class Node, class NodeTraits, bool multiple, class Compare>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_iterator(const const_iterator & other)
   : n(other.n), reverse(other.reverse)
 {}
 
-template<class Node, class NodeTraits, class Compare>
-RBTree<Node, NodeTraits, Compare>::const_iterator::~const_iterator()
+template<class Node, class NodeTraits, bool multiple, class Compare>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::~const_iterator()
 {}
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator &
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator=(const const_iterator & other)
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator &
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator=(const const_iterator & other)
 {
   this->n = other.n;
   this->reverse = other.reverse;
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator &
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator=(const_iterator && other)
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator &
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator=(const_iterator && other)
 {
   this->n = other.n;
   this->reverse = other.reverse;
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 bool
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator==(const const_iterator & other) const
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator==(const const_iterator & other) const
 {
   return (this->n == other.n) && (this->reverse == other.reverse);
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 bool
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator!=(const const_iterator & other) const
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator!=(const const_iterator & other) const
 {
   return (this->n != other.n) || (this->reverse != other.reverse);
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator &
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator++()
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator &
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator++()
 {
   if (!reverse) {
+    // No more equal elements
     if (this->n->_rbt_right != nullptr) {
       // go to smallest larger-or-equal child
       this->n = this->n->_rbt_right;
@@ -823,18 +1087,18 @@ RBTree<Node, NodeTraits, Compare>::const_iterator::operator++()
   return (*this);
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator++(int)
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator++(int)
 {
   const_iterator cpy(*this);
   this->operator++();
   return cpy;
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator &
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator+=(size_t n)
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator &
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator+=(size_t n)
 {
   for (size_t i = 0 ; i < n ; ++n) {
     this->operator++();
@@ -843,32 +1107,32 @@ RBTree<Node, NodeTraits, Compare>::const_iterator::operator+=(size_t n)
   return (*this);
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator+(size_t n) const
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator+(size_t n) const
 {
   const_iterator cpy(*this);
   cpy += n;
   return cpy;
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator::const_reference
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator*() const
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_reference
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator*() const
 {
   return *(this->n);
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator::const_pointer
-RBTree<Node, NodeTraits, Compare>::const_iterator::operator->() const
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_pointer
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator->() const
 {
   return this->n;
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator
-RBTree<Node, NodeTraits, Compare>::cbegin() const
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+RBTree<Node, NodeTraits, multiple, Compare>::cbegin() const
 {
   Node * smallest = this->root;
   if (smallest == nullptr) {
@@ -882,31 +1146,31 @@ RBTree<Node, NodeTraits, Compare>::cbegin() const
   return const_iterator(smallest, false);
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator
-RBTree<Node, NodeTraits, Compare>::cend() const
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+RBTree<Node, NodeTraits, multiple, Compare>::cend() const
 {
   return const_iterator(nullptr, false);
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator
-RBTree<Node, NodeTraits, Compare>::begin() const
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+RBTree<Node, NodeTraits, multiple, Compare>::begin() const
 {
   return this->cbegin();
 }
 
-template<class Node, class NodeTraits, class Compare>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator
-RBTree<Node, NodeTraits, Compare>::end() const
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+RBTree<Node, NodeTraits, multiple, Compare>::end() const
 {
   return this->cend();
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, bool multiple, class Compare>
 template<class Comparable>
-typename RBTree<Node, NodeTraits, Compare>::const_iterator
-RBTree<Node, NodeTraits, Compare>::find(const Comparable & query) const
+typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+RBTree<Node, NodeTraits, multiple, Compare>::find(const Comparable & query) const
 {
   Node * cur = this->root;
   while (cur != nullptr) {
@@ -915,6 +1179,7 @@ RBTree<Node, NodeTraits, Compare>::find(const Comparable & query) const
     } else if (Compare()(*cur, query)) {
       cur = cur->_rbt_right;
     } else {
+      cur = EqualityList::equality_list_find_first(cur);
       return const_iterator(cur, false);
     }
   }
