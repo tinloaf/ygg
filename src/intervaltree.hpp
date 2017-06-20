@@ -41,6 +41,9 @@ class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, m
 {
 public:
   using Key = typename NodeTraits::key_type;
+  // TODO why do I need to specify this again?
+  using EqualityList = iitree::utilities::EqualityListHelper<Node, multiple, IntervalCompare<Node, NodeTraits>>;
+
   IntervalTree();
 
   bool verify_integrity() const;

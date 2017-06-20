@@ -382,7 +382,7 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
     unsigned int data = uni(rng);
 
     transient_nodes[i] = EqualityNode(data);
-    std::cout << "Inserting random value: " << data << "\n";
+    //std::cout << "Inserting random value: " << data << "\n";
   }
 
   std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
@@ -404,7 +404,7 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
     tree.remove(transient_nodes[i]);
 
     //std::string rem_fname = std::string("/tmp/trees/removed-") + std::to_string(i) + std::string(".dot");
-    std::cout << "Step " << i << ": removing data " << transient_nodes[i].data << "\n";
+    //std::cout << "Step " << i << ": removing data " << transient_nodes[i].data << "\n";
     //tree.dump_to_dot(rem_fname);
     ASSERT_TRUE(tree.verify_integrity());
   }
@@ -415,7 +415,7 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
 
   // Query elements
   for (int i = 0 ; i < TESTSIZE ; ++i) {
-    std::cout << "Finding " << i << "\n";
+    //std::cout << "Finding " << i << "\n";
     auto it = tree.find(persistent_nodes[i]);
     assert(&(*it) == &(persistent_nodes[i]));
     ASSERT_EQ(&(*it), &(persistent_nodes[i]));

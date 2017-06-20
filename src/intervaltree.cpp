@@ -142,15 +142,18 @@ IntervalTree<Node, NodeTraits, multiple>::query(const Comparable & q) const
   }
   // Everthing left of here ends too early.
 
+  Node * hit;
   // If this overlaps, this is our first hit. otherwise, find the next one
   if ((NodeTraits::get_lower(q) <= NodeTraits::get_upper(*cur)) &&
       (NodeTraits::get_upper(q) >= NodeTraits::get_lower(*cur))) {
-    return QueryResult<Comparable>(cur, q);
+    hit = cur;
   } else {
-    return QueryResult<Comparable>(
-                       iitree::utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(cur, q),
-                       q);
+    hit = iitree::utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(cur, q);
   }
+  if (hit != nullptr) {
+    hit = EqualityList::equality_list_find_first(hit);
+  }
+  return QueryResult<Comparable>(hit, q);
 }
 
 namespace iitree { namespace utilities {
