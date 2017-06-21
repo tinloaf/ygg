@@ -1,8 +1,7 @@
 #include <set>
 #include <cassert>
 
-namespace iitree {
-  namespace utilities {
+namespace utilities {
 
 template<class Node, class Compare>
 void
@@ -226,8 +225,7 @@ EqualityListHelper<Node, true, Compare>::verify(const Node & node)
   return true;
 }
 
-} // namespace iitree::utilities
-} // namespace iitree
+} // namespace utilities
 
 
 

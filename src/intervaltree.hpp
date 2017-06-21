@@ -3,12 +3,12 @@
 
 #include "rbtree.hpp"
 
-namespace iitree {
+namespace ygg {
   namespace utilities {
     template<class Node, class NodeTraits, bool skipfirst, class Comparable>
     Node * find_next_overlapping(Node * cur, const Comparable & q);
-  }
-}
+  } // namespace utilities
+
 
 template<class Node, class NodeTraits>
 class IntervalCompare {
@@ -42,7 +42,7 @@ class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, m
 public:
   using Key = typename NodeTraits::key_type;
   // TODO why do I need to specify this again?
-  using EqualityList = iitree::utilities::EqualityListHelper<Node, multiple, IntervalCompare<Node, NodeTraits>>;
+  using EqualityList = utilities::EqualityListHelper<Node, multiple, IntervalCompare<Node, NodeTraits>>;
 
   IntervalTree();
 
@@ -100,5 +100,7 @@ private:
 };
 
 #include "intervaltree.cpp"
+
+} // namespace ygg
 
 #endif // INTERVALTREE_HPP

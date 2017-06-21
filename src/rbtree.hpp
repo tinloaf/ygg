@@ -7,7 +7,7 @@
 #include <fstream>
 #include <vector>
 
-namespace iitree {
+namespace ygg {
   namespace utilities {
     template<class Node, bool multiple, class Compare>
     class EqualityListHelper {};
@@ -34,8 +34,7 @@ namespace iitree {
       static void equality_list_swap_if_necessary(Node & n1, Node & n2);
       static bool verify(const Node & n);
     };
-  }
-}
+  } // namespace utilities
 
 
 /**
@@ -113,7 +112,7 @@ class RBTree
 {
 public:
   using Base = RBTreeNodeBase<Node, multiple>;
-  using EqualityList = iitree::utilities::EqualityListHelper<Node, multiple, Compare>;
+  using EqualityList = utilities::EqualityListHelper<Node, multiple, Compare>;
 
   RBTree();
 
@@ -254,5 +253,7 @@ private:
 };
 
 #include "rbtree.cpp"
+
+} // namespace ygg
 
 #endif // RBTREE_HPP

@@ -8,9 +8,9 @@
 
 #include "../src/rbtree.hpp"
 
-#define TESTSIZE 2000
+using namespace ygg;
 
-template<typename T> constexpr const T &as_const(T &t) noexcept { return t; }
+#define TESTSIZE 2000
 
 class Node : public RBTreeNodeBase<Node> {
 public:

@@ -148,7 +148,7 @@ IntervalTree<Node, NodeTraits, multiple>::query(const Comparable & q) const
       (NodeTraits::get_upper(q) >= NodeTraits::get_lower(*cur))) {
     hit = cur;
   } else {
-    hit = iitree::utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(cur, q);
+    hit = utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(cur, q);
   }
   if (hit != nullptr) {
     hit = EqualityList::equality_list_find_first(hit);
@@ -156,7 +156,7 @@ IntervalTree<Node, NodeTraits, multiple>::query(const Comparable & q) const
   return QueryResult<Comparable>(hit, q);
 }
 
-namespace iitree { namespace utilities {
+namespace utilities {
 
 template<class Node, class NodeTraits, bool skipfirst, class Comparable>
 Node *
@@ -239,7 +239,6 @@ find_next_overlapping(Node * cur, const Comparable & q)
 }
 
 } // namespace utilities
-} // namespace iitree
 
 template<class Node, class NodeTraits, bool multiple>
 template<class Comparable>
@@ -312,7 +311,7 @@ typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparab
 IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::operator++()
 {
   //std::cout << "Old n: " << this->n << "\n";
-  this->n = iitree::utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(this->n, this->q);
+  this->n = utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(this->n, this->q);
   //std::cout << "New n: " << this->n << "\n";
 
   return *this;

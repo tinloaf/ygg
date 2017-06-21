@@ -3,6 +3,8 @@
 
 #include "../src/intervaltree.hpp"
 
+using namespace ygg;
+
 #define IT_TESTSIZE 2000
 
 template<class Node>
