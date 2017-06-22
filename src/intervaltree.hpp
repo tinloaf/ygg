@@ -1,6 +1,9 @@
 #ifndef INTERVALTREE_HPP
 #define INTERVALTREE_HPP
 
+#include <algorithm>
+#include <string>
+
 #include "rbtree.hpp"
 
 namespace ygg {

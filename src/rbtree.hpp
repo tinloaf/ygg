@@ -2,6 +2,8 @@
 #define RBTREE_HPP
 
 #include <cstddef>
+#include <set>
+#include <cassert>
 
 // Only for debugging purposes
 #include <fstream>
@@ -89,12 +91,12 @@ public:
 template<class Node>
 class RBDefaultNodeTraits {
 public:
-  static void leaf_inserted(Node & node) {};
-  static void fix_node(Node & node) {};
-  static void rotated_left(Node & node) {};
-  static void rotated_right(Node & node) {};
-  static void deleted_below(Node & node) {};
-  static void swapped(Node & n1, Node & n2) {};
+  static void leaf_inserted(Node & node) { (void)node; };
+  static void fix_node(Node & node) { (void)node; };
+  static void rotated_left(Node & node) { (void)node; };
+  static void rotated_right(Node & node) { (void)node; };
+  static void deleted_below(Node & node) { (void)node; };
+  static void swapped(Node & n1, Node & n2) { (void)n1; (void)n2; };
 };
 
 /**

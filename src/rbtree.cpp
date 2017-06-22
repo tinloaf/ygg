@@ -1,6 +1,3 @@
-#include <set>
-#include <cassert>
-
 namespace utilities {
 
 template<class Node, class Compare>
@@ -271,7 +268,10 @@ RBTree<Node, NodeTraits, multiple, Compare>::insert_leaf(Node & node)
       parent->_rbt_right = &node;
       EqualityList::equality_list_insert_node(node, nullptr);
     } else {
-      assert(multiple);
+      //assert(multiple);
+      if (!multiple) {
+        return;
+      }
       parent->_rbt_right = &node;
       EqualityList::equality_list_insert_node(node, parent);
     }
