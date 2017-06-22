@@ -9,9 +9,11 @@
 
 using hrc = std::chrono::high_resolution_clock;
 
-#define BENCHMARK_SIZE 100000
+using namespace ygg;
 
-class Node : public RBTreeNodeBase<Node>, public boost::intrusive::set_base_hook<> {
+#define BENCHMARK_SIZE 5000000
+
+class Node : public RBTreeNodeBase<Node, false>, public boost::intrusive::set_base_hook<> {
 public:
   int data;
 
@@ -33,21 +35,108 @@ public:
 
 class Benchmarker {
 public:
-  using Tree = RBTree<Node, NodeTraits>;
+  using Tree = RBTree<Node, NodeTraits, false>;
   using BoostSet = boost::intrusive::set< Node, boost::intrusive::compare<std::less<Node> > >;
+
+  Benchmarker() {
+    this->nodes = new Node[BENCHMARK_SIZE];
+  };
 
   void run_all()
   {
-    std::cout << "== Linear Order\n";
+    std::cout << "\n\n== Linear Insertion Order\n";
     this->linearize_nodes();
     this->benchmark_insertion();
+    std::cout << "\n=== Linear Query Order\n";
+    this->linearize_query_order();
+    this->benchmark_queries();
+    std::cout << "\n=== Random Query Order\n";
+    this->randomize_query_order();
+    this->benchmark_queries();
 
-    std::cout << "== Random Order\n";
-    this->linearize_nodes();
+    std::cout << "\n\n== Random Insertion Order\n";
+    this->randomize_nodes();
     this->benchmark_insertion();
+    std::cout << "\n=== Linear Query Order\n";
+    this->linearize_query_order();
+    this->benchmark_queries();
+    std::cout << "\n=== Random Query Order\n";
+    this->randomize_query_order();
+    this->benchmark_queries();
   }
 
 private:
+
+  void benchmark_queries() {
+    std::cout << "====== Queries\n";
+
+    //
+    // IntervalTree
+    //
+    std::cout << "IntervalTree: ";
+
+    Tree t;
+    for (auto i = 0 ; i < BENCHMARK_SIZE ; ++i) {
+      t.insert(nodes[i]);
+    }
+
+    this->flush_cache();
+
+    hrc::time_point before_it = hrc::now();
+    for (auto index : this->query_order) {
+      auto it = t.find(nodes[index]);
+    }
+    hrc::time_point after_it = hrc::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>( after_it - before_it ).count();
+    std::cout << "\t\t\t" << duration << "\n";
+
+
+    //
+    // std::set
+    //
+
+    std::cout << "std::set: ";
+
+    std::set<Node> set;
+    for (auto i = 0 ; i < BENCHMARK_SIZE ; ++i) {
+      set.insert(nodes[i]);
+    }
+
+    this->flush_cache();
+
+    auto before_set = hrc::now();
+    for (auto index : this->query_order) {
+      auto it = set.find(nodes[index]);
+    }
+    auto after_set = hrc::now();
+
+    duration = std::chrono::duration_cast<std::chrono::microseconds>( after_set - before_set ).count();
+
+    std::cout << "\t\t\t" << duration << "\n";
+
+    //
+    // Boost
+    //
+
+    std::cout << "boost::intrusive::set: ";
+
+    BoostSet bset;
+    for (auto i = 0 ; i < BENCHMARK_SIZE ; ++i) {
+      bset.insert(nodes[i]);
+    }
+
+    this->flush_cache();
+
+    auto before_bset = hrc::now();
+    for (auto index : this->query_order) {
+      auto it = bset.find(nodes[index]);
+    }
+    auto after_bset = hrc::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>( after_bset - before_bset ).count();
+
+    std::cout << "\t\t" << duration << "\n";
+
+  }
 
   void benchmark_insertion() {
     std::cout << "====== Insertion\n";
@@ -67,7 +156,7 @@ private:
     hrc::time_point after_it = hrc::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>( after_it - before_it ).count();
 
-    std::cout << duration << "\n";
+    std::cout << "\t\t\t" << duration << "\n";
 
     this->flush_cache();
 
@@ -85,7 +174,7 @@ private:
     hrc::time_point after_set = hrc::now();
     duration = std::chrono::duration_cast<std::chrono::microseconds>( after_set - before_set ).count();
 
-    std::cout << duration << "\n";
+    std::cout << "\t\t\t" << duration << "\n";
 
     //
     // Boost
@@ -101,7 +190,7 @@ private:
     hrc::time_point after_bset = hrc::now();
     duration = std::chrono::duration_cast<std::chrono::microseconds>( after_bset - before_bset ).count();
 
-    std::cout << duration << "\n";
+    std::cout << "\t\t" << duration << "\n";
   }
 
   void flush_cache()
@@ -129,5 +218,26 @@ private:
     }
   }
 
-  Node nodes[BENCHMARK_SIZE];
+  void linearize_query_order()
+  {
+    this->query_order.clear();
+    for (auto i = 0 ; i < BENCHMARK_SIZE ; ++i) {
+      this->query_order.push_back(i);
+    }
+  }
+
+  void randomize_query_order()
+  {
+    this->linearize_query_order();
+
+    std::mt19937 rng(4); // chosen by fair xkcd
+    std::random_shuffle(this->query_order.begin(), this->query_order.end(), [&](int i) {
+      std::uniform_int_distribution<unsigned int> uni(0,
+                                             i - 1);
+      return uni(rng);
+    });
+  }
+
+  Node * nodes;
+  std::vector<size_t> query_order;
 };
