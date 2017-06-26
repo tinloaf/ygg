@@ -279,10 +279,11 @@ TEST(RBTreeTest, ReverseIterationTest) {
   ASSERT_TRUE(tree.verify_integrity());
 
   auto it = tree.rbegin();
-  unsigned int i = 0;
+  unsigned int i = TESTSIZE - 1;
   while (it != tree.rend()) {
     ASSERT_EQ(it->data, i);
     it++;
+    i--;
   }
 }
 
