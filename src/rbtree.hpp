@@ -226,6 +226,8 @@ public:
     const_reference operator*() const;
     const_pointer operator->() const;
 
+    const_iterator<!reverse> get_reverse() const;
+
   private:
     Node * n;
 
@@ -250,6 +252,30 @@ public:
    */
   const_iterator<false> end() const;
 
+  /**
+   * Returns an reverse iterator pointing to the largest element in the tree.
+   */
+  const_iterator<true> crbegin() const;
+  /**
+   * Returns an reverse iterator pointing before the smallest element in the tree.
+   */
+  const_iterator<true> crend() const;
+  /**
+   * Returns an reverse iterator pointing to the largest element in the tree.
+   */
+  const_iterator<true> rbegin() const;
+  /**
+   * Returns an reverse iterator pointing before the smallest element in the tree.
+   */
+  const_iterator<true> rend() const;
+
+  /**
+   * Returns an iterator pointing to the entry held in node.
+   *
+   * @param node  The node the iterator should point to.
+   */
+  const_iterator<false> iterator_to(const Node & node) const;
+
   // querying for contained elements
   template<class Comparable>
   const_iterator<false> find(const Comparable & query) const;
@@ -265,6 +291,9 @@ protected:
 
 private:
   using Path = std::vector<Node *>;
+
+  Node * get_smallest() const;
+  Node * get_largest() const;
 
   void remove_to_leaf(Node & node);
   void fixup_after_delete(Node * parent, bool deleted_left);

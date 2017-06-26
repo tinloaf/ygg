@@ -255,6 +255,37 @@ TEST(RBTreeTest, LinearIterationTest) {
   }
 }
 
+TEST(RBTreeTest, ReverseIterationTest) {
+  auto tree = RBTree<Node, NodeTraits>();
+
+  Node nodes[TESTSIZE];
+  std::vector<size_t> indices;
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    nodes[i] = Node(i);
+    indices.push_back(i);
+  }
+
+  std::mt19937 rng(4); // chosen by fair xkcd
+  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+    std::uniform_int_distribution<unsigned int> uni(0,
+                                           i - 1);
+    return uni(rng);
+  });
+
+  for (auto index : indices) {
+    tree.insert(nodes[index]);
+  }
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  auto it = tree.rbegin();
+  unsigned int i = 0;
+  while (it != tree.rend()) {
+    ASSERT_EQ(it->data, i);
+    it++;
+  }
+}
+
 TEST(RBTreeTest, FindTest) {
   auto tree = RBTree<Node, NodeTraits>();
 

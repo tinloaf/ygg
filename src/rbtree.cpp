@@ -1198,16 +1198,51 @@ RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator->
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
-RBTree<Node, NodeTraits, multiple, Compare>::cbegin() const
+Node *
+RBTree<Node, NodeTraits, multiple, Compare>::get_smallest() const
 {
   Node * smallest = this->root;
   if (smallest == nullptr) {
-    return const_iterator<false>(nullptr);
+    return nullptr;
   }
 
   while (smallest->_rbt_left != nullptr) {
     smallest = smallest->_rbt_left;
+  }
+
+  return smallest;
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+Node *
+RBTree<Node, NodeTraits, multiple, Compare>::get_largest() const
+{
+  Node * largest = this->root;
+  if (largest == nullptr) {
+    return nullptr;
+  }
+
+  while (largest->_rbt_right != nullptr) {
+    largest = largest->_rbt_right;
+  }
+
+  return largest;
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
+RBTree<Node, NodeTraits, multiple, Compare>::iterator_to(const Node & node) const
+{
+  return const_iterator<false>(&node);
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
+RBTree<Node, NodeTraits, multiple, Compare>::cbegin() const
+{
+  Node * smallest = this->get_smallest();
+  if (smallest == nullptr) {
+    return const_iterator<false>(nullptr);
   }
 
   return const_iterator<false>(smallest);
@@ -1232,6 +1267,39 @@ typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<fa
 RBTree<Node, NodeTraits, multiple, Compare>::end() const
 {
   return this->cend();
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<true>
+RBTree<Node, NodeTraits, multiple, Compare>::crbegin() const
+{
+  Node * largest = this->get_largest();
+  if (largest == nullptr) {
+    return const_iterator<true>(nullptr);
+  }
+
+  return const_iterator<true>(largest);
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<true>
+RBTree<Node, NodeTraits, multiple, Compare>::crend() const
+{
+  return const_iterator<true>(nullptr);
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<true>
+RBTree<Node, NodeTraits, multiple, Compare>::rbegin() const
+{
+  return this->crbegin();
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<true>
+RBTree<Node, NodeTraits, multiple, Compare>::rend() const
+{
+  return this->crend();
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
