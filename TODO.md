@@ -4,5 +4,4 @@
 * allow for additional comparison criterion?
 * make multiple = true the default
 * profiling
-* test reverse iteration
-  * starting at .end()!
+* end()--?

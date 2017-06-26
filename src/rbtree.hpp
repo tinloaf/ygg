@@ -217,8 +217,8 @@ public:
 
     const_iterator& operator++();
     const_iterator  operator++(int);
-    const_iterator& operator+=(size_t n);
-    const_iterator  operator+(size_t n) const;
+    const_iterator& operator+=(size_t steps);
+    const_iterator  operator+(size_t steps) const;
 
     const_iterator& operator--();
     const_iterator  operator--(int);
