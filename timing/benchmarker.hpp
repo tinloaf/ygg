@@ -11,7 +11,7 @@ using hrc = std::chrono::high_resolution_clock;
 
 using namespace ygg;
 
-#define BENCHMARK_SIZE 10000000
+#define BENCHMARK_SIZE 5000000
 
 class Node : public RBTreeNodeBase<Node, false>, public boost::intrusive::set_base_hook<> {
 public:
@@ -211,6 +211,25 @@ private:
     duration = std::chrono::duration_cast<std::chrono::microseconds>( after_bset - before_bset ).count();
 
     std::cout << "\t\t" << duration << "(" << duration / base_duration << ")" << "\n";
+
+
+    this->flush_cache();
+
+    //
+    // IntervalTree
+    //
+
+    std::cout << "IntervalTree: ";
+
+    t.clear();
+    before_it = hrc::now();
+    for (auto i = 0 ; i < BENCHMARK_SIZE ; ++i) {
+      t.insert(nodes[i]);
+    }
+    after_it = hrc::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>( after_it - before_it ).count();
+
+    std::cout << "\t\t\t" << duration << "(" << duration / base_duration << ")" << "\n";
   }
 
   void flush_cache()
