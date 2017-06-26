@@ -11,7 +11,7 @@ using hrc = std::chrono::high_resolution_clock;
 
 using namespace ygg;
 
-#define BENCHMARK_SIZE 5000000
+#define BENCHMARK_SIZE 10000000
 
 class Node : public RBTreeNodeBase<Node, false>, public boost::intrusive::set_base_hook<> {
 public:
@@ -89,7 +89,49 @@ private:
     hrc::time_point after_it = hrc::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>( after_it - before_it ).count();
     std::cout << "\t\t\t" << duration << "\n";
+    double base_duration = duration;
 
+    //
+    // Boost
+    //
+
+    std::cout << "boost::intrusive::set: ";
+
+    BoostSet bset;
+    for (auto i = 0 ; i < BENCHMARK_SIZE ; ++i) {
+      bset.insert(nodes[i]);
+    }
+
+    this->flush_cache();
+
+    auto before_bset = hrc::now();
+    for (auto index : this->query_order) {
+      auto it = bset.find(nodes[index]);
+    }
+    auto after_bset = hrc::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>( after_bset - before_bset ).count();
+
+    std::cout << "\t\t" << duration << "(" << duration / base_duration << ")" << "\n";
+
+    //
+    // IntervalTree
+    //
+    std::cout << "IntervalTree: ";
+
+    t.clear();
+    for (auto i = 0 ; i < BENCHMARK_SIZE ; ++i) {
+      t.insert(nodes[i]);
+    }
+
+    this->flush_cache();
+
+    before_it = hrc::now();
+    for (auto index : this->query_order) {
+      auto it = t.find(nodes[index]);
+    }
+    after_it = hrc::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>( after_it - before_it ).count();
+    std::cout << "\t\t\t" << duration << "(" << duration / base_duration << ")" << "\n";
 
     //
     // std::set
@@ -112,30 +154,7 @@ private:
 
     duration = std::chrono::duration_cast<std::chrono::microseconds>( after_set - before_set ).count();
 
-    std::cout << "\t\t\t" << duration << "\n";
-
-    //
-    // Boost
-    //
-
-    std::cout << "boost::intrusive::set: ";
-
-    BoostSet bset;
-    for (auto i = 0 ; i < BENCHMARK_SIZE ; ++i) {
-      bset.insert(nodes[i]);
-    }
-
-    this->flush_cache();
-
-    auto before_bset = hrc::now();
-    for (auto index : this->query_order) {
-      auto it = bset.find(nodes[index]);
-    }
-    auto after_bset = hrc::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>( after_bset - before_bset ).count();
-
-    std::cout << "\t\t" << duration << "\n";
-
+    std::cout << "\t\t\t" << duration << "(" << duration / base_duration << ")" << "\n";
   }
 
   void benchmark_insertion() {
@@ -155,6 +174,7 @@ private:
     }
     hrc::time_point after_it = hrc::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>( after_it - before_it ).count();
+    double base_duration = duration;
 
     std::cout << "\t\t\t" << duration << "\n";
 
@@ -174,7 +194,7 @@ private:
     hrc::time_point after_set = hrc::now();
     duration = std::chrono::duration_cast<std::chrono::microseconds>( after_set - before_set ).count();
 
-    std::cout << "\t\t\t" << duration << "\n";
+    std::cout << "\t\t\t" << duration << "(" << duration / base_duration << ")" << "\n";
 
     //
     // Boost
@@ -190,7 +210,7 @@ private:
     hrc::time_point after_bset = hrc::now();
     duration = std::chrono::duration_cast<std::chrono::microseconds>( after_bset - before_bset ).count();
 
-    std::cout << "\t\t" << duration << "\n";
+    std::cout << "\t\t" << duration << "(" << duration / base_duration << ")" << "\n";
   }
 
   void flush_cache()

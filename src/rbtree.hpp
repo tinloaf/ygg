@@ -141,6 +141,8 @@ public:
    */
   void remove(Node & node);
 
+  void clear();
+
   // Mainly debugging methods
   /// @cond INTERNAL
   bool verify_integrity() const;

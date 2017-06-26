@@ -48,8 +48,8 @@ EqualityListHelper<Node, true, Compare>::equality_list_delete_node(Node & node)
   }
 
   // TODO FIXME DEBUG
-  node._rbt_prev = nullptr;
-  node._rbt_next = nullptr;
+  //node._rbt_prev = nullptr;
+  //node._rbt_next = nullptr;
 }
 
 template<class Node, class Compare>
@@ -407,6 +407,13 @@ RBTree<Node, NodeTraits, multiple, Compare>::insert(Node & node)
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
+void
+RBTree<Node, NodeTraits, multiple, Compare>::clear()
+{
+  this->root = nullptr;
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
 Node *
 RBTree<Node, NodeTraits, multiple, Compare>::get_uncle(Node * node) const
 {
@@ -699,9 +706,9 @@ RBTree<Node, NodeTraits, multiple, Compare>::swap_nodes(Node * n1, Node * n2, bo
   }
 
   // TODO FIXME DEBUG
-  this->verify_equality();
-  EqualityList::equality_list_swap_if_necessary(*n1, *n2);
-  this->verify_equality();
+  //this->verify_equality();
+  //EqualityList::equality_list_swap_if_necessary(*n1, *n2);
+  //this->verify_equality();
 
   if (!swap_colors) {
     std::swap(n1->_rbt_color, n2->_rbt_color);
@@ -806,9 +813,9 @@ RBTree<Node, NodeTraits, multiple, Compare>::remove_to_leaf(Node & node)
   Node * child = &node;
 
   // TODO FIXME DEBUG
-  this->verify_integrity();
-  EqualityList::equality_list_delete_node(node);
-  this->verify_integrity();
+  //this->verify_integrity();
+  //EqualityList::equality_list_delete_node(node);
+  //this->verify_integrity();
 
   if ((cur->_rbt_right != nullptr) && (cur->_rbt_left != nullptr)) {
     // Find the minimum of the larger-or-equal childs
