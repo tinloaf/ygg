@@ -11,6 +11,34 @@
 
 namespace ygg {
   namespace utilities {
+    template<class Node, class const_iterator>
+    class IteratorHelperUnspecialized {
+    public:
+      static const_iterator & step_forward(const_iterator & it);
+      static const_iterator & step_back(const_iterator & it);
+    };
+
+    template<class Node, class const_iterator, bool reverse>
+    class IteratorHelper {
+    public:
+      static const_iterator & operator_plusplus(const_iterator & it);
+      static const_iterator & operator_minusminus(const_iterator & it);
+    };
+
+    template<class Node, class const_iterator>
+    class IteratorHelper<Node, const_iterator, true>  {
+    public:
+      static const_iterator & operator_plusplus(const_iterator & it);
+      static const_iterator & operator_minusminus(const_iterator & it);
+    };
+
+    template<class Node, class const_iterator>
+    class IteratorHelper<Node, const_iterator, false>  {
+    public:
+      static const_iterator & operator_plusplus(const_iterator & it);
+      static const_iterator & operator_minusminus(const_iterator & it);
+    };
+
     template<class Node, bool multiple, class Compare>
     class EqualityListHelper {};
 
@@ -166,6 +194,7 @@ public:
    * is an input iterator in terms of STL iterators, thus it provides only basic
    * functionality.
    */
+  template<bool reverse>
   class const_iterator {
   public:
     /// @cond INTERNAL
@@ -176,7 +205,7 @@ public:
     typedef std::input_iterator_tag           iterator_category;
 
     const_iterator ();
-    const_iterator (Node * n, bool reverse = false);
+    const_iterator (Node * n);
     const_iterator (const const_iterator & other);
     ~const_iterator();
 
@@ -191,35 +220,39 @@ public:
     const_iterator& operator+=(size_t n);
     const_iterator  operator+(size_t n) const;
 
+    const_iterator& operator--();
+    const_iterator  operator--(int);
+
     const_reference operator*() const;
     const_pointer operator->() const;
 
   private:
     Node * n;
-    bool reverse;
+
+    friend class utilities::IteratorHelperUnspecialized<Node, const_iterator<reverse>>;
     /// @endcond
   };
 
   /**
    * Returns an iterator pointing to the smallest element in the tree.
    */
-  const_iterator cbegin() const;
+  const_iterator<false> cbegin() const;
   /**
    * Returns an iterator pointing after the largest element in the tree.
    */
-  const_iterator cend() const;
+  const_iterator<false> cend() const;
   /**
    * Returns an iterator pointing to the smallest element in the tree.
    */
-  const_iterator begin() const;
+  const_iterator<false> begin() const;
   /**
    * Returns an iterator pointing after the largest element in the tree.
    */
-  const_iterator end() const;
+  const_iterator<false> end() const;
 
   // querying for contained elements
   template<class Comparable>
-  const_iterator find(const Comparable & query) const;
+  const_iterator<false> find(const Comparable & query) const;
 
 protected:
   Node *root;

@@ -1,5 +1,94 @@
 namespace utilities {
 
+  template<class Node, class const_iterator>
+  const_iterator &
+  IteratorHelperUnspecialized<Node, const_iterator>::step_forward(const_iterator & it) {
+    // No more equal elements
+    if (it.n->_rbt_right != nullptr) {
+      // go to smallest larger-or-equal child
+      it.n = it.n->_rbt_right;
+      while (it.n->_rbt_left != nullptr) {
+        it.n = it.n->_rbt_left;
+      }
+    } else {
+      // go up
+
+      // skip over the nodes already visited
+      while ((it.n->_rbt_parent != nullptr) && (it.n->_rbt_parent->_rbt_right == it.n)) { // these are the nodes which are smaller and were already visited
+        it.n = it.n->_rbt_parent;
+      }
+
+      // go one further up
+      if (it.n->_rbt_parent == nullptr) {
+        // done
+        it.n = nullptr;
+      } else {
+        // go up
+        it.n = it.n->_rbt_parent;
+      }
+    }
+
+    return it;
+  }
+
+  template<class Node, class const_iterator>
+  const_iterator &
+  IteratorHelperUnspecialized<Node, const_iterator>::step_back(const_iterator & it) {
+    if (it.n->_rbt_left != nullptr) {
+      // go to largest smaller child
+      it.n = it.n->_rbt_left;
+      while (it.n->_rbt_right != nullptr) {
+        it.n = it.n->_rbt_right;
+      }
+    } else {
+      // go up
+
+      // skip over the nodes already visited
+      while ((it.n->_rbt_parent != nullptr) && (it.n->_rbt_parent->_rbt_left == it.n)) { // these are the nodes which are larger and were already visited
+        it.n = it.n->_rbt_parent;
+      }
+
+      // go one further up
+      if (it.n->_rbt_parent == nullptr) {
+        // done
+        it.n = nullptr;
+      } else {
+        // go up
+        it.n = it.n->_rbt_parent;
+      }
+    }
+
+    return it;
+  }
+
+  template<class Node, class const_iterator>
+  const_iterator &
+  IteratorHelper<Node, const_iterator, false>::operator_plusplus(const_iterator & it)
+  {
+    return IteratorHelperUnspecialized<Node, const_iterator>::step_forward(it);
+  }
+
+  template<class Node, class const_iterator>
+  const_iterator &
+  IteratorHelper<Node, const_iterator, true>::operator_plusplus(const_iterator & it)
+  {
+    return IteratorHelperUnspecialized<Node, const_iterator>::step_back(it);
+  }
+
+  template<class Node, class const_iterator>
+  const_iterator &
+  IteratorHelper<Node, const_iterator, false>::operator_minusminus(const_iterator & it)
+  {
+    return IteratorHelperUnspecialized<Node, const_iterator>::step_back(it);
+  }
+
+  template<class Node, class const_iterator>
+  const_iterator &
+  IteratorHelper<Node, const_iterator, true>::operator_minusminus(const_iterator & it)
+  {
+    return IteratorHelperUnspecialized<Node, const_iterator>::step_forward(it);
+  }
+
 template<class Node, class Compare>
 void
 EqualityListHelper<Node, false, Compare>::equality_list_insert_node(Node & node, Node * predecessor)
@@ -991,124 +1080,89 @@ RBTree<Node, NodeTraits, multiple, Compare>::remove(Node & node)
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_iterator()
-  : reverse(false)
+template<bool reverse>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::const_iterator()
 {}
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_iterator(Node * n_in, bool reverse_in)
-  : n(n_in), reverse(reverse_in)
+template<bool reverse>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::const_iterator(Node * n_in)
+  : n(n_in)
 {}
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_iterator(const const_iterator & other)
-  : n(other.n), reverse(other.reverse)
+template<bool reverse>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::const_iterator(const const_iterator & other)
+  : n(other.n)
 {}
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::~const_iterator()
+template<bool reverse>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::~const_iterator()
 {}
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator &
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator=(const const_iterator & other)
+template<bool reverse>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse> &
+RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse>::operator=(const const_iterator<reverse> & other)
 {
   this->n = other.n;
-  this->reverse = other.reverse;
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator &
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator=(const_iterator && other)
+template<bool reverse>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse> &
+RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse>::operator=(const_iterator<reverse> && other)
 {
   this->n = other.n;
-  this->reverse = other.reverse;
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
+template<bool reverse>
 bool
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator==(const const_iterator & other) const
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator==(const const_iterator<reverse> & other) const
 {
-  return (this->n == other.n) && (this->reverse == other.reverse);
+  return (this->n == other.n);
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
+template<bool reverse>
 bool
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator!=(const const_iterator & other) const
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator!=(const const_iterator<reverse> & other) const
 {
-  return (this->n != other.n) || (this->reverse != other.reverse);
+  return (this->n != other.n);
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator &
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator++()
+template<bool reverse>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse> &
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator++()
 {
-  if (!reverse) {
-    // No more equal elements
-    if (this->n->_rbt_right != nullptr) {
-      // go to smallest larger-or-equal child
-      this->n = this->n->_rbt_right;
-      while (this->n->_rbt_left != nullptr) {
-        this->n = this->n->_rbt_left;
-      }
-    } else {
-      // go up
-
-      // skip over the nodes already visited
-      while ((this->n->_rbt_parent != nullptr) && (this->n->_rbt_parent->_rbt_right == this->n)) { // these are the nodes which are smaller and were already visited
-        this->n = this->n->_rbt_parent;
-      }
-
-      // go one further up
-      if (this->n->_rbt_parent == nullptr) {
-        // done
-        this->n = nullptr;
-      } else {
-        // go up
-        this->n = this->n->_rbt_parent;
-      }
-    }
-  } else {
-    if (this->n->_rbt_left != nullptr) {
-      // go to largest smaller child
-      this->n = this->n->_rbt_left;
-      while (this->n->_rbt_right != nullptr) {
-        this->n = this->n->_rbt_right;
-      }
-    } else {
-      // go up
-
-      // skip over the nodes already visited
-      while ((this->n->_rbt_parent != nullptr) && (this->n->_rbt_parent->_rbt_left == this->n)) { // these are the nodes which are larger and were already visited
-        this->n = this->n->_rbt_parent;
-      }
-
-      // go one further up
-      if (this->n->_rbt_parent == nullptr) {
-        // done
-        this->n = nullptr;
-      } else {
-        // go up
-        this->n = this->n->_rbt_parent;
-      }
-    }
-  }
-
-  return (*this);
+  return utilities::IteratorHelper<Node, const_iterator<reverse>, reverse>::operator_plusplus(*this);
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator++(int)
+template<bool reverse>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse> &
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator--()
 {
-  const_iterator cpy(*this);
+  return utilities::IteratorHelper<Node, const_iterator<reverse>, reverse>::operator_minusminus(*this);
+}
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+template<bool reverse>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator++(int)
+{
+  const_iterator<reverse> cpy(*this);
   this->operator++();
   return cpy;
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator &
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator+=(size_t n)
+template<bool reverse>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse> &
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator+=(size_t n)
 {
   for (size_t i = 0 ; i < n ; ++n) {
     this->operator++();
@@ -1118,60 +1172,63 @@ RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator+=(size_t n
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator+(size_t n) const
+template<bool reverse>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse>
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator+(size_t n) const
 {
-  const_iterator cpy(*this);
+  const_iterator<reverse> cpy(*this);
   cpy += n;
   return cpy;
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_reference
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator*() const
+template<bool reverse>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse>::const_reference
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator*() const
 {
   return *(this->n);
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::const_pointer
-RBTree<Node, NodeTraits, multiple, Compare>::const_iterator::operator->() const
+template<bool reverse>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<reverse>::const_pointer
+RBTree<Node, NodeTraits, multiple, Compare>::const_iterator<reverse>::operator->() const
 {
   return this->n;
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
 RBTree<Node, NodeTraits, multiple, Compare>::cbegin() const
 {
   Node * smallest = this->root;
   if (smallest == nullptr) {
-    return const_iterator(nullptr, false);
+    return const_iterator<false>(nullptr);
   }
 
   while (smallest->_rbt_left != nullptr) {
     smallest = smallest->_rbt_left;
   }
 
-  return const_iterator(smallest, false);
+  return const_iterator<false>(smallest);
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
 RBTree<Node, NodeTraits, multiple, Compare>::cend() const
 {
-  return const_iterator(nullptr, false);
+  return const_iterator<false>(nullptr);
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
 RBTree<Node, NodeTraits, multiple, Compare>::begin() const
 {
   return this->cbegin();
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
 RBTree<Node, NodeTraits, multiple, Compare>::end() const
 {
   return this->cend();
@@ -1179,7 +1236,7 @@ RBTree<Node, NodeTraits, multiple, Compare>::end() const
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
 template<class Comparable>
-typename RBTree<Node, NodeTraits, multiple, Compare>::const_iterator
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
 RBTree<Node, NodeTraits, multiple, Compare>::find(const Comparable & query) const
 {
   Node * cur = this->root;
@@ -1190,7 +1247,7 @@ RBTree<Node, NodeTraits, multiple, Compare>::find(const Comparable & query) cons
       cur = cur->_rbt_right;
     } else {
       cur = EqualityList::equality_list_find_first(cur);
-      return const_iterator(cur, false);
+      return const_iterator<false>(cur);
     }
   }
 
