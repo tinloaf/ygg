@@ -335,7 +335,7 @@ RBTree<Node, NodeTraits, multiple, Compare>::insert_leaf(Node & node)
     parent = cur;
     if (Compare()(node, *cur)) {
       cur = cur->_rbt_left;
-    } else { // todo equality!
+    } else { // TODO equality!
       cur = cur->_rbt_right;
     }
   }
@@ -346,6 +346,7 @@ RBTree<Node, NodeTraits, multiple, Compare>::insert_leaf(Node & node)
     node._rbt_color = Base::Color::BLACK;
     this->root = &node;
     EqualityList::equality_list_insert_node(node, nullptr);
+    NodeTraits::leaf_inserted(node);
   } else {
     node._rbt_parent = parent;
     node._rbt_color = Base::Color::RED;
@@ -364,9 +365,11 @@ RBTree<Node, NodeTraits, multiple, Compare>::insert_leaf(Node & node)
       parent->_rbt_right = &node;
       EqualityList::equality_list_insert_node(node, parent);
     }
+
+    NodeTraits::leaf_inserted(node);
+    this->fixup_after_insert(&node);
   }
 
-  NodeTraits::leaf_inserted(node);
 
   return;
 }
@@ -435,12 +438,15 @@ RBTree<Node, NodeTraits, multiple, Compare>::rotate_right(Node * parent)
 
 template<class Node, class NodeTraits, bool multiple, class Compare>
 void
-RBTree<Node, NodeTraits, multiple, Compare>::fix_upwards(Node * node)
+RBTree<Node, NodeTraits, multiple, Compare>::fixup_after_insert(Node * node)
 {
+  // Does not happen: We only call this if we are not the root.
+  /*
   if (node->_rbt_parent == nullptr) {
     node->_rbt_color = Base::Color::BLACK;
     return;
   }
+  */
 
   while ((node->_rbt_parent->_rbt_color == Base::Color::RED) && (this->get_uncle(node) != nullptr) && (this->get_uncle(node)->_rbt_color == Base::Color::RED)) {
     node->_rbt_parent->_rbt_color = Base::Color::BLACK;
@@ -450,6 +456,7 @@ RBTree<Node, NodeTraits, multiple, Compare>::fix_upwards(Node * node)
       node->_rbt_parent->_rbt_parent->_rbt_color = Base::Color::RED;
       node = node->_rbt_parent->_rbt_parent;
     } else {
+      // Don't recurse into the root; don't color it red. We could immediately re-color it black.
       return;
     }
   }
@@ -492,7 +499,6 @@ void
 RBTree<Node, NodeTraits, multiple, Compare>::insert(Node & node)
 {
   this->insert_leaf(node);
-  this->fix_upwards(&node);
 }
 
 template<class Node, class NodeTraits, bool multiple, class Compare>

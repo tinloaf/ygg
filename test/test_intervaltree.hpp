@@ -60,13 +60,13 @@ TEST(ITreeTest, RandomInsertionTest) {
 
     nodes[i] = ITNode(lower, upper, i);
 
-    //std::string fname = std::string("/tmp/trees/before-") + std::to_string(i) + std::string(".dot");
-    //tree.dump_to_dot(fname);
+    std::string fname = std::string("/tmp/trees/before-") + std::to_string(i) + std::string(".dot");
+    tree.dump_to_dot(fname);
 
     tree.insert(nodes[i]);
 
-    //fname = std::string("/tmp/trees/after-") + std::to_string(i) + std::string(".dot");
-    //tree.dump_to_dot(fname);
+    fname = std::string("/tmp/trees/after-") + std::to_string(i) + std::string(".dot");
+    tree.dump_to_dot(fname);
 
     ASSERT_TRUE(tree.verify_integrity());
 

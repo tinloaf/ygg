@@ -302,7 +302,7 @@ private:
 
   void insert_leaf(Node & node);
 
-  void fix_upwards(Node * node);
+  void fixup_after_insert(Node * node);
   void rotate_left(Node * parent);
   void rotate_right(Node * parent);
 
