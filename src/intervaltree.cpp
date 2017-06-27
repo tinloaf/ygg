@@ -1,6 +1,7 @@
 template<class Node, class NodeTraits>
+template<class T1, class T2>
 bool
-IntervalCompare<Node, NodeTraits>::operator()(const Node & lhs, const Node & rhs) const
+IntervalCompare<Node, NodeTraits>::operator()(const T1 & lhs, const T2 & rhs) const
 {
   if (NodeTraits::get_lower(lhs) < NodeTraits::get_lower(rhs)) {
     return true;

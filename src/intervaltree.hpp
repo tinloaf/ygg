@@ -16,7 +16,8 @@ namespace ygg {
 template<class Node, class NodeTraits>
 class IntervalCompare {
 public:
-  bool operator()(const Node & lhs, const Node & rhs) const;
+  template<class T1, class T2>
+  bool operator()(const T1 & lhs, const T2 & rhs) const;
 };
 
 // TODO add a possibility for bulk updates
