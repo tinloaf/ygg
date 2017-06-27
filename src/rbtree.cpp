@@ -1321,3 +1321,51 @@ RBTree<Node, NodeTraits, multiple, Compare>::find(const Comparable & query) cons
 
   return this->cend();
 }
+
+template<class Node, class NodeTraits, bool multiple, class Compare>
+template<class Comparable>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
+RBTree<Node, NodeTraits, multiple, Compare>::upper_bound(const Comparable & query) const
+{
+  Node * cur = this->root;
+  Node * bound = nullptr;
+  while (cur != nullptr) {
+    if (Compare()(query, *cur)) {
+      bound = cur;
+      cur = cur->_rbt_left;
+    } else if (Compare()(*cur, query)) {
+      cur = cur->_rbt_right;
+    } else {
+      // hit the spot
+      cur = cur->_rbt_right;
+      if (cur != nullptr) {
+        bound = cur;
+        break;
+      }
+    }
+  }
+
+  return const_iterator<false>(bound);
+}
+
+/*
+template<class Node, class NodeTraits, bool multiple, class Compare>
+template<class Comparable>
+typename RBTree<Node, NodeTraits, multiple, Compare>::template const_iterator<false>
+RBTree<Node, NodeTraits, multiple, Compare>::lower_bound(const Comparable & query) const
+{
+  Node * cur = this->root;
+  while (cur != nullptr) {
+    if (Compare()(query, *cur)) {
+      cur = cur->_rbt_left;
+    } else if (Compare()(*cur, query)) {
+      cur = cur->_rbt_right;
+    } else {
+      cur = EqualityList::equality_list_find_first(cur);
+      return const_iterator<false>(cur);
+    }
+  }
+
+  return this->cend();
+}
+*/

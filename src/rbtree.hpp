@@ -279,6 +279,8 @@ public:
   // querying for contained elements
   template<class Comparable>
   const_iterator<false> find(const Comparable & query) const;
+  template<class Comparable>
+  const_iterator<false> upper_bound(const Comparable & query) const;
 
 protected:
   Node *root;

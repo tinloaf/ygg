@@ -119,6 +119,29 @@ TEST(RBTreeTest, LinearInsertionTest) {
   }
 }
 
+TEST(RBTreeTest, UpperBoundTest) {
+  auto tree = RBTree<Node, NodeTraits>();
+
+  Node nodes[TESTSIZE];
+
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    nodes[i] = Node(2*i);
+    tree.insert(nodes[i]);
+  }
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  for (unsigned int i = 0 ; i < TESTSIZE - 1 ; ++i) {
+    Node query(2*i + 1);
+    auto it = tree.upper_bound(query);
+    ASSERT_EQ(it->data, nodes[i+1].data);
+  }
+
+  Node query(2*(TESTSIZE - 1) + 1);
+  auto it = tree.upper_bound(query);
+  ASSERT_EQ(it, tree.end());
+}
+
 TEST(RBTreeTest, TrivialDeletionTest) {
   auto tree = RBTree<Node, NodeTraits>();
 
