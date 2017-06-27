@@ -796,7 +796,7 @@ RBTree<Node, NodeTraits, multiple, Compare>::swap_nodes(Node * n1, Node * n2, bo
 
   // TODO FIXME DEBUG
   //this->verify_equality();
-  //EqualityList::equality_list_swap_if_necessary(*n1, *n2);
+  EqualityList::equality_list_swap_if_necessary(*n1, *n2);
   //this->verify_equality();
 
   if (!swap_colors) {
@@ -901,13 +901,8 @@ RBTree<Node, NodeTraits, multiple, Compare>::remove_to_leaf(Node & node)
   Node * cur = &node;
   Node * child = &node;
 
-  // TODO FIXME DEBUG
-  //this->verify_integrity();
-  //EqualityList::equality_list_delete_node(node);
-  //this->verify_integrity();
-
   if ((cur->_rbt_right != nullptr) && (cur->_rbt_left != nullptr)) {
-    // Find the minimum of the larger-or-equal childs
+    // Find the minimum of the larger-or-equal children
     child = cur->_rbt_right;
     while (child->_rbt_left != nullptr) {
       child = child->_rbt_left;
@@ -934,6 +929,9 @@ RBTree<Node, NodeTraits, multiple, Compare>::remove_to_leaf(Node & node)
     right_child->_rbt_right = nullptr; // this stored the node to be deleted…
     // TODO null the pointers in node?
 
+    // TODO do not swap *and* delete…
+    EqualityList::equality_list_delete_node(node);
+
     NodeTraits::deleted_below(*right_child);
 
     return; // no fixup necessary
@@ -946,10 +944,10 @@ RBTree<Node, NodeTraits, multiple, Compare>::remove_to_leaf(Node & node)
       node._rbt_parent->_rbt_left = nullptr;
       deleted_left = true;
     } else {
-      // TODO can this even happen?
       node._rbt_parent->_rbt_right = nullptr;
     }
 
+    EqualityList::equality_list_delete_node(node);
     NodeTraits::deleted_below(*node._rbt_parent);
   } else {
     this->root = nullptr; // Tree is now empty!
