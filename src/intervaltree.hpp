@@ -47,6 +47,7 @@ public:
   using Key = typename NodeTraits::key_type;
   // TODO why do I need to specify this again?
   using EqualityList = utilities::EqualityListHelper<Node, multiple, IntervalCompare<Node, NodeTraits>>;
+  using ENodeTraits = ExtendedNodeTraits<Node, NodeTraits>;
 
   IntervalTree();
 
@@ -96,6 +97,9 @@ public:
 
   template<class Comparable>
   QueryResult<Comparable> query(const Comparable & q) const;
+
+  // TODO FIXME this is actually very specific?
+  void fixup_maxima(Node & lowest);
 
 private:
   bool verify_maxima(Node * n) const;

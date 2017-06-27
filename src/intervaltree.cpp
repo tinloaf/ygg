@@ -129,6 +129,12 @@ IntervalTree<Node, NodeTraits, multiple>::verify_maxima(Node * n) const
 }
 
 template<class Node, class NodeTraits, bool multiple>
+void
+IntervalTree<Node, NodeTraits, multiple>::fixup_maxima(Node & node) {
+  ENodeTraits::fix_node(node);
+}
+
+template<class Node, class NodeTraits, bool multiple>
 template<class Comparable>
 IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>
 IntervalTree<Node, NodeTraits, multiple>::query(const Comparable & q) const
