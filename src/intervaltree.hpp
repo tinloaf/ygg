@@ -10,6 +10,12 @@ namespace ygg {
   namespace utilities {
     template<class Node, class NodeTraits, bool skipfirst, class Comparable>
     Node * find_next_overlapping(Node * cur, const Comparable & q);
+
+    template<class KeyType>
+    class DummyRange : public std::pair<KeyType, KeyType> {
+    public:
+      DummyRange(KeyType lower, KeyType upper);
+    };
   } // namespace utilities
 
 
@@ -31,6 +37,10 @@ public:
   static void rotated_right(Node & node);
   static void deleted_below(Node & node);
   static void swapped(Node & n1, Node & n2);
+
+  // Make our DummyRange comparable
+  static typename NodeTraits::key_type get_lower(const utilities::DummyRange<typename NodeTraits::key_type> & range);
+  static typename NodeTraits::key_type get_upper(const utilities::DummyRange<typename NodeTraits::key_type> & range);
 };
 
 template<class Node, class NodeTraits, bool multiple = false>
@@ -48,6 +58,7 @@ public:
   // TODO why do I need to specify this again?
   using EqualityList = utilities::EqualityListHelper<Node, multiple, IntervalCompare<Node, NodeTraits>>;
   using ENodeTraits = ExtendedNodeTraits<Node, NodeTraits>;
+  using BaseTree = RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, multiple, IntervalCompare<Node, NodeTraits>>;
 
   IntervalTree();
 
@@ -98,13 +109,14 @@ public:
   template<class Comparable>
   QueryResult<Comparable> query(const Comparable & q) const;
 
+  template<class Comparable>
+  typename BaseTree::template const_iterator<false> interval_upper_bound(const Comparable & query) const;
+
   // TODO FIXME this is actually very specific?
   void fixup_maxima(Node & lowest);
 
 private:
   bool verify_maxima(Node * n) const;
-
-  using BaseTree = RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, multiple, IntervalCompare<Node, NodeTraits>>;
 };
 
 #include "intervaltree.cpp"

@@ -6,6 +6,6 @@
 * profiling
 * end()--?
 * lower_bound
-* test upper_bound
+* test upper_bound / interval_upper_bound
 * fine-tune link fixup at swap and rotation
 * Interval Tree: Reduce the number of fixup operations

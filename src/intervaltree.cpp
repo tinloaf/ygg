@@ -91,6 +91,20 @@ ExtendedNodeTraits<Node, NodeTraits>::swapped(Node & n1, Node & n2) {
   }
 }
 
+template<class Node, class NodeTraits>
+typename NodeTraits::key_type
+ExtendedNodeTraits<Node, NodeTraits>::get_lower(const utilities::DummyRange<typename NodeTraits::key_type> & range)
+{
+  return std::get<0>(range);
+}
+
+template<class Node, class NodeTraits>
+typename NodeTraits::key_type
+ExtendedNodeTraits<Node, NodeTraits>::get_upper(const utilities::DummyRange<typename NodeTraits::key_type> & range)
+{
+  return std::get<1>(range);
+}
+
 template<class Node, class NodeTraits, bool multiple>
 IntervalTree<Node, NodeTraits, multiple>::IntervalTree()
 {}
@@ -163,7 +177,25 @@ IntervalTree<Node, NodeTraits, multiple>::query(const Comparable & q) const
   return QueryResult<Comparable>(hit, q);
 }
 
+template<class Node, class NodeTraits, bool multiple>
+template<class Comparable>
+typename IntervalTree<Node, NodeTraits, multiple>::BaseTree::template const_iterator<false>
+IntervalTree<Node, NodeTraits, multiple>::interval_upper_bound(const Comparable & query) const
+{
+  // An interval lying strictly after <query> is an upper-bound (in the RBTree sense) of the
+  // interval that just spans the last point of <query>
+  utilities::DummyRange<typename NodeTraits::key_type> range(NodeTraits::get_upper(query), NodeTraits::get_upper(query));
+
+  return this->upper_bound(range);
+}
+
+// TODO move stuff here
 namespace utilities {
+
+template <class KeyType>
+DummyRange<KeyType>::DummyRange(KeyType lower, KeyType upper)
+  : std::pair<KeyType, KeyType>(lower, upper)
+{}
 
 template<class Node, class NodeTraits, bool skipfirst, class Comparable>
 Node *
