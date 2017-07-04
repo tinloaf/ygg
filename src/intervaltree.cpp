@@ -180,13 +180,13 @@ IntervalTree<Node, NodeTraits, multiple>::query(const Comparable & q) const
 template<class Node, class NodeTraits, bool multiple>
 template<class Comparable>
 typename IntervalTree<Node, NodeTraits, multiple>::BaseTree::template const_iterator<false>
-IntervalTree<Node, NodeTraits, multiple>::interval_upper_bound(const Comparable & query) const
+IntervalTree<Node, NodeTraits, multiple>::interval_upper_bound(const Comparable & query_range) const
 {
   // An interval lying strictly after <query> is an upper-bound (in the RBTree sense) of the
   // interval that just spans the last point of <query>
-  utilities::DummyRange<typename NodeTraits::key_type> range(NodeTraits::get_upper(query), NodeTraits::get_upper(query));
+  utilities::DummyRange<typename NodeTraits::key_type> dummy_range(NodeTraits::get_upper(query_range), NodeTraits::get_upper(query_range));
 
-  return this->upper_bound(range);
+  return this->upper_bound(dummy_range);
 }
 
 // TODO move stuff here

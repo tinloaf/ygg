@@ -110,7 +110,7 @@ public:
   QueryResult<Comparable> query(const Comparable & q) const;
 
   template<class Comparable>
-  typename BaseTree::template const_iterator<false> interval_upper_bound(const Comparable & query) const;
+  typename BaseTree::template const_iterator<false> interval_upper_bound(const Comparable & query_range) const;
 
   // TODO FIXME this is actually very specific?
   void fixup_maxima(Node & lowest);
