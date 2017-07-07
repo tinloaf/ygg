@@ -105,13 +105,13 @@ ExtendedNodeTraits<Node, NodeTraits>::get_upper(const utilities::DummyRange<type
   return std::get<1>(range);
 }
 
-template<class Node, class NodeTraits, bool multiple>
-IntervalTree<Node, NodeTraits, multiple>::IntervalTree()
+template<class Node, class NodeTraits>
+IntervalTree<Node, NodeTraits>::IntervalTree()
 {}
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 bool
-IntervalTree<Node, NodeTraits, multiple>::verify_integrity() const
+IntervalTree<Node, NodeTraits>::verify_integrity() const
 {
   bool base_verification = this->BaseTree::verify_integrity();
   assert(base_verification);
@@ -121,9 +121,9 @@ IntervalTree<Node, NodeTraits, multiple>::verify_integrity() const
   return base_verification && maxima_valid;
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 bool
-IntervalTree<Node, NodeTraits, multiple>::verify_maxima(Node * n) const
+IntervalTree<Node, NodeTraits>::verify_maxima(Node * n) const
 {
   bool valid = true;
   auto maximum = NodeTraits::get_upper(*n);
@@ -142,16 +142,16 @@ IntervalTree<Node, NodeTraits, multiple>::verify_maxima(Node * n) const
   return valid;
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 void
-IntervalTree<Node, NodeTraits, multiple>::fixup_maxima(Node & node) {
+IntervalTree<Node, NodeTraits>::fixup_maxima(Node & node) {
   ENodeTraits::fix_node(node);
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>
-IntervalTree<Node, NodeTraits, multiple>::query(const Comparable & q) const
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>
+IntervalTree<Node, NodeTraits>::query(const Comparable & q) const
 {
   Node * cur = this->root;
   if (this->root == nullptr) {
@@ -177,10 +177,10 @@ IntervalTree<Node, NodeTraits, multiple>::query(const Comparable & q) const
   return QueryResult<Comparable>(hit, q);
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-typename IntervalTree<Node, NodeTraits, multiple>::BaseTree::template const_iterator<false>
-IntervalTree<Node, NodeTraits, multiple>::interval_upper_bound(const Comparable & query_range) const
+typename IntervalTree<Node, NodeTraits>::BaseTree::template const_iterator<false>
+IntervalTree<Node, NodeTraits>::interval_upper_bound(const Comparable & query_range) const
 {
   // An interval lying strictly after <query> is an upper-bound (in the RBTree sense) of the
   // interval that just spans the last point of <query>
@@ -279,75 +279,75 @@ find_next_overlapping(Node * cur, const Comparable & q)
 
 } // namespace utilities
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::QueryResult(Node * n_in, const Comparable & q_in)
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::QueryResult(Node * n_in, const Comparable & q_in)
   : n(n_in), q(q_in)
 {}
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::begin() const
+typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::begin() const
 {
   return const_iterator(this->n, this->q);
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::end() const
+typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::end() const
 {
   return const_iterator(nullptr, this->q);
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::const_iterator(Node * n_in, const Comparable & q_in)
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::const_iterator(Node * n_in, const Comparable & q_in)
   : n(n_in), q(q_in)
 {}
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::const_iterator(const typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator & other)
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::const_iterator(const typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator & other)
   : n(other.n), q(other.q)
 {}
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::~const_iterator()
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::~const_iterator()
 {}
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator &
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::operator=(const typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator & other)
+typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator &
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator=(const typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator & other)
 {
   this->n = other.n;
   this->q = other.q;
   return *this;
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
 bool
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::operator==(const typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator & other) const
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator==(const typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator & other) const
 {
   return ((this->n == other.n) && (NodeTraits::get_lower(this->q) == NodeTraits::get_lower(other.q)) && (NodeTraits::get_upper(this->q) && NodeTraits::get_upper(other.q)));
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
 bool
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::operator!=(const typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator & other) const
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator!=(const typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator & other) const
 {
   return !(*this == other);
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator &
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::operator++()
+typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator &
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator++()
 {
   //std::cout << "Old n: " << this->n << "\n";
   this->n = utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(this->n, this->q);
@@ -356,37 +356,37 @@ IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterato
   return *this;
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
-typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::operator++(int)
+typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator++(int)
 {
-  typename IntervalTree<Node, NodeTraits, multiple>::template QueryResult<Comparable>::const_iterator cpy(*this);
+  typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator cpy(*this);
 
   this->operator++();
 
   return cpy;
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
 const Node &
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::operator*() const
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator*() const
 {
   return *(this->n);
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 template<class Comparable>
 const Node *
-IntervalTree<Node, NodeTraits, multiple>::QueryResult<Comparable>::const_iterator::operator->() const
+IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator->() const
 {
   return this->cur;
 }
 
-template<class Node, class NodeTraits, bool multiple>
+template<class Node, class NodeTraits>
 void
-IntervalTree<Node, NodeTraits, multiple>::dump_to_dot(std::string & filename) const
+IntervalTree<Node, NodeTraits>::dump_to_dot(std::string & filename) const
 {
   this->dump_to_dot_base(filename, [&](const Node * node) {
     return NodeTraits::get_id(node) +

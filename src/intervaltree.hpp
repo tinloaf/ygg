@@ -50,15 +50,15 @@ public:
 };
 
 
-template<class Node, class NodeTraits, bool multiple = false>
-class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, multiple, IntervalCompare<Node, NodeTraits>>
+template<class Node, class NodeTraits>
+class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, IntervalCompare<Node, NodeTraits>>
 {
 public:
   using Key = typename NodeTraits::key_type;
   // TODO why do I need to specify this again?
-  using EqualityList = utilities::EqualityListHelper<Node, multiple, IntervalCompare<Node, NodeTraits>>;
+  using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple, IntervalCompare<Node, NodeTraits>>;
   using ENodeTraits = ExtendedNodeTraits<Node, NodeTraits>;
-  using BaseTree = RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, multiple, IntervalCompare<Node, NodeTraits>>;
+  using BaseTree = RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, IntervalCompare<Node, NodeTraits>>;
 
   IntervalTree();
 

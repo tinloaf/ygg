@@ -85,6 +85,7 @@ template<class Node>
 class RBTreeNodeBase<Node, true> {
 public:
   enum class Color { RED, BLACK };
+  constexpr static bool _rbt_multiple = true;
 
   Node *                  _rbt_parent = nullptr;
   Node *                  _rbt_left = nullptr;
@@ -99,6 +100,8 @@ template<class Node>
 class RBTreeNodeBase<Node, false> {
 public:
   enum class Color { RED, BLACK };
+  constexpr static bool _rbt_multiple = false;
+
 
   Node *                  _rbt_parent = nullptr;
   Node *                  _rbt_left = nullptr;
@@ -134,15 +137,14 @@ public:
  *
  * @tparam Node         The node class for this tree. It must be derived from RBTreeNodeBase. DOCTODO link
  * @tparam NodeTraits   A class implementing various hooks and functions on your node class. See DOCTODO for details.
- * @tparam multiple     A boolean specifying whether multiple elements that compare equally to each other (i.e. with the same key) may be inserted into the tree. If you set this to false and nonetheless insert multiple equal elements, undefined behaviour occurrs. However, if you know that this will not happen, setting this to false will speed up operations and save a little memory.
  * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'. Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
-template<class Node, class NodeTraits, bool multiple = false, class Compare = std::less<Node>>
+template<class Node, class NodeTraits, class Compare = std::less<Node>>
 class RBTree
 {
 public:
-  using Base = RBTreeNodeBase<Node, multiple>;
-  using EqualityList = utilities::EqualityListHelper<Node, multiple, Compare>;
+  using Base = RBTreeNodeBase<Node, Node::_rbt_multiple>;
+  using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple, Compare>;
 
   RBTree();
 

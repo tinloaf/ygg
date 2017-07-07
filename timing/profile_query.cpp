@@ -34,7 +34,7 @@ public:
 
 class Profiler {
 public:
-  using Tree = RBTree<Node, NodeTraits, false>;
+  using Tree = RBTree<Node, NodeTraits>;
 
   Profiler() {
     this->nodes = new Node[BENCHMARK_SIZE];

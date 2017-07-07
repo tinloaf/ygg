@@ -1,5 +1,4 @@
 * doxygen?
-* multiple in Node necessary?
 * 'default comparable?'
 * allow for additional comparison criterion?
 * make multiple = true the default
@@ -10,3 +9,4 @@
 * fine-tune link fixup at swap and rotation
 * Interval Tree: Reduce the number of fixup operations
 * move lots of stuff into ygg::utilities
+* make early fails configurable

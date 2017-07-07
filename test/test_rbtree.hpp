@@ -228,7 +228,7 @@ TEST(RBTreeTest, LinearInsertionRandomDeletionTest) {
 }
 
 TEST(RBTreeTest, LinearMultipleIterationTest) {
-  auto tree = RBTree<EqualityNode, EqualityNodeTraits, true>();
+  auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
 
   EqualityNode nodes[TESTSIZE*5];
 
@@ -418,7 +418,7 @@ TEST(RBTreeTest, ComprehensiveTest) {
 
 
 TEST(RBTreeTest, ComprehensiveMultipleTest) {
-  auto tree = RBTree<EqualityNode, EqualityNodeTraits, true>();
+  auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
 
   EqualityNode persistent_nodes[TESTSIZE];
   std::vector<unsigned int> indices;

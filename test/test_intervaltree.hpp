@@ -38,7 +38,7 @@ public:
 };
 
 TEST(ITreeTest, TrivialInsertionTest) {
-  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>, true>();
+  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode n(0, 10, 0);
   tree.insert(n);
@@ -47,7 +47,7 @@ TEST(ITreeTest, TrivialInsertionTest) {
 }
 
 TEST(ITreeTest, RandomInsertionTest) {
-  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>, true>();
+  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode nodes[IT_TESTSIZE];
   std::mt19937 rng(4); // chosen by fair xkcd
@@ -74,7 +74,7 @@ TEST(ITreeTest, RandomInsertionTest) {
 }
 
 TEST(ITreeTest, RandomInsertionRandomDeletionTest) {
-  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>, true>();
+  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode nodes[IT_TESTSIZE];
   std::vector<unsigned int> indices;
@@ -116,7 +116,7 @@ TEST(ITreeTest, RandomInsertionRandomDeletionTest) {
 
 
 TEST(ITreeTest, TrivialQueryTest) {
-  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>, true>();
+  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode n(10, 20, 0);
   tree.insert(n);
@@ -174,7 +174,7 @@ TEST(ITreeTest, TrivialQueryTest) {
 
 
 TEST(ITreeTest, SimpleQueryTest) {
-  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>, true>();
+  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode n1(10, 20, 1);
   tree.insert(n1);
@@ -244,7 +244,7 @@ TEST(ITreeTest, SimpleQueryTest) {
 }
 
 TEST(ITreeTest, ComprehensiveTest) {
-  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>, true>();
+  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode persistent_nodes[IT_TESTSIZE];
   std::vector<unsigned int> indices;
@@ -319,7 +319,7 @@ TEST(ITreeTest, ComprehensiveTest) {
 
 
 TEST(ITreeTest, RandomEqualInsertionRandomDeletionTest) {
-  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>, true>();
+  auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode nodes[IT_TESTSIZE*5];
   std::vector<unsigned int> indices;
