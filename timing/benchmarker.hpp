@@ -106,7 +106,8 @@ private:
 
     auto before_bset = hrc::now();
     for (auto index : this->query_order) {
-      auto it = bset.find(nodes[index]);
+      volatile auto it = bset.find(nodes[index]);
+      (void)it;
     }
     auto after_bset = hrc::now();
     duration = std::chrono::duration_cast<std::chrono::microseconds>( after_bset - before_bset ).count();
@@ -148,7 +149,8 @@ private:
 
     auto before_set = hrc::now();
     for (auto index : this->query_order) {
-      auto it = set.find(nodes[index]);
+      volatile auto it = set.find(nodes[index]);
+      (void)it;
     }
     auto after_set = hrc::now();
 
