@@ -611,6 +611,7 @@ RBTree<Node, NodeTraits, multiple, Compare>::verify_order() const
     if (n._rbt_left != nullptr) {
       // left may not be larger
       if (Compare()(n, *(n._rbt_left))) {
+        assert(false);
         return false;
       }
     }
@@ -618,6 +619,7 @@ RBTree<Node, NodeTraits, multiple, Compare>::verify_order() const
     if (n._rbt_right != nullptr) {
       // right may not be smaller
       if (Compare()(*(n._rbt_right), n)) {
+        assert(false);
         return false;
       }
     }
