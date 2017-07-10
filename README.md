@@ -83,3 +83,8 @@ int main(int argc, char **argv) {
   }
 }
 ~~~~~~~~~~~~~
+
+License
+=======
+
+This software is licensed under the MIT license. See LICENSE.txt for details.
