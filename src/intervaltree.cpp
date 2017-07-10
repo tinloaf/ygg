@@ -386,7 +386,7 @@ IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operato
 
 template<class Node, class NodeTraits>
 void
-IntervalTree<Node, NodeTraits>::dump_to_dot(std::string & filename) const
+IntervalTree<Node, NodeTraits>::dump_to_dot(const std::string & filename) const
 {
   this->dump_to_dot_base(filename, [&](const Node * node) {
     return NodeTraits::get_id(node) +

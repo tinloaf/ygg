@@ -12,3 +12,4 @@
 * make early fails configurable
 * mark end iterator differently
 * test insertion with hint
+* hint insertion: actually search

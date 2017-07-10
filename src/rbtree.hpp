@@ -195,7 +195,7 @@ public:
    *
    * @param filename  The file path where to write the .dot file.
    */
-  void dump_to_dot(std::string & filename) const;
+  void dump_to_dot(const std::string & filename) const;
 
   // Iteration
   /**
@@ -331,7 +331,7 @@ protected:
   Node *root;
 
   template<class NodeNameGetter>
-  void dump_to_dot_base(std::string & filename, NodeNameGetter name_getter) const;
+  void dump_to_dot_base(const std::string & filename, NodeNameGetter name_getter) const;
 
   template<class NodeNameGetter>
   void output_node_base(const Node * node, std::ofstream & out, NodeNameGetter name_getter) const;

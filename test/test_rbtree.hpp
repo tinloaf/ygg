@@ -119,6 +119,24 @@ TEST(RBTreeTest, LinearInsertionTest) {
   }
 }
 
+TEST(RBTreeTest, LinearHintedInsertionTest) {
+  auto tree = RBTree<Node, NodeTraits>();
+
+  Node nodes[TESTSIZE];
+
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    nodes[i] = Node(i);
+  }
+
+  tree.insert(nodes[TESTSIZE - 1]);
+
+  for (int i = TESTSIZE - 2 ; i >= 0 ; --i) {
+    tree.insert(nodes[i], nodes[i+1]);
+
+    ASSERT_TRUE(tree.verify_integrity());
+  }
+}
+
 TEST(RBTreeTest, UpperBoundTest) {
   auto tree = RBTree<Node, NodeTraits>();
 

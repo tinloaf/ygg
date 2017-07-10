@@ -548,10 +548,8 @@ RBTree<Node, NodeTraits, Compare>::insert(Node & node, Node & hint)
 
   if (insert_left) {
     parent->_rbt_left = &node;
-    EqualityList::equality_list_insert_after(node, nullptr);
   } else {
     parent->_rbt_right = &node;
-    EqualityList::equality_list_insert_after(node, parent);
   }
 
   if (!Compare()(node, *parent) && !Compare()(*parent, node)) {
@@ -806,7 +804,7 @@ RBTree<Node, NodeTraits, Compare>::verify_integrity() const
 template<class Node, class NodeTraits, class Compare>
 template<class NodeNameGetter>
 void
-RBTree<Node, NodeTraits, Compare>::dump_to_dot_base(std::string & filename, NodeNameGetter name_getter) const
+RBTree<Node, NodeTraits, Compare>::dump_to_dot_base(const std::string & filename, NodeNameGetter name_getter) const
 {
   std::ofstream dotfile;
   dotfile.open(filename);
@@ -817,7 +815,7 @@ RBTree<Node, NodeTraits, Compare>::dump_to_dot_base(std::string & filename, Node
 
 template<class Node, class NodeTraits, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::dump_to_dot(std::string & filename) const
+RBTree<Node, NodeTraits, Compare>::dump_to_dot(const std::string & filename) const
 {
   this->dump_to_dot_base(filename, [&](const Node * node) {
     return NodeTraits::get_id(node);

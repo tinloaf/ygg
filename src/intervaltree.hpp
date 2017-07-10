@@ -63,7 +63,7 @@ public:
   IntervalTree();
 
   bool verify_integrity() const;
-  void dump_to_dot(std::string & filename) const;
+  void dump_to_dot(const std::string & filename) const;
 
   // Iteration of sets of intervals
   template <class Comparable>
