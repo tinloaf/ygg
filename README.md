@@ -9,6 +9,11 @@ Features
 * You can be notified when stuff happens. Want to do something to the tree nodes every time a tree rotation happens? Need to know whenever two nodes swap places in the tree? Look no further. Ygg will call methods specified by you on several occasions. In fact, that's how the Interval Tree (the augmented tree version from Cormen et al.) is implemented.
 * It's pretty fast. Doing benchmarks correctly is pretty difficult. However, performance should not be too far away from boost::intrusive::rbtree. Comparing against std::set is unfair - std::set loses because it needs to do memory allocation.
 
+Installation
+============
+
+It's a header-only library. (Yes I know, there are .cpp files. I like to keep declaration and definition separated, even if everything's actually a header.) Just make sure everything in the src folder is in your include path, and you're set.
+
 Documentation
 =============
 
