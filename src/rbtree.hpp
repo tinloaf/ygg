@@ -345,7 +345,7 @@ private:
   void remove_to_leaf(Node & node);
   void fixup_after_delete(Node * parent, bool deleted_left);
 
-  void insert_leaf(Node & node);
+  void insert_leaf(Node & node, Node * start);
 
   void fixup_after_insert(Node * node);
   void rotate_left(Node * parent);

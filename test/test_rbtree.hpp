@@ -28,10 +28,11 @@ public:
 class EqualityNode : public RBTreeNodeBase<EqualityNode, true> {
 public:
   int data;
+  int sub_data;
 
   EqualityNode () : data(0) {};
-  explicit EqualityNode(int data_in) : data(data_in) {};
-  EqualityNode(const EqualityNode &other) : data(other.data) {};
+  explicit EqualityNode(int data_in, int sub_data_in = 0) : data(data_in), sub_data(sub_data_in) {};
+  EqualityNode(const EqualityNode &other) : data(other.data), sub_data(other.sub_data) {};
 
   bool operator<(const EqualityNode & other) const {
     return this->data < other.data;
@@ -119,7 +120,68 @@ TEST(RBTreeTest, LinearInsertionTest) {
   }
 }
 
-TEST(RBTreeTest, LinearHintedInsertionTest) {
+TEST(RBTreeTest, LinearEndHintedInsertionTest) {
+  auto tree = RBTree<Node, NodeTraits>();
+
+  Node nodes[TESTSIZE];
+
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    nodes[i] = Node(i);
+  }
+
+  tree.insert(nodes[TESTSIZE - 1]);
+
+  for (int i = TESTSIZE - 2 ; i >= 0 ; --i) {
+    tree.insert(nodes[i], nodes[TESTSIZE - 1]);
+    ASSERT_TRUE(tree.verify_integrity());
+  }
+
+  int i = 0;
+  for (const auto & n : tree) {
+    ASSERT_EQ(n.data, i);
+    i++;
+  }
+}
+
+TEST(RBTreeTest, HinterOrderPreservationTest) {
+  auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
+
+  EqualityNode nodes[3*TESTSIZE];
+
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    nodes[3*i] = EqualityNode(i, 0);
+    nodes[3*i + 1] = EqualityNode(i, 1);
+    nodes[3*i + 2] = EqualityNode(i, 2);
+  }
+
+  // insert the middles
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    tree.insert(nodes[3*i + 1]);
+  }
+
+  tree.verify_integrity();
+
+  // insert the prefix, using a hint
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    tree.insert(nodes[3*i], nodes[3*i + 1]);
+  }
+
+  tree.verify_integrity();
+
+  // insert the postfix, using a hint
+  for (unsigned int i = 0 ; i < TESTSIZE - 1 ; ++i) {
+    tree.insert(nodes[3*i + 2], nodes[3*i + 3]);
+  }
+
+  unsigned int i = 0;
+  for (auto & n : tree) {
+    ASSERT_EQ(n.data, i / 3);
+    ASSERT_EQ(n.sub_data, i % 3);
+    ++i;
+  }
+}
+
+TEST(RBTreeTest, LinearNextHintedInsertionTest) {
   auto tree = RBTree<Node, NodeTraits>();
 
   Node nodes[TESTSIZE];
@@ -132,8 +194,13 @@ TEST(RBTreeTest, LinearHintedInsertionTest) {
 
   for (int i = TESTSIZE - 2 ; i >= 0 ; --i) {
     tree.insert(nodes[i], nodes[i+1]);
-
     ASSERT_TRUE(tree.verify_integrity());
+  }
+
+  int i = 0;
+  for (const auto & n : tree) {
+    ASSERT_EQ(n.data, i);
+    i++;
   }
 }
 

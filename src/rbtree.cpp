@@ -347,19 +347,20 @@ RBTree<Node, NodeTraits, Compare>::RBTree()
 
 template<class Node, class NodeTraits, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
+RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node, Node *start)
 {
   node._rbt_right = nullptr;
   node._rbt_left = nullptr;
 
-  Node *parent = this->root;
-  Node *cur = this->root;
+  Node *parent = start;
+  Node *cur = start;
+
   while (cur != nullptr) {
     parent = cur;
-    if (Compare()(node, *cur)) {
-      cur = cur->_rbt_left;
-    } else { // TODO equality!
+    if (Compare()(*cur, node)) {
       cur = cur->_rbt_right;
+    } else {
+      cur = cur->_rbt_left;
     }
   }
 
@@ -385,8 +386,8 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
       if (!Node::_rbt_multiple) {
         return;
       }
-      parent->_rbt_right = &node;
-      EqualityList::equality_list_insert_after(node, parent);
+      parent->_rbt_left = &node;
+      EqualityList::equality_list_insert_before(node, parent);
     }
 
     NodeTraits::leaf_inserted(node);
@@ -522,7 +523,7 @@ void
 RBTree<Node, NodeTraits, Compare>::insert(Node & node)
 {
   // TODO flatten
-  this->insert_leaf(node);
+  this->insert_leaf(node, this->root);
 }
 
 template<class Node, class NodeTraits, class Compare>
@@ -533,37 +534,13 @@ RBTree<Node, NodeTraits, Compare>::insert(Node & node, Node & hint)
 
   // find parent
   Node * parent = &hint;
-  bool insert_left = true;
 
-  if (parent->_rbt_left != nullptr) {
-    insert_left = false;
-    parent = parent->_rbt_left;
-    while (parent->_rbt_right != nullptr) {
-      parent = parent->_rbt_right;
-    }
+  // walk up until we are not smaller anymore
+  while ((parent->_rbt_parent != nullptr) && (Compare()(node, *parent->_rbt_parent))) {
+    parent = parent->_rbt_parent;
   }
 
-  node._rbt_parent = parent;
-  node._rbt_color = Base::Color::RED;
-
-  if (insert_left) {
-    parent->_rbt_left = &node;
-  } else {
-    parent->_rbt_right = &node;
-  }
-
-  if (!Compare()(node, *parent) && !Compare()(*parent, node)) {
-    if (insert_left) {
-      EqualityList::equality_list_insert_before(node, parent);
-    } else {
-      EqualityList::equality_list_insert_after(node, parent);
-    }
-  } else {
-    EqualityList::equality_list_insert_after(node, nullptr);
-  }
-
-  NodeTraits::leaf_inserted(node);
-  this->fixup_after_insert(&node);
+  this->insert_leaf(node, parent);
 }
 
 template<class Node, class NodeTraits, class Compare>
