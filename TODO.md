@@ -10,3 +10,4 @@
 * Interval Tree: Reduce the number of fixup operations
 * move lots of stuff into ygg::utilities
 * make early fails configurable
+* mark end iterator differently 

@@ -75,7 +75,7 @@ namespace ygg {
  * contain the linking between the tree nodes.
  *
  * @tparam Node       The node class itself. Yes, that's the class derived from this template. This sounds weird, but is correct. See the examples if you're confused.
- * @tparam multiple   Boolean specifying whether the Red-Black Tree should support multiple elements that compare equally to each other. See RBTree documentation for details.
+ * @tparam multiple     A boolean specifying whether multiple elements that compare equally to each other (i.e. with the same key) may be inserted into the tree. If you set this to false and nonetheless insert multiple equal elements, undefined behaviour occurrs. However, if you know that this will not happen, setting this to false will speed up operations and save a little memory.
  */
 template<class Node, bool multiple = false>
 class RBTreeNodeBase;
@@ -171,6 +171,11 @@ public:
    */
   void remove(Node & node);
 
+  /**
+   * @brief Removes all elements from the tree.
+   *
+   * Removes all elements from the tree.
+   */
   void clear();
 
   // Mainly debugging methods
@@ -195,6 +200,8 @@ public:
    * This class represents an iterator over elements in a Red-Black tree. The iterator
    * is an input iterator in terms of STL iterators, thus it provides only basic
    * functionality.
+   *
+   * *Warning*: For efficiency reasons, it is currently not possible to decrement the end() iterator!
    */
   template<bool reverse>
   class const_iterator {
@@ -278,9 +285,41 @@ public:
    */
   const_iterator<false> iterator_to(const Node & node) const;
 
-  // querying for contained elements
+  /**
+   * @brief Finds an element in the tree
+   *
+   * Returns an iterator to the first element that compares equally to <query>.
+   * Note that <query> does not have to be a Node, but can be anything that can
+   * be compared to a Node, i.e., for which
+   *    Compare()(const Node &, const Comparable &)
+   * and
+   *    Compare()(const Comparable &, const Node &)
+   * are defined and implemented. In the case of using the default std::less as
+   * Compare, that means you have to implement operator<() for both types.
+   *
+   * @param query An object comparing equally to the element that should be found.
+   * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
+   */
   template<class Comparable>
   const_iterator<false> find(const Comparable & query) const;
+
+  /**
+   * @brief Upper-bounds an element
+   *
+   * Returns an iterator to the smallest element to which <query> compares as
+   * "less", i.e. that is considered to go after <query>.
+   *
+   * Note that <query> does not have to be a Node, but can be anything that can
+   * be compared to a Node, i.e., for which
+   *    Compare()(const Node &, const Comparable &)
+   * and
+   *    Compare()(const Comparable &, const Node &)
+   * are defined and implemented. In the case of using the default std::less as
+   * Compare, that means you have to implement operator<() for both types.
+   *
+   * @param query An object comparable to Node that should be upper-bounded
+   * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
+   */
   template<class Comparable>
   const_iterator<false> upper_bound(const Comparable & query) const;
 
