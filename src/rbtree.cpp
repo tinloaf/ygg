@@ -91,7 +91,7 @@ namespace utilities {
 
 template<class Node, class Compare>
 void
-EqualityListHelper<Node, false, Compare>::equality_list_insert_node(Node & node, Node * predecessor)
+EqualityListHelper<Node, false, Compare>::equality_list_insert_before(Node & node, Node * predecessor)
 {
   (void)node;
   (void)predecessor;
@@ -99,7 +99,15 @@ EqualityListHelper<Node, false, Compare>::equality_list_insert_node(Node & node,
 
 template<class Node, class Compare>
 void
-EqualityListHelper<Node, true, Compare>::equality_list_insert_node(Node & node, Node * predecessor)
+EqualityListHelper<Node, false, Compare>::equality_list_insert_after(Node & node, Node * successor)
+{
+  (void)node;
+  (void)successor;
+}
+
+template<class Node, class Compare>
+void
+EqualityListHelper<Node, true, Compare>::equality_list_insert_before(Node & node, Node * predecessor)
 {
   if (predecessor == nullptr) {
     node._rbt_next = nullptr;
@@ -116,6 +124,23 @@ EqualityListHelper<Node, true, Compare>::equality_list_insert_node(Node & node, 
   }
 }
 
+template<class Node, class Compare>
+void
+EqualityListHelper<Node, true, Compare>::equality_list_insert_after(Node & node, Node * successor)
+{
+  if (successor == nullptr) {
+    node._rbt_next = nullptr;
+    node._rbt_prev = nullptr;
+  } else {
+    node._rbt_prev = successor->_rbt_prev;
+    node._rbt_next = successor;
+
+    if (successor->_rbt_prev != nullptr) {
+      successor->_rbt_prev->_rbt_next = &node;
+    }
+    successor->_rbt_prev = &node;
+  }
+}
 
 template<class Node, class Compare>
 void
@@ -343,7 +368,7 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
     node._rbt_parent = nullptr;
     node._rbt_color = Base::Color::BLACK;
     this->root = &node;
-    EqualityList::equality_list_insert_node(node, nullptr);
+    EqualityList::equality_list_insert_after(node, nullptr);
     NodeTraits::leaf_inserted(node);
   } else {
     node._rbt_parent = parent;
@@ -351,17 +376,17 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
 
     if (Compare()(node, *parent)) {
       parent->_rbt_left = &node;
-      EqualityList::equality_list_insert_node(node, nullptr);
+      EqualityList::equality_list_insert_after(node, nullptr);
     } else if (Compare()(*parent, node)) {
       parent->_rbt_right = &node;
-      EqualityList::equality_list_insert_node(node, nullptr);
+      EqualityList::equality_list_insert_after(node, nullptr);
     } else {
       //assert(multiple);
       if (!Node::_rbt_multiple) {
         return;
       }
       parent->_rbt_right = &node;
-      EqualityList::equality_list_insert_node(node, parent);
+      EqualityList::equality_list_insert_after(node, parent);
     }
 
     NodeTraits::leaf_inserted(node);
@@ -496,7 +521,51 @@ template<class Node, class NodeTraits, class Compare>
 void
 RBTree<Node, NodeTraits, Compare>::insert(Node & node)
 {
+  // TODO flatten
   this->insert_leaf(node);
+}
+
+template<class Node, class NodeTraits, class Compare>
+void
+RBTree<Node, NodeTraits, Compare>::insert(Node & node, Node & hint)
+{
+  // TODO step up etc. if not a direct predecessor?
+
+  // find parent
+  Node * parent = &hint;
+  bool insert_left = true;
+
+  if (parent->_rbt_left != nullptr) {
+    insert_left = false;
+    parent = parent->_rbt_left;
+    while (parent->_rbt_right != nullptr) {
+      parent = parent->_rbt_right;
+    }
+  }
+
+  node._rbt_parent = parent;
+  node._rbt_color = Base::Color::RED;
+
+  if (insert_left) {
+    parent->_rbt_left = &node;
+    EqualityList::equality_list_insert_after(node, nullptr);
+  } else {
+    parent->_rbt_right = &node;
+    EqualityList::equality_list_insert_after(node, parent);
+  }
+
+  if (!Compare()(node, *parent) && !Compare()(*parent, node)) {
+    if (insert_left) {
+      EqualityList::equality_list_insert_before(node, parent);
+    } else {
+      EqualityList::equality_list_insert_after(node, parent);
+    }
+  } else {
+    EqualityList::equality_list_insert_after(node, nullptr);
+  }
+
+  NodeTraits::leaf_inserted(node);
+  this->fixup_after_insert(&node);
 }
 
 template<class Node, class NodeTraits, class Compare>

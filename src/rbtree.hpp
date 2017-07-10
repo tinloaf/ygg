@@ -45,7 +45,8 @@ namespace ygg {
     template<class Node, class Compare>
     class EqualityListHelper<Node, true, Compare> {
     public:
-      static void equality_list_insert_node(Node & node, Node * predecessor);
+      static void equality_list_insert_after(Node & node, Node * predecessor);
+      static void equality_list_insert_before(Node & node, Node * successor);
       static void equality_list_delete_node(Node & node);
       static Node * equality_list_find_first(Node * node);
       static Node * equality_list_next(Node * node);
@@ -56,7 +57,8 @@ namespace ygg {
     template<class Node, class Compare>
     class EqualityListHelper<Node, false, Compare> {
     public:
-      static void equality_list_insert_node(Node & node, Node * predecessor);
+      static void equality_list_insert_after(Node & node, Node * predecessor);
+      static void equality_list_insert_before(Node & node, Node * successor);
       static void equality_list_delete_node(Node & node);
       static Node * equality_list_find_first(Node * node);
       static Node * equality_list_next(Node * node);
@@ -161,6 +163,8 @@ public:
    * @param   Node  The node to be inserted.
    */
   void insert(Node & node);
+
+  void insert(Node & node, Node & hint);
 
   /**
    * @brief Removes <node> from the tree
