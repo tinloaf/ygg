@@ -344,6 +344,21 @@ template<class Node, class NodeTraits, class Compare>
 void
 RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node, Node *start)
 {
+  this->insert_leaf_base<true>(node, start);
+}
+
+template<class Node, class NodeTraits, class Compare>
+void
+RBTree<Node, NodeTraits, Compare>::insert_leaf_right_biased(Node & node, Node *start)
+{
+  this->insert_leaf_base<false>(node, start);
+}
+
+template<class Node, class NodeTraits, class Compare>
+template<bool on_equality_prefer_left>
+void
+RBTree<Node, NodeTraits, Compare>::insert_leaf_base(Node & node, Node *start)
+{
   node._rbt_right = nullptr;
   node._rbt_left = nullptr;
 
@@ -381,8 +396,13 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node, Node *start)
       if (!Node::_rbt_multiple) {
         return;
       }
-      parent->_rbt_left = &node;
-      EqualityList::equality_list_insert_before(node, parent);
+      if (on_equality_prefer_left) {
+        parent->_rbt_left = &node;
+        EqualityList::equality_list_insert_before(node, parent);
+      } else {
+        parent->_rbt_right = &node;
+        EqualityList::equality_list_insert_after(node, parent);
+      }
     }
 
     NodeTraits::leaf_inserted(node);
@@ -528,6 +548,28 @@ RBTree<Node, NodeTraits, Compare>::insert(Node & node, Node & hint)
   }
 
   this->insert_leaf(node, parent);
+}
+
+template<class Node, class NodeTraits, class Compare>
+void
+RBTree<Node, NodeTraits, Compare>::insert(Node & node, RBTree<Node, NodeTraits, Compare>::const_iterator<false> hint)
+{
+  if (hint == this->end()) {
+    // special case: insert at the end
+    Node *parent = this->root;
+
+    if (parent == nullptr) {
+      this->insert_leaf_right_biased(node, parent);
+    } else {
+      while (parent->_rbt_right != nullptr) {
+        parent = parent->_rbt_right;
+      }
+      this->insert_leaf_right_biased(node, parent);
+    }
+  } else {
+    // TODO non-const iterator?
+    this->insert(node, const_cast<Node &>(*hint));
+  }
 }
 
 template<class Node, class NodeTraits, class Compare>

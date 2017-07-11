@@ -148,56 +148,6 @@ public:
   using Base = RBTreeNodeBase<Node, Node::_rbt_multiple>;
   using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple, Compare>;
 
-  RBTree();
-
-  /**
-   * @brief Inserts <node> into the tree
-   *
-   * Inserts <node> into the tree.
-   *
-   * *Warning*: Please note that after calling insert() on a node (and before
-   * removing that node again), that node *may not move in memory*. A common
-   * pitfall is to store nodes in a std::vector (or other STL container), which
-   * reallocates (and thereby moves objecs around).
-   *
-   * @param   Node  The node to be inserted.
-   */
-  void insert(Node & node);
-
-  void insert(Node & node, Node & hint);
-
-  /**
-   * @brief Removes <node> from the tree
-   *
-   * Removes <node> from the tree.
-   *
-   * @param   Node  The node to be removed.
-   */
-  void remove(Node & node);
-
-  /**
-   * @brief Removes all elements from the tree.
-   *
-   * Removes all elements from the tree.
-   */
-  void clear();
-
-  // Mainly debugging methods
-  /// @cond INTERNAL
-  bool verify_integrity() const;
-  /// @endcond
-
-  /**
-   * @brief Debugging Method: Draw the Tree as a .dot file
-   *
-   * Outputs the current tree as a .dot file which can be drawn using
-   * graphviz.
-   *
-   * @param filename  The file path where to write the .dot file.
-   */
-  void dump_to_dot(const std::string & filename) const;
-
-  // Iteration
   /**
    * @brief Iterator over elements in the tree
    *
@@ -248,6 +198,56 @@ public:
     /// @endcond
   };
 
+  RBTree();
+
+  /**
+   * @brief Inserts <node> into the tree
+   *
+   * Inserts <node> into the tree.
+   *
+   * *Warning*: Please note that after calling insert() on a node (and before
+   * removing that node again), that node *may not move in memory*. A common
+   * pitfall is to store nodes in a std::vector (or other STL container), which
+   * reallocates (and thereby moves objecs around).
+   *
+   * @param   Node  The node to be inserted.
+   */
+  void insert(Node & node);
+
+  void insert(Node & node, Node & hint);
+  void insert(Node & node, const_iterator<false> hint);
+  /**
+   * @brief Removes <node> from the tree
+   *
+   * Removes <node> from the tree.
+   *
+   * @param   Node  The node to be removed.
+   */
+  void remove(Node & node);
+
+  /**
+   * @brief Removes all elements from the tree.
+   *
+   * Removes all elements from the tree.
+   */
+  void clear();
+
+  // Mainly debugging methods
+  /// @cond INTERNAL
+  bool verify_integrity() const;
+  /// @endcond
+
+  /**
+   * @brief Debugging Method: Draw the Tree as a .dot file
+   *
+   * Outputs the current tree as a .dot file which can be drawn using
+   * graphviz.
+   *
+   * @param filename  The file path where to write the .dot file.
+   */
+  void dump_to_dot(const std::string & filename) const;
+
+  // Iteration
   /**
    * Returns an iterator pointing to the smallest element in the tree.
    */
@@ -345,7 +345,10 @@ private:
   void remove_to_leaf(Node & node);
   void fixup_after_delete(Node * parent, bool deleted_left);
 
+  template<bool on_equality_prefer_left>
+  void insert_leaf_base(Node & node, Node * start);
   void insert_leaf(Node & node, Node * start);
+  void insert_leaf_right_biased(Node & node, Node * start);
 
   void fixup_after_insert(Node * node);
   void rotate_left(Node * parent);
