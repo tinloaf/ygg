@@ -205,6 +205,8 @@ find_next_overlapping(Node * cur, const Comparable & q)
   // Pruning occurrs, we need to restart the search for the next larger node.
 
   do {
+    //std::cout << std::flush;
+
     // We make sure that at the start of the loop, the lower of cur is smaller
     // than the upper of q. Thus, we need to only check the upper to check for
     // overlap.
@@ -239,8 +241,7 @@ find_next_overlapping(Node * cur, const Comparable & q)
             //std::cout << "Pruning 2…";
             // Prune!
             // Nothing starting from this node can overlap. Backtrack.
-            // TODO WTF?
-            cur = cur->_rbt_left;
+            cur = cur->_rbt_parent;
             break;
           }
         }
@@ -349,9 +350,9 @@ template<class Comparable>
 typename IntervalTree<Node, NodeTraits>::template QueryResult<Comparable>::const_iterator &
 IntervalTree<Node, NodeTraits>::QueryResult<Comparable>::const_iterator::operator++()
 {
-  //std::cout << "Old n: " << this->n << "\n";
+  ////std::cout << "Old n: " << this->n << "\n";
   this->n = utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(this->n, this->q);
-  //std::cout << "New n: " << this->n << "\n";
+  ////std::cout << "New n: " << this->n << "\n";
 
   return *this;
 }
