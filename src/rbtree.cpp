@@ -161,7 +161,7 @@ EqualityListHelper<Node, true, Compare>::equality_list_delete_node(Node & node)
     node._rbt_prev->_rbt_next = node._rbt_next;
   }
 
-  // TODO FIXME DEBUG
+  // TODO Should pointers be nulled?
   //node._rbt_prev = nullptr;
   //node._rbt_next = nullptr;
 }
@@ -229,12 +229,7 @@ EqualityListHelper<Node, true, Compare>::equality_list_swap_if_necessary(Node & 
 {
   auto c = Compare();
 
-  // TODO FIXME DEBUG
-  bool n1ltn2 = c(n1, n2);
-  bool n2ltn1 = c(n2, n1);
-
-  //if (c(n1, n2) || c(n2, n1)) {
-  if (n1ltn2 || n2ltn1) {
+  if (c(n1, n2) || c(n2, n1)) {
     return; // elements are not equal
   }
 
@@ -347,19 +342,20 @@ RBTree<Node, NodeTraits, Compare>::RBTree()
 
 template<class Node, class NodeTraits, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
+RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node, Node *start)
 {
   node._rbt_right = nullptr;
   node._rbt_left = nullptr;
 
-  Node *parent = this->root;
-  Node *cur = this->root;
+  Node *parent = start;
+  Node *cur = start;
+
   while (cur != nullptr) {
     parent = cur;
-    if (Compare()(node, *cur)) {
-      cur = cur->_rbt_left;
-    } else { // TODO equality!
+    if (Compare()(*cur, node)) {
       cur = cur->_rbt_right;
+    } else {
+      cur = cur->_rbt_left;
     }
   }
 
@@ -385,8 +381,8 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf(Node & node)
       if (!Node::_rbt_multiple) {
         return;
       }
-      parent->_rbt_right = &node;
-      EqualityList::equality_list_insert_after(node, parent);
+      parent->_rbt_left = &node;
+      EqualityList::equality_list_insert_before(node, parent);
     }
 
     NodeTraits::leaf_inserted(node);
@@ -422,9 +418,6 @@ RBTree<Node, NodeTraits, Compare>::rotate_left(Node * parent)
 
   parent->_rbt_parent = right_child;
 
-  // TODO FIXME DEBUG
-  //this->verify_tree();
-
   NodeTraits::rotated_left(*parent);
 }
 
@@ -452,9 +445,6 @@ RBTree<Node, NodeTraits, Compare>::rotate_right(Node * parent)
   }
 
   parent->_rbt_parent = left_child;
-
-  // TODO FIXME DEBUG
-  //this->verify_tree();
 
   NodeTraits::rotated_right(*parent);
 }
@@ -522,48 +512,22 @@ void
 RBTree<Node, NodeTraits, Compare>::insert(Node & node)
 {
   // TODO flatten
-  this->insert_leaf(node);
+  this->insert_leaf(node, this->root);
 }
 
 template<class Node, class NodeTraits, class Compare>
 void
 RBTree<Node, NodeTraits, Compare>::insert(Node & node, Node & hint)
 {
-  // TODO step up etc. if not a direct predecessor?
-
   // find parent
   Node * parent = &hint;
-  bool insert_left = true;
 
-  if (parent->_rbt_left != nullptr) {
-    insert_left = false;
-    parent = parent->_rbt_left;
-    while (parent->_rbt_right != nullptr) {
-      parent = parent->_rbt_right;
-    }
+  // walk up until we are not smaller anymore
+  while ((parent->_rbt_parent != nullptr) && (Compare()(node, *parent->_rbt_parent))) {
+    parent = parent->_rbt_parent;
   }
 
-  node._rbt_parent = parent;
-  node._rbt_color = Base::Color::RED;
-
-  if (insert_left) {
-    parent->_rbt_left = &node;
-  } else {
-    parent->_rbt_right = &node;
-  }
-
-  if (!Compare()(node, *parent) && !Compare()(*parent, node)) {
-    if (insert_left) {
-      EqualityList::equality_list_insert_before(node, parent);
-    } else {
-      EqualityList::equality_list_insert_after(node, parent);
-    }
-  } else {
-    EqualityList::equality_list_insert_after(node, nullptr);
-  }
-
-  NodeTraits::leaf_inserted(node);
-  this->fixup_after_insert(&node);
+  this->insert_leaf(node, parent);
 }
 
 template<class Node, class NodeTraits, class Compare>
@@ -867,10 +831,7 @@ RBTree<Node, NodeTraits, Compare>::swap_nodes(Node * n1, Node * n2, bool swap_co
     this->swap_unrelated_nodes(n1, n2);
   }
 
-  // TODO FIXME DEBUG
-  //this->verify_equality();
   EqualityList::equality_list_swap_if_necessary(*n1, *n2);
-  //this->verify_equality();
 
   if (!swap_colors) {
     std::swap(n1->_rbt_color, n2->_rbt_color);
@@ -1028,10 +989,6 @@ RBTree<Node, NodeTraits, Compare>::remove_to_leaf(Node & node)
   }
 
   if (node._rbt_color == Base::Color::BLACK) {
-    // TODO FIXME DEBUG
-    //std::string fname = std::string("/tmp/trees/before-fixup.dot");
-    //this->dump_to_dot(fname);
-
     this->fixup_after_delete(node._rbt_parent, deleted_left);
   }
 }
@@ -1096,8 +1053,7 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
     //std::cout << "Case 4… ";
     parent->_rbt_color = Base::Color::BLACK;
     sibling->_rbt_color = Base::Color::RED;
-    // TODO FIXME DEBUG
-    //this->verify_integrity();
+
     return; // No further fixup necessary
   }
 
@@ -1127,10 +1083,6 @@ RBTree<Node, NodeTraits, Compare>::fixup_after_delete(Node * parent, bool delete
       // The new sibling is now the parent of the sibling
       sibling = sibling->_rbt_parent;
       sibling->_rbt_color = Base::Color::BLACK;
-
-      // TODO FIXME DEBUG
-      //std::string fname = std::string("/tmp/trees/after-5r.dot");
-      //this->dump_to_dot(fname);
     }
 
     // straight situation, case 6 applies!
@@ -1147,7 +1099,6 @@ RBTree<Node, NodeTraits, Compare>::remove(Node & node)
 {
   // TODO collapse this method
   this->remove_to_leaf(node);
-  //this->verify_integrity();
 }
 
 template<class Node, class NodeTraits, class Compare>

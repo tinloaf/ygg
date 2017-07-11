@@ -11,5 +11,4 @@
 * move lots of stuff into ygg::utilities
 * make early fails configurable
 * mark end iterator differently
-* test insertion with hint
-* hint insertion: actually search
+* kill move-constructor & copy-constructor & copy-assignment
