@@ -17,7 +17,7 @@ It's a header-only library. (Yes I know, there are .cpp files. I like to keep de
 Documentation
 =============
 
-There's a short usage example below which is probably enough if you just want to use the Red-Black-Tree. More documentation is being added over time here TODO.
+There's a short usage example below which is probably enough if you just want to use the Red-Black-Tree. More [Documentation](https://tinloaf.github.io/ygg/) is being added over time.
 
 Usage Example
 =============
