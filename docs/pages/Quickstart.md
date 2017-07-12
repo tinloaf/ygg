@@ -1,3 +1,5 @@
+@page quickstart Quickstart
+
 This page will guide you through the minimum steps necessary to use ygg::RBTree and ygg::IntervalTree.
 
 Using ygg::RBTree
