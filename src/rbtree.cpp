@@ -367,10 +367,18 @@ RBTree<Node, NodeTraits, Compare>::insert_leaf_base(Node & node, Node *start)
 
   while (cur != nullptr) {
     parent = cur;
-    if (Compare()(*cur, node)) {
-      cur = cur->_rbt_right;
+    if (on_equality_prefer_left) {
+      if (Compare()(*cur, node)) {
+        cur = cur->_rbt_right;
+      } else {
+        cur = cur->_rbt_left;
+      }
     } else {
-      cur = cur->_rbt_left;
+      if (Compare()(node, *cur)) {
+        cur = cur->_rbt_left;
+      } else {
+        cur = cur->_rbt_right;
+      }
     }
   }
 
@@ -542,12 +550,23 @@ RBTree<Node, NodeTraits, Compare>::insert(Node & node, Node & hint)
   // find parent
   Node * parent = &hint;
 
-  // walk up until we are not smaller anymore
-  while ((parent->_rbt_parent != nullptr) && (Compare()(node, *parent->_rbt_parent))) {
+  /* We need to walk up if:
+   *  - we're larger than the parent and in its left subtree
+   *  - we're smaller than the parent and in its right subtree
+   */
+  while ((parent->_rbt_parent != nullptr) &&
+          (((parent->_rbt_parent->_rbt_left == parent) && (Compare()(*parent->_rbt_parent, node))) || // left subtree, parent should go before node
+           ((parent->_rbt_parent->_rbt_right == parent) && (Compare()(node, *parent->_rbt_parent))))) { // right subtree, node should go before parent
     parent = parent->_rbt_parent;
   }
 
-  this->insert_leaf(node, parent);
+  if (parent->_rbt_left != nullptr) {
+    parent = parent->_rbt_left;
+    this->insert_leaf_right_biased(node, parent);
+  } else {
+    // TODO rename this to left_biased
+    this->insert_leaf(node, parent);
+  }
 }
 
 template<class Node, class NodeTraits, class Compare>

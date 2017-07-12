@@ -10,7 +10,7 @@
 
 using namespace ygg;
 
-#define TESTSIZE 2000
+#define TESTSIZE 1000
 
 class Node : public RBTreeNodeBase<Node> {
 public:
@@ -55,7 +55,7 @@ public:
 class EqualityNodeTraits {
 public:
   static std::string get_id(const EqualityNode * node) {
-    return std::to_string(node->data);
+    return std::string("(") + std::to_string(node->data) + std::string("/") + std::to_string(node->sub_data) + std::string(")");
   }
 
   static void leaf_inserted(EqualityNode & node) { (void)node ; };
@@ -175,6 +175,7 @@ TEST(RBTreeTest, RepeatedHintedPostEqualInsertionTest) {
 
   for (int i = TESTSIZE - 2 ; i >= 0 ; --i) {
     tree.insert(nodes_pre[i], nodes_pre[i+1]);
+    ASSERT_EQ(tree.begin()->sub_data, i);
   }
 
   for (int i = 0 ; i < TESTSIZE ; ++i) {
@@ -183,7 +184,6 @@ TEST(RBTreeTest, RepeatedHintedPostEqualInsertionTest) {
 
   tree.insert(node_border_large, nodes_post[0]);
   tree.insert(node_border_small, node_border_large);
-
   ASSERT_TRUE(tree.verify_integrity());
 
   auto it = tree.begin();
