@@ -120,6 +120,96 @@ TEST(RBTreeTest, LinearInsertionTest) {
   }
 }
 
+TEST(RBTreeTest, HintedPostEqualInsertionTest) {
+  auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
+
+  EqualityNode n_insert_before(1, 0);
+  EqualityNode n_pre(1, 1);
+  EqualityNode n_insert_between(1, 2);
+  EqualityNode n_post(2, 3);
+
+  tree.insert(n_pre);
+  tree.insert(n_post);
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  // should be inserted before pre
+  tree.insert(n_insert_before, n_pre);
+
+  // should be inserted between pre and post
+  tree.insert(n_insert_between, n_post);
+
+
+  auto it = tree.begin();
+  ASSERT_EQ(it->sub_data, 0);
+  it++;
+  ASSERT_EQ(it->sub_data, 1);
+  it++;
+  ASSERT_EQ(it->sub_data, 2);
+  it++;
+  ASSERT_EQ(it->sub_data, 3);
+  it++;
+  ASSERT_EQ(it, tree.end());
+}
+
+TEST(RBTreeTest, RepeatedHintedPostEqualInsertionTest) {
+  auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
+
+  EqualityNode nodes_pre[TESTSIZE];
+  EqualityNode nodes_post[TESTSIZE];
+  EqualityNode nodes_between[TESTSIZE];
+  EqualityNode node_border_small(1, TESTSIZE + 2);
+  EqualityNode node_border_large(2, TESTSIZE + 2);
+
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    nodes_pre[i] = EqualityNode(1, i);
+    nodes_post[i] = EqualityNode(2, i);
+    nodes_between[i] = EqualityNode(1, TESTSIZE + 1);
+  }
+
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    tree.insert(nodes_post[i], tree.end()); // insert in order
+  }
+
+  tree.insert(nodes_pre[TESTSIZE-1], nodes_post[0]);
+
+  for (int i = TESTSIZE - 2 ; i >= 0 ; --i) {
+    tree.insert(nodes_pre[i], nodes_pre[i+1]);
+  }
+
+  for (int i = 0 ; i < TESTSIZE ; ++i) {
+    tree.insert(nodes_between[i], nodes_pre[i]);
+  }
+
+  tree.insert(node_border_large, nodes_post[0]);
+  tree.insert(node_border_small, node_border_large);
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  auto it = tree.begin();
+  for (int i = 0 ; i < TESTSIZE ; ++i) {
+    ASSERT_EQ(it->data, 1);
+    ASSERT_EQ(it->sub_data, TESTSIZE + 1); // first, the 'between' node
+    it++;
+    ASSERT_EQ(it->data, 1);
+    ASSERT_EQ(it->sub_data, i); // now, the pre-node
+    it++;
+  }
+
+  ASSERT_EQ(it->data, 1);
+  ASSERT_EQ(it->sub_data, TESTSIZE + 2); // small border
+  it++;
+  ASSERT_EQ(it->data, 2);
+  ASSERT_EQ(it->sub_data, TESTSIZE + 2); // large border
+  it++;
+
+  for (int i = 0 ; i < TESTSIZE ; ++i) {
+    ASSERT_EQ(it->data, 2);
+    ASSERT_EQ(it->sub_data, i); // post-nodes
+    it++;
+  }
+}
+
 TEST(RBTreeTest, LinearEndHintedInsertionTest) {
   auto tree = RBTree<Node, NodeTraits>();
 
