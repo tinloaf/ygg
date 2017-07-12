@@ -5,12 +5,12 @@ This page will guide you through the minimum steps necessary to use ygg::RBTree 
 Using ygg::RBTree
 =================
 
-Setting up your own RBTree basically consists of TODO or TODO steps:
+Setting up your own RBTree basically consists of two to four steps:
 
 1. Define your Node class, inheriting from RBTreeNodeBase
 2. Optionally define your NodeTraits class (see below)
 3. Optionally define an own comparator class
-4. Create an RBTree based on the Node and NodeTraits class
+4. Create an RBTree based on the Node, NodeTraits and comparator class
 
 This example (which uses the defaults for steps 2 and 3 above) demonstrates it, assuming that you want to store a simple integer-to-string map in the tree:
 
@@ -36,7 +36,7 @@ using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>>;
 ~~~~~~~~~~~~~
 
 
-Inserting values into the tree is then a TODO steps process:
+Inserting values into the tree is then a three-step process:
 
 1. Allocate memory for the new node (you should probably allocate multiple in one go?)
 2. Set the node data
