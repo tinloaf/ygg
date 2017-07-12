@@ -104,7 +104,6 @@ public:
   enum class Color { RED, BLACK };
   constexpr static bool _rbt_multiple = false;
 
-
   Node *                  _rbt_parent = nullptr;
   Node *                  _rbt_left = nullptr;
   Node *                  _rbt_right = nullptr;
@@ -214,8 +213,46 @@ public:
    */
   void insert(Node & node);
 
+  /**
+   * @brief Inserts <node> into the tree, with a hint
+   *
+   * Inserts <node> into the tree, as close as possible before <hint>. Note that
+   * <hint> *must* be a node inserted into the tree that should not go before
+   * <node>. Otherwise, undefined behaviour occurrs.
+   *
+   * Specifying the hint allows you to (a) (very) slightly speed up insertion and
+   * (b) for <node> to go directly after <hint> if they compare equal.
+   *
+   * *Warning*: Please note that after calling insert() on a node (and before
+   * removing that node again), that node *may not move in memory*. A common
+   * pitfall is to store nodes in a std::vector (or other STL container), which
+   * reallocates (and thereby moves objecs around).
+   *
+   * @param   Node  The node to be inserted.
+   * @param   hint  A node before which <node> should be inserted.
+   */
   void insert(Node & node, Node & hint);
+
+  /**
+   * @brief Inserts <node> into the tree, with a hint
+   *
+   * Inserts <node> into the tree, as close as possible before <hint>. Note that
+   * <hint> *must* be pointing to a node inserted into the tree that should not go before
+   * <node>. Otherwise, undefined behaviour occurrs.
+   *
+   * Specifying the hint allows you to (a) (very) slightly speed up insertion and
+   * (b) for <node> to go directly after <hint> if they compare equal.
+   *
+   * *Warning*: Please note that after calling insert() on a node (and before
+   * removing that node again), that node *may not move in memory*. A common
+   * pitfall is to store nodes in a std::vector (or other STL container), which
+   * reallocates (and thereby moves objecs around).
+   *
+   * @param   Node  The node to be inserted.
+   * @param   hint  An iterator pointing to a node before which <node> should be inserted.
+   */
   void insert(Node & node, const_iterator<false> hint);
+
   /**
    * @brief Removes <node> from the tree
    *
