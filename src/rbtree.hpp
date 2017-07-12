@@ -79,7 +79,7 @@ namespace ygg {
  * @tparam Node       The node class itself. Yes, that's the class derived from this template. This sounds weird, but is correct. See the examples if you're confused.
  * @tparam multiple     A boolean specifying whether multiple elements that compare equally to each other (i.e. with the same key) may be inserted into the tree. If you set this to false and nonetheless insert multiple equal elements, undefined behaviour occurrs. However, if you know that this will not happen, setting this to false will speed up operations and save a little memory.
  */
-template<class Node, bool multiple = false>
+template<class Node, bool multiple = true>
 class RBTreeNodeBase;
 
 /// @cond INTERNAL
