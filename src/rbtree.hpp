@@ -133,16 +133,13 @@ public:
 };
 
 /**
- * @brief The Red-Black Tree
+ * @brief The non-specialized parts of the Red-Black Tree
  *
  * This is the main Red-Black Tree class.
  *
- * @tparam Node         The node class for this tree. It must be derived from RBTreeNodeBase. DOCTODO link
- * @tparam NodeTraits   A class implementing various hooks and functions on your node class. See DOCTODO for details.
- * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'. Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
 template<class Node, class NodeTraits, class Compare = std::less<Node>>
-class RBTree
+class RBTreeBase
 {
 public:
   using Base = RBTreeNodeBase<Node, Node::_rbt_multiple>;
@@ -198,24 +195,6 @@ public:
     /// @endcond
   };
 
-  RBTree();
-
-  /**
-   * @brief Inserts <node> into the tree
-   *
-   * Inserts <node> into the tree.
-   *
-   * *Warning*: Please note that after calling insert() on a node (and before
-   * removing that node again), that node *may not move in memory*. A common
-   * pitfall is to store nodes in a std::vector (or other STL container), which
-   * reallocates (and thereby moves objecs around).
-   *
-   * @param   Node  The node to be inserted.
-   */
-  void insert(Node & node);
-
-  void insert(Node & node, Node & hint);
-  void insert(Node & node, const_iterator<false> hint);
   /**
    * @brief Removes <node> from the tree
    *
@@ -289,46 +268,14 @@ public:
    */
   const_iterator<false> iterator_to(const Node & node) const;
 
-  /**
-   * @brief Finds an element in the tree
-   *
-   * Returns an iterator to the first element that compares equally to <query>.
-   * Note that <query> does not have to be a Node, but can be anything that can
-   * be compared to a Node, i.e., for which
-   *    Compare()(const Node &, const Comparable &)
-   * and
-   *    Compare()(const Comparable &, const Node &)
-   * are defined and implemented. In the case of using the default std::less as
-   * Compare, that means you have to implement operator<() for both types.
-   *
-   * @param query An object comparing equally to the element that should be found.
-   * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
-   */
-  template<class Comparable>
-  const_iterator<false> find(const Comparable & query) const;
-
-  /**
-   * @brief Upper-bounds an element
-   *
-   * Returns an iterator to the smallest element to which <query> compares as
-   * "less", i.e. that is considered to go after <query>.
-   *
-   * Note that <query> does not have to be a Node, but can be anything that can
-   * be compared to a Node, i.e., for which
-   *    Compare()(const Node &, const Comparable &)
-   * and
-   *    Compare()(const Comparable &, const Node &)
-   * are defined and implemented. In the case of using the default std::less as
-   * Compare, that means you have to implement operator<() for both types.
-   *
-   * @param query An object comparable to Node that should be upper-bounded
-   * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
-   */
-  template<class Comparable>
-  const_iterator<false> upper_bound(const Comparable & query) const;
-
 protected:
-  Node *root;
+	/**
+ 	 * This class should never be instantiated directly, only through RBTree!
+ 	 */
+	RBTreeBase();
+
+
+	Node *root;
 
   template<class NodeNameGetter>
   void dump_to_dot_base(const std::string & filename, NodeNameGetter name_getter) const;
@@ -336,7 +283,6 @@ protected:
   template<class NodeNameGetter>
   void output_node_base(const Node * node, std::ofstream & out, NodeNameGetter name_getter) const;
 
-private:
   using Path = std::vector<Node *>;
 
   Node * get_smallest() const;
@@ -366,6 +312,87 @@ private:
   bool verify_tree() const;
   bool verify_order() const;
   bool verify_equality() const;
+};
+
+
+/**
+ * @brief The Red-Black Tree
+ *
+ * This is the main Red-Black Tree class.
+ *
+ * @tparam Node         The node class for this tree. It must be derived from RBTreeNodeBase. DOCTODO link
+ * @tparam NodeTraits   A class implementing various hooks and functions on your node class. See DOCTODO for details.
+ * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'. Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
+ */
+template<class Node, class NodeTraits, class Compare = std::less<Node>>
+class RBTree : public RBTreeBase<Node, NodeTraits, Compare> {
+public:
+	RBTree();
+
+	template<bool reverse>
+	using const_iterator = typename RBTreeBase<Node, NodeTraits, Compare>::
+																										template const_iterator<reverse>;
+	using EqualityList = typename RBTreeBase<Node, NodeTraits, Compare>::EqualityList;
+
+	/**
+   * @brief Inserts <node> into the tree
+   *
+   * Inserts <node> into the tree.
+   *
+   * *Warning*: Please note that after calling insert() on a node (and before
+   * removing that node again), that node *may not move in memory*. A common
+   * pitfall is to store nodes in a std::vector (or other STL container), which
+   * reallocates (and thereby moves objecs around).
+   *
+   * @warning Not available for explicitly ordered trees
+   *
+   * @param   Node  The node to be inserted.
+   */
+	void insert(Node & node);
+	void insert(Node & node, Node & hint);
+	void insert(Node & node, const_iterator<false> hint);
+
+	/**
+	 * @brief Finds an element in the tree
+	 *
+	 * Returns an iterator to the first element that compares equally to <query>.
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default std::less as
+	 * Compare, that means you have to implement operator<() for both types.
+	 *
+	 * @warning Not available for explicitly ordered trees
+	 *
+	 * @param query An object comparing equally to the element that should be found.
+	 * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
+	 */
+	template<class Comparable>
+	const_iterator<false> find(const Comparable & query) const;
+
+	/**
+	 * @brief Upper-bounds an element
+	 *
+	 * Returns an iterator to the smallest element to which <query> compares as
+	 * "less", i.e. that is considered to go after <query>.
+	 *
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default std::less as
+	 * Compare, that means you have to implement operator<() for both types.
+ 	 *
+   * @warning Not available for explicitly ordered trees
+   *
+	 * @param query An object comparable to Node that should be upper-bounded
+	 * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
+	 */
+	template<class Comparable>
+	const_iterator<false> upper_bound(const Comparable & query) const;
 };
 
 #include "rbtree.cpp"
