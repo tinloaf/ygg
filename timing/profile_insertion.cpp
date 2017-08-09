@@ -12,7 +12,7 @@ using namespace ygg;
 
 #define BENCHMARK_SIZE 5000000
 
-class Node : public RBTreeNodeBase<Node, false> {
+class Node : public RBTreeNodeBase<Node, TreeOptions<>> {
 public:
   int data;
 

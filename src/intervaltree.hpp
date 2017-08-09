@@ -44,22 +44,24 @@ public:
   static typename NodeTraits::key_type get_upper(const utilities::DummyRange<typename NodeTraits::key_type> & range);
 };
 
-template<class Node, class NodeTraits, bool multiple = false>
-class ITreeNodeBase : public RBTreeNodeBase<Node, multiple> {
+template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>>
+class ITreeNodeBase : public RBTreeNodeBase<Node, Options> {
 public:
   typename NodeTraits::key_type    _it_max_upper;
 };
 
 
-template<class Node, class NodeTraits>
-class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, IntervalCompare<Node, NodeTraits>>
+template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>>
+class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>,
+                                   Options, IntervalCompare<Node, NodeTraits>>
 {
 public:
   using Key = typename NodeTraits::key_type;
   // TODO why do I need to specify this again?
   using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple, IntervalCompare<Node, NodeTraits>>;
   using ENodeTraits = ExtendedNodeTraits<Node, NodeTraits>;
-  using BaseTree = RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, IntervalCompare<Node, NodeTraits>>;
+  using BaseTree = RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, Options,
+                          IntervalCompare<Node, NodeTraits>>;
 
   IntervalTree();
 

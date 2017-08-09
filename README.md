@@ -2,6 +2,9 @@ This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a 
 
 If you need a Red-Black- or Interval Tree in your C++ application, and for some reason the existing implementations (like std::set or boost::instrusive::rbtree) are not suited for you, Ygg may be the answer. See the list of features below for why it's awesome!
 
+**Warning**: This is still in development. Therefore, things might could break. Also, the API 
+might change.
+
 Features
 ========
 

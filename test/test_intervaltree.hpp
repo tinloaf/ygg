@@ -26,7 +26,7 @@ public:
   }
 };
 
-class ITNode : public ITreeNodeBase<ITNode, MyNodeTraits<Node>, true> {
+class ITNode : public ITreeNodeBase<ITNode, MyNodeTraits<Node>, TreeOptions<TreeFlags::MULTIPLE>> {
 public:
   int data;
   unsigned int lower;

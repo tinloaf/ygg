@@ -13,7 +13,7 @@ using namespace ygg;
 
 #define BENCHMARK_SIZE 5000000
 
-class Node : public RBTreeNodeBase<Node, false>, public boost::intrusive::set_base_hook<> {
+class Node : public RBTreeNodeBase<Node, TreeOptions<>>, public boost::intrusive::set_base_hook<> {
 public:
   int data;
 

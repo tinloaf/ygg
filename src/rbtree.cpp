@@ -333,10 +333,8 @@ EqualityListHelper<Node, true, Compare>::verify(const Node & node)
 
 } // namespace utilities
 
-
-
-template<class Node, class NodeTraits, class Compare>
-RBTree<Node, NodeTraits, Compare>::RBTree()
+template<class Node, class NodeTraits, class Options, class Compare>
+RBTree<Node, NodeTraits, Options, Compare>::RBTree()
   : RBTreeBase<Node, NodeTraits, Compare>()
 {}
 
@@ -540,17 +538,17 @@ RBTreeBase<Node, NodeTraits, Compare>::fixup_after_insert(Node * node)
   grandparent->_rbt_color = Base::Color::RED;
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, class Options, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::insert(Node & node)
+RBTree<Node, NodeTraits, Options, Compare>::insert(Node & node)
 {
   // TODO flatten
   this->insert_leaf(node, this->root);
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, class Options, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::insert(Node & node, Node & hint)
+RBTree<Node, NodeTraits, Options, Compare>::insert(Node & node, Node & hint)
 {
   // find parent
   Node * parent = &hint;
@@ -574,9 +572,9 @@ RBTree<Node, NodeTraits, Compare>::insert(Node & node, Node & hint)
   }
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, class Options, class Compare>
 void
-RBTree<Node, NodeTraits, Compare>::insert(Node & node, RBTree<Node, NodeTraits, Compare>::const_iterator<false> hint)
+RBTree<Node, NodeTraits, Options, Compare>::insert(Node & node, RBTree<Node, NodeTraits, Options, Compare>::const_iterator<false> hint)
 {
   if (hint == this->end()) {
     // special case: insert at the end
@@ -1390,10 +1388,10 @@ RBTreeBase<Node, NodeTraits, Compare>::rend() const
   return this->crend();
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, class Options, class Compare>
 template<class Comparable>
-typename RBTree<Node, NodeTraits, Compare>::template const_iterator<false>
-RBTree<Node, NodeTraits, Compare>::find(const Comparable & query) const
+typename RBTree<Node, NodeTraits, Options, Compare>::template const_iterator<false>
+RBTree<Node, NodeTraits, Options, Compare>::find(const Comparable & query) const
 {
   Node * cur = this->root;
   while (cur != nullptr) {
@@ -1410,10 +1408,10 @@ RBTree<Node, NodeTraits, Compare>::find(const Comparable & query) const
   return this->cend();
 }
 
-template<class Node, class NodeTraits, class Compare>
+template<class Node, class NodeTraits, class Options, class Compare>
 template<class Comparable>
-typename RBTree<Node, NodeTraits, Compare>::template const_iterator<false>
-RBTree<Node, NodeTraits, Compare>::upper_bound(const Comparable & query) const
+typename RBTree<Node, NodeTraits, Options, Compare>::template const_iterator<false>
+RBTree<Node, NodeTraits, Options, Compare>::upper_bound(const Comparable & query) const
 {
   Node * cur = this->root;
   Node * bound = nullptr;

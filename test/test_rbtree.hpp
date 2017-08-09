@@ -12,7 +12,7 @@ using namespace ygg;
 
 #define TESTSIZE 1000
 
-class Node : public RBTreeNodeBase<Node> {
+class Node : public RBTreeNodeBase<Node, TreeOptions<>> { // No multi-nodes!
 public:
   int data;
 
@@ -25,7 +25,7 @@ public:
   }
 };
 
-class EqualityNode : public RBTreeNodeBase<EqualityNode, true> {
+class EqualityNode : public RBTreeNodeBase<EqualityNode> {
 public:
   int data;
   int sub_data;
@@ -66,7 +66,7 @@ public:
 };
 
 TEST(RBTreeTest, TrivialInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node n;
   n.data = 0;
@@ -77,7 +77,7 @@ TEST(RBTreeTest, TrivialInsertionTest) {
 
 
 TEST(RBTreeTest, RandomInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   std::mt19937 rng(4); // chosen by fair xkcd
   std::uniform_int_distribution<int> uni(std::numeric_limits<int>::min(),
@@ -104,7 +104,7 @@ TEST(RBTreeTest, RandomInsertionTest) {
 }
 
 TEST(RBTreeTest, LinearInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node nodes[TESTSIZE];
 
@@ -211,7 +211,7 @@ TEST(RBTreeTest, RepeatedHintedPostEqualInsertionTest) {
 }
 
 TEST(RBTreeTest, LinearEndHintedInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node nodes[TESTSIZE];
 
@@ -272,7 +272,7 @@ TEST(RBTreeTest, HinterOrderPreservationTest) {
 }
 
 TEST(RBTreeTest, LinearNextHintedInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node nodes[TESTSIZE];
 
@@ -295,7 +295,7 @@ TEST(RBTreeTest, LinearNextHintedInsertionTest) {
 }
 
 TEST(RBTreeTest, UpperBoundTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node nodes[TESTSIZE];
 
@@ -318,7 +318,7 @@ TEST(RBTreeTest, UpperBoundTest) {
 }
 
 TEST(RBTreeTest, TrivialDeletionTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node n1;
   n1.data = 0;
@@ -340,7 +340,7 @@ TEST(RBTreeTest, TrivialDeletionTest) {
 }
 
 TEST(RBTreeTest, LinearInsertionLinearDeletionTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node nodes[TESTSIZE];
 
@@ -368,7 +368,7 @@ TEST(RBTreeTest, LinearInsertionLinearDeletionTest) {
 }
 
 TEST(RBTreeTest, LinearInsertionRandomDeletionTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node nodes[TESTSIZE];
   std::vector<unsigned int> indices;
@@ -424,7 +424,7 @@ TEST(RBTreeTest, LinearMultipleIterationTest) {
 }
 
 TEST(RBTreeTest, LinearIterationTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node nodes[TESTSIZE];
   std::vector<size_t> indices;
@@ -454,7 +454,7 @@ TEST(RBTreeTest, LinearIterationTest) {
 }
 
 TEST(RBTreeTest, ReverseIterationTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node nodes[TESTSIZE];
   std::vector<size_t> indices;
@@ -486,7 +486,7 @@ TEST(RBTreeTest, ReverseIterationTest) {
 }
 
 TEST(RBTreeTest, FindTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node nodes[TESTSIZE];
 
@@ -511,7 +511,7 @@ TEST(RBTreeTest, FindTest) {
 }
 
 TEST(RBTreeTest, ComprehensiveTest) {
-  auto tree = RBTree<Node, NodeTraits>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
   Node persistent_nodes[TESTSIZE];
   std::vector<unsigned int> indices;

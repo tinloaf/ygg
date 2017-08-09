@@ -20,4 +20,4 @@ add_subdirectory (timing)
 
 # make CLion analyze all files
 add_custom_target(clion_dummy SOURCES src/rbtree.hpp src/intervaltree.hpp src/ygg.hpp
-        src/intervaltree.cpp src/rbtree.cpp)
+        src/intervaltree.cpp src/rbtree.cpp src/ygg.hpp src/util.hpp src/options.hpp)

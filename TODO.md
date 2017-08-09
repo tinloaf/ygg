@@ -1,7 +1,4 @@
-* doxygen?
 * 'default comparable?'
-* allow for additional comparison criterion?
-* make multiple = true the default
 * profiling
 * end()--?
 * lower_bound
@@ -12,3 +9,6 @@
 * make early fails configurable
 * mark end iterator differently
 * kill move-constructor & copy-constructor & copy-assignment
+
+* make helper functions use SFINAE
+* update documentation to reflect new options

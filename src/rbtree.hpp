@@ -5,6 +5,8 @@
 #include <set>
 #include <cassert>
 
+#include "options.hpp"
+
 // Only for debugging purposes
 #include <fstream>
 #include <vector>
@@ -66,6 +68,38 @@ namespace ygg {
       static void equality_list_swap_if_necessary(Node & n1, Node & n2);
       static bool verify(const Node & n);
     };
+
+	  /// @cond INTERNAL
+	  template<class Node, bool multiple>
+	  class RBTreeNodeBaseImpl;
+
+	  template<class Node>
+	  class RBTreeNodeBaseImpl<Node, true> {
+	  public:
+		  enum class Color { RED, BLACK };
+		  constexpr static bool _rbt_multiple = true;
+
+		  Node *                      _rbt_parent = nullptr;
+		  Node *                      _rbt_left = nullptr;
+		  Node *                      _rbt_right = nullptr;
+		  RBTreeNodeBaseImpl::Color   _rbt_color;
+
+		  Node *                      _rbt_prev;
+		  Node *                      _rbt_next;
+	  };
+
+	  template<class Node>
+	  class RBTreeNodeBaseImpl<Node, false> {
+	  public:
+		  enum class Color { RED, BLACK };
+		  constexpr static bool _rbt_multiple = false;
+
+		  Node *                      _rbt_parent = nullptr;
+		  Node *                      _rbt_left = nullptr;
+		  Node *                      _rbt_right = nullptr;
+		  RBTreeNodeBaseImpl::Color   _rbt_color;
+	  };
+	  /// @endcond
   } // namespace utilities
 
 
@@ -79,38 +113,8 @@ namespace ygg {
  * @tparam Node       The node class itself. Yes, that's the class derived from this template. This sounds weird, but is correct. See the examples if you're confused.
  * @tparam multiple     A boolean specifying whether multiple elements that compare equally to each other (i.e. with the same key) may be inserted into the tree. If you set this to false and nonetheless insert multiple equal elements, undefined behaviour occurrs. However, if you know that this will not happen, setting this to false will speed up operations and save a little memory.
  */
-template<class Node, bool multiple = false>
-class RBTreeNodeBase;
-
-/// @cond INTERNAL
-template<class Node>
-class RBTreeNodeBase<Node, true> {
-public:
-  enum class Color { RED, BLACK };
-  constexpr static bool _rbt_multiple = true;
-
-  Node *                  _rbt_parent = nullptr;
-  Node *                  _rbt_left = nullptr;
-  Node *                  _rbt_right = nullptr;
-  RBTreeNodeBase::Color   _rbt_color;
-
-  Node *                  _rbt_prev;
-  Node *                  _rbt_next;
-};
-
-template<class Node>
-class RBTreeNodeBase<Node, false> {
-public:
-  enum class Color { RED, BLACK };
-  constexpr static bool _rbt_multiple = false;
-
-
-  Node *                  _rbt_parent = nullptr;
-  Node *                  _rbt_left = nullptr;
-  Node *                  _rbt_right = nullptr;
-  RBTreeNodeBase::Color   _rbt_color;
-};
-/// @endcond
+template<class Node, class Options = TreeOptions<TreeFlags::MULTIPLE>>
+using RBTreeNodeBase = utilities::RBTreeNodeBaseImpl<Node, Options::multiple>;
 
 /**
  * @brief   Helper base class for the NodeTraits you need to implement
@@ -142,7 +146,7 @@ template<class Node, class NodeTraits, class Compare = std::less<Node>>
 class RBTreeBase
 {
 public:
-  using Base = RBTreeNodeBase<Node, Node::_rbt_multiple>;
+  using Base = utilities::RBTreeNodeBaseImpl<Node, Node::_rbt_multiple>;
   using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple, Compare>;
 
   /**
@@ -324,7 +328,8 @@ protected:
  * @tparam NodeTraits   A class implementing various hooks and functions on your node class. See DOCTODO for details.
  * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'. Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
-template<class Node, class NodeTraits, class Compare = std::less<Node>>
+template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
+         class Compare = std::less<Node>>
 class RBTree : public RBTreeBase<Node, NodeTraits, Compare> {
 public:
 	RBTree();
