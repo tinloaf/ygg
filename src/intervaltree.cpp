@@ -1,109 +1,116 @@
-template<class Node, class NodeTraits>
-template<class T1, class T2>
+namespace utilities {
+
+template <class Node, class NodeTraits>
+template <class T1, class T2>
 bool
-IntervalCompare<Node, NodeTraits>::operator()(const T1 & lhs, const T2 & rhs) const
+IntervalCompare<Node, NodeTraits>::operator()(const T1 &lhs, const T2 &rhs) const
 {
-  if (NodeTraits::get_lower(lhs) < NodeTraits::get_lower(rhs)) {
-    return true;
-  } else if ((NodeTraits::get_lower(lhs) == NodeTraits::get_lower(rhs)) &&
-             (NodeTraits::get_upper(lhs) < NodeTraits::get_upper(rhs))) {
-    return true;
-  } else {
-    return false;
-  }
+	if (NodeTraits::get_lower(lhs) < NodeTraits::get_lower(rhs)) {
+		return true;
+	} else if ((NodeTraits::get_lower(lhs) == NodeTraits::get_lower(rhs)) &&
+	           (NodeTraits::get_upper(lhs) < NodeTraits::get_upper(rhs))) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
-template<class Node, class NodeTraits>
+template <class Node, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::leaf_inserted(Node & node)
+ExtendedNodeTraits<Node, NodeTraits>::leaf_inserted(Node &node)
 {
-  node._it_max_upper = NodeTraits::get_upper(node);
+	node._it_max_upper = NodeTraits::get_upper(node);
 
-  // Propagate up
-  Node * cur = node._rbt_parent;
-  while ((cur != nullptr) && (cur->_it_max_upper < node._it_max_upper)) {
-    cur->_it_max_upper = node._it_max_upper;
-    cur = cur->_rbt_parent;
-  }
+	// Propagate up
+	Node *cur = node._rbt_parent;
+	while ((cur != nullptr) && (cur->_it_max_upper < node._it_max_upper)) {
+		cur->_it_max_upper = node._it_max_upper;
+		cur = cur->_rbt_parent;
+	}
 }
 
-template<class Node, class NodeTraits>
+template <class Node, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::fix_node(Node & node)
+ExtendedNodeTraits<Node, NodeTraits>::fix_node(Node &node)
 {
-  auto old_val = node._it_max_upper;
-  node._it_max_upper = NodeTraits::get_upper(node);
+	auto old_val = node._it_max_upper;
+	node._it_max_upper = NodeTraits::get_upper(node);
 
-  if (node._rbt_left != nullptr) {
-    node._it_max_upper = std::max(node._it_max_upper, node._rbt_left->_it_max_upper);
-  }
+	if (node._rbt_left != nullptr) {
+		node._it_max_upper = std::max(node._it_max_upper, node._rbt_left->_it_max_upper);
+	}
 
-  if (node._rbt_right != nullptr) {
-    node._it_max_upper = std::max(node._it_max_upper, node._rbt_right->_it_max_upper);
-  }
+	if (node._rbt_right != nullptr) {
+		node._it_max_upper = std::max(node._it_max_upper, node._rbt_right->_it_max_upper);
+	}
 
-  if (old_val != node._it_max_upper) {
-    // propagate up
-    Node * cur = node._rbt_parent;
-    if (cur != nullptr) {
-      if ((cur->_it_max_upper < node._it_max_upper) || (cur->_it_max_upper == old_val)) {
-        fix_node(*cur);
-      }
-    }
-  }
+	if (old_val != node._it_max_upper) {
+		// propagate up
+		Node *cur = node._rbt_parent;
+		if (cur != nullptr) {
+			if ((cur->_it_max_upper < node._it_max_upper) || (cur->_it_max_upper == old_val)) {
+				fix_node(*cur);
+			}
+		}
+	}
 }
 
-template<class Node, class NodeTraits>
+template <class Node, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::rotated_left(Node & node)
+ExtendedNodeTraits<Node, NodeTraits>::rotated_left(Node &node)
 {
-  // 'node' is the node that was the old parent.
-  fix_node(node);
-  fix_node(*(node._rbt_parent));
+	// 'node' is the node that was the old parent.
+	fix_node(node);
+	fix_node(*(node._rbt_parent));
 }
 
-template<class Node, class NodeTraits>
+template <class Node, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::rotated_right(Node & node)
+ExtendedNodeTraits<Node, NodeTraits>::rotated_right(Node &node)
 {
-  // 'node' is the node that was the old parent.
-  fix_node(node);
-  fix_node(*(node._rbt_parent));
+	// 'node' is the node that was the old parent.
+	fix_node(node);
+	fix_node(*(node._rbt_parent));
 }
 
-template<class Node, class NodeTraits>
+template <class Node, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::deleted_below(Node & node) {
-  fix_node(node);
+ExtendedNodeTraits<Node, NodeTraits>::deleted_below(Node &node)
+{
+	fix_node(node);
 }
 
-template<class Node, class NodeTraits>
+template <class Node, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::swapped(Node & n1, Node & n2) {
-  fix_node(n1);
-  if (n1._rbt_parent != nullptr) {
-    fix_node(*(n1._rbt_parent));
-  }
+ExtendedNodeTraits<Node, NodeTraits>::swapped(Node &n1, Node &n2)
+{
+	fix_node(n1);
+	if (n1._rbt_parent != nullptr) {
+		fix_node(*(n1._rbt_parent));
+	}
 
-  fix_node(n2);
-  if (n2._rbt_parent != nullptr) {
-    fix_node(*(n2._rbt_parent));
-  }
+	fix_node(n2);
+	if (n2._rbt_parent != nullptr) {
+		fix_node(*(n2._rbt_parent));
+	}
 }
 
-template<class Node, class NodeTraits>
+template <class Node, class NodeTraits>
 typename NodeTraits::key_type
-ExtendedNodeTraits<Node, NodeTraits>::get_lower(const utilities::DummyRange<typename NodeTraits::key_type> & range)
+ExtendedNodeTraits<Node, NodeTraits>::get_lower(
+				const utilities::DummyRange<typename NodeTraits::key_type> &range)
 {
-  return std::get<0>(range);
+	return std::get<0>(range);
 }
 
-template<class Node, class NodeTraits>
+template <class Node, class NodeTraits>
 typename NodeTraits::key_type
-ExtendedNodeTraits<Node, NodeTraits>::get_upper(const utilities::DummyRange<typename NodeTraits::key_type> & range)
+ExtendedNodeTraits<Node, NodeTraits>::get_upper(
+				const utilities::DummyRange<typename NodeTraits::key_type> &range)
 {
-  return std::get<1>(range);
+	return std::get<1>(range);
 }
+} // namespace utilities
 
 template<class Node, class NodeTraits, class Options>
 IntervalTree<Node, NodeTraits, Options>::IntervalTree()

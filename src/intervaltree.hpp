@@ -17,32 +17,31 @@ namespace ygg {
     public:
       DummyRange(KeyType lower, KeyType upper);
     };
+
+	  template<class Node, class NodeTraits>
+	  class IntervalCompare {
+	  public:
+		  template<class T1, class T2>
+		  bool operator()(const T1 & lhs, const T2 & rhs) const;
+	  };
+
+	  // TODO add a possibility for bulk updates
+	  template<class Node, class NodeTraits>
+	  class ExtendedNodeTraits : public NodeTraits {
+	  public:
+		  // TODO these can probably made more efficient
+		  static void leaf_inserted(Node & node);
+		  static void fix_node(Node & node);
+		  static void rotated_left(Node & node);
+		  static void rotated_right(Node & node);
+		  static void deleted_below(Node & node);
+		  static void swapped(Node & n1, Node & n2);
+
+		  // Make our DummyRange comparable
+		  static typename NodeTraits::key_type get_lower(const utilities::DummyRange<typename NodeTraits::key_type> & range);
+		  static typename NodeTraits::key_type get_upper(const utilities::DummyRange<typename NodeTraits::key_type> & range);
+	  };
   } // namespace utilities
-
-
-template<class Node, class NodeTraits>
-class IntervalCompare {
-public:
-  template<class T1, class T2>
-  bool operator()(const T1 & lhs, const T2 & rhs) const;
-};
-
-// TODO add a possibility for bulk updates
-template<class Node, class NodeTraits>
-class ExtendedNodeTraits : public NodeTraits {
-public:
-  // TODO these can probably made more efficient
-  static void leaf_inserted(Node & node);
-  static void fix_node(Node & node);
-  static void rotated_left(Node & node);
-  static void rotated_right(Node & node);
-  static void deleted_below(Node & node);
-  static void swapped(Node & n1, Node & n2);
-
-  // Make our DummyRange comparable
-  static typename NodeTraits::key_type get_lower(const utilities::DummyRange<typename NodeTraits::key_type> & range);
-  static typename NodeTraits::key_type get_upper(const utilities::DummyRange<typename NodeTraits::key_type> & range);
-};
 
 template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>>
 class ITreeNodeBase : public RBTreeNodeBase<Node, Options> {
@@ -52,16 +51,17 @@ public:
 
 
 template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>>
-class IntervalTree : public RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>,
-                                   Options, IntervalCompare<Node, NodeTraits>>
+class IntervalTree : public RBTree<Node, utilities::ExtendedNodeTraits<Node, NodeTraits>,
+                                   Options, utilities::IntervalCompare<Node, NodeTraits>>
 {
 public:
   using Key = typename NodeTraits::key_type;
   // TODO why do I need to specify this again?
-  using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple, IntervalCompare<Node, NodeTraits>>;
-  using ENodeTraits = ExtendedNodeTraits<Node, NodeTraits>;
-  using BaseTree = RBTree<Node, ExtendedNodeTraits<Node, NodeTraits>, Options,
-                          IntervalCompare<Node, NodeTraits>>;
+  using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple,
+                                                     utilities::IntervalCompare<Node, NodeTraits>>;
+  using ENodeTraits = utilities::ExtendedNodeTraits<Node, NodeTraits>;
+  using BaseTree = RBTree<Node, utilities::ExtendedNodeTraits<Node, NodeTraits>, Options,
+					                utilities::IntervalCompare<Node, NodeTraits>>;
 
   IntervalTree();
 

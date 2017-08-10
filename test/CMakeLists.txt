@@ -14,3 +14,6 @@ set_target_properties(run_tests
                       )
 
 target_link_libraries (run_tests LINK_PUBLIC ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
+# make CLion analyze all files
+add_custom_target(clion_test_dummy SOURCES test_intervaltree.hpp test_orderlist.hpp test_rbtree.hpp)

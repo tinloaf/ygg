@@ -20,7 +20,8 @@ It's a header-only library. (Yes I know, there are .cpp files. I like to keep de
 Documentation
 =============
 
-There's a short usage example below which is probably enough if you just want to use the Red-Black-Tree. More documentation is being added over time here TODO.
+There's a short usage example below which is probably enough if you just want to use the 
+Red-Black-Tree. More documentation is being added over time [here](https://tinloaf.github.io/ygg/).
 
 Usage Example
 =============
@@ -32,8 +33,11 @@ This creates a Node class for you (which just holds an int-to-std::string mappin
 
 using namespace ygg;
 
+// The tree options
+using MyTreeOptions = TreeOptions<TreeFlags::Multiple>;
+
 // The node class
-class Node : public RBTreeNodeBase<Node> {
+class Node : public RBTreeNodeBase<Node, MyTreeOptions> {
 public:
   int key;
   std::string value;
@@ -45,7 +49,7 @@ public:
 }
 
 // Configure the RBTree based on Node and the default NodeTraits
-using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>>;
+using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
 ~~~~~~~~~~~~~
 
 Now, let's add some elements, iterate and query:

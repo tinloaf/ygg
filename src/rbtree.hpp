@@ -110,11 +110,13 @@ namespace ygg {
  * class (template). It supplies your class with the necessary members to
  * contain the linking between the tree nodes.
  *
- * @tparam Node       The node class itself. Yes, that's the class derived from this template. This sounds weird, but is correct. See the examples if you're confused.
- * @tparam multiple     A boolean specifying whether multiple elements that compare equally to each other (i.e. with the same key) may be inserted into the tree. If you set this to false and nonetheless insert multiple equal elements, undefined behaviour occurrs. However, if you know that this will not happen, setting this to false will speed up operations and save a little memory.
+ * @tparam Node    The node class itself. Yes, that's the class derived from this template. This
+ * sounds weird, but is correct. See the examples if you're confused.
+ * @tparam options  The options class (a version of TreeOptions) that you parameterize the tree
+ * with. (See the options parameter of RBTree.)
  */
 template<class Node, class Options = TreeOptions<TreeFlags::MULTIPLE>>
-using RBTreeNodeBase = utilities::RBTreeNodeBaseImpl<Node, Options::multiple>;
+class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Options::multiple> {};
 
 /**
  * @brief   Helper base class for the NodeTraits you need to implement
@@ -139,14 +141,15 @@ public:
 /**
  * @brief The non-specialized parts of the Red-Black Tree
  *
- * This is the main Red-Black Tree class.
+ * This is the main Red-Black Tree class. For more information, see RBTree. This class cannot be
+ * instantiated on its own.
  *
  */
 template<class Node, class NodeTraits, class Compare = std::less<Node>>
 class RBTreeBase
 {
 public:
-  using Base = utilities::RBTreeNodeBaseImpl<Node, Node::_rbt_multiple>;
+  using Base = utilities::RBTreeNodeBaseImpl<Node, Node::_rbt_multiple>; // TODO rename
   using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple, Compare>;
 
   /**
@@ -324,9 +327,13 @@ protected:
  *
  * This is the main Red-Black Tree class.
  *
- * @tparam Node         The node class for this tree. It must be derived from RBTreeNodeBase. DOCTODO link
- * @tparam NodeTraits   A class implementing various hooks and functions on your node class. See DOCTODO for details.
- * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'. Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
+ * @tparam Node         The node class for this tree. It must be derived from RBTreeNodeBase.
+ * @tparam NodeTraits   A class implementing various hooks and functions on your node class. See
+ * DOCTODO for details.
+ * @tparam Options			The TreeOptions class specifying the parameters of this RBTree. See the
+ * TreeOptions and TreeFlags classes for details.
+ * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'.
+ * Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
 template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
          class Compare = std::less<Node>>

@@ -3,22 +3,27 @@ This page will guide you through the minimum steps necessary to use ygg::RBTree 
 Using ygg::RBTree
 =================
 
-Setting up your own RBTree basically consists of TODO or TODO steps:
+Setting up your own RBTree basically consists of three to five steps:
 
-1. Define your Node class, inheriting from RBTreeNodeBase
-2. Optionally define your NodeTraits class (see below)
-3. Optionally define an own comparator class
-4. Create an RBTree based on the Node and NodeTraits class
+1. Decide on which options to set for your tree.
+2. Define your Node class, inheriting from RBTreeNodeBase
+3. Optionally define your own NodeTraits class (see below)
+4. Optionally define an own comparator class
+5. Create an RBTree based on the Node and NodeTraits class
 
-This example (which uses the defaults for steps 2 and 3 above) demonstrates it, assuming that you want to store a simple integer-to-string map in the tree:
+This example (which uses the defaults for steps 3 and 4 above) demonstrates it, assuming that you
+ want to store a simple integer-to-string map in the tree:
 
 ~~~~~~~~~~~~~{.cpp}
 #include "ygg.hpp"
 
 using namespace ygg;
 
+// The tree options
+using MyTreeOptions = TreeOptions<TreeFlags::Multiple>;
+
 // The node class
-class Node : public RBTreeNodeBase<Node> {
+class Node : public RBTreeNodeBase<Node, MyTreeOptions> {
 public:
   int key;
   std::string value;
@@ -30,11 +35,13 @@ public:
 }
 
 // Configure the RBTree based on Node and the default NodeTraits
-using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>>;
+using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
 ~~~~~~~~~~~~~
 
+In fact, we could have skipped defining our own TreeOptions here, since TreeFlags::MULTIPLE is 
+the default.
 
-Inserting values into the tree is then a TODO steps process:
+Inserting values into the tree is then a three-step process:
 
 1. Allocate memory for the new node (you should probably allocate multiple in one go?)
 2. Set the node data
@@ -84,7 +91,8 @@ Using ygg::IntervalTree
 
 Using the IntervalTree is similar to using the RBTree. You need to implement your own node. However, Intervals can not just be compared to each other using `operator<(…)`, but the IntervalTree has to have access to the actual upper and lower bounds of the intervals. This is achieved by implementing the `get_upper()` and `get_lower()` methods, and setting a `key_type` typedef (or using) in the NodeTraits. You have to implement NodeTraits yourself for the IntervalTree (as opposed to the Red-Black-Tree). However, these are the only three things you have to implement. See TODO for details on implementing NodeTraits.
 
-Again, an example demonstrates setting up an IntervalTree, this time mapping intervals to strings:
+Again, an example demonstrates setting up an IntervalTree, this time mapping intervals to strings
+. Note that this time we do not specify our own TreeOptions, but use the default value.
 
 ~~~~~~~~~~~~~{.cpp}
 #include "ygg.hpp"

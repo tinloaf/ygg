@@ -12,3 +12,5 @@
 
 * make helper functions use SFINAE
 * update documentation to reflect new options
+
+* move node base into tree
