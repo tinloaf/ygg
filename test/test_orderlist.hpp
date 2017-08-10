@@ -14,8 +14,8 @@ using namespace ygg::utilities;
 
 class ONode : public OrderListItem<ONode, true> {
 public:
-	ONode * _rbt_prev;
 	ONode * _rbt_next;
+	ONode * _rbt_prev;
 
 	ONode () : _rbt_next(nullptr), _rbt_prev(nullptr) {};
 };
