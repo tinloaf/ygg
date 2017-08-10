@@ -1,8 +1,8 @@
 This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++11 implementation of a Red-Black-Tree as well as an Interval Tree based on the Red-Black-Tree.
 
-If you need a Red-Black- or Interval Tree in your C++ application, and for some reason the existing implementations (like std::set or boost::instrusive::rbtree) are not suited for you, Ygg may be the answer. See the list of features below for why it's awesome!
+If you need a Red-Black- or Interval Tree in your C++ application, and for some reason the existing implementations (like `std::set` or `boost::instrusive::rbtree`) are not suited for you, Ygg may be the answer. See the list of features below for why it's awesome!
 
-**Warning**: This is still in development. Therefore, things could break. Also, the API 
+**Warning**: This is still in development. Therefore, things could break. Also, the API
 might change.
 
 Features
@@ -20,15 +20,14 @@ It's a header-only library. (Yes I know, there are .cpp files. I like to keep de
 Documentation
 =============
 
-There's a short usage example below which is probably enough if you just want to use the 
-Red-Black-Tree. More documentation is being added over time [here](https://tinloaf.github.io/ygg/).
+There's a short usage example below which is probably enough if you just want to use the Red-Black-Tree. More [Documentation](https://tinloaf.github.io/ygg/) is being added over time.
 
 Usage Example
 =============
 
 This creates a Node class for you (which just holds an int-to-std::string mapping, pretty boring) and sets up an Red-Black-Tree on top of it:
 
-~~~~~~~~~~~~~{.cpp}
+```cpp
 #include "ygg.hpp"
 
 using namespace ygg;
@@ -54,7 +53,7 @@ using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
 
 Now, let's add some elements, iterate and query:
 
-~~~~~~~~~~~~~{.cpp}
+```cpp
 // We need this s.t. we can query by key value (i.e, an int) directly
 bool operator<(const Node & lhs, int rhs) {
   return lhs.key < rhs;
@@ -94,7 +93,7 @@ int main(int argc, char **argv) {
     std::cout << "A node: " << n.value << "\n";
   }
 }
-~~~~~~~~~~~~~
+```
 
 License
 =======
