@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['welcome_20to_20ygg',['Welcome to Ygg',['../start.html',1,'']]]
+  ['startpage',['Startpage',['../md_pages_Startpage.html',1,'']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['welcome_20to_20ygg',['Welcome to Ygg',['../start.html',1,'']]]
+  ['upper_5fbound',['upper_bound',['../classygg_1_1RBTree.html#acb0b67ce9b4b1f8ea5879fd65550a132',1,'ygg::RBTree']]]
 ];
