@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['begin',['begin',['../classygg_1_1RBTreeBase.html#acd2ff837287901e477e26b2a6ab4ad1c',1,'ygg::RBTreeBase']]]
+  ['begin',['begin',['../classygg_1_1RBTreeBase.html#a525c0ec7fd418e3badce6f21e80bfbbe',1,'ygg::RBTreeBase']]]
 ];

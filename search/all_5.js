@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['insert',['insert',['../classygg_1_1RBTree.html#a0b8e912b384673193b1506756654c45b',1,'ygg::RBTree']]],
-  ['intervaltree',['IntervalTree',['../classygg_1_1IntervalTree.html',1,'ygg']]],
-  ['iterator_5fto',['iterator_to',['../classygg_1_1RBTreeBase.html#a131c25e0476307f48196327e858e19f8',1,'ygg::RBTreeBase']]],
-  ['itreenodebase',['ITreeNodeBase',['../classygg_1_1ITreeNodeBase.html',1,'ygg']]]
+  ['get_5flower',['get_lower',['../classygg_1_1ITreeNodeTraits.html#aa9fb6e1b6f66acd042aab563e785470b',1,'ygg::ITreeNodeTraits']]],
+  ['get_5fupper',['get_upper',['../classygg_1_1ITreeNodeTraits.html#ab72917887e039aa9981d1b0dda00ecff',1,'ygg::ITreeNodeTraits']]]
 ];
