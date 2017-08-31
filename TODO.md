@@ -10,3 +10,4 @@
 * make helper functions use SFINAE
 * move node base into tree
 * When we pass NB around, we probably don't need NodeTraits anymore?
+* Multi-Trees: add more tests
