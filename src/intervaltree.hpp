@@ -50,7 +50,52 @@ public:
   typename NodeTraits::key_type    _it_max_upper;
 };
 
+/**
+ * @brief Abstract base class for the Node Traits that need to be implemented
+ *
+ * Every Interval Tree needs to be supplied with a node traits class that must be derived from
+ * this class. In your derived class, you must define the key_type as the type of your interval's
+ * bounds, and you must implement get_lower() and get_upper() to return the interval bounds of
+ * your nodes.
+ */
+template<class Node>
+class ITreeNodeTraits {
+public:
+	/**
+	 * @brief The type of your interval bounds. This is the type that get_lower() and get_upper()
+	 * must return. This type must be comparable, i.e., operator< etc. must be implemented.
+	 */
+	using key_type = void;
 
+	/**
+	 * Must be implemented to return the lower bound of the interval represented by n.
+	 *
+	 * @param n The node whose lower interval bound should be returned.
+	 * @return Must return the lower interval bound of n
+	 */
+	key_type get_lower(const Node & n) = delete;
+
+	/**
+	 * Must be implemented to return the upper bound of the interval represented by n.
+	 *
+	 * @param n The node whose upper interval bound should be returned.
+	 * @return Must return the upper interval bound of n
+	 */
+	key_type get_upper(const Node & n) = delete;
+};
+
+/**
+ * @brief Stores an Interval Tree
+ *
+ * This class stores an interval tree on the nodes it contains. It is implemented via the
+ * 'augmented red-black tree' described by Cormen et al.
+ *
+ * @tparam Node 				The node class for this Interval Tree. Must be derived from ITreeNodeBase.
+ * @tparam NodeTraits 	The node traits for this Interval Tree. Must be derived from
+ * @tparam Options			Passed through to RBTree. See there for documentation.
+ * @tparam Tag					Used to add nodes to multiple interval trees. See RBTree documentation
+ * for details.
+ */
 template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
 				int Tag = 0>
 class IntervalTree : public RBTree<Node,
@@ -64,10 +109,13 @@ public:
   // TODO why do I need to specify this again?
 
 	using INB = ITreeNodeBase<Node, NodeTraits, Options, Tag>;
-	static_assert(std::is_base_of<INB, Node>::value, "Node class not properly derived from "
-					"ITreeNodeBase");
+	static_assert(std::is_base_of<INB, Node>::value,
+	              "Node class not properly derived from ITreeNodeBase!");
 
-  using EqualityList = utilities::EqualityListHelper<Node, INB, Node::_rbt_multiple,
+	static_assert(std::is_base_of<ITreeNodeTraits<Node>, NodeTraits>::value,
+	              "NodeTraits not properly derived from ITreeNodeTraits!");
+
+	using EqualityList = utilities::EqualityListHelper<Node, INB, Node::_rbt_multiple,
                                                      utilities::IntervalCompare<Node, NodeTraits>>;
   using ENodeTraits = utilities::ExtendedNodeTraits<Node, INB, NodeTraits>;
   using BaseTree = RBTree<Node, utilities::ExtendedNodeTraits<Node, INB, NodeTraits>, Options, Tag,

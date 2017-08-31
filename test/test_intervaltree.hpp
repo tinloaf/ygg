@@ -8,7 +8,7 @@ using namespace ygg;
 #define IT_TESTSIZE 2000
 
 template<class Node>
-class MyNodeTraits {
+class MyNodeTraits : public ITreeNodeTraits<Node> {
 public:
   using key_type = unsigned int;
 

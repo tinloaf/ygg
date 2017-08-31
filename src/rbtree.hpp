@@ -115,6 +115,8 @@ namespace ygg {
  * sounds weird, but is correct. See the examples if you're confused.
  * @tparam options  The options class (a version of TreeOptions) that you parameterize the tree
  * with. (See the options parameter of RBTree.)
+ * @tparam Tag 		The tag used to identify the tree that this node should be inserted into. See
+ * RBTree and DOCTODO for details.
  */
 template<class Node, class Options = TreeOptions<TreeFlags::MULTIPLE>, int Tag = 0>
 class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Options::multiple, Tag> {};
@@ -333,6 +335,8 @@ protected:
  * DOCTODO for details.
  * @tparam Options			The TreeOptions class specifying the parameters of this RBTree. See the
  * TreeOptions and TreeFlags classes for details.
+ * @tparam Tag					An integer tag that identifies this tree. Can be used to insert the same
+ * nodes into multiple trees. See DOCTODO for details.
  * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'.
  * Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
