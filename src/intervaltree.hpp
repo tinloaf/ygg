@@ -43,16 +43,18 @@ namespace ygg {
 	  };
   } // namespace utilities
 
-template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>>
-class ITreeNodeBase : public RBTreeNodeBase<Node, Options> {
+template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
+				int Tag = 0>
+class ITreeNodeBase : public RBTreeNodeBase<Node, Options, Tag> {
 public:
   typename NodeTraits::key_type    _it_max_upper;
 };
 
 
-template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>>
+template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
+				int Tag = 0>
 class IntervalTree : public RBTree<Node, utilities::ExtendedNodeTraits<Node, NodeTraits>,
-                                   Options, utilities::IntervalCompare<Node, NodeTraits>>
+                                   Options, Tag, utilities::IntervalCompare<Node, NodeTraits>>
 {
 public:
   using Key = typename NodeTraits::key_type;
@@ -60,8 +62,12 @@ public:
   using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple,
                                                      utilities::IntervalCompare<Node, NodeTraits>>;
   using ENodeTraits = utilities::ExtendedNodeTraits<Node, NodeTraits>;
-  using BaseTree = RBTree<Node, utilities::ExtendedNodeTraits<Node, NodeTraits>, Options,
+  using BaseTree = RBTree<Node, utilities::ExtendedNodeTraits<Node, NodeTraits>, Options, Tag,
 					                utilities::IntervalCompare<Node, NodeTraits>>;
+
+	using INB = ITreeNodeBase<Node, NodeTraits, Options, Tag>;
+	static_assert(std::is_base_of<INB, Node>::value, "Node class not properly derived from "
+					"ITreeNodeBase");
 
   IntervalTree();
 

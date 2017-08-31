@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <set>
 #include <cassert>
+#include <type_traits>
 
 #include "options.hpp"
 
@@ -70,11 +71,11 @@ namespace ygg {
     };
 
 	  /// @cond INTERNAL
-	  template<class Node, bool multiple>
+	  template<class Node, bool multiple, int Tag>
 	  class RBTreeNodeBaseImpl;
 
-	  template<class Node>
-	  class RBTreeNodeBaseImpl<Node, true> {
+	  template<class Node, int Tag>
+	  class RBTreeNodeBaseImpl<Node, true, Tag> {
 	  public:
 		  enum class Color { RED, BLACK };
 		  constexpr static bool _rbt_multiple = true;
@@ -88,8 +89,8 @@ namespace ygg {
 		  Node *                      _rbt_next;
 	  };
 
-	  template<class Node>
-	  class RBTreeNodeBaseImpl<Node, false> {
+	  template<class Node, int Tag>
+	  class RBTreeNodeBaseImpl<Node, false, Tag> {
 	  public:
 		  enum class Color { RED, BLACK };
 		  constexpr static bool _rbt_multiple = false;
@@ -115,8 +116,8 @@ namespace ygg {
  * @tparam options  The options class (a version of TreeOptions) that you parameterize the tree
  * with. (See the options parameter of RBTree.)
  */
-template<class Node, class Options = TreeOptions<TreeFlags::MULTIPLE>>
-class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Options::multiple> {};
+template<class Node, class Options = TreeOptions<TreeFlags::MULTIPLE>, int Tag = 0>
+class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Options::multiple, Tag> {};
 
 /**
  * @brief   Helper base class for the NodeTraits you need to implement
@@ -145,11 +146,11 @@ public:
  * instantiated on its own.
  *
  */
-template<class Node, class NodeTraits, class Compare = std::less<Node>>
+template<class Node, class NodeTraits, int Tag = 0, class Compare = std::less<Node>>
 class RBTreeBase
 {
 public:
-  using Base = utilities::RBTreeNodeBaseImpl<Node, Node::_rbt_multiple>; // TODO rename
+  using Base = utilities::RBTreeNodeBaseImpl<Node, Node::_rbt_multiple, Tag>; // TODO rename
   using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple, Compare>;
 
   /**
@@ -335,16 +336,20 @@ protected:
  * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'.
  * Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
-template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
+template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>, int Tag = 0,
          class Compare = std::less<Node>>
-class RBTree : public RBTreeBase<Node, NodeTraits, Compare> {
+class RBTree : public RBTreeBase<Node, NodeTraits, Tag, Compare> {
 public:
 	RBTree();
 
 	template<bool reverse>
-	using const_iterator = typename RBTreeBase<Node, NodeTraits, Compare>::
+	using const_iterator = typename RBTreeBase<Node, NodeTraits, Tag, Compare>::
 																										template const_iterator<reverse>;
-	using EqualityList = typename RBTreeBase<Node, NodeTraits, Compare>::EqualityList;
+	using EqualityList = typename RBTreeBase<Node, NodeTraits, Tag, Compare>::EqualityList;
+
+	// Node Base
+	using NB = RBTreeNodeBase<Node, Options, Tag>;
+	static_assert(std::is_base_of<NB, Node>::value, "Node class not properly derived from RBTreeNodeBase");
 
 	/**
    * @brief Inserts <node> into the tree

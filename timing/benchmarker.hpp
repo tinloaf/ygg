@@ -35,7 +35,7 @@ public:
 
 class Benchmarker {
 public:
-  using Tree = RBTree<Node, NodeTraits>;
+  using Tree = RBTree<Node, NodeTraits, TreeOptions<>>;
   using BoostSet = boost::intrusive::set< Node, boost::intrusive::compare<std::less<Node> > >;
 
   Benchmarker() {
