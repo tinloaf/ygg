@@ -9,7 +9,7 @@
 
 namespace ygg {
   namespace utilities {
-    template<class Node, class NodeTraits, bool skipfirst, class Comparable>
+    template<class Node, class INB, class NodeTraits, bool skipfirst, class Comparable>
     Node * find_next_overlapping(Node * cur, const Comparable & q);
 
     template<class KeyType>
@@ -26,7 +26,7 @@ namespace ygg {
 	  };
 
 	  // TODO add a possibility for bulk updates
-	  template<class Node, class NodeTraits>
+	  template<class Node, class NB, class NodeTraits>
 	  class ExtendedNodeTraits : public NodeTraits {
 	  public:
 		  // TODO these can probably made more efficient
@@ -53,21 +53,27 @@ public:
 
 template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
 				int Tag = 0>
-class IntervalTree : public RBTree<Node, utilities::ExtendedNodeTraits<Node, NodeTraits>,
+class IntervalTree : public RBTree<Node,
+                                   utilities::ExtendedNodeTraits<Node,
+                                                                 ITreeNodeBase<Node, NodeTraits, Options, Tag>,
+                                                                 NodeTraits>,
                                    Options, Tag, utilities::IntervalCompare<Node, NodeTraits>>
 {
 public:
   using Key = typename NodeTraits::key_type;
   // TODO why do I need to specify this again?
-  using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple,
-                                                     utilities::IntervalCompare<Node, NodeTraits>>;
-  using ENodeTraits = utilities::ExtendedNodeTraits<Node, NodeTraits>;
-  using BaseTree = RBTree<Node, utilities::ExtendedNodeTraits<Node, NodeTraits>, Options, Tag,
-					                utilities::IntervalCompare<Node, NodeTraits>>;
 
 	using INB = ITreeNodeBase<Node, NodeTraits, Options, Tag>;
 	static_assert(std::is_base_of<INB, Node>::value, "Node class not properly derived from "
 					"ITreeNodeBase");
+
+  using EqualityList = utilities::EqualityListHelper<Node, INB, Node::_rbt_multiple,
+                                                     utilities::IntervalCompare<Node, NodeTraits>>;
+  using ENodeTraits = utilities::ExtendedNodeTraits<Node, INB, NodeTraits>;
+  using BaseTree = RBTree<Node, utilities::ExtendedNodeTraits<Node, INB, NodeTraits>, Options, Tag,
+					                utilities::IntervalCompare<Node, NodeTraits>>;
+
+
 
   IntervalTree();
 

@@ -9,3 +9,4 @@
 * kill move-constructor & copy-constructor & copy-assignment
 * make helper functions use SFINAE
 * move node base into tree
+* When we pass NB around, we probably don't need NodeTraits anymore?

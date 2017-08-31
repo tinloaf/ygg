@@ -14,39 +14,39 @@
 
 namespace ygg {
   namespace utilities {
-    template<class Node, class const_iterator>
+    template<class Node, class NB, class const_iterator>
     class IteratorHelperUnspecialized {
     public:
       static const_iterator & step_forward(const_iterator & it);
       static const_iterator & step_back(const_iterator & it);
     };
 
-    template<class Node, class const_iterator, bool reverse>
+    template<class Node, class NB, class const_iterator, bool reverse>
     class IteratorHelper {
     public:
       static const_iterator & operator_plusplus(const_iterator & it);
       static const_iterator & operator_minusminus(const_iterator & it);
     };
 
-    template<class Node, class const_iterator>
-    class IteratorHelper<Node, const_iterator, true>  {
+    template<class Node, class NB, class const_iterator>
+    class IteratorHelper<Node, NB, const_iterator, true>  {
     public:
       static const_iterator & operator_plusplus(const_iterator & it);
       static const_iterator & operator_minusminus(const_iterator & it);
     };
 
-    template<class Node, class const_iterator>
-    class IteratorHelper<Node, const_iterator, false>  {
+    template<class Node, class NB, class const_iterator>
+    class IteratorHelper<Node, NB, const_iterator, false>  {
     public:
       static const_iterator & operator_plusplus(const_iterator & it);
       static const_iterator & operator_minusminus(const_iterator & it);
     };
 
-    template<class Node, bool multiple, class Compare>
+    template<class Node, class NB, bool multiple, class Compare>
     class EqualityListHelper {};
 
-    template<class Node, class Compare>
-    class EqualityListHelper<Node, true, Compare> {
+    template<class Node, class NB, class Compare>
+    class EqualityListHelper<Node, NB, true, Compare> {
     public:
       static void equality_list_insert_after(Node & node, Node * predecessor);
       static void equality_list_insert_before(Node & node, Node * successor);
@@ -57,8 +57,8 @@ namespace ygg {
       static void equality_list_swap_if_necessary(Node & n1, Node & n2);
       static bool verify(const Node & n);
     };
-    template<class Node, class Compare>
-    class EqualityListHelper<Node, false, Compare> {
+    template<class Node, class NB, class Compare>
+    class EqualityListHelper<Node, NB, false, Compare> {
     public:
       static void equality_list_insert_after(Node & node, Node * predecessor);
       static void equality_list_insert_before(Node & node, Node * successor);
@@ -146,12 +146,12 @@ public:
  * instantiated on its own.
  *
  */
-template<class Node, class NodeTraits, int Tag = 0, class Compare = std::less<Node>>
+template<class Node, class NB, class NodeTraits, int Tag = 0, class Compare = std::less<Node>>
 class RBTreeBase
 {
 public:
   using Base = utilities::RBTreeNodeBaseImpl<Node, Node::_rbt_multiple, Tag>; // TODO rename
-  using EqualityList = utilities::EqualityListHelper<Node, Node::_rbt_multiple, Compare>;
+  using EqualityList = utilities::EqualityListHelper<Node, NB, Node::_rbt_multiple, Compare>;
 
   /**
    * @brief Iterator over elements in the tree
@@ -199,7 +199,7 @@ public:
   private:
     Node * n;
 
-    friend class utilities::IteratorHelperUnspecialized<Node, const_iterator<reverse>>;
+    friend class utilities::IteratorHelperUnspecialized<Node, NB, const_iterator<reverse>>;
     /// @endcond
   };
 
@@ -338,18 +338,20 @@ protected:
  */
 template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>, int Tag = 0,
          class Compare = std::less<Node>>
-class RBTree : public RBTreeBase<Node, NodeTraits, Tag, Compare> {
+class RBTree : public RBTreeBase<Node, RBTreeNodeBase<Node, Options, Tag>, NodeTraits, Tag,
+                                 Compare>
+{
 public:
 	RBTree();
-
-	template<bool reverse>
-	using const_iterator = typename RBTreeBase<Node, NodeTraits, Tag, Compare>::
-																										template const_iterator<reverse>;
-	using EqualityList = typename RBTreeBase<Node, NodeTraits, Tag, Compare>::EqualityList;
 
 	// Node Base
 	using NB = RBTreeNodeBase<Node, Options, Tag>;
 	static_assert(std::is_base_of<NB, Node>::value, "Node class not properly derived from RBTreeNodeBase");
+
+	template<bool reverse>
+	using const_iterator = typename RBTreeBase<Node, NB, NodeTraits, Tag, Compare>::
+																										template const_iterator<reverse>;
+	using EqualityList = typename RBTreeBase<Node, NB, NodeTraits, Tag, Compare>::EqualityList;
 
 	/**
    * @brief Inserts <node> into the tree

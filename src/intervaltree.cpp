@@ -15,74 +15,74 @@ IntervalCompare<Node, NodeTraits>::operator()(const T1 &lhs, const T2 &rhs) cons
 	}
 }
 
-template <class Node, class NodeTraits>
+template <class Node, class INB, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::leaf_inserted(Node &node)
+ExtendedNodeTraits<Node, INB, NodeTraits>::leaf_inserted(Node &node)
 {
-	node._it_max_upper = NodeTraits::get_upper(node);
+	node.INB::_it_max_upper = NodeTraits::get_upper(node);
 
 	// Propagate up
 	Node *cur = node._rbt_parent;
-	while ((cur != nullptr) && (cur->_it_max_upper < node._it_max_upper)) {
-		cur->_it_max_upper = node._it_max_upper;
+	while ((cur != nullptr) && (cur->INB::_it_max_upper < node.INB::_it_max_upper)) {
+		cur->INB::_it_max_upper = node.INB::_it_max_upper;
 		cur = cur->_rbt_parent;
 	}
 }
 
-template <class Node, class NodeTraits>
+template <class Node, class INB, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::fix_node(Node &node)
+ExtendedNodeTraits<Node, INB, NodeTraits>::fix_node(Node &node)
 {
-	auto old_val = node._it_max_upper;
-	node._it_max_upper = NodeTraits::get_upper(node);
+	auto old_val = node.INB::_it_max_upper;
+	node.INB::_it_max_upper = NodeTraits::get_upper(node);
 
 	if (node._rbt_left != nullptr) {
-		node._it_max_upper = std::max(node._it_max_upper, node._rbt_left->_it_max_upper);
+		node.INB::_it_max_upper = std::max(node.INB::_it_max_upper, node._rbt_left->INB::_it_max_upper);
 	}
 
 	if (node._rbt_right != nullptr) {
-		node._it_max_upper = std::max(node._it_max_upper, node._rbt_right->_it_max_upper);
+		node.INB::_it_max_upper = std::max(node.INB::_it_max_upper, node._rbt_right->INB::_it_max_upper);
 	}
 
-	if (old_val != node._it_max_upper) {
+	if (old_val != node.INB::_it_max_upper) {
 		// propagate up
 		Node *cur = node._rbt_parent;
 		if (cur != nullptr) {
-			if ((cur->_it_max_upper < node._it_max_upper) || (cur->_it_max_upper == old_val)) {
+			if ((cur->INB::_it_max_upper < node.INB::_it_max_upper) || (cur->INB::_it_max_upper == old_val)) {
 				fix_node(*cur);
 			}
 		}
 	}
 }
 
-template <class Node, class NodeTraits>
+template <class Node, class INB, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::rotated_left(Node &node)
+ExtendedNodeTraits<Node, INB, NodeTraits>::rotated_left(Node &node)
 {
 	// 'node' is the node that was the old parent.
 	fix_node(node);
 	fix_node(*(node._rbt_parent));
 }
 
-template <class Node, class NodeTraits>
+template <class Node, class INB, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::rotated_right(Node &node)
+ExtendedNodeTraits<Node, INB, NodeTraits>::rotated_right(Node &node)
 {
 	// 'node' is the node that was the old parent.
 	fix_node(node);
 	fix_node(*(node._rbt_parent));
 }
 
-template <class Node, class NodeTraits>
+template <class Node, class INB, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::deleted_below(Node &node)
+ExtendedNodeTraits<Node, INB, NodeTraits>::deleted_below(Node &node)
 {
 	fix_node(node);
 }
 
-template <class Node, class NodeTraits>
+template <class Node, class INB, class NodeTraits>
 void
-ExtendedNodeTraits<Node, NodeTraits>::swapped(Node &n1, Node &n2)
+ExtendedNodeTraits<Node, INB, NodeTraits>::swapped(Node &n1, Node &n2)
 {
 	fix_node(n1);
 	if (n1._rbt_parent != nullptr) {
@@ -95,17 +95,17 @@ ExtendedNodeTraits<Node, NodeTraits>::swapped(Node &n1, Node &n2)
 	}
 }
 
-template <class Node, class NodeTraits>
+template <class Node, class INB, class NodeTraits>
 typename NodeTraits::key_type
-ExtendedNodeTraits<Node, NodeTraits>::get_lower(
+ExtendedNodeTraits<Node, INB, NodeTraits>::get_lower(
 				const utilities::DummyRange<typename NodeTraits::key_type> &range)
 {
 	return std::get<0>(range);
 }
 
-template <class Node, class NodeTraits>
+template <class Node, class INB, class NodeTraits>
 typename NodeTraits::key_type
-ExtendedNodeTraits<Node, NodeTraits>::get_upper(
+ExtendedNodeTraits<Node, INB, NodeTraits>::get_upper(
 				const utilities::DummyRange<typename NodeTraits::key_type> &range)
 {
 	return std::get<1>(range);
@@ -136,15 +136,15 @@ IntervalTree<Node, NodeTraits, Options, Tag>::verify_maxima(Node * n) const
   auto maximum = NodeTraits::get_upper(*n);
 
   if (n->_rbt_right != nullptr) {
-    maximum = std::max(maximum, n->_rbt_right->_it_max_upper);
+    maximum = std::max(maximum, n->_rbt_right->INB::_it_max_upper);
     valid &= this->verify_maxima(n->_rbt_right);
   }
   if (n->_rbt_left != nullptr) {
-    maximum = std::max(maximum, n->_rbt_left->_it_max_upper);
+    maximum = std::max(maximum, n->_rbt_left->INB::_it_max_upper);
     valid &= this->verify_maxima(n->_rbt_left);
   }
 
-  valid &= (maximum == n->_it_max_upper);
+  valid &= (maximum == n->INB::_it_max_upper);
 
   return valid;
 }
@@ -165,7 +165,7 @@ IntervalTree<Node, NodeTraits, Options, Tag>::query(const Comparable & q) const
     return QueryResult<Comparable>(nullptr, q);
   }
 
-  while ((cur->_rbt_left != nullptr) && (cur->_rbt_left->_it_max_upper >= NodeTraits::get_lower(q))) {
+  while ((cur->_rbt_left != nullptr) && (cur->_rbt_left->INB::_it_max_upper >= NodeTraits::get_lower(q))) {
       cur = cur->_rbt_left;
   }
   // Everthing left of here ends too early.
@@ -176,7 +176,7 @@ IntervalTree<Node, NodeTraits, Options, Tag>::query(const Comparable & q) const
       (NodeTraits::get_upper(q) >= NodeTraits::get_lower(*cur))) {
     hit = cur;
   } else {
-    hit = utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(cur, q);
+    hit = utilities::find_next_overlapping<Node, INB, NodeTraits, false, Comparable>(cur, q);
   }
   if (hit != nullptr) {
     hit = EqualityList::equality_list_find_first(hit);
@@ -204,7 +204,7 @@ DummyRange<KeyType>::DummyRange(KeyType lower, KeyType upper)
   : std::pair<KeyType, KeyType>(lower, upper)
 {}
 
-template<class Node, class NodeTraits, bool skipfirst, class Comparable>
+template<class Node, class INB, class NodeTraits, bool skipfirst, class Comparable>
 Node *
 find_next_overlapping(Node * cur, const Comparable & q)
 {
@@ -221,7 +221,7 @@ find_next_overlapping(Node * cur, const Comparable & q)
       //std::cout << "Going right…";
       // go to smallest larger-or-equal child
       cur = cur->_rbt_right;
-      if (cur->_it_max_upper < NodeTraits::get_lower(q)) {
+      if (cur->INB::_it_max_upper < NodeTraits::get_lower(q)) {
         //std::cout << "Pruning 1…";
         // Prune!
         // Nothing starting from this node can overlap b/c of upper limit. Backtrack.
@@ -244,7 +244,7 @@ find_next_overlapping(Node * cur, const Comparable & q)
         while (cur->_rbt_left != nullptr) {
           cur = cur->_rbt_left;
           //std::cout << "descending…";
-          if (cur->_it_max_upper < NodeTraits::get_lower(q)) {
+          if (cur->INB::_it_max_upper < NodeTraits::get_lower(q)) {
             //std::cout << "Pruning 2…";
             // Prune!
             // Nothing starting from this node can overlap. Backtrack.
@@ -358,7 +358,8 @@ typename IntervalTree<Node, NodeTraits, Options, Tag>::template QueryResult<Comp
 IntervalTree<Node, NodeTraits, Options, Tag>::QueryResult<Comparable>::const_iterator::operator++()
 {
   ////std::cout << "Old n: " << this->n << "\n";
-  this->n = utilities::find_next_overlapping<Node, NodeTraits, false, Comparable>(this->n, this->q);
+  this->n = utilities::find_next_overlapping<Node, INB, NodeTraits, false, Comparable>
+				  (this->n,  this->q);
   ////std::cout << "New n: " << this->n << "\n";
 
   return *this;
@@ -404,6 +405,6 @@ IntervalTree<Node, NodeTraits, Options, Tag>::dump_to_dot(const std::string & fi
           std::to_string(NodeTraits::get_upper(*node)) +
           std::string("]\n") +
           std::string("-> ") +
-          std::to_string(node->_it_max_upper);
+          std::to_string(node->INB::_it_max_upper);
   });
 }
