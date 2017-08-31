@@ -150,8 +150,8 @@ template<class Node, class NB, class NodeTraits, int Tag = 0, class Compare = st
 class RBTreeBase
 {
 public:
-  using Base = utilities::RBTreeNodeBaseImpl<Node, Node::_rbt_multiple, Tag>; // TODO rename
-  using EqualityList = utilities::EqualityListHelper<Node, NB, Node::_rbt_multiple, Compare>;
+  using Base = utilities::RBTreeNodeBaseImpl<Node, NB::_rbt_multiple, Tag>; // TODO rename
+  using EqualityList = utilities::EqualityListHelper<Node, NB, NB::_rbt_multiple, Compare>;
 
   /**
    * @brief Iterator over elements in the tree

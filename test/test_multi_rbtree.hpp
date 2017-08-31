@@ -1,5 +1,5 @@
-#ifndef TEST_RBTREE_HPP
-#define TEST_RBTREE_HPP
+#ifndef TEST_MULTI_RBTREE_HPP
+#define TEST_MULTI_RBTREE_HPP
 
 #include <gtest/gtest.h>
 #include <random>
@@ -12,72 +12,138 @@ using namespace ygg;
 
 #define TESTSIZE 1000
 
-class Node : public RBTreeNodeBase<Node, TreeOptions<>> { // No multi-nodes!
+#define TAG_A 23
+#define TAG_B 42
+
+namespace multitest {
+
+class Node : public RBTreeNodeBase<Node, TreeOptions<TreeFlags::MULTIPLE>, TAG_A>, public RBTreeNodeBase<Node, TreeOptions<TreeFlags::MULTIPLE>, TAG_B>
+{ // No multi-nodes!
 public:
-  int data;
+	int dataA;
+	int dataB;
 
-  Node () : data(0) {};
-  explicit Node(int data_in) : data(data_in) {};
-  Node(const Node &other) : data(other.data) {};
+	Node()
+					: dataA(0), dataB(0)
+	{};
 
-  bool operator<(const Node & other) const {
-    return this->data < other.data;
-  }
+	explicit Node(int dataA_in, int dataB_in)
+					: dataA(dataA_in), dataB(dataB_in)
+	{};
+
+	Node(const Node &other)
+					: dataA(other.dataA), dataB(other.dataB)
+	{};
 };
 
-class EqualityNode : public RBTreeNodeBase<EqualityNode> {
+using NodeBaseA = RBTreeNodeBase<Node, TreeOptions<TreeFlags::MULTIPLE>, TAG_A>;
+using NodeBaseB = RBTreeNodeBase<Node, TreeOptions<TreeFlags::MULTIPLE>, TAG_B>;
+
+class CompareA
+{
 public:
-  int data;
-  int sub_data;
-
-  EqualityNode () : data(0) {};
-  explicit EqualityNode(int data_in, int sub_data_in = 0) : data(data_in), sub_data(sub_data_in) {};
-  EqualityNode(const EqualityNode &other) : data(other.data), sub_data(other.sub_data) {};
-
-  bool operator<(const EqualityNode & other) const {
-    return this->data < other.data;
-  }
+	bool operator()(const Node &lhs, const Node &rhs)
+	{
+		return lhs.dataA < rhs.dataA;
+	}
 };
 
-class NodeTraits {
+class CompareB
+{
 public:
-  static std::string get_id(const Node * node) {
-    return std::to_string(node->data);
-  }
-
-  static void leaf_inserted(Node & node) { (void)node ; };
-  static void rotated_left(Node & node) { (void)node ; };
-  static void rotated_right(Node & node) { (void)node ; };
-  static void deleted_below(Node & node) { (void)node ; };
-  static void swapped(Node & n1, Node & n2) { (void)n1 ; (void)n2 ; };
+	bool operator()(const Node &lhs, const Node &rhs)
+	{
+		return lhs.dataB < rhs.dataB;
+	}
 };
 
-class EqualityNodeTraits {
+class NodeTraits
+{
 public:
-  static std::string get_id(const EqualityNode * node) {
-    return std::string("(") + std::to_string(node->data) + std::string("/") + std::to_string(node->sub_data) + std::string(")");
-  }
+	static std::string get_id(const Node *node)
+	{
+		return std::to_string(node->dataA) + std::string (" / ") + std::to_string(node->dataB);
+	}
 
-  static void leaf_inserted(EqualityNode & node) { (void)node ; };
-  static void rotated_left(EqualityNode & node) { (void)node ; };
-  static void rotated_right(EqualityNode & node) { (void)node ; };
-  static void deleted_below(EqualityNode & node) { (void)node ; };
-  static void swapped(EqualityNode & n1, EqualityNode & n2) { (void)n1 ; (void)n2 ; };
+	static void leaf_inserted(Node &node)
+	{ (void)node; };
+
+	static void rotated_left(Node &node)
+	{ (void)node; };
+
+	static void rotated_right(Node &node)
+	{ (void)node; };
+
+	static void deleted_below(Node &node)
+	{ (void)node; };
+
+	static void swapped(Node &n1, Node &n2)
+	{
+		(void)n1;
+		(void)n2;
+	};
 };
 
-TEST(RBTreeTest, TrivialInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+using TreeA = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::MULTIPLE>, TAG_A, CompareA>;
+using TreeB = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::MULTIPLE>, TAG_B, CompareB>;
 
-  Node n;
-  n.data = 0;
-  tree.insert(n);
+TEST(MultiRBTreeTest, TrivialInsertionTest)
+{
+	auto ta = TreeA();
+	auto tb = TreeB();
 
-  ASSERT_TRUE(tree.verify_integrity());
+	Node n(0, 0);
+	ta.insert(n);
+	tb.insert(n);
+
+	ASSERT_TRUE(ta.verify_integrity());
+	ASSERT_TRUE(tb.verify_integrity());
 }
 
+TEST(MultiRBTreeTest, MinimalInteractionTest)
+{
+	auto ta = TreeA();
+	auto tb = TreeB();
 
-TEST(RBTreeTest, RandomInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  class TestNode : public Node
+  {
+  public:
+	  using Node::Node;
+  private:
+	  FRIEND_TEST(MultiRBTreeTest, MinimalInteractionTest);
+  };
+
+	TestNode n1(0, 0);
+	TestNode n2(-1, 1);
+
+	ta.insert(n1);
+	ta.insert(n2);
+
+	ASSERT_EQ(n1.NodeBaseA::_rbt_right, nullptr);
+	ASSERT_EQ(n1.NodeBaseA::_rbt_left, &n2);
+	ASSERT_EQ(n1.NodeBaseA::_rbt_parent, nullptr);
+	ASSERT_EQ(n2.NodeBaseA::_rbt_parent, &n1);
+
+	tb.insert(n1);
+	tb.insert(n2);
+
+	ASSERT_EQ(n1.NodeBaseA::_rbt_right, nullptr);
+	ASSERT_EQ(n1.NodeBaseA::_rbt_left, &n2);
+	ASSERT_EQ(n1.NodeBaseA::_rbt_parent, nullptr);
+	ASSERT_EQ(n2.NodeBaseA::_rbt_parent, &n1);
+
+	ASSERT_EQ(n1.NodeBaseB::_rbt_right, &n2);
+	ASSERT_EQ(n1.NodeBaseB::_rbt_left, nullptr);
+	ASSERT_EQ(n1.NodeBaseB::_rbt_parent, nullptr);
+	ASSERT_EQ(n2.NodeBaseB::_rbt_parent, &n1);
+
+	ASSERT_TRUE(ta.verify_integrity());
+	ASSERT_TRUE(tb.verify_integrity());
+}
+
+TEST(MultiRBTreeTest, RandomInsertionTest) {
+  auto ta = TreeA();
+	auto tb = TreeB();
 
   std::mt19937 rng(4); // chosen by fair xkcd
   std::uniform_int_distribution<int> uni(std::numeric_limits<int>::min(),
@@ -85,41 +151,58 @@ TEST(RBTreeTest, RandomInsertionTest) {
 
   Node nodes[TESTSIZE];
 
-  std::set<int> values_seen;
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
-    int val = uni(rng);
-    while (values_seen.find(val) != values_seen.end()) {
-      val = uni(rng);
-    }
-    nodes[i] = Node(val);
-    values_seen.insert(val);
 
-    tree.insert(nodes[i]);
+  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+    int val_a = uni(rng);
+	  int val_b = uni(rng);
+
+    nodes[i] = Node(val_a, val_b);
+
+    ta.insert(nodes[i]);
+		tb.insert(nodes[i]);
 
     //std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i) + std::string(".dot");
     //tree.dump_to_dot(fname);
 
-    ASSERT_TRUE(tree.verify_integrity());
+    ASSERT_TRUE(ta.verify_integrity());
+	  ASSERT_TRUE(tb.verify_integrity());
   }
+
+	int last_val = std::numeric_limits<int>::min();
+	for (const auto & n : ta) {
+		ASSERT_GE(n.dataA, last_val);
+		last_val = n.dataA;
+	}
+
+	last_val = std::numeric_limits<int>::min();
+	for (const auto & n : tb) {
+		ASSERT_GE(n.dataB, last_val);
+		last_val = n.dataB;
+	}
 }
 
-TEST(RBTreeTest, LinearInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+TEST(MultiRBTreeTest, LinearInsertionTest)
+{
+	auto ta = TreeA();
+	auto tb = TreeB();
 
-  Node nodes[TESTSIZE];
+	Node nodes[TESTSIZE];
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
-    nodes[i] = Node(i);
+	for (unsigned int i = 0; i < TESTSIZE; ++i) {
+		nodes[i] = Node(i, i);
 
-    tree.insert(nodes[i]);
+		ta.insert(nodes[i]);
+		tb.insert(nodes[i]);
 
-    //std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i) + std::string(".dot");
-    //tree.dump_to_dot(fname);
+		//std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i) + std::string(".dot");
+		//tree.dump_to_dot(fname);
 
-    ASSERT_TRUE(tree.verify_integrity());
-  }
+		ASSERT_TRUE(ta.verify_integrity());
+		ASSERT_TRUE(ta.verify_integrity());
+	}
 }
 
+/*
 TEST(RBTreeTest, HintedPostEqualInsertionTest) {
   auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
 
@@ -415,37 +498,51 @@ TEST(RBTreeTest, LinearMultipleIterationTest) {
     i++;
   }
 }
+*/
 
-TEST(RBTreeTest, LinearIterationTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
-  std::vector<size_t> indices;
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
-    nodes[i] = Node(i);
-    indices.push_back(i);
-  }
+TEST(MultiRBTreeTest, LinearIterationTest)
+{
+	auto ta = TreeA();
+	auto tb = TreeB();
 
-  std::mt19937 rng(4); // chosen by fair xkcd
-  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
-    std::uniform_int_distribution<unsigned int> uni(0,
-                                           i - 1);
-    return uni(rng);
-  });
+	Node nodes[TESTSIZE];
 
-  for (auto index : indices) {
-    tree.insert(nodes[index]);
-  }
+	std::vector<size_t> indices;
+	for (unsigned int i = 0; i < TESTSIZE; ++i) {
+		nodes[i] = Node(i, TESTSIZE - i);
+		indices.push_back(i);
+	}
 
-  ASSERT_TRUE(tree.verify_integrity());
+	std::mt19937 rng(4); // chosen by fair xkcd
+	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+		std::uniform_int_distribution<unsigned int> uni(0,
+		                                                i - 1);
+		return uni(rng);
+	});
 
-  unsigned int i = 0;
-  for (auto & n : tree) {
-    ASSERT_EQ(n.data, i);
-    i++;
-  }
+	for (auto index : indices) {
+		ta.insert(nodes[index]);
+		tb.insert(nodes[index]);
+	}
+
+	ASSERT_TRUE(ta.verify_integrity());
+	ASSERT_TRUE(tb.verify_integrity());
+
+	unsigned int i = 0;
+	for (auto &n : ta) {
+		ASSERT_EQ(n.dataA, i);
+		i++;
+	}
+
+	i = 1;
+	for (auto &n : tb) {
+		ASSERT_EQ(n.dataB, i);
+		i++;
+	}
 }
 
+/*
 TEST(RBTreeTest, ReverseIterationTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
@@ -656,6 +753,10 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
   }
 
 }
+
+ */
 // TODO test equal elements
+
+} // namespace multitest
 
 #endif // TEST_RBTREE_HPP
