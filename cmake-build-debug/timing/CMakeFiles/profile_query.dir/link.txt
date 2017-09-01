@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -Wextra -g  -rdynamic -pg CMakeFiles/profile_query.dir/profile_query.cpp.o  -o profile_query 

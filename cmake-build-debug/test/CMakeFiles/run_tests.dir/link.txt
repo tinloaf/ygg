@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -Wextra -g  -rdynamic -fprofile-arcs -ftest-coverage CMakeFiles/run_tests.dir/main.cpp.o  -o run_tests -Wl,-Bstatic -lgtest -lgtest_main -Wl,-Bdynamic -lpthread 

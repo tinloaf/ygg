@@ -1,0 +1,4 @@
+/home/lukas/opt/clion/clion-2017.2.1/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/lukas/src/intervaltree
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/lukas/src/intervaltree/cmake-build-debug

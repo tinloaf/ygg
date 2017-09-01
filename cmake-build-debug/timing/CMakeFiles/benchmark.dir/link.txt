@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -Wextra -g  -rdynamic CMakeFiles/benchmark.dir/main.cpp.o  -o benchmark 

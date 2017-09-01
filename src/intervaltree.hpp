@@ -73,7 +73,7 @@ public:
 	 * @param n The node whose lower interval bound should be returned.
 	 * @return Must return the lower interval bound of n
 	 */
-	key_type get_lower(const Node & n) = delete;
+	static key_type get_lower(const Node & n) = delete;
 
 	/**
 	 * Must be implemented to return the upper bound of the interval represented by n.
@@ -81,7 +81,7 @@ public:
 	 * @param n The node whose upper interval bound should be returned.
 	 * @return Must return the upper interval bound of n
 	 */
-	key_type get_upper(const Node & n) = delete;
+	static key_type get_upper(const Node & n) = delete;
 };
 
 /**
