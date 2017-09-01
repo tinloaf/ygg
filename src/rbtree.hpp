@@ -322,6 +322,8 @@ protected:
   bool verify_tree() const;
   bool verify_order() const;
   bool verify_equality() const;
+
+	Compare cmp;
 };
 
 
