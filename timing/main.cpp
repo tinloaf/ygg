@@ -1,8 +1,5 @@
-#include "benchmarker.hpp"
+#include <celero/Celero.h>
 
-int main()
-{
-  Benchmarker b;
+#include "bench_rbtree.hpp"
 
-  b.run_all();
-}
+CELERO_MAIN;

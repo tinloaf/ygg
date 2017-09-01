@@ -373,13 +373,13 @@ RBTreeBase<Node, NB, NodeTraits, Tag, Compare>::insert_leaf_base(Node & node, No
   while (cur != nullptr) {
     parent = cur;
     if (on_equality_prefer_left) {
-      if (Compare()(*cur, node)) {
+      if (this->cmp(*cur, node)) {
         cur = cur->NB::_rbt_right;
       } else {
         cur = cur->NB::_rbt_left;
       }
     } else {
-      if (Compare()(node, *cur)) {
+      if (this->cmp(node, *cur)) {
         cur = cur->NB::_rbt_left;
       } else {
         cur = cur->NB::_rbt_right;
@@ -398,10 +398,10 @@ RBTreeBase<Node, NB, NodeTraits, Tag, Compare>::insert_leaf_base(Node & node, No
     node.NB::_rbt_parent = parent;
     node.NB::_rbt_color = Base::Color::RED;
 
-    if (Compare()(node, *parent)) {
+    if (this->cmp(node, *parent)) {
       parent->NB::_rbt_left = &node;
       EqualityList::equality_list_insert_after(node, nullptr);
-    } else if (Compare()(*parent, node)) {
+    } else if (this->cmp(*parent, node)) {
       parent->NB::_rbt_right = &node;
       EqualityList::equality_list_insert_after(node, nullptr);
     } else {
@@ -560,8 +560,10 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node, Node & hint
    *  - we're smaller than the parent and in its right subtree
    */
   while ((parent->NB::_rbt_parent != nullptr) &&
-          (((parent->NB::_rbt_parent->NB::_rbt_left == parent) && (Compare()(*parent->NB::_rbt_parent, node))) || // left subtree, parent should go before node
-           ((parent->NB::_rbt_parent->NB::_rbt_right == parent) && (Compare()(node, *parent->NB::_rbt_parent))))) { // right subtree, node should go before parent
+          (((parent->NB::_rbt_parent->NB::_rbt_left == parent) && (this->cmp(*parent->NB::_rbt_parent,
+                                                                     node))) || // left subtree, parent should go before node
+           ((parent->NB::_rbt_parent->NB::_rbt_right == parent) && (this->cmp(node,
+                                                                      *parent->NB::_rbt_parent))))) { // right subtree, node should go before parent
     parent = parent->NB::_rbt_parent;
   }
 
@@ -705,7 +707,7 @@ RBTreeBase<Node, NB, NodeTraits, Tag, Compare>::verify_order() const
   for (const Node & n : *this) {
     if (n.NB::_rbt_left != nullptr) {
       // left may not be larger
-      if (Compare()(n, *(n.NB::_rbt_left))) {
+      if (this->cmp(n, *(n.NB::_rbt_left))) {
         assert(false);
         return false;
       }
@@ -713,7 +715,7 @@ RBTreeBase<Node, NB, NodeTraits, Tag, Compare>::verify_order() const
 
     if (n.NB::_rbt_right != nullptr) {
       // right may not be smaller
-      if (Compare()(*(n.NB::_rbt_right), n)) {
+      if (this->cmp(*(n.NB::_rbt_right), n)) {
         assert(false);
         return false;
       }
@@ -1399,9 +1401,9 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::find(const Comparable & query) 
 {
   Node * cur = this->root;
   while (cur != nullptr) {
-    if (Compare()(query, *cur)) {
+    if (this->cmp(query, *cur)) {
       cur = cur->NB::_rbt_left;
-    } else if (Compare()(*cur, query)) {
+    } else if (this->cmp(*cur, query)) {
       cur = cur->NB::_rbt_right;
     } else {
       cur = EqualityList::equality_list_find_first(cur);
@@ -1420,10 +1422,10 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable & 
   Node * cur = this->root;
   Node * bound = nullptr;
   while (cur != nullptr) {
-    if (Compare()(query, *cur)) {
+    if (this->cmp(query, *cur)) {
       bound = cur;
       cur = cur->NB::_rbt_left;
-    } else if (Compare()(*cur, query)) {
+    } else if (this->cmp(*cur, query)) {
       cur = cur->NB::_rbt_right;
     } else {
       // hit the spot
