@@ -10,7 +10,7 @@
 
 using namespace ygg;
 
-#define TESTSIZE 5000
+#define RBTREE_TESTSIZE 5000
 
 class Node : public RBTreeNodeBase<Node, TreeOptions<>> { // No multi-nodes!
 public:
@@ -83,10 +83,10 @@ TEST(RBTreeTest, RandomInsertionTest) {
   std::uniform_int_distribution<int> uni(std::numeric_limits<int>::min(),
                                          std::numeric_limits<int>::max());
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
 
   std::set<int> values_seen;
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     int val = uni(rng);
     while (values_seen.find(val) != values_seen.end()) {
       val = uni(rng);
@@ -106,9 +106,9 @@ TEST(RBTreeTest, RandomInsertionTest) {
 TEST(RBTreeTest, LinearInsertionTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[i] = Node(i);
 
     tree.insert(nodes[i]);
@@ -155,30 +155,30 @@ TEST(RBTreeTest, HintedPostEqualInsertionTest) {
 TEST(RBTreeTest, RepeatedHintedPostEqualInsertionTest) {
   auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
 
-  EqualityNode nodes_pre[TESTSIZE];
-  EqualityNode nodes_post[TESTSIZE];
-  EqualityNode nodes_between[TESTSIZE];
-  EqualityNode node_border_small(1, TESTSIZE + 2);
-  EqualityNode node_border_large(2, TESTSIZE + 2);
+  EqualityNode nodes_pre[RBTREE_TESTSIZE];
+  EqualityNode nodes_post[RBTREE_TESTSIZE];
+  EqualityNode nodes_between[RBTREE_TESTSIZE];
+  EqualityNode node_border_small(1, RBTREE_TESTSIZE + 2);
+  EqualityNode node_border_large(2, RBTREE_TESTSIZE + 2);
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes_pre[i] = EqualityNode(1, i);
     nodes_post[i] = EqualityNode(2, i);
-    nodes_between[i] = EqualityNode(1, TESTSIZE + 1);
+    nodes_between[i] = EqualityNode(1, RBTREE_TESTSIZE + 1);
   }
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     tree.insert(nodes_post[i], tree.end()); // insert in order
   }
 
-  tree.insert(nodes_pre[TESTSIZE-1], nodes_post[0]);
+  tree.insert(nodes_pre[RBTREE_TESTSIZE-1], nodes_post[0]);
 
-  for (int i = TESTSIZE - 2 ; i >= 0 ; --i) {
+  for (int i = RBTREE_TESTSIZE - 2 ; i >= 0 ; --i) {
     tree.insert(nodes_pre[i], nodes_pre[i+1]);
     ASSERT_EQ(tree.begin()->sub_data, i);
   }
 
-  for (int i = 0 ; i < TESTSIZE ; ++i) {
+  for (int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     tree.insert(nodes_between[i], nodes_pre[i]);
   }
 
@@ -187,9 +187,9 @@ TEST(RBTreeTest, RepeatedHintedPostEqualInsertionTest) {
   ASSERT_TRUE(tree.verify_integrity());
 
   auto it = tree.begin();
-  for (int i = 0 ; i < TESTSIZE ; ++i) {
+  for (int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     ASSERT_EQ(it->data, 1);
-    ASSERT_EQ(it->sub_data, TESTSIZE + 1); // first, the 'between' node
+    ASSERT_EQ(it->sub_data, RBTREE_TESTSIZE + 1); // first, the 'between' node
     it++;
     ASSERT_EQ(it->data, 1);
     ASSERT_EQ(it->sub_data, i); // now, the pre-node
@@ -197,13 +197,13 @@ TEST(RBTreeTest, RepeatedHintedPostEqualInsertionTest) {
   }
 
   ASSERT_EQ(it->data, 1);
-  ASSERT_EQ(it->sub_data, TESTSIZE + 2); // small border
+  ASSERT_EQ(it->sub_data, RBTREE_TESTSIZE + 2); // small border
   it++;
   ASSERT_EQ(it->data, 2);
-  ASSERT_EQ(it->sub_data, TESTSIZE + 2); // large border
+  ASSERT_EQ(it->sub_data, RBTREE_TESTSIZE + 2); // large border
   it++;
 
-  for (int i = 0 ; i < TESTSIZE ; ++i) {
+  for (int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     ASSERT_EQ(it->data, 2);
     ASSERT_EQ(it->sub_data, i); // post-nodes
     it++;
@@ -213,16 +213,16 @@ TEST(RBTreeTest, RepeatedHintedPostEqualInsertionTest) {
 TEST(RBTreeTest, LinearEndHintedInsertionTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[i] = Node(i);
   }
 
-  tree.insert(nodes[TESTSIZE - 1]);
+  tree.insert(nodes[RBTREE_TESTSIZE - 1]);
 
-  for (int i = TESTSIZE - 2 ; i >= 0 ; --i) {
-    tree.insert(nodes[i], nodes[TESTSIZE - 1]);
+  for (int i = RBTREE_TESTSIZE - 2 ; i >= 0 ; --i) {
+    tree.insert(nodes[i], nodes[RBTREE_TESTSIZE - 1]);
     ASSERT_TRUE(tree.verify_integrity());
   }
 
@@ -236,30 +236,30 @@ TEST(RBTreeTest, LinearEndHintedInsertionTest) {
 TEST(RBTreeTest, HinterOrderPreservationTest) {
   auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
 
-  EqualityNode nodes[3*TESTSIZE];
+  EqualityNode nodes[3*RBTREE_TESTSIZE];
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[3*i] = EqualityNode(i, 0);
     nodes[3*i + 1] = EqualityNode(i, 1);
     nodes[3*i + 2] = EqualityNode(i, 2);
   }
 
   // insert the middles
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     tree.insert(nodes[3*i + 1]);
   }
 
   tree.verify_integrity();
 
   // insert the prefix, using a hint
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     tree.insert(nodes[3*i], nodes[3*i + 1]);
   }
 
   tree.verify_integrity();
 
   // insert the postfix, using a hint
-  for (unsigned int i = 0 ; i < TESTSIZE - 1 ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE - 1 ; ++i) {
     tree.insert(nodes[3*i + 2], nodes[3*i + 3]);
   }
 
@@ -274,15 +274,15 @@ TEST(RBTreeTest, HinterOrderPreservationTest) {
 TEST(RBTreeTest, LinearNextHintedInsertionTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[i] = Node(i);
   }
 
-  tree.insert(nodes[TESTSIZE - 1]);
+  tree.insert(nodes[RBTREE_TESTSIZE - 1]);
 
-  for (int i = TESTSIZE - 2 ; i >= 0 ; --i) {
+  for (int i = RBTREE_TESTSIZE - 2 ; i >= 0 ; --i) {
     tree.insert(nodes[i], nodes[i+1]);
     ASSERT_TRUE(tree.verify_integrity());
   }
@@ -297,22 +297,22 @@ TEST(RBTreeTest, LinearNextHintedInsertionTest) {
 TEST(RBTreeTest, UpperBoundTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[i] = Node(2*i);
     tree.insert(nodes[i]);
   }
 
   ASSERT_TRUE(tree.verify_integrity());
 
-  for (unsigned int i = 0 ; i < TESTSIZE - 1 ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE - 1 ; ++i) {
     Node query(2*i + 1);
     auto it = tree.upper_bound(query);
     ASSERT_EQ(it->data, nodes[i+1].data);
   }
 
-  Node query(2*(TESTSIZE - 1) + 1);
+  Node query(2*(RBTREE_TESTSIZE - 1) + 1);
   auto it = tree.upper_bound(query);
   ASSERT_EQ(it, tree.end());
 }
@@ -342,9 +342,9 @@ TEST(RBTreeTest, TrivialDeletionTest) {
 TEST(RBTreeTest, LinearInsertionLinearDeletionTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[i] = Node(i);
 
     tree.insert(nodes[i]);
@@ -352,7 +352,7 @@ TEST(RBTreeTest, LinearInsertionLinearDeletionTest) {
 
   ASSERT_TRUE(tree.verify_integrity());
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     //std::cout << "\n\n Removing " << i << "\n";
     tree.remove(nodes[i]);
 
@@ -363,10 +363,10 @@ TEST(RBTreeTest, LinearInsertionLinearDeletionTest) {
 TEST(RBTreeTest, LinearInsertionRandomDeletionTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
   std::vector<unsigned int> indices;
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[i] = Node(i);
 
     tree.insert(nodes[i]);
@@ -382,7 +382,7 @@ TEST(RBTreeTest, LinearInsertionRandomDeletionTest) {
 
   ASSERT_TRUE(tree.verify_integrity());
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     //std::string fname = std::string("/tmp/trees/before-") + std::to_string(i) + std::string(".dot");
     //tree.dump_to_dot(fname);
 
@@ -398,13 +398,25 @@ TEST(RBTreeTest, LinearInsertionRandomDeletionTest) {
 TEST(RBTreeTest, LinearMultipleIterationTest) {
   auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
 
-  EqualityNode nodes[TESTSIZE*5];
+  EqualityNode nodes[RBTREE_TESTSIZE*5];
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  std::vector<size_t> indices;
+
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     for (unsigned j = 0 ; j < 5 ; ++j) {
       nodes[5*i + j] = EqualityNode(i);
-      tree.insert(nodes[5*i + j]);
+      indices.push_back(5*i + j);
     }
+  }
+
+  std::mt19937 rng(4); // chosen by fair xkcd
+  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+    std::uniform_int_distribution<unsigned int> uni(0, i - 1);
+    return uni(rng);
+  });
+
+  for (auto index : indices) {
+    tree.insert(nodes[index]);
   }
 
   ASSERT_TRUE(tree.verify_integrity());
@@ -419,17 +431,16 @@ TEST(RBTreeTest, LinearMultipleIterationTest) {
 TEST(RBTreeTest, LinearIterationTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
   std::vector<size_t> indices;
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[i] = Node(i);
     indices.push_back(i);
   }
 
   std::mt19937 rng(4); // chosen by fair xkcd
   std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
-    std::uniform_int_distribution<unsigned int> uni(0,
-                                           i - 1);
+    std::uniform_int_distribution<unsigned int> uni(0, i - 1);
     return uni(rng);
   });
 
@@ -449,9 +460,9 @@ TEST(RBTreeTest, LinearIterationTest) {
 TEST(RBTreeTest, ReverseIterationTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
   std::vector<size_t> indices;
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[i] = Node(i);
     indices.push_back(i);
   }
@@ -470,7 +481,7 @@ TEST(RBTreeTest, ReverseIterationTest) {
   ASSERT_TRUE(tree.verify_integrity());
 
   auto it = tree.rbegin();
-  unsigned int i = TESTSIZE - 1;
+  unsigned int i = RBTREE_TESTSIZE - 1;
   while (it != tree.rend()) {
     ASSERT_EQ(it->data, i);
     it++;
@@ -481,22 +492,22 @@ TEST(RBTreeTest, ReverseIterationTest) {
 TEST(RBTreeTest, FindTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node nodes[TESTSIZE];
+  Node nodes[RBTREE_TESTSIZE];
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     nodes[i] = Node(2*i);
     tree.insert(nodes[i]);
   }
 
   // Nonexisting
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     Node findme(2*i+1);
     auto it = tree.find(findme);
     ASSERT_EQ(it, tree.cend());
   }
 
   // Existing
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     Node findme(2*i);
     auto it = tree.find(findme);
     ASSERT_EQ(&(*it), &(nodes[i]));
@@ -506,13 +517,13 @@ TEST(RBTreeTest, FindTest) {
 TEST(RBTreeTest, ComprehensiveTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
-  Node persistent_nodes[TESTSIZE];
+  Node persistent_nodes[RBTREE_TESTSIZE];
   std::vector<unsigned int> indices;
   std::mt19937 rng(4); // chosen by fair xkcd
 
   std::set<unsigned int> values_seen;
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     unsigned int data = 10 * i;
     persistent_nodes[i] = Node(data);
     indices.push_back(i);
@@ -531,9 +542,9 @@ TEST(RBTreeTest, ComprehensiveTest) {
 
   ASSERT_TRUE(tree.verify_integrity());
 
-  Node transient_nodes[TESTSIZE];
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
-    std::uniform_int_distribution<unsigned int> uni(0, 10 * (TESTSIZE + 1));
+  Node transient_nodes[RBTREE_TESTSIZE];
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
+    std::uniform_int_distribution<unsigned int> uni(0, 10 * (RBTREE_TESTSIZE + 1));
     unsigned int data = uni(rng);
 
     while (values_seen.find(data) != values_seen.end()) {
@@ -562,7 +573,7 @@ TEST(RBTreeTest, ComprehensiveTest) {
   //std::string fname_before = std::string("/tmp/trees/rbt-comprehensive-before.dot");
   //tree.dump_to_dot(fname_before);
 
-  for (int i = 0 ; i < TESTSIZE ; ++i) {
+  for (int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     tree.remove(transient_nodes[i]);
 
 
@@ -576,7 +587,7 @@ TEST(RBTreeTest, ComprehensiveTest) {
   //tree.dump_to_dot(fname);
 
   // Query elements
-  for (int i = 0 ; i < TESTSIZE ; ++i) {
+  for (int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     auto it = tree.find(persistent_nodes[i]);
     assert(&(*it) == &(persistent_nodes[i]));
     ASSERT_EQ(&(*it), &(persistent_nodes[i]));
@@ -588,11 +599,11 @@ TEST(RBTreeTest, ComprehensiveTest) {
 TEST(RBTreeTest, ComprehensiveMultipleTest) {
   auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
 
-  EqualityNode persistent_nodes[TESTSIZE];
+  EqualityNode persistent_nodes[RBTREE_TESTSIZE];
   std::vector<unsigned int> indices;
   std::mt19937 rng(4); // chosen by fair xkcd
 
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     unsigned int data = 10 * i;
     persistent_nodes[i] = EqualityNode(data);
     indices.push_back(i);
@@ -610,9 +621,9 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
 
   ASSERT_TRUE(tree.verify_integrity());
 
-  EqualityNode transient_nodes[TESTSIZE];
-  for (unsigned int i = 0 ; i < TESTSIZE ; ++i) {
-    std::uniform_int_distribution<unsigned int> uni(0, 10 * (TESTSIZE + 1));
+  EqualityNode transient_nodes[RBTREE_TESTSIZE];
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
+    std::uniform_int_distribution<unsigned int> uni(0, 10 * (RBTREE_TESTSIZE + 1));
     unsigned int data = uni(rng);
 
     transient_nodes[i] = EqualityNode(data);
@@ -634,7 +645,7 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
   //std::string fname_before = std::string("/tmp/trees/rbt-comprehensive-before.dot");
   //tree.dump_to_dot(fname_before);
 
-  for (int i = 0 ; i < TESTSIZE ; ++i) {
+  for (int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     tree.remove(transient_nodes[i]);
 
     //std::string rem_fname = std::string("/tmp/trees/removed-") + std::to_string(i) + std::string(".dot");
@@ -648,7 +659,7 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
   //tree.dump_to_dot(fname);
 
   // Query elements
-  for (int i = 0 ; i < TESTSIZE ; ++i) {
+  for (int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     //std::cout << "Finding " << i << "\n";
     auto it = tree.find(persistent_nodes[i]);
     assert(&(*it) == &(persistent_nodes[i]));
