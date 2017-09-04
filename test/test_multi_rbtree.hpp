@@ -42,7 +42,7 @@ using NodeBaseB = RBTreeNodeBase<Node, TreeOptions<TreeFlags::MULTIPLE>, TAG_B>;
 class CompareA
 {
 public:
-	bool operator()(const Node &lhs, const Node &rhs)
+	bool operator()(const Node &lhs, const Node &rhs) const
 	{
 		return lhs.dataA < rhs.dataA;
 	}
@@ -51,7 +51,7 @@ public:
 class CompareB
 {
 public:
-	bool operator()(const Node &lhs, const Node &rhs)
+	bool operator()(const Node &lhs, const Node &rhs) const
 	{
 		return lhs.dataB < rhs.dataB;
 	}
