@@ -115,8 +115,6 @@ public:
 	static_assert(std::is_base_of<ITreeNodeTraits<Node>, NodeTraits>::value,
 	              "NodeTraits not properly derived from ITreeNodeTraits!");
 
-	using EqualityList = utilities::EqualityListHelper<Node, INB, Node::_rbt_multiple,
-                                                     utilities::IntervalCompare<Node, NodeTraits>>;
   using ENodeTraits = utilities::ExtendedNodeTraits<Node, INB, NodeTraits>;
   using BaseTree = RBTree<Node, utilities::ExtendedNodeTraits<Node, INB, NodeTraits>, Options, Tag,
 					                utilities::IntervalCompare<Node, NodeTraits>>;

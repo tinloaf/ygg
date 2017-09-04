@@ -178,9 +178,12 @@ IntervalTree<Node, NodeTraits, Options, Tag>::query(const Comparable & q) const
   } else {
     hit = utilities::find_next_overlapping<Node, INB, NodeTraits, false, Comparable>(cur, q);
   }
+	// TODO FIXME make sure that we always find the first one!
+	/*
   if (hit != nullptr) {
     hit = EqualityList::equality_list_find_first(hit);
   }
+	 */
   return QueryResult<Comparable>(hit, q);
 }
 

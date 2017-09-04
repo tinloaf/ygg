@@ -42,58 +42,11 @@ namespace ygg {
       static const_iterator & operator_minusminus(const_iterator & it);
     };
 
-    template<class Node, class NB, bool multiple, class Compare>
-    class EqualityListHelper {};
-
-    template<class Node, class NB, class Compare>
-    class EqualityListHelper<Node, NB, true, Compare> {
-    public:
-      static void equality_list_insert_after(Node & node, Node * predecessor);
-      static void equality_list_insert_before(Node & node, Node * successor);
-      static void equality_list_delete_node(Node & node);
-      static Node * equality_list_find_first(Node * node);
-      static Node * equality_list_next(Node * node);
-      static Node * equality_list_prev(Node * node);
-      static void equality_list_swap_if_necessary(Node & n1, Node & n2);
-      static bool verify(const Node & n);
-    };
-    template<class Node, class NB, class Compare>
-    class EqualityListHelper<Node, NB, false, Compare> {
-    public:
-      static void equality_list_insert_after(Node & node, Node * predecessor);
-      static void equality_list_insert_before(Node & node, Node * successor);
-      static void equality_list_delete_node(Node & node);
-      static Node * equality_list_find_first(Node * node);
-      static Node * equality_list_next(Node * node);
-      static Node * equality_list_prev(Node * node);
-      static void equality_list_swap_if_necessary(Node & n1, Node & n2);
-      static bool verify(const Node & n);
-    };
-
 	  /// @cond INTERNAL
-	  template<class Node, bool multiple, int Tag>
-	  class RBTreeNodeBaseImpl;
-
 	  template<class Node, int Tag>
-	  class RBTreeNodeBaseImpl<Node, true, Tag> {
+	  class RBTreeNodeBaseImpl {
 	  public:
 		  enum class Color { RED, BLACK };
-		  constexpr static bool _rbt_multiple = true;
-
-		  Node *                      _rbt_parent = nullptr;
-		  Node *                      _rbt_left = nullptr;
-		  Node *                      _rbt_right = nullptr;
-		  RBTreeNodeBaseImpl::Color   _rbt_color;
-
-		  Node *                      _rbt_prev;
-		  Node *                      _rbt_next;
-	  };
-
-	  template<class Node, int Tag>
-	  class RBTreeNodeBaseImpl<Node, false, Tag> {
-	  public:
-		  enum class Color { RED, BLACK };
-		  constexpr static bool _rbt_multiple = false;
 
 		  Node *                      _rbt_parent = nullptr;
 		  Node *                      _rbt_left = nullptr;
@@ -119,7 +72,7 @@ namespace ygg {
  * RBTree and DOCTODO for details.
  */
 template<class Node, class Options = TreeOptions<TreeFlags::MULTIPLE>, int Tag = 0>
-class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Options::multiple, Tag> {};
+class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Tag> {};
 
 /**
  * @brief   Helper base class for the NodeTraits you need to implement
@@ -142,68 +95,142 @@ public:
 };
 
 /**
- * @brief The non-specialized parts of the Red-Black Tree
+ * @brief The Red-Black Tree
  *
- * This is the main Red-Black Tree class. For more information, see RBTree. This class cannot be
- * instantiated on its own.
+ * This is the main Red-Black Tree class.
  *
+ * @tparam Node         The node class for this tree. It must be derived from RBTreeNodeBase.
+ * @tparam NodeTraits   A class implementing various hooks and functions on your node class. See
+ * DOCTODO for details.
+ * @tparam Options			The TreeOptions class specifying the parameters of this RBTree. See the
+ * TreeOptions and TreeFlags classes for details.
+ * @tparam Tag					An integer tag that identifies this tree. Can be used to insert the same
+ * nodes into multiple trees. See DOCTODO for details.
+ * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'.
+ * Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
-template<class Node, class NB, class NodeTraits, int Tag = 0, class Compare = std::less<Node>>
-class RBTreeBase
+template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>, int Tag = 0,
+         class Compare = std::less<Node>>
+class RBTree
 {
 public:
-  using Base = utilities::RBTreeNodeBaseImpl<Node, NB::_rbt_multiple, Tag>; // TODO rename
-  using EqualityList = utilities::EqualityListHelper<Node, NB, NB::_rbt_multiple, Compare>;
+  using Base = utilities::RBTreeNodeBaseImpl<Node, Tag>; // TODO rename
 
-  /**
-   * @brief Iterator over elements in the tree
+	RBTree();
+
+	// Node Base
+	using NB = RBTreeNodeBase<Node, Options, Tag>;
+	static_assert(std::is_base_of<NB, Node>::value, "Node class not properly derived from RBTreeNodeBase");
+
+	/**
+ * @brief Iterator over elements in the tree
+ *
+ * This class represents an iterator over elements in a Red-Black tree. The iterator
+ * is an input iterator in terms of STL iterators, thus it provides only basic
+ * functionality.
+ *
+ * *Warning*: For efficiency reasons, it is currently not possible to decrement the end() iterator!
+ */
+	template<bool reverse>
+	class const_iterator {
+	public:
+		/// @cond INTERNAL
+		typedef ptrdiff_t                         difference_type;
+		typedef Node                              value_type;
+		typedef const Node &                      const_reference;
+		typedef const Node *                      const_pointer;
+		typedef std::input_iterator_tag           iterator_category;
+
+		const_iterator ();
+		const_iterator (Node * n);
+		const_iterator (const const_iterator & other);
+		~const_iterator();
+
+		const_iterator& operator=(const const_iterator & other);
+		const_iterator& operator=(const_iterator && other);
+
+		bool operator==(const const_iterator & other) const;
+		bool operator!=(const const_iterator & other) const;
+
+		const_iterator& operator++();
+		const_iterator  operator++(int);
+		const_iterator& operator+=(size_t steps);
+		const_iterator  operator+(size_t steps) const;
+
+		const_iterator& operator--();
+		const_iterator  operator--(int);
+
+		const_reference operator*() const;
+		const_pointer operator->() const;
+
+		const_iterator<!reverse> get_reverse() const;
+
+	private:
+		Node * n;
+
+		friend class utilities::IteratorHelperUnspecialized<Node, NB, const_iterator<reverse>>;
+		/// @endcond
+	};
+
+	/**
+   * @brief Inserts <node> into the tree
    *
-   * This class represents an iterator over elements in a Red-Black tree. The iterator
-   * is an input iterator in terms of STL iterators, thus it provides only basic
-   * functionality.
+   * Inserts <node> into the tree.
    *
-   * *Warning*: For efficiency reasons, it is currently not possible to decrement the end() iterator!
+   * *Warning*: Please note that after calling insert() on a node (and before
+   * removing that node again), that node *may not move in memory*. A common
+   * pitfall is to store nodes in a std::vector (or other STL container), which
+   * reallocates (and thereby moves objecs around).
+   *
+   * @warning Not available for explicitly ordered trees
+   *
+   * @param   Node  The node to be inserted.
    */
-  template<bool reverse>
-  class const_iterator {
-  public:
-    /// @cond INTERNAL
-    typedef ptrdiff_t                         difference_type;
-    typedef Node                              value_type;
-    typedef const Node &                      const_reference;
-    typedef const Node *                      const_pointer;
-    typedef std::input_iterator_tag           iterator_category;
+	void insert(Node & node);
+	void insert(Node & node, Node & hint);
+	void insert(Node & node, const_iterator<false> hint);
 
-    const_iterator ();
-    const_iterator (Node * n);
-    const_iterator (const const_iterator & other);
-    ~const_iterator();
+	/**
+	 * @brief Finds an element in the tree
+	 *
+	 * Returns an iterator to the first element that compares equally to <query>.
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default std::less as
+	 * Compare, that means you have to implement operator<() for both types.
+	 *
+	 * @warning Not available for explicitly ordered trees
+	 *
+	 * @param query An object comparing equally to the element that should be found.
+	 * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
+	 */
+	template<class Comparable>
+	const_iterator<false> find(const Comparable & query) const;
 
-    const_iterator& operator=(const const_iterator & other);
-    const_iterator& operator=(const_iterator && other);
-
-    bool operator==(const const_iterator & other) const;
-    bool operator!=(const const_iterator & other) const;
-
-    const_iterator& operator++();
-    const_iterator  operator++(int);
-    const_iterator& operator+=(size_t steps);
-    const_iterator  operator+(size_t steps) const;
-
-    const_iterator& operator--();
-    const_iterator  operator--(int);
-
-    const_reference operator*() const;
-    const_pointer operator->() const;
-
-    const_iterator<!reverse> get_reverse() const;
-
-  private:
-    Node * n;
-
-    friend class utilities::IteratorHelperUnspecialized<Node, NB, const_iterator<reverse>>;
-    /// @endcond
-  };
+	/**
+	 * @brief Upper-bounds an element
+	 *
+	 * Returns an iterator to the smallest element to which <query> compares as
+	 * "less", i.e. that is considered to go after <query>.
+	 *
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default std::less as
+	 * Compare, that means you have to implement operator<() for both types.
+ 	 *
+   * @warning Not available for explicitly ordered trees
+   *
+	 * @param query An object comparable to Node that should be upper-bounded
+	 * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
+	 */
+	template<class Comparable>
+	const_iterator<false> upper_bound(const Comparable & query) const;
 
   /**
    * @brief Removes <node> from the tree
@@ -279,12 +306,6 @@ public:
   const_iterator<false> iterator_to(const Node & node) const;
 
 protected:
-	/**
- 	 * This class should never be instantiated directly, only through RBTree!
- 	 */
-	RBTreeBase();
-
-
 	Node *root;
 
   template<class NodeNameGetter>
@@ -321,103 +342,8 @@ protected:
   bool verify_red_black(const Node * node) const;
   bool verify_tree() const;
   bool verify_order() const;
-  bool verify_equality() const;
 
 	Compare cmp;
-};
-
-
-/**
- * @brief The Red-Black Tree
- *
- * This is the main Red-Black Tree class.
- *
- * @tparam Node         The node class for this tree. It must be derived from RBTreeNodeBase.
- * @tparam NodeTraits   A class implementing various hooks and functions on your node class. See
- * DOCTODO for details.
- * @tparam Options			The TreeOptions class specifying the parameters of this RBTree. See the
- * TreeOptions and TreeFlags classes for details.
- * @tparam Tag					An integer tag that identifies this tree. Can be used to insert the same
- * nodes into multiple trees. See DOCTODO for details.
- * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'.
- * Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
- */
-template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>, int Tag = 0,
-         class Compare = std::less<Node>>
-class RBTree : public RBTreeBase<Node, RBTreeNodeBase<Node, Options, Tag>, NodeTraits, Tag,
-                                 Compare>
-{
-public:
-	RBTree();
-
-	// Node Base
-	using NB = RBTreeNodeBase<Node, Options, Tag>;
-	static_assert(std::is_base_of<NB, Node>::value, "Node class not properly derived from RBTreeNodeBase");
-
-	template<bool reverse>
-	using const_iterator = typename RBTreeBase<Node, NB, NodeTraits, Tag, Compare>::
-																										template const_iterator<reverse>;
-	using EqualityList = typename RBTreeBase<Node, NB, NodeTraits, Tag, Compare>::EqualityList;
-
-	/**
-   * @brief Inserts <node> into the tree
-   *
-   * Inserts <node> into the tree.
-   *
-   * *Warning*: Please note that after calling insert() on a node (and before
-   * removing that node again), that node *may not move in memory*. A common
-   * pitfall is to store nodes in a std::vector (or other STL container), which
-   * reallocates (and thereby moves objecs around).
-   *
-   * @warning Not available for explicitly ordered trees
-   *
-   * @param   Node  The node to be inserted.
-   */
-	void insert(Node & node);
-	void insert(Node & node, Node & hint);
-	void insert(Node & node, const_iterator<false> hint);
-
-	/**
-	 * @brief Finds an element in the tree
-	 *
-	 * Returns an iterator to the first element that compares equally to <query>.
-	 * Note that <query> does not have to be a Node, but can be anything that can
-	 * be compared to a Node, i.e., for which
-	 *    Compare()(const Node &, const Comparable &)
-	 * and
-	 *    Compare()(const Comparable &, const Node &)
-	 * are defined and implemented. In the case of using the default std::less as
-	 * Compare, that means you have to implement operator<() for both types.
-	 *
-	 * @warning Not available for explicitly ordered trees
-	 *
-	 * @param query An object comparing equally to the element that should be found.
-	 * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
-	 */
-	template<class Comparable>
-	const_iterator<false> find(const Comparable & query) const;
-
-	/**
-	 * @brief Upper-bounds an element
-	 *
-	 * Returns an iterator to the smallest element to which <query> compares as
-	 * "less", i.e. that is considered to go after <query>.
-	 *
-	 * Note that <query> does not have to be a Node, but can be anything that can
-	 * be compared to a Node, i.e., for which
-	 *    Compare()(const Node &, const Comparable &)
-	 * and
-	 *    Compare()(const Comparable &, const Node &)
-	 * are defined and implemented. In the case of using the default std::less as
-	 * Compare, that means you have to implement operator<() for both types.
- 	 *
-   * @warning Not available for explicitly ordered trees
-   *
-	 * @param query An object comparable to Node that should be upper-bounded
-	 * @returns An iterator to the first element comparing equally to <query>, or end() if no such element exists
-	 */
-	template<class Comparable>
-	const_iterator<false> upper_bound(const Comparable & query) const;
 };
 
 #include "rbtree.cpp"

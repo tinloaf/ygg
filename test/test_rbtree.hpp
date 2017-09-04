@@ -10,7 +10,7 @@
 
 using namespace ygg;
 
-#define TESTSIZE 1000
+#define TESTSIZE 5000
 
 class Node : public RBTreeNodeBase<Node, TreeOptions<>> { // No multi-nodes!
 public:
