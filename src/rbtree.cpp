@@ -1400,18 +1400,22 @@ typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterato
 RBTree<Node, NodeTraits, Options, Tag, Compare>::find(const Comparable & query) const
 {
   Node * cur = this->root;
+	Node * last_left = nullptr;
+
   while (cur != nullptr) {
-    if (this->cmp(query, *cur)) {
-      cur = cur->NB::_rbt_left;
-    } else if (this->cmp(*cur, query)) {
-      cur = cur->NB::_rbt_right;
-    } else {
-      cur = EqualityList::equality_list_find_first(cur);
-      return const_iterator<false>(cur);
-    }
+	  if (this->cmp(*cur, query)) {
+		  cur = cur->NB::_rbt_right;
+	  } else {
+		  last_left = cur;
+		  cur = cur->NB::_rbt_left;
+	  }
   }
 
-  return this->cend();
+	if ((last_left != nullptr) && (! this->cmp(query, *last_left))) {
+		return const_iterator<false>(last_left);
+	} else {
+		return this->cend();
+	}
 }
 
 template<class Node, class NodeTraits, class Options, int Tag, class Compare>
