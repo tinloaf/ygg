@@ -15,7 +15,7 @@ using namespace ygg;
 class RBTreeBaseFixture : public celero::TestFixture {
 public:
 	RBTreeBaseFixture() {
-		const int totalNumberOfTests = 12;
+		const int totalNumberOfTests = 8;
 
 		this->instance_sizes.clear();
 		for(int i = 0; i < totalNumberOfTests; i++)
@@ -221,8 +221,6 @@ BASELINE_F(RBTreeInsert, BoostMultiset, BoostSetInsertFixture, 30, 50)
 	celero::DoNotOptimizeAway(this->t);
 }
 
-
-
 BENCHMARK_F(RBTreeSearch, Ygg, YggTreeSearchFixture, 30, 50)
 {
   int sum = 0;
@@ -245,6 +243,40 @@ BASELINE_F(RBTreeSearch, BoostSet, BoostSetSearchFixture, 30, 50)
 		}
 
 	celero::DoNotOptimizeAway(sum);
+}
+
+BENCHMARK_F(RBTreeIteration, Ygg, YggTreeSearchFixture, 50, 200)
+{
+	for (const auto & n : this->t) {
+		//sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
+}
+
+BASELINE_F(RBTreeIteration, BoostSet, BoostSetSearchFixture, 50, 200)
+{
+	for (const auto &n : this->t) {
+		//sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
+}
+
+BENCHMARK_F(RBTreeDelete, Ygg, YggTreeSearchFixture, 1000, 1)
+{
+	for (auto & v : this->search_values) {
+		this->t.remove(*v);
+	}
+
+	celero::DoNotOptimizeAway(this->t);
+}
+
+BASELINE_F(RBTreeDelete, BoostSet, BoostSetSearchFixture, 1000, 1)
+{
+	for (auto & v : this->search_values) {
+		this->t.erase(*v);
+	}
+
+	celero::DoNotOptimizeAway(this->t);
 }
 
 #endif //YGG_BENCH_RBTREE_HPP
