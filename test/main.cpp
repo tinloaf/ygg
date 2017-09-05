@@ -3,6 +3,7 @@
 #include "test_rbtree.hpp"
 #include "test_intervaltree.hpp"
 #include "test_multi_rbtree.hpp"
+#include "test_intervalmap.hpp"
 //#include "test_orderlist.hpp"
 
 int main(int argc, char **argv) {
