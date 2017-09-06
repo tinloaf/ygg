@@ -1,1 +1,0 @@
-/usr/bin/c++   -Wall -Wextra -g  -rdynamic -pg CMakeFiles/profile_insertion.dir/profile_insertion.cpp.o  -o profile_insertion 
