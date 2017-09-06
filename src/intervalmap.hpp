@@ -18,10 +18,31 @@ namespace internal {
 		KeyT point;
 		ValueT aggregate;
 
-		bool operator<(const InnerNode<KeyT, ValueT, Tag> & rhs) {
-			return this->point < rhs.point;
-		}
+
+		class Compare {
+		public:
+			constexpr bool operator()(const InnerNode<KeyT, ValueT, Tag> & lhs,
+			                          const InnerNode<KeyT, ValueT, Tag> & rhs) const
+			{
+				return lhs.point < rhs.point;
+			}
+
+			constexpr bool operator()(int lhs,
+			                          const InnerNode<KeyT, ValueT, Tag> & rhs) const
+			{
+				return lhs < rhs.point;
+			}
+
+			constexpr bool operator()(const InnerNode<KeyT, ValueT, Tag> & lhs,
+			                          int rhs) const
+			{
+				return lhs.point < rhs;
+			}
+		};
 	};
+
+
+
 } // namespace internal
 
 
@@ -63,8 +84,12 @@ public:
 	static value_type  get_value(const Node & n) = delete;
 
 	// TODO DOC
-	static void on_value_change(typename Node::Segment & seg, const value_type & old_val,
-	                            const value_type & new_val) {} ;
+	static void on_value_changed(typename Node::Segment & seg, const value_type & old_val,
+	                             const value_type & new_val) {
+		(void)seg;
+		(void)old_val;
+		(void)new_val;
+	} ;
 };
 
 
@@ -79,7 +104,7 @@ public:
 	              "Node class not properly derived from IMapNodeBase!");
 	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type, Tag>;
 	using ITree = RBTree<Segment, RBDefaultNodeTraits<Segment>, TreeOptions<TreeFlags::MULTIPLE>,
-	                     Tag>;
+	                     Tag, typename Segment::Compare>;
 
 	void insert(Node & n);
 	void remove(Node & n);
@@ -89,37 +114,38 @@ public:
 
 	value_type get_aggregate(Segment & n);
 
-	class iterator {
+	template<class ConcreteIterator, class InnerIterator>
+	class IteratorBase {
 	public:
 		/// @cond INTERNAL
-		using InnerIterator = typename ITree::template const_iterator<false>;
+
 
 		typedef typename InnerIterator::difference_type      difference_type;
 		typedef typename InnerIterator::value_type           value_type;
-		typedef typename InnerIterator::const_reference      const_reference;
-		typedef typename InnerIterator::const_pointer        const_pointer;
+		typedef typename InnerIterator::reference            reference;
+		typedef typename InnerIterator::pointer              pointer;
 		typedef std::input_iterator_tag             iterator_category;
 
-		iterator ();
-		iterator (const InnerIterator & it, const ITree * t);
-		iterator (const iterator & other);
+		IteratorBase();
+		IteratorBase(const InnerIterator & it, ITree * t);
+		IteratorBase(const ConcreteIterator & other);
 
-		iterator& operator=(const iterator & other);
-		iterator& operator=(iterator && other);
+		ConcreteIterator& operator=(const ConcreteIterator & other);
+		ConcreteIterator& operator=(ConcreteIterator && other);
 
-		bool operator==(const iterator & other) const;
-		bool operator!=(const iterator & other) const;
+		bool operator==(const ConcreteIterator & other) const;
+		bool operator!=(const ConcreteIterator & other) const;
 
-		iterator& operator++();
-		iterator  operator++(int);
-		iterator& operator+=(size_t steps);
-		iterator  operator+(size_t steps) const;
+		ConcreteIterator& operator++();
+		ConcreteIterator  operator++(int);
+		ConcreteIterator& operator+=(size_t steps);
+		ConcreteIterator  operator+(size_t steps) const;
 
-		iterator& operator--();
-		iterator  operator--(int);
+		ConcreteIterator& operator--();
+		ConcreteIterator  operator--(int);
 
-		const_reference operator*() const;
-		const_pointer operator->() const;
+		reference operator*() const;
+		pointer operator->() const;
 		/// @endcond
 
 		key_type get_lower() const;
@@ -131,13 +157,26 @@ public:
 
 		// TODO store the next pointer!
 		InnerIterator inner;
-		const ITree * t;
+		ITree * t;
 
 		/// @endcond
 	};
 
-	iterator begin() const;
-	iterator end() const;
+	class const_iterator : public IteratorBase<const_iterator,
+	                                           typename ITree::template const_iterator<false>> {
+	public:
+		using IteratorBase<const_iterator, typename ITree::template const_iterator<false>>::IteratorBase;
+	};
+
+	class iterator : public IteratorBase<iterator, typename ITree::template iterator<false>> {
+	public:
+		using IteratorBase<iterator, typename ITree::template iterator<false>>::IteratorBase;
+	};
+
+	const_iterator begin() const;
+	const_iterator end() const;
+	iterator begin();
+	iterator end();
 
 private:
 	ITree t;

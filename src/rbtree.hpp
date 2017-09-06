@@ -14,34 +14,6 @@
 
 namespace ygg {
   namespace utilities {
-    template<class Node, class NB, class const_iterator>
-    class IteratorHelperUnspecialized {
-    public:
-      static const_iterator & step_forward(const_iterator & it);
-      static const_iterator & step_back(const_iterator & it);
-    };
-
-    template<class Node, class NB, class const_iterator, bool reverse>
-    class IteratorHelper {
-    public:
-      static const_iterator & operator_plusplus(const_iterator & it);
-      static const_iterator & operator_minusminus(const_iterator & it);
-    };
-
-    template<class Node, class NB, class const_iterator>
-    class IteratorHelper<Node, NB, const_iterator, true>  {
-    public:
-      static const_iterator & operator_plusplus(const_iterator & it);
-      static const_iterator & operator_minusminus(const_iterator & it);
-    };
-
-    template<class Node, class NB, class const_iterator>
-    class IteratorHelper<Node, NB, const_iterator, false>  {
-    public:
-      static const_iterator & operator_plusplus(const_iterator & it);
-      static const_iterator & operator_minusminus(const_iterator & it);
-    };
-
 	  /// @cond INTERNAL
 	  template<class Node, int Tag>
 	  class RBTreeNodeBaseImpl {
@@ -131,45 +103,96 @@ public:
  *
  * *Warning*: For efficiency reasons, it is currently not possible to decrement the end() iterator!
  */
-	template<bool reverse>
-	class const_iterator {
+	template<class ConcreteIterator, class BaseType, bool reverse>
+	class IteratorBase {
 	public:
 		/// @cond INTERNAL
 		typedef ptrdiff_t                         difference_type;
-		typedef Node                              value_type;
-		typedef const Node &                      const_reference;
-		typedef const Node *                      const_pointer;
+		typedef BaseType                          value_type;
+		typedef BaseType &                        reference;
+		typedef BaseType *                        pointer;
 		typedef std::input_iterator_tag           iterator_category;
 
-		const_iterator ();
-		const_iterator (Node * n);
-		const_iterator (const const_iterator & other);
-		~const_iterator();
+		IteratorBase ();
+		IteratorBase (BaseType * n);
+		IteratorBase (const ConcreteIterator & other);
 
-		const_iterator& operator=(const const_iterator & other);
-		const_iterator& operator=(const_iterator && other);
+		ConcreteIterator& operator=(const ConcreteIterator & other);
+		ConcreteIterator& operator=(ConcreteIterator && other);
 
-		bool operator==(const const_iterator & other) const;
-		bool operator!=(const const_iterator & other) const;
+		bool operator==(const ConcreteIterator & other) const;
+		bool operator!=(const ConcreteIterator & other) const;
 
-		const_iterator& operator++();
-		const_iterator  operator++(int);
-		const_iterator& operator+=(size_t steps);
-		const_iterator  operator+(size_t steps) const;
+		ConcreteIterator& operator++();
+		ConcreteIterator  operator++(int);
+		ConcreteIterator& operator+=(size_t steps);
+		ConcreteIterator  operator+(size_t steps) const;
 
-		const_iterator& operator--();
-		const_iterator  operator--(int);
+		ConcreteIterator& operator--();
+		ConcreteIterator  operator--(int);
 
-		const_reference operator*() const;
-		const_pointer operator->() const;
+		reference operator*() const;
+		pointer operator->() const;
 
-		const_iterator<!reverse> get_reverse() const;
+		IteratorBase<ConcreteIterator, BaseType, !reverse> get_reverse() const;
 
-	private:
-		Node * n;
+	protected:
+		/*
+		 * Dispatch methods to switch the meaning of ++ / -- via SFINAE based on
+		 * the value of reverse
+		 */
+		template<bool inner_reverse = reverse>
+		typename std::enable_if<inner_reverse, void>::type dispatch_operator_pp() {
+			this->step_back();
+		}
+		template<bool inner_reverse = reverse>
+		typename std::enable_if<!inner_reverse, void>::type dispatch_operator_pp() {
+			this->step_forward();
+		}
+		template<bool inner_reverse = reverse>
+		typename std::enable_if<inner_reverse, void>::type dispatch_operator_mm() {
+			this->step_forward();
+		}
+		template<bool inner_reverse = reverse>
+		typename std::enable_if<!inner_reverse, void>::type dispatch_operator_mm() {
+			this->step_back();
+		}
 
-		friend class utilities::IteratorHelperUnspecialized<Node, NB, const_iterator<reverse>>;
+		/*
+		 * Actual implementation of "going forwards" and "going backwards"
+		 */
+		void step_forward();
+		void step_back();
+
+		BaseType * n;
+
+		using my_type = RBTree<Node, NodeTraits, Options, Tag,
+		                       Compare>::IteratorBase<ConcreteIterator, BaseType, reverse>;
 		/// @endcond
+	};
+
+	// forward, for friendship
+	template<bool reverse>
+	class const_iterator;
+
+	template<bool reverse>
+	class iterator : public IteratorBase<iterator<reverse>, Node, reverse> {
+	public:
+		using IteratorBase<iterator<reverse>, Node, reverse>::IteratorBase;
+		iterator(const iterator<reverse> & orig)
+		: IteratorBase<iterator<reverse>, Node, reverse>(orig.n) {}
+	private:
+		friend class const_iterator<reverse>;
+	};
+
+	template<bool reverse>
+	class const_iterator : public IteratorBase<const_iterator<reverse>, const Node, reverse> {
+	public:
+		using IteratorBase<const_iterator<reverse>, const Node, reverse>::IteratorBase;
+		const_iterator(const const_iterator<reverse> & orig)
+		: IteratorBase<const_iterator<reverse>, const Node, reverse>(orig.n) {};
+		const_iterator(const iterator<reverse> & orig)
+		: IteratorBase<const_iterator<reverse>, const Node, reverse>(orig.n) {};
 	};
 
 	/**
@@ -188,7 +211,7 @@ public:
    */
 	void insert(Node & node);
 	void insert(Node & node, Node & hint);
-	void insert(Node & node, const_iterator<false> hint);
+	void insert(Node & node, iterator<false> hint);
 
 	/**
 	 * @brief Finds an element in the tree
@@ -209,6 +232,8 @@ public:
 	 */
 	template<class Comparable>
 	const_iterator<false> find(const Comparable & query) const;
+	template<class Comparable>
+	iterator<false> find(const Comparable & query);
 
 	/**
 	 * @brief Upper-bounds an element
@@ -276,12 +301,15 @@ public:
    * Returns an iterator pointing to the smallest element in the tree.
    */
   const_iterator<false> begin() const;
-  /**
+	iterator<false> begin();
+
+	/**
    * Returns an iterator pointing after the largest element in the tree.
    */
   const_iterator<false> end() const;
+	iterator<false> end();
 
-  /**
+	/**
    * Returns an reverse iterator pointing to the largest element in the tree.
    */
   const_iterator<true> crbegin() const;
@@ -293,10 +321,13 @@ public:
    * Returns an reverse iterator pointing to the largest element in the tree.
    */
   const_iterator<true> rbegin() const;
-  /**
+	iterator<true> rbegin();
+
+	/**
    * Returns an reverse iterator pointing before the smallest element in the tree.
    */
   const_iterator<true> rend() const;
+	iterator<true> rend();
 
   /**
    * Returns an iterator pointing to the entry held in node.

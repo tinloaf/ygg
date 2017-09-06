@@ -314,7 +314,7 @@ TEST(RBTreeTest, UpperBoundTest) {
 
   Node query(2*(RBTREE_TESTSIZE - 1) + 1);
   auto it = tree.upper_bound(query);
-  ASSERT_EQ(it, tree.end());
+  ASSERT_EQ(it, tree.cend());
 }
 
 TEST(RBTreeTest, TrivialDeletionTest) {
@@ -503,7 +503,7 @@ TEST(RBTreeTest, FindTest) {
   for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     Node findme(2*i+1);
     auto it = tree.find(findme);
-    ASSERT_EQ(it, tree.cend());
+    ASSERT_EQ(it, tree.end());
   }
 
   // Existing
