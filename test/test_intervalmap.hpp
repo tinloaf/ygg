@@ -15,6 +15,8 @@
 #define IMAP_TESTSIZE 1000
 #define IMAP_MULTIPLICITY 3
 
+// TODO test all the callbacks
+
 namespace test_intervalmap {
 	using namespace ygg;
 

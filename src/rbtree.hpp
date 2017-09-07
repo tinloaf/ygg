@@ -335,6 +335,7 @@ public:
    * @param node  The node the iterator should point to.
    */
   const_iterator<false> iterator_to(const Node & node) const;
+	iterator<false> iterator_to(Node & node);
 
 protected:
 	Node *root;

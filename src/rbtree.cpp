@@ -1054,6 +1054,13 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::iterator_to(const Node & node) 
 }
 
 template<class Node, class NodeTraits, class Options, int Tag, class Compare>
+typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template iterator<false>
+RBTree<Node, NodeTraits, Options, Tag, Compare>::iterator_to(Node & node)
+{
+  return iterator<false>(&node);
+}
+
+template<class Node, class NodeTraits, class Options, int Tag, class Compare>
 typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterator<false>
 RBTree<Node, NodeTraits, Options, Tag, Compare>::cbegin() const
 {
