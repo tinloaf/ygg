@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/tinloaf/ygg.svg?branch=master)](https://travis-ci.org/tinloaf/ygg)
+
 This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++11 implementation of a Red-Black-Tree as well as an Interval Tree based on the Red-Black-Tree.
 
 If you need a Red-Black- or Interval Tree in your C++ application, and for some reason the existing implementations (like `std::set` or `boost::instrusive::rbtree`) are not suited for you, Ygg may be the answer. See the list of features below for why it's awesome!
