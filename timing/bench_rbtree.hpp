@@ -6,6 +6,7 @@
 #define YGG_BENCH_RBTREE_HPP
 
 #include <celero/Celero.h>
+#include <cmath>
 
 #include "../src/ygg.hpp"
 #include <boost/intrusive/set.hpp>
