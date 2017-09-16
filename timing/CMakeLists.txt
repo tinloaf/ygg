@@ -1,7 +1,3 @@
-FIND_PATH(CELERO_HEADERS celero/Celero.h)
-
-FIND_LIBRARY(CELERO_LIB_DIR libcelero.so)
-
 find_package(Boost REQUIRED)
 
 include_directories(${CELERO_HEADERS} ${Boost_INCLUDE_DIRS})
