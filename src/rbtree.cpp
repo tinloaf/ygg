@@ -900,6 +900,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::IteratorBase<ConcreteIterator,
         const ConcreteIterator & other)
 {
   this->n = other.n;
+
+  return *(static_cast<ConcreteIterator *>(this));
 }
 
 template<class Node, class NodeTraits, class Options, int Tag, class Compare>
@@ -910,6 +912,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::IteratorBase<ConcreteIterator,
         ConcreteIterator && other)
 {
   this->n = other.n;
+
+  return *(static_cast<ConcreteIterator *>(this));
 }
 
 template<class Node, class NodeTraits, class Options, int Tag, class Compare>

@@ -1,4 +1,5 @@
 #include "options.hpp"
+#include "list.hpp"
 #include "rbtree.hpp"
 #include "intervaltree.hpp"
 #include "intervalmap.hpp"
