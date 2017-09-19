@@ -307,9 +307,13 @@ TEST(RBTreeTest, UpperBoundTest) {
   ASSERT_TRUE(tree.verify_integrity());
 
   for (unsigned int i = 0 ; i < RBTREE_TESTSIZE - 1 ; ++i) {
-    Node query(2*i + 1);
+    Node query_next(2*i + 1);
+    auto it_next = tree.upper_bound(query_next);
+    ASSERT_EQ(it_next->data, nodes[i+1].data);
+
+    Node query(2*i);
     auto it = tree.upper_bound(query);
-    ASSERT_EQ(it->data, nodes[i+1].data);
+    ASSERT_EQ(it->data, nodes[i].data);
   }
 
   Node query(2*(RBTREE_TESTSIZE - 1) + 1);

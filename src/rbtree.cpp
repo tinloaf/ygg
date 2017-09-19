@@ -1205,24 +1205,22 @@ typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterato
 RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable & query) const
 {
   Node * cur = this->root;
-  Node * bound = nullptr;
+  Node * last_left = nullptr;
+
   while (cur != nullptr) {
-    if (this->cmp(query, *cur)) {
-      bound = cur;
-      cur = cur->NB::_rbt_left;
-    } else if (this->cmp(*cur, query)) {
+    if (this->cmp(*cur, query)) {
       cur = cur->NB::_rbt_right;
     } else {
-      // hit the spot
-      cur = cur->NB::_rbt_right;
-      if (cur != nullptr) {
-        bound = cur;
-        break;
-      }
+      last_left = cur;
+      cur = cur->NB::_rbt_left;
     }
   }
 
-  return const_iterator<false>(bound);
+  if (last_left != nullptr) {
+    return iterator<false>(last_left);
+  } else {
+    return this->end();
+  }
 }
 
 /*
