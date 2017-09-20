@@ -18,3 +18,8 @@ add_custom_target(clion_test_dummy SOURCES test_intervaltree.hpp test_orderlist.
 
 enable_testing()
 add_test(NAME gtest COMMAND run_tests)
+
+# copy gdb pretty printers to build dir
+add_custom_command(TARGET run_tests PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/gdbscripts ${CMAKE_BINARY_DIR}/test/gdbscripts)

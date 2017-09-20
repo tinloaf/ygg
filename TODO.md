@@ -12,3 +12,6 @@
 * When we pass NB around, we probably don't need NodeTraits anymore?
 * Multi-Trees: add more tests
 * Document List
+* Access interval map fields through full names
+* Interval Map integrity verification
+* Interval Map: merge segments!

@@ -7,13 +7,15 @@
 
 #include "intervaltree.hpp"
 #include "rbtree.hpp"
+#include "list.hpp"
 
 namespace ygg {
 
 namespace internal {
 	template<class KeyT, class ValueT, int Tag>
-	class InnerNode : public  RBTreeNodeBase<InnerNode<KeyT, ValueT, Tag>,
-	                                                   TreeOptions<TreeFlags::MULTIPLE>, Tag> {
+	class InnerNode : public RBTreeNodeBase<InnerNode<KeyT, ValueT, Tag>,
+	                                                   TreeOptions<TreeFlags::MULTIPLE>, Tag>,
+										public ListNodeBase<InnerNode<KeyT, ValueT, Tag>, Tag> {
 	public:
 		KeyT point;
 		ValueT aggregate;
@@ -140,6 +142,9 @@ public:
 	 * the length of a segment; especially note that there are zero-length segments. See DOCTODO
 	 * for information on segments.
 	 *
+	 * Note that this will also be called on newly inserted segments; the aggregate value for those
+	 * segments will then not be updated yet.
+	 *
 	 * @param seg The segment that changed its length.
 	 */
 	static void on_length_changed(typename Node::Segment & seg)
@@ -205,9 +210,12 @@ public:
 	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type, Tag>;
 	using ITree = RBTree<Segment, RBDefaultNodeTraits<Segment>, TreeOptions<TreeFlags::MULTIPLE>,
 	                     Tag, typename Segment::Compare>;
+	using SegList = List<Segment, Tag>;
 
 	/**
 	 * @brief Inserts a node into the IntervalMap.
+	 *
+	 * TODO iterator invalidation
 	 *
 	 * @param n The node to be inserted.
 	 */
@@ -215,6 +223,8 @@ public:
 
 	/**
 	 * @brief Removes a node from the IntervalMap.
+	 *
+	 * TODO iterator invalidation
 	 *
 	 * @param n The node to be removed.
 	 */
@@ -244,7 +254,7 @@ public:
 		typedef std::input_iterator_tag             iterator_category;
 
 		IteratorBase();
-		IteratorBase(const InnerIterator & it, ITree * t);
+		IteratorBase(const InnerIterator & it, SegList * l);
 		IteratorBase(const ConcreteIterator & other);
 
 		ConcreteIterator& operator=(const ConcreteIterator & other);
@@ -272,22 +282,20 @@ public:
 	private:
 		/// @cond INTERNAL
 
-		InnerIterator lower;
-		InnerIterator upper;
-		ITree * t;
+		InnerIterator inner;
+		SegList * l;
 
 		/// @endcond
 	};
 
-	class const_iterator : public IteratorBase<const_iterator,
-	                                           typename ITree::template const_iterator<false>> {
+	class const_iterator : public IteratorBase<const_iterator, typename SegList::const_iterator> {
 	public:
-		using IteratorBase<const_iterator, typename ITree::template const_iterator<false>>::IteratorBase;
+		using IteratorBase<const_iterator, typename SegList::const_iterator>::IteratorBase;
 	};
 
-	class iterator : public IteratorBase<iterator, typename ITree::template iterator<false>> {
+	class iterator : public IteratorBase<iterator, typename SegList::iterator> {
 	public:
-		using IteratorBase<iterator, typename ITree::template iterator<false>>::IteratorBase;
+		using IteratorBase<iterator, typename SegList::iterator>::IteratorBase;
 	};
 
 	const_iterator begin() const;
@@ -295,10 +303,18 @@ public:
 	iterator begin();
 	iterator end();
 
+	void dbg_verify();
+
 private:
+	void insert_segment(Segment * seg);
+	void remove_segment(Segment * seg);
+
+	iterator find_upper_bound_representative(typename Node::key_type point);
+
 	ITree t;
+	SegList l;
 
-
+	void dbg_verify_list();
 };
 
 } // namespace ygg

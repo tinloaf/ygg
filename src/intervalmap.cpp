@@ -8,38 +8,93 @@ namespace ygg {
 
 template <class Node, class NodeTraits, int Tag>
 void
+IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
+{
+	key_type & point = seg->point;
+
+	auto upper_bound_it = this->t.upper_bound(point);
+	Segment * ub_repr = nullptr;
+	if (upper_bound_it != this->t.end()) {
+		ub_repr = &*upper_bound_it;
+	}
+
+	this->t.insert(*seg);
+
+	NodeTraits::on_segment_inserted(*seg);
+
+	/*
+	 * Insert begin segment into the segment list
+	 */
+	if (ub_repr != nullptr) {
+		if (ub_repr->point > point) {
+			/* We are not at the same point as the upper-bounded representative; it is truly after us.
+			 * This means two things:
+			 *
+			 * - We can take our value from the representative's predecessor (as long as it has one)
+			 *    - If it has no predecessor, we are the first in the list and initialize to 0
+			 * - We must insert ourselves as new representative before the upper-bounded repr
+			 */
+			this->l.insert(ub_repr, seg);
+			NodeTraits::on_length_changed(*seg);
+
+			auto list_it = this->l.iterator_to(*seg);
+			if (list_it != this->l.begin()) {
+				// Take the value of the upper-bounds old predecessor
+				list_it--;
+				seg->aggregate = list_it->aggregate;
+				NodeTraits::on_length_changed(*seg);
+			} else {
+				// We are now the first segment! Initialize value to zero.
+				seg->aggregate = value_type();
+			}
+
+		} else {
+			/* We are at the same point as the upper-bounded repr. We…
+			 *
+			 * - can take the value of the upper-bounded repr.
+			 * - must replace the upper-bounded repr iff we were inserted directly before it in the tree
+			 */
+			seg->aggregate = upper_bound_it->aggregate;
+
+			auto seg_it = this->t.iterator_to(*seg);
+			auto repr_it = this->t.iterator_to(*ub_repr);
+			if (++seg_it == repr_it) {
+				// we were inserted directly before the representative and have to replace it!
+				this->l.insert(ub_repr, seg);
+				this->l.remove(ub_repr);
+
+				NodeTraits::on_length_changed(*ub_repr);
+				NodeTraits::on_length_changed(*seg);
+			}
+		}
+	} else {
+		/* We are the very last element in the list. Insert at the end and take the aggregate from
+		 * the previous last element. */
+		this->l.insert(nullptr, seg);
+
+		auto list_it = this->l.iterator_to(*seg);
+		if (list_it != this->l.begin()) {
+			--list_it;
+			seg->aggregate = list_it->aggregate;
+			NodeTraits::on_length_changed(*list_it);
+		} else {
+			// there is no other element in the list. Initialize to zero.
+			seg->aggregate = value_type();
+		}
+	}
+}
+
+template <class Node, class NodeTraits, int Tag>
+void
 IntervalMap<Node, NodeTraits, Tag>::insert(Node &n)
 {
 	// TODO this is redundant.
 	n._imap_begin.point = NodeTraits::get_lower(n);
 	n._imap_end.point = NodeTraits::get_upper(n);
 
-	this->t.insert(n._imap_begin);
-	this->t.insert(n._imap_end);
 
-	NodeTraits::on_segment_inserted(n._imap_begin);
-	NodeTraits::on_segment_inserted(n._imap_end);
-
-	// Determine the aggregate from before the begin
-	auto begin_it = this->t.iterator_to(n._imap_begin);
-	if (++begin_it != this->t.iterator_to(n._imap_end) &&
-					begin_it->point == NodeTraits::get_lower(n)) {
-		n._imap_begin.aggregate = begin_it->aggregate;
-	} else {
-		begin_it = this->t.iterator_to(n._imap_begin);
-		if (begin_it != this->t.begin()) {
-			begin_it--;
-			n._imap_begin.aggregate = begin_it->aggregate;
-			NodeTraits::on_length_changed(*begin_it);
-		}
-	}
-
-	auto end_it = this->t.iterator_to(n._imap_end);
-	--end_it;
-	n._imap_end.aggregate = end_it->aggregate;
-	if (end_it != this->t.iterator_to(n._imap_begin)) {
-		NodeTraits::on_length_changed(*end_it);
-	}
+	this->insert_segment(&n._imap_begin);
+	this->insert_segment(&n._imap_end);
 
 	auto it = this->t.find(n._imap_begin.point); // guaranteed to be the first (in tree order)
 																			         // segment with this point
@@ -56,75 +111,80 @@ IntervalMap<Node, NodeTraits, Tag>::insert(Node &n)
 
 template <class Node, class NodeTraits, int Tag>
 void
+IntervalMap<Node, NodeTraits, Tag>::remove_segment(Segment *seg)
+{
+	auto tree_it = this->t.iterator_to(seg);
+	if ((tree_it == this->t.begin()) || ((tree_it - 1)->point != seg->point)) {
+		// We are a representatitve and must delete from the list!
+		auto next_it = tree_it + 1;
+		if ((next_it != this->t.end()) && (next_it->point == seg->point)) {
+			// The next entry replaces us!
+			Segment * next_entry = nullptr;
+			auto list_it = this->l.iterator_to(seg);
+			++list_it;
+			if (list_it != this->l.end()) {
+				next_entry = *list_it;
+			}
+
+			this->l.insert(next_entry, *next_it);
+
+			NodeTraits::on_length_changed(*next_it);
+		}
+
+		Segment * list_pred = nullptr;
+		if (this->l.iterator_to(*seg) != this->l.begin()) {
+			list_pred = * this->l.iterator_to(*seg) - 1;
+		}
+
+		this->l.remove(seg);
+
+		if (list_pred != nullptr) {
+			NodeTraits::on_length_changed(*list_pred);
+		}
+	}
+
+	this->t.remove(seg);
+}
+
+template <class Node, class NodeTraits, int Tag>
+void
 IntervalMap<Node, NodeTraits, Tag>::remove(Node &n)
 {
   auto it = this->t.find(n._imap_begin.point);
-	auto stop_it = this->t.find(n._imap_end.point);
+	typename Node::key_t stop_point = NodeTraits::get_upper(n);
 
-	while (it != stop_it) {
+	while (it->point < stop_point) {
 		value_type old_val = it->aggregate;
 		it->aggregate -= NodeTraits::get_value(n);
 		NodeTraits::on_value_changed(*it, old_val, it->aggregate);
 		it++;
 	}
 
-	bool notify_begin = false;
-	auto begin_it = this->t.iterator_to(n._imap_begin);
-	bool notify_end = false;
-	auto end_it = this->t.iterator_to(n._imap_end);
-
-	// TODO check if there are more segments at this point - if so, the length of the segment before
-	// does not change!
-	if (begin_it != this->t.begin()) {
-		--begin_it;
-		notify_begin = true;
-	}
-
-	this->t.remove(n._imap_begin);
-
-	if (notify_begin) {
-		NodeTraits::on_length_changed(*begin_it);
-	}
-
-	if (end_it != this->t.begin()) {
-		--end_it;
-		notify_end = true;
-	}
-
-	this->t.remove(n._imap_end);
-
-	if (notify_end) {
-		NodeTraits::on_length_changed(*end_it);
-	}
+	this->remove_segment(& n._imap_end);
+	this->remove_segment(& n._imap_begin);
 }
 
 template <class Node, class NodeTraits, int Tag>
 template<class ConcreteIterator, class InnerIterator>
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::IteratorBase()
-	: t(nullptr)
+	: l(nullptr)
 {}
 
 template <class Node, class NodeTraits, int Tag>
 template<class ConcreteIterator, class InnerIterator>
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::IteratorBase(
 				const ConcreteIterator & other)
-				: lower(other.lower), upper(other.upper), t(other.t)
+				: inner(other.inner), l(other.l)
 {}
 
 template <class Node, class NodeTraits, int Tag>
 template<class ConcreteIterator, class InnerIterator>
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::IteratorBase(
-				const InnerIterator & it, ITree * t_in)
-				: lower(it), upper(it), t(t_in)
+				const InnerIterator & it, SegList * l_in)
+				: inner(it), l(l_in)
 {
-	if (this->lower == this->t->end()) {
-		this->upper = this->t->end();
-	} else {
-		this->upper = this->lower + 1;
-
-		if (this->lower->point == this->upper->point) {
-			this->operator++();
-		}
+	if ((inner == this->l->back()) && (this->l->back() != this->l->end())) {
+		inner++; // The last entry is not really a segment
 	}
 }
 
@@ -134,9 +194,9 @@ ConcreteIterator &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator=(
 				const ConcreteIterator & other)
 {
-	this->lower = other.lower;
-	this->upper = other.upper;
-	this->t = other.t;
+	this->inner = other.inner;
+	this->l = other.l;
+
 	return *this;
 };
 
@@ -146,9 +206,9 @@ ConcreteIterator &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator=(
 				ConcreteIterator && other)
 {
-	this->lower = std::move(other.lower);
-	this->upper = std::move(other.upper);
-	this->t = other.t;
+	this->inner = std::move(other.inner);
+	this->l = other.l;
+
 	return *this;
 };
 
@@ -158,7 +218,7 @@ bool
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator==(
 				const ConcreteIterator & other) const
 {
-	return other.upper == this->upper;
+	return (other.inner == this->inner) && (other.l == this->l);
 }
 
 template <class Node, class NodeTraits, int Tag>
@@ -167,7 +227,7 @@ bool
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator!=(
 				const ConcreteIterator & other) const
 {
-	return other.upper != this->upper;
+	return (other.inner != this->inner) || (other.l != this->l);
 }
 
 
@@ -176,12 +236,9 @@ template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator++()
 {
-	this->lower = this->upper;
-	++(this->upper);
-
-	while ((this->upper != this->t->end()) && (this->lower->point == this->upper->point)) {
-		this->lower = this->upper;
-		++(this->upper);
+	this->inner++;
+	if (this->inner == this->l->back()) {
+		this->inner++; // last entry is not really a segment
 	}
 
 	return *(static_cast<ConcreteIterator *>(this));
@@ -216,7 +273,7 @@ template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator+(size_t steps) const
 {
-	iterator it(this->lower + steps, this->t);
+	ConcreteIterator it(this->inner + steps, this->l);
 	return it;
 };
 
@@ -225,19 +282,10 @@ template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator--()
 {
-
-	this->upper = this->lower;
-	--(this->lower);
-
-	while ((this->lower != this->t.begin()) && (this->lower->point == this->upper->point)) {
-		this->upper = this->lower;
-		--(this->lower);
-	}
-
-	// If we ran into a stack of zero-length segments at the beginning, go to the first non-zero
-	// length segment
-	if ((this->lower->point == this->upper->point)) {
-		this->operator++();
+	if (this->inner == this->l.end()) {
+		this->inner = this->l.back() - 1;
+	} else {
+		this->inner--;
 	}
 
 	return *this;
@@ -248,7 +296,7 @@ template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator--(int)
 {
-	iterator buf(*this);
+	ConcreteIterator buf(*this);
 
 	this->operator--();
 
@@ -261,7 +309,7 @@ typename IntervalMap<Node, NodeTraits, Tag>::template IteratorBase<ConcreteItera
                                                                    InnerIterator>::reference
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator*() const
 {
-	return *(this->lower);
+	return *(this->inner);
 }
 
 template <class Node, class NodeTraits, int Tag>
@@ -270,7 +318,7 @@ typename IntervalMap<Node, NodeTraits, Tag>::template IteratorBase<ConcreteItera
                                                                    InnerIterator>::pointer
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator->() const
 {
-	return this->lower->operator->();
+	return &*this->inner;
 }
 
 template <class Node, class NodeTraits, int Tag>
@@ -278,7 +326,7 @@ template<class ConcreteIterator, class InnerIterator>
 typename IntervalMap<Node, NodeTraits, Tag>::key_type
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::get_lower() const
 {
-	return this->lower->point;
+	return this->inner->point;
 }
 
 template <class Node, class NodeTraits, int Tag>
@@ -286,7 +334,7 @@ template<class ConcreteIterator, class InnerIterator>
 typename IntervalMap<Node, NodeTraits, Tag>::key_type
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::get_upper() const
 {
-	return this->upper->point;
+	return (this->inner + 1)->point;
 }
 
 template <class Node, class NodeTraits, int Tag>
@@ -294,35 +342,71 @@ template<class ConcreteIterator, class InnerIterator>
 const typename IntervalMap<Node, NodeTraits, Tag>::value_type &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::get_value() const
 {
-	return this->lower->aggregate;
+	return this->inner->aggregate;
 }
 
 template <class Node, class NodeTraits, int Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::const_iterator
 IntervalMap<Node, NodeTraits, Tag>::begin() const
 {
-	return const_iterator(this->t.begin(), & this->t);
+	return const_iterator(this->l.begin(), & this->l);
 };
 
 template <class Node, class NodeTraits, int Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::const_iterator
 IntervalMap<Node, NodeTraits, Tag>::end() const
 {
-	return const_iterator(this->t.end(), & this->t);
+	return const_iterator(this->l.end(), & this->l);
 };
 
 template <class Node, class NodeTraits, int Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::iterator
 IntervalMap<Node, NodeTraits, Tag>::begin()
 {
-	return iterator(this->t.begin(), & this->t);
+	return iterator(this->l.begin(), & this->l);
 };
 
 template <class Node, class NodeTraits, int Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::iterator
 IntervalMap<Node, NodeTraits, Tag>::end()
 {
-	return iterator(this->t.end(), & this->t);
+	return iterator(this->l.end(), & this->l);
 };
+
+template <class Node, class NodeTraits, int Tag>
+typename IntervalMap<Node, NodeTraits, Tag>::iterator
+IntervalMap<Node, NodeTraits, Tag>::find_upper_bound_representative(typename Node::key_type point)
+{
+	typename SegList::iterator inner_iterator = this->l.iterator_to(*this->t.upper_bound(point));
+	return iterator(inner_iterator, & this->l);
+}
+
+template <class Node, class NodeTraits, int Tag>
+void
+IntervalMap<Node, NodeTraits, Tag>::dbg_verify()
+{
+	this->dbg_verify_list();
+}
+
+template <class Node, class NodeTraits, int Tag>
+void
+IntervalMap<Node, NodeTraits, Tag>::dbg_verify_list()
+{
+	auto list_it = this->l.begin();
+	auto tree_it = this->t.begin();
+
+	while (list_it != this->l.end()) {
+		assert(&*list_it == &*tree_it);
+
+		// Advance list once, tree until the next point is found
+		key_type old_point = tree_it->point;
+		while ((tree_it != this->t.end()) && (tree_it->point == old_point)) {
+			++tree_it;
+		}
+		++list_it;
+	}
+
+	assert(tree_it == this->t.end());
+}
 
 } // namespace ygg

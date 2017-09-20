@@ -257,6 +257,8 @@ public:
 	 */
 	template<class Comparable>
 	const_iterator<false> upper_bound(const Comparable & query) const;
+	template<class Comparable>
+	iterator<false> upper_bound(const Comparable & query);
 
   /**
    * @brief Removes <node> from the tree

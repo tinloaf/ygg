@@ -318,7 +318,7 @@ TEST(RBTreeTest, UpperBoundTest) {
 
   Node query(2*(RBTREE_TESTSIZE - 1) + 1);
   auto it = tree.upper_bound(query);
-  ASSERT_EQ(it, tree.cend());
+  ASSERT_EQ(it, tree.end());
 }
 
 TEST(RBTreeTest, TrivialDeletionTest) {

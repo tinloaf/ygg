@@ -1201,8 +1201,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::find(const Comparable & query) 
 
 template<class Node, class NodeTraits, class Options, int Tag, class Compare>
 template<class Comparable>
-typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterator<false>
-RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable & query) const
+typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template iterator<false>
+RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable & query)
 {
   Node * cur = this->root;
   Node * last_left = nullptr;
@@ -1222,6 +1222,15 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable & 
     return this->end();
   }
 }
+
+
+template<class Node, class NodeTraits, class Options, int Tag, class Compare>
+template<class Comparable>
+typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterator<false>
+RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable & query) const
+{
+  return const_iterator<false>(this->upper_bound(query));
+};
 
 /*
 template<class Node, class NodeTraits, class Options, int Tag, class Compare>

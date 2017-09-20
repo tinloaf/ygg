@@ -67,6 +67,7 @@ TEST(IMapTest, GappedInsertionTest)
 
 	for (unsigned int i = 0 ; i < IMAP_TESTSIZE ; ++i) {
 		m.insert(nodes[i]);
+		m.dbg_verify();
 	}
 
 	auto it = m.begin();
@@ -106,6 +107,7 @@ TEST(IMapTest, NestedInsertionTest)
 
 	for (unsigned int i = 0 ; i < IMAP_TESTSIZE ; ++i) {
 		m.insert(nodes[i]);
+		m.dbg_verify();
 	}
 
 	auto it = m.begin();
@@ -141,6 +143,7 @@ TEST(IMapTest, MultipleNestedInsertionTest)
 
 	for (unsigned int i = 0 ; i < (IMAP_MULTIPLICITY * IMAP_TESTSIZE) ; ++i) {
 		m.insert(nodes[i]);
+		m.dbg_verify();
 	}
 
 	auto it = m.begin();

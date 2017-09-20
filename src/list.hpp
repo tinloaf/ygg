@@ -63,14 +63,19 @@ public:
 		List<Node, Tag> * l;
 	};
 
+	class const_iterator; // forward for friendship
+
 	class iterator : public IteratorBase<iterator, Node> {
 	public:
 		using IteratorBase<iterator, Node>::IteratorBase;
+		friend  class const_iterator;
 	};
 
-	class const_iterator : public IteratorBase<const iterator, const Node> {
+	class const_iterator : public IteratorBase<const_iterator, const Node> {
 	public:
 		using IteratorBase<const_iterator, const Node>::IteratorBase;
+		const_iterator(const iterator & other) :
+						IteratorBase<const_iterator, const Node>::IteratorBase(other.l, other.n) {};
 	};
 
 	List();
@@ -83,7 +88,11 @@ public:
 	iterator end();
 	const_iterator end() const;
 
+	iterator back();
+	const_iterator back() const;
+
 	const_iterator iterator_to(const Node & n) const;
+	iterator iterator_to(const Node & n);
 
 private:
 	Node * head;

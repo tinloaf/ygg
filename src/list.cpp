@@ -104,7 +104,7 @@ template<class ConcreteIterator, class BaseType>
 ConcreteIterator
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator+(size_t steps) const
 {
-	ConcreteIterator cpy(*(static_cast<ConcreteIterator *>(this)));
+	ConcreteIterator cpy(*(static_cast<const ConcreteIterator *>(this)));
 	cpy += steps;
 	return cpy;
 };
@@ -201,6 +201,20 @@ List<Node, Tag>::begin() const
 
 template<class Node, int Tag>
 typename List<Node, Tag>::iterator
+List<Node, Tag>::back()
+{
+	return iterator(this, this->tail);
+};
+
+template<class Node, int Tag>
+typename List<Node, Tag>::const_iterator
+List<Node, Tag>::back() const
+{
+	return const_iterator(this, this->tail);
+};
+
+template<class Node, int Tag>
+typename List<Node, Tag>::iterator
 List<Node, Tag>::end()
 {
 	return iterator(this, nullptr);
@@ -217,9 +231,14 @@ template<class Node, int Tag>
 typename List<Node, Tag>::const_iterator
 List<Node, Tag>::iterator_to(const Node & n) const
 {
-	return const_iterator(this, &n);
+	return const_iterator(const_cast<List<Node, Tag> *>(this), &n);
 };
 
-
+template<class Node, int Tag>
+typename List<Node, Tag>::iterator
+List<Node, Tag>::iterator_to(const Node & n)
+{
+	return iterator(this, const_cast<Node *>(&n));
+};
 
 } // namespace ygg
