@@ -6,7 +6,7 @@
 
 namespace ygg {
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 void
 IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
 {
@@ -84,7 +84,7 @@ IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
 	}
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 void
 IntervalMap<Node, NodeTraits, Tag>::insert(Node &n)
 {
@@ -109,7 +109,7 @@ IntervalMap<Node, NodeTraits, Tag>::insert(Node &n)
 	}
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 void
 IntervalMap<Node, NodeTraits, Tag>::remove_segment(Segment *seg)
 {
@@ -146,7 +146,7 @@ IntervalMap<Node, NodeTraits, Tag>::remove_segment(Segment *seg)
 	this->t.remove(seg);
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 void
 IntervalMap<Node, NodeTraits, Tag>::remove(Node &n)
 {
@@ -164,20 +164,20 @@ IntervalMap<Node, NodeTraits, Tag>::remove(Node &n)
 	this->remove_segment(& n._imap_begin);
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::IteratorBase()
 	: l(nullptr)
 {}
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::IteratorBase(
 				const ConcreteIterator & other)
 				: inner(other.inner), l(other.l)
 {}
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::IteratorBase(
 				const InnerIterator & it, SegList * l_in)
@@ -188,7 +188,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	}
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator=(
@@ -200,7 +200,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return *this;
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator=(
@@ -212,7 +212,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return *this;
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 bool
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator==(
@@ -221,7 +221,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return (other.inner == this->inner) && (other.l == this->l);
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 bool
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator!=(
@@ -231,7 +231,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 }
 
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator++()
@@ -244,7 +244,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return *(static_cast<ConcreteIterator *>(this));
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator++(int)
@@ -256,7 +256,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return buf;
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator+=(size_t steps)
@@ -268,7 +268,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return *this;
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator+(size_t steps) const
@@ -277,7 +277,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return it;
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator--()
@@ -291,7 +291,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return *this;
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 ConcreteIterator
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::operator--(int)
@@ -303,7 +303,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return buf;
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 typename IntervalMap<Node, NodeTraits, Tag>::template IteratorBase<ConcreteIterator,
                                                                    InnerIterator>::reference
@@ -312,7 +312,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return *(this->inner);
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 typename IntervalMap<Node, NodeTraits, Tag>::template IteratorBase<ConcreteIterator,
                                                                    InnerIterator>::pointer
@@ -321,7 +321,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return &*this->inner;
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 typename IntervalMap<Node, NodeTraits, Tag>::key_type
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::get_lower() const
@@ -329,7 +329,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return this->inner->point;
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 typename IntervalMap<Node, NodeTraits, Tag>::key_type
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::get_upper() const
@@ -337,7 +337,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return (this->inner + 1)->point;
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
 const typename IntervalMap<Node, NodeTraits, Tag>::value_type &
 IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator>::get_value() const
@@ -345,35 +345,35 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	return this->inner->aggregate;
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::const_iterator
 IntervalMap<Node, NodeTraits, Tag>::begin() const
 {
 	return const_iterator(this->l.begin(), & this->l);
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::const_iterator
 IntervalMap<Node, NodeTraits, Tag>::end() const
 {
 	return const_iterator(this->l.end(), & this->l);
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::iterator
 IntervalMap<Node, NodeTraits, Tag>::begin()
 {
 	return iterator(this->l.begin(), & this->l);
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::iterator
 IntervalMap<Node, NodeTraits, Tag>::end()
 {
 	return iterator(this->l.end(), & this->l);
 };
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::iterator
 IntervalMap<Node, NodeTraits, Tag>::find_upper_bound_representative(typename Node::key_type point)
 {
@@ -381,14 +381,14 @@ IntervalMap<Node, NodeTraits, Tag>::find_upper_bound_representative(typename Nod
 	return iterator(inner_iterator, & this->l);
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 void
 IntervalMap<Node, NodeTraits, Tag>::dbg_verify()
 {
 	this->dbg_verify_list();
 }
 
-template <class Node, class NodeTraits, int Tag>
+template <class Node, class NodeTraits, class Tag>
 void
 IntervalMap<Node, NodeTraits, Tag>::dbg_verify_list()
 {

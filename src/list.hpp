@@ -11,14 +11,14 @@
 
 namespace ygg {
 
-template<class Node, int Tag = 0>
+template<class Node, class Tag = int>
 class ListNodeBase {
 public:
 	Node * _l_prev;
 	Node * _l_next;
 };
 
-template<class Node, int Tag = 0>
+template<class Node, class Tag = int>
 class List {
 public:
 	using NB = ListNodeBase<Node, Tag>;

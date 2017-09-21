@@ -6,30 +6,30 @@
 
 namespace ygg {
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 List<Node, Tag>::List()
 	: head(nullptr), tail(nullptr)
 {}
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::IteratorBase()
   : n(nullptr), l(nullptr)
 {}
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::IteratorBase(List *l_in, BaseType *n_in)
 	: n(n_in), l(l_in)
 {}
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::IteratorBase(const ConcreteIterator &other)
 	: n(other.n), l(other.l)
 {}
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 ConcreteIterator &
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator=(const ConcreteIterator & other)
@@ -40,7 +40,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator=(const Concr
 	return *(static_cast<ConcreteIterator *>(this));
 }
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 ConcreteIterator &
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator=(ConcreteIterator && other)
@@ -51,7 +51,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator=(ConcreteIte
 	return *(static_cast<ConcreteIterator *>(this));
 }
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 bool
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator==(const ConcreteIterator & other) const
@@ -59,7 +59,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator==(const Conc
 	return (this->n == other.n) && (this->l == other.l);
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 bool
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator!=(const ConcreteIterator & other) const
@@ -67,7 +67,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator!=(const Conc
 	return (this->n != other.n) || (this->l != other.l);
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 ConcreteIterator &
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator++()
@@ -77,7 +77,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator++()
 	return (*(static_cast<ConcreteIterator *>(this)));
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 ConcreteIterator
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator++(int)
@@ -87,7 +87,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator++(int)
 	return cpy;
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 ConcreteIterator &
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator+=(size_t steps)
@@ -99,7 +99,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator+=(size_t ste
 	return (*(static_cast<ConcreteIterator *>(this)));
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 ConcreteIterator
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator+(size_t steps) const
@@ -109,7 +109,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator+(size_t step
 	return cpy;
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 ConcreteIterator &
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator--()
@@ -119,7 +119,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator--()
 	return (*(static_cast<ConcreteIterator *>(this)));
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 ConcreteIterator
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator--(int)
@@ -129,7 +129,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator--(int)
 	return cpy;
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 typename List<Node, Tag>::template IteratorBase<ConcreteIterator, BaseType>::reference
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator*() const
@@ -137,7 +137,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator*() const
 	return *(this->n);
 }
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
 typename List<Node, Tag>::template IteratorBase<ConcreteIterator, BaseType>::pointer
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator->() const
@@ -145,7 +145,7 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator->() const
 	return this->n;
 }
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 void
 List<Node, Tag>::insert(Node *next, Node *n)
 {
@@ -168,7 +168,7 @@ List<Node, Tag>::insert(Node *next, Node *n)
 	n->NB::_l_prev = prev;
 }
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 void
 List<Node, Tag>::remove(Node * n)
 {
@@ -185,56 +185,56 @@ List<Node, Tag>::remove(Node * n)
 	}
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 typename List<Node, Tag>::iterator
 List<Node, Tag>::begin()
 {
 	return iterator(this, this->head);
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 typename List<Node, Tag>::const_iterator
 List<Node, Tag>::begin() const
 {
 	return const_iterator(this, this->head);
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 typename List<Node, Tag>::iterator
 List<Node, Tag>::back()
 {
 	return iterator(this, this->tail);
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 typename List<Node, Tag>::const_iterator
 List<Node, Tag>::back() const
 {
 	return const_iterator(this, this->tail);
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 typename List<Node, Tag>::iterator
 List<Node, Tag>::end()
 {
 	return iterator(this, nullptr);
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 typename List<Node, Tag>::const_iterator
 List<Node, Tag>::end() const
 {
 	return const_iterator(this, nullptr);
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 typename List<Node, Tag>::const_iterator
 List<Node, Tag>::iterator_to(const Node & n) const
 {
 	return const_iterator(const_cast<List<Node, Tag> *>(this), &n);
 };
 
-template<class Node, int Tag>
+template<class Node, class Tag>
 typename List<Node, Tag>::iterator
 List<Node, Tag>::iterator_to(const Node & n)
 {

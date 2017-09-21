@@ -12,8 +12,8 @@ using namespace ygg;
 
 #define TESTSIZE 1000
 
-#define TAG_A 23
-#define TAG_B 42
+class TAG_A {};
+class TAG_B {};
 
 namespace multitest {
 

@@ -15,7 +15,7 @@
 namespace ygg {
   namespace utilities {
 	  /// @cond INTERNAL
-	  template<class Node, int Tag>
+	  template<class Node, class Tag>
 	  class RBTreeNodeBaseImpl {
 	  public:
 		  enum class Color { RED, BLACK };
@@ -41,9 +41,9 @@ namespace ygg {
  * @tparam options  The options class (a version of TreeOptions) that you parameterize the tree
  * with. (See the options parameter of RBTree.)
  * @tparam Tag 		The tag used to identify the tree that this node should be inserted into. See
- * RBTree and DOCTODO for details.
+ * RBTree for details.
  */
-template<class Node, class Options = TreeOptions<TreeFlags::MULTIPLE>, int Tag = 0>
+template<class Node, class Options = TreeOptions<TreeFlags::MULTIPLE>, class Tag = int>
 class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Tag> {};
 
 /**
@@ -76,13 +76,13 @@ public:
  * DOCTODO for details.
  * @tparam Options			The TreeOptions class specifying the parameters of this RBTree. See the
  * TreeOptions and TreeFlags classes for details.
- * @tparam Tag					An integer tag that identifies this tree. Can be used to insert the same
- * nodes into multiple trees. See DOCTODO for details.
+ * @tparam Tag					An class tag that identifies this tree. Can be used to insert the same
+ * nodes into multiple trees. See DOCTODO for details. Can be any class, the class can be empty
  * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'.
  * Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
-template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>, int Tag = 0,
-         class Compare = std::less<Node>>
+template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>, class
+Tag = int, class Compare = std::less<Node>>
 class RBTree
 {
 public:

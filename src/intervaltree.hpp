@@ -44,7 +44,7 @@ namespace ygg {
   } // namespace utilities
 
 template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
-				int Tag = 0>
+				class Tag = int>
 class ITreeNodeBase : public RBTreeNodeBase<Node, Options, Tag> {
 public:
   typename NodeTraits::key_type    _it_max_upper;
@@ -97,7 +97,7 @@ public:
  * for details.
  */
 template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
-				int Tag = 0>
+				class Tag = int>
 class IntervalTree : public RBTree<Node,
                                    utilities::ExtendedNodeTraits<Node,
                                                                  ITreeNodeBase<Node, NodeTraits, Options, Tag>,

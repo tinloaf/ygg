@@ -12,7 +12,7 @@
 namespace ygg {
 
 namespace internal {
-	template<class KeyT, class ValueT, int Tag>
+	template<class KeyT, class ValueT, class Tag>
 	class InnerNode : public RBTreeNodeBase<InnerNode<KeyT, ValueT, Tag>,
 	                                                   TreeOptions<TreeFlags::MULTIPLE>, Tag>,
 										public ListNodeBase<InnerNode<KeyT, ValueT, Tag>, Tag> {
@@ -62,8 +62,9 @@ namespace internal {
  * addable and subtractable.
  * @tparam Tag			The tag used to identify the underlying RBTree. If you want your nodes to be
  * part of multiple IntervalMaps, RBTrees or IntervalTrees, each must have its own unique tag.
+ * Can be any class, the class can be empty.
  */
-template<class KeyT, class ValueT, int Tag = 0>
+template<class KeyT, class ValueT, class Tag = int>
 class IMapNodeBase
 {
 public:
@@ -197,8 +198,9 @@ public:
  * your nodes. Must be derived from IMapNodeTraits.
  * @tparam Tag					The tag used to identify the underlying RBTree. If you want your nodes to be
  * part of multiple IntervalMaps, RBTrees or IntervalTrees, each must have its own unique tag.
+ * Can be any class, the class can be empty
  */
-template <class Node, class NodeTraits, int Tag = 0>
+template <class Node, class NodeTraits, class Tag = int>
 class IntervalMap {
 public:
 	static_assert(std::is_base_of<IMapNodeTraits<Node>, NodeTraits>::value,
