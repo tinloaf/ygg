@@ -4,8 +4,25 @@
 
 #ifndef YGG_UTIL_HPP
 
+#include <type_traits>
+
 namespace ygg {
 namespace utilities {
+
+/**
+ * @brief A more flexible version of std::less
+ *
+ * This is a more flexible version of std::less, which allows to compare two objects of different
+ * types T1 and T2, as long as operator<(T1, T2) and operator<(T2, T1) is defined.
+ */
+class flexible_less {
+public:
+	template<class T1, class T2>
+	constexpr bool operator()(const T1 &lhs, const T2 &rhs) const
+	{
+		return lhs < rhs;
+	}
+};
 
 /*
  * This is inspired by

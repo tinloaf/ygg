@@ -79,10 +79,10 @@ public:
  * @tparam Tag					An class tag that identifies this tree. Can be used to insert the same
  * nodes into multiple trees. See DOCTODO for details. Can be any class, the class can be empty
  * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'.
- * Defaults to std::less<Node>. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
+ * Defaults to ygg::utilities::flexible_less. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
 template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>, class
-Tag = int, class Compare = std::less<Node>>
+Tag = int, class Compare = ygg::utilities::flexible_less>
 class RBTree
 {
 public:
@@ -224,7 +224,7 @@ public:
 	 *    Compare()(const Node &, const Comparable &)
 	 * and
 	 *    Compare()(const Comparable &, const Node &)
-	 * are defined and implemented. In the case of using the default std::less as
+	 * are defined and implemented. In the case of using the default ygg::utilities::flexible_less as
 	 * Compare, that means you have to implement operator<() for both types.
 	 *
 	 * @warning Not available for explicitly ordered trees
@@ -248,7 +248,7 @@ public:
 	 *    Compare()(const Node &, const Comparable &)
 	 * and
 	 *    Compare()(const Comparable &, const Node &)
-	 * are defined and implemented. In the case of using the default std::less as
+	 * are defined and implemented. In the case of using the default ygg::utilities::flexible_less as
 	 * Compare, that means you have to implement operator<() for both types.
  	 *
    * @warning Not available for explicitly ordered trees
