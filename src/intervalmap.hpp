@@ -12,6 +12,7 @@
 namespace ygg {
 
 namespace internal {
+	/// @cond INTERNAL
 	class SegListTag {};
 	class RepresentativeSegListTag {};
 	class InnerRBTTag {};
@@ -48,14 +49,12 @@ namespace internal {
 			}
 		};
 	};
-
-
-
+	/// @endcond
 } // namespace internal
 
 /**
  * @brief Base class (template) to supply your node class with metainformation for inclusion in
- * an ItervalMap
+ * an IntervalMap
  *
  * The class you use as node within the ItervalMap *must* derive from this class template. I
  * supplies your node class with the necessary members to contain the metainformation for
@@ -90,8 +89,8 @@ public:
 };
 
 /**
- * @brief You must derive your own class from this class template, telling the IntervalMap how to
- * interact with your node class.
+ * @brief You must derive your own traits class from this class template, telling the IntervalMap
+ * how to interact with your node class.
  *
  * You must derive from this class template and supply the IntervalMap with your own derived
  * class. At the least, you have to implement the methods get_lower, get_upper and get_value for
@@ -102,7 +101,13 @@ public:
 template<class Node>
 class IMapNodeTraits {
 public:
+	/**
+	 * The type of the keys of intervals / segments in the IntervalMap
+	 */
 	using key_type = typename Node::key_type;
+	/**
+	 * The type of the values / aggregates in the IntervalMap
+	 */
 	using value_type = typename Node::value_type;
 
 	/**
@@ -204,11 +209,12 @@ public:
  * your nodes. Must be derived from IMapNodeTraits.
  * @tparam Tag					The tag used to identify the underlying RBTree. If you want your nodes to be
  * part of multiple IntervalMaps, RBTrees or IntervalTrees, each must have its own unique tag.
- * Can be any class, the class can be empty
+ * Can be any class, the class can be empty.
  */
 template <class Node, class NodeTraits, class Tag = int>
 class IntervalMap {
 public:
+	/// @cond internal
 	static_assert(std::is_base_of<IMapNodeTraits<Node>, NodeTraits>::value,
 	              "NodeTraits not properly derived from IMapNodeTraits!");
 
@@ -220,6 +226,7 @@ public:
 	                     internal::InnerRBTTag, typename Segment::Compare>;
 	using SegList = List<Segment, internal::SegListTag>;
 	using RepresentativeSegList = List<Segment, internal::RepresentativeSegListTag>;
+	/// @endcond
 
 	/**
 	 * @brief Inserts a node into the IntervalMap.
@@ -250,10 +257,10 @@ public:
 	 */
 	value_type get_aggregate(Segment & s);
 
+	/// @cond INTERNAL
 	template<class ConcreteIterator, class InnerIterator>
 	class IteratorBase {
 	public:
-		/// @cond INTERNAL
 
 
 		typedef typename InnerIterator::difference_type      difference_type;
@@ -282,20 +289,16 @@ public:
 
 		reference operator*() const;
 		pointer operator->() const;
-		/// @endcond
 
 		key_type get_lower() const;
 		key_type get_upper() const;
 		const typename IntervalMap<Node, NodeTraits, Tag>::value_type & get_value() const;
-
 	private:
-		/// @cond INTERNAL
 
 		InnerIterator inner;
 		RepresentativeSegList * l;
-
-		/// @endcond
 	};
+	/// @cond INTERNAL
 
 	class const_iterator : public IteratorBase<const_iterator, typename RepresentativeSegList::const_iterator> {
 	public:
