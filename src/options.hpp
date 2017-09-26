@@ -69,6 +69,6 @@ private:
 	TreeOptions(); // Instantiation now allowed
 };
 
-}; // namespace ygg
+} // namespace ygg
 
 #endif //YGG_OPTIONS_HPP

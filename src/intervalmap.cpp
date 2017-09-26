@@ -451,7 +451,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	this->l = other.l;
 
 	return *this;
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
@@ -463,7 +463,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	this->l = other.l;
 
 	return *this;
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
@@ -519,7 +519,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	}
 
 	return *this;
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
@@ -528,7 +528,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 {
 	ConcreteIterator it(this->inner + steps, this->l);
 	return it;
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
@@ -542,7 +542,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	}
 
 	return *this;
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
@@ -554,7 +554,7 @@ IntervalMap<Node, NodeTraits, Tag>::IteratorBase<ConcreteIterator, InnerIterator
 	this->operator--();
 
 	return buf;
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 template<class ConcreteIterator, class InnerIterator>
@@ -603,28 +603,28 @@ typename IntervalMap<Node, NodeTraits, Tag>::const_iterator
 IntervalMap<Node, NodeTraits, Tag>::begin() const
 {
 	return const_iterator(this->repr_list.begin(), & this->repr_list);
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::const_iterator
 IntervalMap<Node, NodeTraits, Tag>::end() const
 {
 	return const_iterator(this->repr_list.end(), & this->repr_list);
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::iterator
 IntervalMap<Node, NodeTraits, Tag>::begin()
 {
 	return iterator(this->repr_list.begin(), & this->repr_list);
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::iterator
 IntervalMap<Node, NodeTraits, Tag>::end()
 {
 	return iterator(this->repr_list.end(), & this->repr_list);
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::iterator
@@ -655,7 +655,7 @@ IntervalMap<Node, NodeTraits, Tag>::get_head(Segment * seg)
 	}
 
 	return head;
-};
+}
 
 template <class Node, class NodeTraits, class Tag>
 void

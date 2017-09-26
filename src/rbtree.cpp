@@ -1221,7 +1221,7 @@ typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterato
 RBTree<Node, NodeTraits, Options, Tag, Compare>::find(const Comparable & query) const
 {
 	return const_iterator<false>(const_cast<decltype(this)>(this)->find(query));
-};
+}
 
 template<class Node, class NodeTraits, class Options, class Tag, class Compare>
 template<class Comparable>
@@ -1254,7 +1254,7 @@ typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterato
 RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable & query) const
 {
   return const_iterator<false>(this->upper_bound(query));
-};
+}
 
 /*
 template<class Node, class NodeTraits, class Options, class Tag, class Compare>
