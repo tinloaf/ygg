@@ -1,11 +1,24 @@
 [![Build Status](https://travis-ci.org/tinloaf/ygg.svg?branch=master)](https://travis-ci.org/tinloaf/ygg)
 
-This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++11 implementation of a Red-Black-Tree as well as an Interval Tree based on the Red-Black-Tree.
+This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++11 
+implementation of several intrusive datastructures:
 
-If you need a Red-Black- or Interval Tree in your C++ application, and for some reason the existing implementations (like `std::set` or `boost::instrusive::rbtree`) are not suited for you, Ygg may be the answer. See the list of features below for why it's awesome!
+* a Red-Black Tree
+* an Interval Tree
+* an Interval Map
+* a Doubly-Linked List
+
+If you need one of these in your C++ application, and for some reason the existing implementations 
+(like `std::set` or `boost::instrusive::rbtree`) are not suited for you, Ygg may be the answer. 
+See the list of features below for why it's awesome!
+
+If you're not sure whether one of these data structures is the right data structure for your 
+application, check out the datastructure overview in the 
+[Documentation](https://tinloaf.github.io/ygg/).
 
 **Warning**: This is still in development. Therefore, things could break. Also, the API
-might change.
+might change. If you found an example where one of the data structures does not behave as 
+expected, please let me know.
 
 Features
 ========
@@ -22,7 +35,11 @@ It's a header-only library. (Yes I know, there are .cpp files. I like to keep de
 Documentation
 =============
 
-There's a short usage example below which is probably enough if you just want to use the Red-Black-Tree. More [Documentation](https://tinloaf.github.io/ygg/) is being added over time.
+There's a short usage example below which is probably enough if you just want to use the 
+Red-Black-Tree. 
+
+The [Documentation](https://tinloaf.github.io/ygg/) contains an overview over how the different 
+datastructures behave as well as more in-depth examples as well as an API documentation.
 
 Usage Example
 =============
