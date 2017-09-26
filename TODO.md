@@ -13,5 +13,3 @@
 * Multi-Trees: add more tests
 * Document List
 * Access interval map fields through full names
-* Interval Map integrity verification
-* Interval Map: merge segments!
