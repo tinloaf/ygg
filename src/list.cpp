@@ -101,11 +101,33 @@ List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator+=(size_t ste
 
 template<class Node, class Tag>
 template<class ConcreteIterator, class BaseType>
+ConcreteIterator &
+List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator-=(size_t steps)
+{
+	for (size_t i = 0 ; i < steps ; ++i) {
+		this->operator--();
+	}
+
+	return (*(static_cast<ConcreteIterator *>(this)));
+};
+
+template<class Node, class Tag>
+template<class ConcreteIterator, class BaseType>
 ConcreteIterator
 List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator+(size_t steps) const
 {
 	ConcreteIterator cpy(*(static_cast<const ConcreteIterator *>(this)));
 	cpy += steps;
+	return cpy;
+};
+
+template<class Node, class Tag>
+template<class ConcreteIterator, class BaseType>
+ConcreteIterator
+List<Node, Tag>::IteratorBase<ConcreteIterator, BaseType>::operator-(size_t steps) const
+{
+	ConcreteIterator cpy(*(static_cast<const ConcreteIterator *>(this)));
+	cpy -= steps;
 	return cpy;
 };
 

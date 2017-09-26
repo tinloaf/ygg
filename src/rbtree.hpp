@@ -130,6 +130,8 @@ public:
 
 		ConcreteIterator& operator--();
 		ConcreteIterator  operator--(int);
+		ConcreteIterator& operator-=(size_t steps);
+		ConcreteIterator  operator-(size_t steps) const;
 
 		reference operator*() const;
 		pointer operator->() const;

@@ -12,7 +12,7 @@
 
 #include "../src/ygg.hpp"
 
-#define IMAP_TESTSIZE 1000
+#define IMAP_TESTSIZE 20
 #define IMAP_MULTIPLICITY 3
 
 // TODO test all the callbacks
@@ -51,6 +51,73 @@ namespace test_intervalmap {
 TEST(IMapTest, TrivialTest)
 {
 	IMap m;
+}
+
+TEST(IMapTest, SimpleInsertionTest)
+{
+	IMap m;
+
+	Node n;
+	n.lower = 1;
+	n.upper = 2;
+	n.value = 10;
+
+	m.insert(n);
+	m.dbg_verify();
+
+	auto it = m.begin();
+	ASSERT_EQ(it.get_lower(), 1);
+	ASSERT_EQ(it.get_upper(), 2);
+	++it;
+	ASSERT_EQ(it, m.end());
+
+	m.remove(n);
+	m.dbg_verify();
+
+	it = m.begin();
+	ASSERT_EQ(it, m.end());
+
+}
+
+TEST(IMapTest, SegmentMergingTest)
+{
+	std::vector<Node> nodes(IMAP_TESTSIZE);
+
+	IMap m;
+
+	for (unsigned int i = 0 ; i < IMAP_TESTSIZE ; ++i) {
+		nodes[i].lower = i;
+		nodes[i].upper = i + 1;
+		nodes[i].value = 42;
+	}
+
+	// Linear insertion
+	for (unsigned int i = 0 ; i < IMAP_TESTSIZE ; ++i) {
+		m.insert(nodes[i]);
+	}
+	m.dbg_verify();
+
+	auto it = m.begin();
+	ASSERT_EQ(it.get_lower(), 0);
+	ASSERT_EQ(it.get_upper(), IMAP_TESTSIZE);
+	ASSERT_EQ(it.get_value(), 42);
+	++it;
+	ASSERT_EQ(it, m.end());
+
+	// Linear deletion
+	for (unsigned int i = 0 ; i < IMAP_TESTSIZE ; ++i) {
+		std::cout << "############################ Deleting ############################\n";
+		m.remove(nodes[i]);
+		m.dbg_verify();
+
+		it = m.begin();
+		if (i < IMAP_TESTSIZE - 1) {
+			ASSERT_EQ(it.get_lower(), i + 1);
+		} else {
+			ASSERT_EQ(it, m.end());
+		}
+	}
+	m.dbg_verify();
 }
 
 TEST(IMapTest, GappedInsertionTest)

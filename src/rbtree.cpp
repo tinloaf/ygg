@@ -1004,6 +1004,30 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::IteratorBase<ConcreteIterator, 
 
 template<class Node, class NodeTraits, class Options, class Tag, class Compare>
 template<class ConcreteIterator, class BaseType, bool reverse>
+ConcreteIterator &
+RBTree<Node, NodeTraits, Options, Tag, Compare>::IteratorBase<ConcreteIterator, BaseType,
+                                                              reverse>::operator-=(size_t steps)
+{
+	for (size_t i = 0 ; i < steps ; ++i) {
+		this->operator--();
+	}
+
+	return (*(static_cast<ConcreteIterator *>(this)));
+}
+
+template<class Node, class NodeTraits, class Options, class Tag, class Compare>
+template<class ConcreteIterator, class BaseType, bool reverse>
+ConcreteIterator
+RBTree<Node, NodeTraits, Options, Tag, Compare>::IteratorBase<ConcreteIterator, BaseType,
+                                                              reverse>::operator-(size_t steps) const
+{
+	ConcreteIterator cpy(this->n);
+	cpy -= steps;
+	return cpy;
+}
+
+template<class Node, class NodeTraits, class Options, class Tag, class Compare>
+template<class ConcreteIterator, class BaseType, bool reverse>
 typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template IteratorBase<ConcreteIterator, BaseType, reverse>::reference
 RBTree<Node, NodeTraits, Options, Tag, Compare>::IteratorBase<ConcreteIterator, BaseType, reverse>::operator*() const
 {

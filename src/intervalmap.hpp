@@ -12,30 +12,36 @@
 namespace ygg {
 
 namespace internal {
-	template<class KeyT, class ValueT, class Tag>
-	class InnerNode : public RBTreeNodeBase<InnerNode<KeyT, ValueT, Tag>,
-	                                                   TreeOptions<TreeFlags::MULTIPLE>, Tag>,
-										public ListNodeBase<InnerNode<KeyT, ValueT, Tag>, Tag> {
+	class SegListTag {};
+	class RepresentativeSegListTag {};
+	class InnerRBTTag {};
+
+	template<class KeyT, class ValueT>
+	class InnerNode : public RBTreeNodeBase<InnerNode<KeyT, ValueT>,
+	                                                   TreeOptions<TreeFlags::MULTIPLE>, InnerRBTTag>,
+										public ListNodeBase<InnerNode<KeyT, ValueT>, SegListTag>,
+										public ListNodeBase<InnerNode<KeyT, ValueT>, RepresentativeSegListTag>
+	{
 	public:
 		KeyT point;
 		ValueT aggregate;
-
+		InnerNode<KeyT, ValueT> * repr;
 
 		class Compare {
 		public:
-			constexpr bool operator()(const InnerNode<KeyT, ValueT, Tag> & lhs,
-			                          const InnerNode<KeyT, ValueT, Tag> & rhs) const
+			constexpr bool operator()(const InnerNode<KeyT, ValueT> & lhs,
+			                          const InnerNode<KeyT, ValueT> & rhs) const
 			{
 				return lhs.point < rhs.point;
 			}
 
 			constexpr bool operator()(int lhs,
-			                          const InnerNode<KeyT, ValueT, Tag> & rhs) const
+			                          const InnerNode<KeyT, ValueT> & rhs) const
 			{
 				return lhs < rhs.point;
 			}
 
-			constexpr bool operator()(const InnerNode<KeyT, ValueT, Tag> & lhs,
+			constexpr bool operator()(const InnerNode<KeyT, ValueT> & lhs,
 			                          int rhs) const
 			{
 				return lhs.point < rhs;
@@ -72,7 +78,7 @@ public:
 	 * Inserting nodes into an IntervalMap results in the key space to be divided into Segments.
 	 * See DOCTODO for details and examples. This is the type that these segments will have.
 	 */
-	using Segment = internal::InnerNode<KeyT, ValueT, Tag>;
+	using Segment = internal::InnerNode<KeyT, ValueT>;
 
 	/// @cond INTERNAL
 	Segment _imap_begin;
@@ -209,10 +215,11 @@ public:
 	using NB = IMapNodeBase<typename Node::key_type, typename Node::value_type, Tag>;
 	static_assert(std::is_base_of<NB, Node>::value,
 	              "Node class not properly derived from IMapNodeBase!");
-	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type, Tag>;
+	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type>;
 	using ITree = RBTree<Segment, RBDefaultNodeTraits<Segment>, TreeOptions<TreeFlags::MULTIPLE>,
-	                     Tag, typename Segment::Compare>;
-	using SegList = List<Segment, Tag>;
+	                     internal::InnerRBTTag, typename Segment::Compare>;
+	using SegList = List<Segment, internal::SegListTag>;
+	using RepresentativeSegList = List<Segment, internal::RepresentativeSegListTag>;
 
 	/**
 	 * @brief Inserts a node into the IntervalMap.
@@ -256,7 +263,7 @@ public:
 		typedef std::input_iterator_tag             iterator_category;
 
 		IteratorBase();
-		IteratorBase(const InnerIterator & it, SegList * l);
+		IteratorBase(const InnerIterator & it, RepresentativeSegList * l);
 		IteratorBase(const ConcreteIterator & other);
 
 		ConcreteIterator& operator=(const ConcreteIterator & other);
@@ -285,19 +292,19 @@ public:
 		/// @cond INTERNAL
 
 		InnerIterator inner;
-		SegList * l;
+		RepresentativeSegList * l;
 
 		/// @endcond
 	};
 
-	class const_iterator : public IteratorBase<const_iterator, typename SegList::const_iterator> {
+	class const_iterator : public IteratorBase<const_iterator, typename RepresentativeSegList::const_iterator> {
 	public:
-		using IteratorBase<const_iterator, typename SegList::const_iterator>::IteratorBase;
+		using IteratorBase<const_iterator, typename RepresentativeSegList::const_iterator>::IteratorBase;
 	};
 
-	class iterator : public IteratorBase<iterator, typename SegList::iterator> {
+	class iterator : public IteratorBase<iterator, typename RepresentativeSegList::iterator> {
 	public:
-		using IteratorBase<iterator, typename SegList::iterator>::IteratorBase;
+		using IteratorBase<iterator, typename RepresentativeSegList::iterator>::IteratorBase;
 	};
 
 	const_iterator begin() const;
@@ -308,15 +315,23 @@ public:
 	void dbg_verify();
 
 private:
-	void insert_segment(Segment * seg);
+	Segment * get_head(Segment * seg);
+
+	Segment * insert_segment(Segment * seg);
 	void remove_segment(Segment * seg);
+
+	void repr_now_equal(Segment *a, Segment *b);
+	void repr_now_different(Segment *a, Segment *b);
+	void repr_replaced(Segment *old, Segment *replacement);
 
 	iterator find_upper_bound_representative(typename Node::key_type point);
 
 	ITree t;
 	SegList l;
+	RepresentativeSegList repr_list;
 
 	void dbg_verify_list();
+	void dbg_verify_representatives();
 };
 
 } // namespace ygg
