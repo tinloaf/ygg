@@ -22,7 +22,7 @@ This example (which uses the defaults for steps 3 and 4 above) demonstrates it, 
 using namespace ygg;
 
 // The tree options
-using MyTreeOptions = TreeOptions<TreeFlags::Multiple>;
+using MyTreeOptions = TreeOptions<TreeFlags::MULTIPLE>;
 
 // The node class
 class Node : public RBTreeNodeBase<Node, MyTreeOptions> {
@@ -34,7 +34,7 @@ public:
   bool operator<(const Node & other) const {
     return this->key < other.key;
   }
-}
+};
 
 // Configure the RBTree based on Node and the default NodeTraits
 using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
@@ -53,10 +53,10 @@ Again, a simple example (based on the example above), where we just add a couple
 
 ~~~~~~~~~~~~~{.cpp}
 // We need this s.t. we can query by key value (i.e, an int) directly
-bool operator<(const Node & lhs, int rhs) {
+bool operator<(const Node & lhs, const int & rhs) {
   return lhs.key < rhs;
 }
-bool operator<(int lhs, const Node & rhs) {
+bool operator<(const int & lhs, const Node & rhs) {
   return lhs < rhs.key;
 }
 
@@ -101,32 +101,35 @@ Again, an example demonstrates setting up an IntervalTree, this time mapping int
 
 using namespace ygg;
 
+/* This class will be used by the IntervalTree to retrieve the upper and lower interval borders from the nodes.
+ */
 template<class Node>
-class NodeTraits {
+class NodeTraits : public ITreeNodeTraits<Node> {
 public:
-  using key_type = int;
+	using key_type = int;
 
-  static int get_lower(const Node & node) {
-    return node.lower;
-  }
+	static int get_lower(const Node & node) {
+		return node.lower;
+	}
 
-  static int get_upper(const Node & node) {
-    return node.upper;
-  }
+	static int get_upper(const Node & node) {
+		return node.upper;
+	}
 };
 
-// The node class
+/* This is the node class. It provides a simple interval -> value mapping, with the interval
+ * borders being integers and the value being a string.
+ */
 class Node : public ITreeNodeBase<Node, NodeTraits<Node>> {
 public:
-  int upper;
-  int lower;
+	int upper;
+	int lower;
 
-  std::string value;
+	std::string value;
 
-  // No need to implement operator< here. Intervals are compared based on what
-  // get_upper() and get_lower() return.
-}
-
+	// No need to implement operator< here. Intervals are compared based on what
+	// get_upper() and get_lower() return.
+};
 
 // Configure the IntervalTree
 using MyTree = IntervalTree<Node, NodeTraits<Node>>;
@@ -136,28 +139,31 @@ Setting up a tree and inserting intervals is very similar to an RBTree:
 
 ~~~~~~~~~~~~~{.cpp}
 int main(int argc, char **argv) {
-  MyTree t;
+	(void)argc;
+	(void)argv;
 
-  // Storage for the actual nodes.
-  // WARNING: using STL containers here can backfire badly. See TODO.
-  Node nodes[5];
+	MyTree t;
 
-  // Initialize the nodes with some values
-  for (size_t i = 0 ; i < 5 ; ++i) {
-    nodes[i].lower = i;
-    nodes[i].upper = i + 10;
-    nodes[i].value = std::string("The interval is [") + std::to_string(i) + std::string("]");
-  }
+	// Storage for the actual nodes.
+	// WARNING: using STL containers here can backfire badly. See TODO.
+	Node nodes[5];
 
-  // Insert them
-  for (size_t i = 0 ; i < 5 ; ++i) {
-    t.insert(nodes[i]);
-  }
+	// Initialize the nodes with some values
+	for (size_t i = 0 ; i < 5 ; ++i) {
+		nodes[i].lower = i;
+		nodes[i].upper = i + 10;
+		nodes[i].value = std::string("The interval is [") + std::to_string(i) + std::string("]");
+	}
 
-  // Querying explained below
+	// Insert them
+	for (size_t i = 0 ; i < 5 ; ++i) {
+		t.insert(nodes[i]);
+	}
 
-  // Delete one node
-  t.remove(nodes[3]);
+	// Querying explained below
+
+	// Delete one node
+	t.remove(nodes[3]);
 }
 ~~~~~~~~~~~~~
 

@@ -791,7 +791,9 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                =  pages/Quickstart.md pages/License.md pages/Startpage.md ../src/rbtree.hpp \
-                        ../src/intervaltree.hpp ../src/list.hpp ../src/intervalmap.hpp
+                        ../src/intervaltree.hpp ../src/list.hpp ../src/intervalmap.hpp \
+                        pages/DatastructuresOverview.md pages/IntervalMapExample.md \
+                        pages/IntervalTreeExample.md pages/RBTreeExample.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

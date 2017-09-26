@@ -5,7 +5,8 @@ set (CMAKE_CXX_STANDARD 11)
 
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra" )
 
-add_subdirectory (test)
+add_subdirectory(test)
+add_subdirectory(examples)
 
 FIND_LIBRARY(CELERO_LIB_DIR libcelero.so)
 if (DEFINED ${CELERO_LIB_DIR})
