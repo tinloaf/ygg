@@ -10,7 +10,7 @@ template <class Node, class NodeTraits, class Tag>
 void
 IntervalMap<Node, NodeTraits, Tag>::repr_now_equal(Segment *a, Segment *b)
 {
-	std::cout << " Now-equal between " << a << " and " << b << "\n";
+	//std::cout << "  ---> Now equal: " << a << " / " << b << "\n";
 	Segment * new_repr = nullptr;
 	if (a != nullptr) {
 		new_repr = a->repr;
@@ -48,7 +48,7 @@ template <class Node, class NodeTraits, class Tag>
 void
 IntervalMap<Node, NodeTraits, Tag>::repr_now_different(Segment *a, Segment *b)
 {
-	std::cout << " Now-different between " << a << " and " << b << "\n";
+	//std::cout << "  ---> Now different: " << a << " / " << b << "\n";
 
 	Segment * next = nullptr;
 	if (a != nullptr) {
@@ -82,12 +82,12 @@ template <class Node, class NodeTraits, class Tag>
 void
 IntervalMap<Node, NodeTraits, Tag>::repr_replaced(Segment *original, Segment *replacement)
 {
-	std::cout << " replaced " << original << " with " << replacement << "\n";
-
 	// We only need to do anything if original is a representative!
 	if (original->repr != original) {
 		return;
 	}
+
+	//std::cout << "  ---> Replaced: " << original << " by " << replacement << "\n";
 
 	Segment * next = nullptr;
 	auto repr_it = this->repr_list.iterator_to(*original);
@@ -112,7 +112,7 @@ template <class Node, class NodeTraits, class Tag>
 typename IntervalMap<Node, NodeTraits, Tag>::Segment *
 IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
 {
-	std::cout << "Inserting segment " << seg << " @ " << seg->point << "\n";
+	//std::cout << "   Inserting " << seg << "\n";
 	key_type & point = seg->point;
 
 	auto upper_bound_it = this->t.upper_bound(point);
@@ -120,6 +120,9 @@ IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
 	if (upper_bound_it != this->t.end()) {
 		ub_head = &*upper_bound_it;
 	}
+	auto head_it = this->t.iterator_to(*ub_head);
+
+	//std::cout << "     Uppper-Bounded Head: " << &*ub_head << "\n";
 
 	this->t.insert(*seg);
 
@@ -130,6 +133,7 @@ IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
 	 */
 	if (ub_head != nullptr) {
 		if (ub_head->point > point) {
+			//std::cout << "     Not at the same point!\n";
 			/* We are not at the same point as the upper-bounded header; it is truly after us.
 			 * This means two things:
 			 *
@@ -156,6 +160,7 @@ IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
 			return seg;
 
 		} else {
+			//std::cout << "     At the same point!\n";
 			/* We are at the same point as the upper-bounded head. We…
 			 *
 			 * - can take the value of the upper-bounded head.
@@ -164,8 +169,8 @@ IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
 			seg->aggregate = upper_bound_it->aggregate;
 
 			auto seg_it = this->t.iterator_to(*seg);
-			auto head_it = this->t.iterator_to(*ub_head);
 			if (++seg_it == head_it) {
+				//std::cout << "     Replacing the head!\n";
 				// we were inserted directly before the header and have to replace it!
 				this->l.insert(ub_head, seg);
 				this->l.remove(ub_head);
@@ -174,7 +179,7 @@ IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
 				NodeTraits::on_length_changed(*ub_head);
 				NodeTraits::on_length_changed(*seg);
 
-				seg->repr = seg;
+				seg->repr = ub_head->repr;
 				this->repr_replaced(ub_head, seg);
 
 				return seg;
@@ -185,6 +190,7 @@ IntervalMap<Node, NodeTraits, Tag>::insert_segment(Segment *seg)
 			}
 		}
 	} else {
+		//std::cout << "     At the end!\n";
 		/* We are the very last element in the list. Insert at the end and take the aggregate from
 		 * the previous last element. */
 		this->l.insert(nullptr, seg);
@@ -210,12 +216,15 @@ void
 IntervalMap<Node, NodeTraits, Tag>::insert(Node &n)
 {
 	// TODO this is redundant.
+	//std::cout << " ====> Insert. Begin Segment: " << &n._imap_begin << "   End Segment: "
+	//          << &n._imap_end << "\n";
 	n._imap_begin.point = NodeTraits::get_lower(n);
 	n._imap_end.point = NodeTraits::get_upper(n);
 
-
 	Segment * begin_head = this->insert_segment(&n._imap_begin);
 	Segment * end_head = this->insert_segment(&n._imap_end);
+
+	//std::cout << "Begin Head: " << begin_head << "    End Head: " << end_head << "\n";
 
 	bool begin_was_equal = begin_head->repr != begin_head;
 	bool end_was_equal = end_head->repr != end_head;
@@ -264,6 +273,9 @@ IntervalMap<Node, NodeTraits, Tag>::insert(Node &n)
 	if (end_head->repr == nullptr) {
 		end_now_equal = false;
 	}
+
+	//std::cout << "  ~~~ Begin was equal: " << begin_was_equal << "  /  is now equal: "
+	// << begin_now_equal << "\n";
 
 	if (begin_was_equal && ! begin_now_equal) {
 		Segment * predecessor = nullptr;
@@ -370,11 +382,8 @@ IntervalMap<Node, NodeTraits, Tag>::remove(Node &n)
 	}
 
 	if (begin_was_equal && ! begin_now_equal) {
-		std::cout << "Begin is now different!\n";
 		this->repr_now_different(&*(begin_it - 1), begin_head);
 	} else if (!begin_was_equal && begin_now_equal) {
-		std::cout << "Begin is now equal!\n";
-
 		if (begin_it != this->l.begin()) {
 			this->repr_now_equal(&*(begin_it - 1), begin_head);
 		} else {
@@ -399,10 +408,8 @@ IntervalMap<Node, NodeTraits, Tag>::remove(Node &n)
 
 
 	if (end_was_equal && ! end_now_equal) {
-		std::cout << "End is now different!\n";
 		this->repr_now_different(&*(end_it - 1), end_head);
 	} else if (!end_was_equal && end_now_equal) {
-		std::cout << "End is now equal!\n";
 		this->repr_now_equal(&*(end_it - 1), end_head);
 	}
 
@@ -665,31 +672,33 @@ IntervalMap<Node, NodeTraits, Tag>::dbg_verify_representatives()
 	auto head_it = this->l.begin();
 	auto repr_it = this->repr_list.begin();
 
-	std::cout << "=================================================\n";
+	/*
+	//std::cout << "=================================================\n";
 	for (auto & seg : this->t) {
-		std::cout << " TreeNode: " << &seg << " @" << seg.point << " : " << seg.aggregate << "  (repr: "
+		//std::cout << " TreeNode: " << &seg << " @" << seg.point << " : " << seg.aggregate << "  (repr: "
 						"" << seg.repr <<  ")\n";
 	}
-	std::cout << "---------------------------------\n";
+	//std::cout << "---------------------------------\n";
 	for (auto & seg : this->l) {
-		std::cout << " Head: " << &seg << "  @" << seg.point << " : " << seg.aggregate << "  (repr: "
+		//std::cout << " Head: " << &seg << "  @" << seg.point << " : " << seg.aggregate << "  (repr: "
 						"" << seg.repr <<  ")\n";
 	}
-	std::cout << "---------------------------------\n";
+	//std::cout << "---------------------------------\n";
 
 	for (auto & seg : this->repr_list) {
-		std::cout << " Repr: " << &seg << "  @" << seg.point << " : " << seg.aggregate << "  (repr: "
+		//std::cout << " Repr: " << &seg << "  @" << seg.point << " : " << seg.aggregate << "  (repr: "
 						"" << seg.repr <<  ")\n";
 	}
-	std::cout << "=================================================\n";
-
+	//std::cout << "=================================================\n";
+	*/
+	
 	while (head_it != this->l.end()) {
-		std::cout << "Head: " << &*head_it << "  /  Repr: " << &*repr_it << "\n";
+		////std::cout << "Head: " << &*head_it << "  /  Repr: " << &*repr_it << "\n";
 		assert(&*head_it == &*repr_it);
 		auto val = head_it->aggregate;
 		while ((head_it != this->l.end()) && (head_it->aggregate == val)) {
 			assert(head_it->repr == &*repr_it);
-			std::cout << "  Skipping Head: " << &*head_it << "\n";
+			////std::cout << "  Skipping Head: " << &*head_it << "\n";
 			++head_it;
 		}
 		++repr_it;
