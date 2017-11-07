@@ -6,6 +6,7 @@
 #include <cassert>
 #include <type_traits>
 
+#include "size_holder.hpp"
 #include "options.hpp"
 
 // Only for debugging purposes
@@ -43,7 +44,7 @@ namespace ygg {
  * @tparam Tag 		The tag used to identify the tree that this node should be inserted into. See
  * RBTree for details.
  */
-template<class Node, class Options = TreeOptions<TreeFlags::MULTIPLE>, class Tag = int>
+template<class Node, class Options = DefaultOptions, class Tag = int>
 class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Tag> {};
 
 /**
@@ -81,8 +82,8 @@ public:
  * @tparam Compare      A compare class. The Red-Black Tree follows STL semantics for 'Compare'.
  * Defaults to ygg::utilities::flexible_less. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
-template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>, class
-Tag = int, class Compare = ygg::utilities::flexible_less>
+template<class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int,
+         class Compare = ygg::utilities::flexible_less>
 class RBTree
 {
 public:
@@ -342,6 +343,17 @@ public:
   const_iterator<false> iterator_to(const Node & node) const;
 	iterator<false> iterator_to(Node & node);
 
+	/**
+	 * Return the number of elements in the tree.
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @warning This method is only available if CONSTANT_TIME_SIZE is set as option!
+	 *
+	 * @return The number of elements in the tree.
+	 */
+	size_t size() const;
+
 protected:
 	Node *root;
 
@@ -381,6 +393,8 @@ protected:
   bool verify_order() const;
 
 	Compare cmp;
+
+	SizeHolder<Options::constant_time_size> s;
 };
 
 #include "rbtree.cpp"

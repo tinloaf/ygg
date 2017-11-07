@@ -75,6 +75,15 @@ TEST(RBTreeTest, TrivialInsertionTest) {
   ASSERT_TRUE(tree.verify_integrity());
 }
 
+TEST(RBTreeTest, TrivialSizeTest) {
+  auto tree = RBTree<EqualityNode, EqualityNodeTraits>();
+
+  EqualityNode n;
+  n.data = 0;
+  tree.insert(n);
+
+  ASSERT_EQ(tree.size(), 1);
+}
 
 TEST(RBTreeTest, RandomInsertionTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
@@ -419,8 +428,11 @@ TEST(RBTreeTest, LinearMultipleIterationTest) {
     return uni(rng);
   });
 
+  size_t size = 0;
   for (auto index : indices) {
     tree.insert(nodes[index]);
+    size++;
+    ASSERT_EQ(tree.size(), size);
   }
 
   ASSERT_TRUE(tree.verify_integrity());
@@ -619,8 +631,10 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
     return uni(rng);
   });
 
+  size_t size = 0;
   for (auto index : indices) {
     tree.insert(persistent_nodes[index]);
+    size++;
   }
 
   ASSERT_TRUE(tree.verify_integrity());
@@ -642,8 +656,10 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
 
   for (auto index : indices) {
     tree.insert(transient_nodes[index]);
+    size++;
   }
 
+  ASSERT_EQ(tree.size(), size);
   ASSERT_TRUE(tree.verify_integrity());
 
   //std::string fname_before = std::string("/tmp/trees/rbt-comprehensive-before.dot");
@@ -651,11 +667,12 @@ TEST(RBTreeTest, ComprehensiveMultipleTest) {
 
   for (int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
     tree.remove(transient_nodes[i]);
-
+    size--;
     //std::string rem_fname = std::string("/tmp/trees/removed-") + std::to_string(i) + std::string(".dot");
     //std::cout << "Step " << i << ": removing data " << transient_nodes[i].data << "\n";
     //tree.dump_to_dot(rem_fname);
     ASSERT_TRUE(tree.verify_integrity());
+    ASSERT_EQ(tree.size(), size);
   }
 
 

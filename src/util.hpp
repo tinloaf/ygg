@@ -40,6 +40,10 @@ constexpr bool pack_contains() {
 	return false;
 }
 
+// Forward
+template<typename QueryT, typename First, typename ...Rest>
+constexpr bool pack_contains();
+
 template<typename QueryT, bool found, typename ...Rest>
 constexpr typename std::enable_if<found, bool>::type pack_contains_forward() {
 	return true;
@@ -49,8 +53,6 @@ template<typename QueryT, bool found, typename ...Rest>
 constexpr typename std::enable_if<! found, bool>::type pack_contains_forward() {
 	return pack_contains<QueryT, Rest...>();
 }
-
-
 
 template<typename QueryT, typename First, typename ...Rest>
 constexpr bool pack_contains() {

@@ -12,6 +12,7 @@ template<class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf(Node & node, Node *start)
 {
+  this->s.add(1);
   this->insert_leaf_base<true>(node, start);
 }
 
@@ -19,6 +20,7 @@ template<class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_right_biased(Node & node, Node *start)
 {
+  this->s.add(1);
   this->insert_leaf_base<false>(node, start);
 }
 
@@ -532,6 +534,13 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::output_node_base(const Node * n
 }
 
 template<class Node, class NodeTraits, class Options, class Tag, class Compare>
+size_t
+RBTree<Node, NodeTraits, Options, Tag, Compare>::size() const
+{
+  return this->s.get();
+}
+
+template<class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1, Node * n2, bool swap_colors)
 {
@@ -803,6 +812,8 @@ template<class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::remove(Node & node)
 {
+  this->s.reduce(1);
+
   // TODO collapse this method
   this->remove_to_leaf(node);
 }

@@ -43,8 +43,7 @@ namespace ygg {
 	  };
   } // namespace utilities
 
-template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
-				class Tag = int>
+template<class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int>
 class ITreeNodeBase : public RBTreeNodeBase<Node, Options, Tag> {
 public:
   typename NodeTraits::key_type    _it_max_upper;
@@ -96,8 +95,7 @@ public:
  * @tparam Tag					Used to add nodes to multiple interval trees. See RBTree documentation
  * for details.
  */
-template<class Node, class NodeTraits, class Options = TreeOptions<TreeFlags::MULTIPLE>,
-				class Tag = int>
+template<class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int>
 class IntervalTree : public RBTree<Node,
                                    utilities::ExtendedNodeTraits<Node,
                                                                  ITreeNodeBase<Node, NodeTraits, Options, Tag>,

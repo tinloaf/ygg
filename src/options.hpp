@@ -37,6 +37,14 @@ public:
 	 * RBTree::insert allows you to enforce a certain order on equal elements. TODO link to method
 	 */
 	class ORDER_QUERIES {};
+	/**
+	 * @brief RBTree / List option: support size() in O(1)
+	 *
+	 * If this flag is set, the data structures keep track of the number of elements in them,
+	 * thereby supporting size() queries in O(1). This requires a little space and will slow
+	 * down insert and remove operations minimally.
+	 */
+	class CONSTANT_TIME_SIZE {};
 };
 
 /**
@@ -64,10 +72,14 @@ public:
 	static constexpr bool multiple = utilities::pack_contains<TreeFlags::MULTIPLE, Opts...>();
 	static constexpr bool order_queries = utilities::pack_contains<TreeFlags::ORDER_QUERIES,
 	                                                               Opts...>();
+	static constexpr bool constant_time_size = utilities::pack_contains<TreeFlags::CONSTANT_TIME_SIZE,
+	                                                                    Opts...>();
 	/// @endcond
 private:
-	TreeOptions(); // Instantiation now allowed
+	TreeOptions(); // Instantiation not allowed
 };
+
+using DefaultOptions = TreeOptions<TreeFlags::MULTIPLE, TreeFlags::CONSTANT_TIME_SIZE>;
 
 } // namespace ygg
 
