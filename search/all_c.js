@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['upper_5fbound',['upper_bound',['../classygg_1_1RBTree.html#ae68e9b9f51f8f703afb863f46bf89675',1,'ygg::RBTree']]]
+  ['startpage',['Startpage',['../md_pages_Startpage.html',1,'']]],
+  ['size',['size',['../classygg_1_1RBTree.html#aedcdfba7b385f7c1e9f665d1807a31a5',1,'ygg::RBTree::size()'],['../classygg_1_1List.html#a39da3aa6be68e1db0a412b0ff959b068',1,'ygg::List::size()']]]
 ];

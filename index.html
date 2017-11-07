@@ -80,18 +80,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Yggdrasill Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This is Ygg (short for <a href="https://en.wikipedia.org/wiki/Yggdrasil">Yggdrasil</a>), a C++11 implementation of a Red-Black-Tree as well as an Interval Tree based on the Red-Black-Tree.</p>
-<p>If you need a Red-Black- or Interval Tree in your C++ application, and for some reason the existing implementations (like std::set or boost::instrusive::rbtree) are not suited for you, Ygg may be the answer. See the list of features below for why it's awesome!</p>
+<div class="textblock"><p>This is Ygg (short for <a href="https://en.wikipedia.org/wiki/Yggdrasil">Yggdrasil</a>), a C++11 implementation of intrusive search tree and interval datastructures. It currently contains:</p>
+<ul>
+<li>a red-black tree</li>
+<li>an interval tree</li>
+<li>an interval map</li>
+<li>a doubly-linked list</li>
+</ul>
+<p>If you need a Red-Black-Tree, an Interval Tree or an Interval Map in your C++ application, and for some reason the existing implementations (like std::set or boost::instrusive::rbtree) are not suited for you, Ygg may be the answer. See the list of features below for why it's awesome!</p>
+<p>If you are not sure whether one of these data structures is right for your application, check out the <a class="el" href="datastructuresoverview.html">Overview over the Data Structures</a>.</p>
 <h1>Features </h1>
 <ul>
-<li>It's intrusive! Like the containers in boost::intrusive, Ygg follows a 'bring your own data structure' approach. Depending on your use case, this can save a lot of time by avoiding memory allocation and copying stuff around.</li>
+<li>All the data structures are intrusive! Like the containers in boost::intrusive, Ygg follows a 'bring your own data structure' approach. Depending on your use case, this can save a lot of time by avoiding memory allocation and copying stuff around.</li>
 <li>You can be notified when stuff happens. Want to do something to the tree nodes every time a tree rotation happens? Need to know whenever two nodes swap places in the tree? Look no further. Ygg will call methods specified by you on several occasions. In fact, that's how the Interval Tree (the augmented tree version from Cormen et al.) is implemented.</li>
 <li>It's pretty fast. Doing benchmarks correctly is pretty difficult. However, performance should not be too far away from boost::intrusive::rbtree. Comparing against std::set is unfair - std::set loses because it needs to do memory allocation.</li>
 </ul>
 <h1>Installation </h1>
 <p>It's a header-only library. (Yes I know, there are .cpp files. I like to keep declaration and definition separated, even if everything's actually a header.) Just make sure everything in the src folder is in your include path, and you're set.</p>
+<h1>Getting Started </h1>
+<p>If you already know which data structure you want to use (if not, check out <a class="el" href="datastructuresoverview.html">Overview over the Data Structures</a>), the examples (which can also be found in the examples folder) might be the easiest way to get started:</p>
+<ul>
+<li>Example of using the red-black tree: <a class="el" href="rbtreeexample.html">Red-Black Tree Example</a></li>
+<li>Example of using the interval tree: <a class="el" href="intervaltreeexample.html">IntervalTree Example</a></li>
+<li>Example of using the interval map: <a class="el" href="intervalmapexample.html">IntervalMap Example</a></li>
+</ul>
+<p>There's also a <a class="el" href="quickstart.html">Quickstart</a> page that walks you through the examples for the red-black tree and the interval tree.</p>
 <h1>Documentation </h1>
-<p>There's a <a class="el" href="quickstart.html">Quickstart</a> page that should get you up and running pretty quickly, and some class documentation (see the menu above).</p>
+<p>The API is somewhat documented. Check out the menu above for documentation on the individual classes.</p>
 <h1>License </h1>
 <p>This software is licensed under the MIT license. See <a class="el" href="license.html">License</a> for details. </p>
 </div></div><!-- contents -->

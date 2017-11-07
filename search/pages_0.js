@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['license',['License',['../license.html',1,'']]],
-  ['license',['License',['../md_pages_License.html',1,'']]]
+  ['datastructuresoverview',['DatastructuresOverview',['../md_pages_DatastructuresOverview.html',1,'']]]
 ];

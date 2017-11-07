@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['startpage',['Startpage',['../md_pages_Startpage.html',1,'']]]
+  ['license',['License',['../license.html',1,'']]],
+  ['license',['License',['../md_pages_License.html',1,'']]]
 ];

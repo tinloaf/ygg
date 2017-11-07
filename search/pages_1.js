@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['quickstart',['Quickstart',['../md_pages_Quickstart.html',1,'']]],
-  ['quickstart',['Quickstart',['../quickstart.html',1,'']]]
+  ['intervalmap_20example',['IntervalMap Example',['../intervalmapexample.html',1,'']]],
+  ['intervaltree_20example',['IntervalTree Example',['../intervaltreeexample.html',1,'']]],
+  ['intervalmapexample',['IntervalMapExample',['../md_pages_IntervalMapExample.html',1,'']]],
+  ['intervaltreeexample',['IntervalTreeExample',['../md_pages_IntervalTreeExample.html',1,'']]]
 ];
