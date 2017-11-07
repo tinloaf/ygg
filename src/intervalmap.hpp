@@ -8,6 +8,8 @@
 #include "intervaltree.hpp"
 #include "rbtree.hpp"
 #include "list.hpp"
+#include "options.hpp"
+#include "size_holder.hpp"
 
 namespace ygg {
 
@@ -207,16 +209,20 @@ public:
  * @tparam Node					The node class for the interval map. Must be derived from IMapNodeBase.
  * @tparam NodeTraits		The node traits, mainly defining how the IntervalMap retrieves data from
  * your nodes. Must be derived from IMapNodeTraits.
+ * @tparam Options			The TreeOptions class specifying the parameters of this IntervalMap. See the
+ * TreeOptions and TreeFlags classes for details.
  * @tparam Tag					The tag used to identify the underlying RBTree. If you want your nodes to be
  * part of multiple IntervalMaps, RBTrees or IntervalTrees, each must have its own unique tag.
  * Can be any class, the class can be empty.
  */
-template <class Node, class NodeTraits, class Tag = int>
+template <class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int>
 class IntervalMap {
 public:
 	/// @cond internal
 	static_assert(std::is_base_of<IMapNodeTraits<Node>, NodeTraits>::value,
 	              "NodeTraits not properly derived from IMapNodeTraits!");
+
+	static_assert(Options::multiple, "IntervalMap always allows multiple equal intervals.");
 
 	using NB = IMapNodeBase<typename Node::key_type, typename Node::value_type, Tag>;
 	static_assert(std::is_base_of<NB, Node>::value,
@@ -224,8 +230,8 @@ public:
 	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type>;
 	using ITree = RBTree<Segment, RBDefaultNodeTraits<Segment>, TreeOptions<TreeFlags::MULTIPLE>,
 	                     internal::InnerRBTTag, typename Segment::Compare>;
-	using SegList = List<Segment, internal::SegListTag>;
-	using RepresentativeSegList = List<Segment, internal::RepresentativeSegListTag>;
+	using SegList = List<Segment, TreeOptions<>, internal::SegListTag>;
+	using RepresentativeSegList = List<Segment, TreeOptions<>, internal::RepresentativeSegListTag>;
 	/// @endcond
 
 	/**
@@ -248,6 +254,17 @@ public:
 
 	using value_type = typename Node::value_type;
 	using key_type = typename Node::key_type;
+
+	/**
+	 * @brief Returns the number of intervals currently in the map
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @warning This method is only available if CONSTANT_TIME_SIZE is set.
+	 *
+	 * @return 	The number of intervals in the IntervalMap
+	 */
+	size_t size() const;
 
 	/**
 	 * @brief Returns the aggregate value during a segment
@@ -292,7 +309,7 @@ public:
 
 		key_type get_lower() const;
 		key_type get_upper() const;
-		const typename IntervalMap<Node, NodeTraits, Tag>::value_type & get_value() const;
+		const typename IntervalMap<Node, NodeTraits, Options, Tag>::value_type & get_value() const;
 	private:
 
 		InnerIterator inner;
@@ -332,6 +349,8 @@ private:
 	ITree t;
 	SegList l;
 	RepresentativeSegList repr_list;
+
+	SizeHolder<Options::constant_time_size> s;
 
 	void dbg_verify_list();
 	void dbg_verify_representatives();

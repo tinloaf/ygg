@@ -5,6 +5,8 @@
 #ifndef YGG_OPTIONS_HPP
 #define YGG_OPTIONS_HPP
 
+#include <type_traits>
+
 #include "util.hpp"
 
 namespace ygg {

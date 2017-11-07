@@ -39,6 +39,7 @@ TEST(ListTest, SimpleTest) {
 	ASSERT_EQ(it->data, 3);
 	++it;
 	ASSERT_EQ(it, l.end());
+	ASSERT_EQ(l.size(), 3);
 }
 
 TEST(ListTest, ComprehensiveTest) {
@@ -46,20 +47,27 @@ TEST(ListTest, ComprehensiveTest) {
 	LNode nodes[LIST_TESTSIZE];
 	MyList l;
 
+	size_t size = 0;
 	for (unsigned int i = 0 ; i < LIST_TESTSIZE ; ++i) {
 		delete_me[i].data = 0;
 		nodes[i].data = i;
 
 		l.insert(nullptr, &delete_me[i]);
+		size++;
 	}
+	ASSERT_EQ(l.size(), size);
 
 	for (unsigned int i = 0 ; i < LIST_TESTSIZE ; ++i) {
 		l.insert(&delete_me[i], &nodes[i]);
+		size++;
 	}
+	ASSERT_EQ(l.size(), size);
 
 	for (unsigned int i = 0 ; i < LIST_TESTSIZE ; ++i) {
 		l.remove(&delete_me[i]);
+		size--;
 	}
+	ASSERT_EQ(l.size(), size);
 
 	unsigned int i = 0;
 	for (auto & n : l) {

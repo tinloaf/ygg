@@ -9,6 +9,10 @@
 #include <cstddef>
 #include <iterator>
 
+#include "options.hpp"
+#include "size_holder.hpp"
+
+
 namespace ygg {
 
 /**
@@ -40,7 +44,7 @@ public:
  * nodes into multiple lists. See DOCTODO for details. Can be any class, the class can be empty.
  * Must be the same tag as specified for the nodes.
  */
-template<class Node, class Tag = int>
+template<class Node, class Options = DefaultOptions, class Tag = int>
 class List {
 public:
 	using NB = ListNodeBase<Node, Tag>;
@@ -59,7 +63,7 @@ public:
 		typedef std::input_iterator_tag           iterator_category;
 
 		IteratorBase ();
-		IteratorBase (List * l, BaseType * n);
+		IteratorBase (List<Node, Options, Tag> * l, BaseType * n);
 		IteratorBase (const ConcreteIterator & other);
 
 		ConcreteIterator& operator=(const ConcreteIterator & other);
@@ -83,7 +87,7 @@ public:
 
 	protected:
 		BaseType * n;
-		List<Node, Tag> * l;
+		List<Node, Options, Tag> * l;
 	};
 	/// @endcond
 
@@ -166,9 +170,22 @@ public:
 	const_iterator iterator_to(const Node & n) const;
 	iterator iterator_to(const Node & n);
 
+	/**
+	 * @brief Returns the number of elements in the list
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @warning This method is only available if CONSTANT_TIME_SIZE is set.
+	 *
+	 * @return 	The number of elements in the list
+	 */
+	size_t size() const;
+
 private:
 	Node * head;
 	Node * tail;
+
+	SizeHolder<Options::constant_time_size> s;
 };
 
 } // namespace ygg

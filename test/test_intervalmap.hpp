@@ -18,35 +18,35 @@
 // TODO test all the callbacks
 
 namespace test_intervalmap {
-	using namespace ygg;
+using namespace ygg;
 
-	class Node : public IMapNodeBase<int, int> {
-	public:
-		int lower;
-		int upper;
-		int value;
-	};
+class Node : public IMapNodeBase<int, int> {
+public:
+	int lower;
+	int upper;
+	int value;
+};
 
-	class NodeTraits : public IMapNodeTraits<Node> {
-	public:
-		using key_type = int;
-		using value_type = int;
+class NodeTraits : public IMapNodeTraits<Node> {
+public:
+	using key_type = int;
+	using value_type = int;
 
-		static key_type get_lower(const Node & n) {
-			return n.lower;
-		}
+	static key_type get_lower(const Node & n) {
+		return n.lower;
+	}
 
-		static key_type get_upper(const Node & n) {
-			return n.upper;
-		}
+	static key_type get_upper(const Node & n) {
+		return n.upper;
+	}
 
-		static value_type get_value(const Node & n) {
-			return n.value;
-		}
-	};
+	static value_type get_value(const Node & n) {
+		return n.value;
+	}
+};
 
 
-	using IMap = IntervalMap<Node, NodeTraits>;
+using IMap = IntervalMap<Node, NodeTraits>;
 
 TEST(IMapTest, TrivialTest)
 {
@@ -70,13 +70,14 @@ TEST(IMapTest, SimpleInsertionTest)
 	ASSERT_EQ(it.get_upper(), 2);
 	++it;
 	ASSERT_EQ(it, m.end());
+	ASSERT_EQ(m.size(), 1);
 
 	m.remove(n);
 	m.dbg_verify();
 
 	it = m.begin();
 	ASSERT_EQ(it, m.end());
-
+	ASSERT_EQ(m.size(), 0);
 }
 
 TEST(IMapTest, SegmentMergingTest)
