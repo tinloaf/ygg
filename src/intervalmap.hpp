@@ -218,6 +218,18 @@ public:
 template <class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int>
 class IntervalMap {
 public:
+	/**
+ * @brief A segment is a continuous range during which the aggregated value does not change.
+ *
+ * Not that at the start and end of every segment, at least one interval starts or ends.
+ * However, not all interval starts and ends create a segment border, because two consecutive
+ * intervals might have the same value, thus resulting in a single segment.
+ *
+ * @note Internally, the IntervalMap contains more segments than described above. However, the
+ * IntervalMap API presents the segments as described above.
+ */
+	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type>;
+	
 	/// @cond internal
 	static_assert(std::is_base_of<IMapNodeTraits<Node>, NodeTraits>::value,
 	              "NodeTraits not properly derived from IMapNodeTraits!");
@@ -234,18 +246,6 @@ public:
 	using value_type = typename Node::value_type;
 	using key_type = typename Node::key_type;
 	/// @endcond
-
-	/**
-	 * @brief A segment is a continuous range during which the aggregated value does not change.
-	 *
-	 * Not that at the start and end of every segment, at least one interval starts or ends.
-	 * However, not all interval starts and ends create a segment border, because two consecutive
-	 * intervals might have the same value, thus resulting in a single segment.
-	 *
-	 * @note Internally, the IntervalMap contains more segments than described above. However, the
-	 * IntervalMap API presents the segments as described above.
-	 */
-	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type>;
 
 	/**
 	 * @brief Inserts a node into the IntervalMap.
