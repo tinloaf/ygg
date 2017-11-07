@@ -17,4 +17,4 @@ endif()
 # make CLion analyze all files
 add_custom_target(clion_dummy SOURCES src/rbtree.hpp src/intervaltree.hpp src/ygg.hpp
         src/intervaltree.cpp src/rbtree.cpp src/ygg.hpp src/util.hpp src/options.hpp
-        src/orderlist.hpp src/intervalmap.hpp src/intervalmap.cpp src/list.hpp src/list.cpp)
+        src/intervalmap.hpp src/intervalmap.cpp src/list.hpp src/list.cpp)
