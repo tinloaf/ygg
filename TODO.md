@@ -13,4 +13,4 @@
 * Multi-Trees: add more tests
 * Document List
 * Access interval map fields through full names
-* add constant-time size
+* Add layer on top of IntervalMap segments to access borders etc.

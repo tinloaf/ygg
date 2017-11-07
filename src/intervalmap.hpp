@@ -227,12 +227,25 @@ public:
 	using NB = IMapNodeBase<typename Node::key_type, typename Node::value_type, Tag>;
 	static_assert(std::is_base_of<NB, Node>::value,
 	              "Node class not properly derived from IMapNodeBase!");
-	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type>;
 	using ITree = RBTree<Segment, RBDefaultNodeTraits<Segment>, TreeOptions<TreeFlags::MULTIPLE>,
 	                     internal::InnerRBTTag, typename Segment::Compare>;
 	using SegList = List<Segment, TreeOptions<>, internal::SegListTag>;
 	using RepresentativeSegList = List<Segment, TreeOptions<>, internal::RepresentativeSegListTag>;
+	using value_type = typename Node::value_type;
+	using key_type = typename Node::key_type;
 	/// @endcond
+
+	/**
+	 * @brief A segment is a continuous range during which the aggregated value does not change.
+	 *
+	 * Not that at the start and end of every segment, at least one interval starts or ends.
+	 * However, not all interval starts and ends create a segment border, because two consecutive
+	 * intervals might have the same value, thus resulting in a single segment.
+	 *
+	 * @note Internally, the IntervalMap contains more segments than described above. However, the
+	 * IntervalMap API presents the segments as described above.
+	 */
+	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type>;
 
 	/**
 	 * @brief Inserts a node into the IntervalMap.
@@ -251,9 +264,6 @@ public:
 	 * @param n The node to be removed.
 	 */
 	void remove(Node & n);
-
-	using value_type = typename Node::value_type;
-	using key_type = typename Node::key_type;
 
 	/**
 	 * @brief Returns the number of intervals currently in the map
@@ -317,11 +327,17 @@ public:
 	};
 	/// @cond INTERNAL
 
+	/**
+	 * @brief A constant iterator over all Segment s in the map
+	 */
 	class const_iterator : public IteratorBase<const_iterator, typename RepresentativeSegList::const_iterator> {
 	public:
 		using IteratorBase<const_iterator, typename RepresentativeSegList::const_iterator>::IteratorBase;
 	};
 
+	/**
+	 * @brief An iterator over all Segment s in the map
+	 */
 	class iterator : public IteratorBase<iterator, typename RepresentativeSegList::iterator> {
 	public:
 		using IteratorBase<iterator, typename RepresentativeSegList::iterator>::IteratorBase;
