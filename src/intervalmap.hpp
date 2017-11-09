@@ -229,7 +229,7 @@ public:
  * IntervalMap API presents the segments as described above.
  */
 	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type>;
-	
+
 	/// @cond internal
 	static_assert(std::is_base_of<IMapNodeTraits<Node>, NodeTraits>::value,
 	              "NodeTraits not properly derived from IMapNodeTraits!");

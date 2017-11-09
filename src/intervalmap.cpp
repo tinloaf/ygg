@@ -218,30 +218,17 @@ IntervalMap<Node, NodeTraits, Options, Tag>::insert(Node &n)
 	this->s.add(1);
 
 	// TODO this is redundant.
-	//std::cout << " ====> Insert. Begin Segment: " << &n._imap_begin << "   End Segment: "
-	//          << &n._imap_end << "\n";
-	n._imap_begin.point = NodeTraits::get_lower(n);
-	n._imap_end.point = NodeTraits::get_upper(n);
+	//std::cout << " ====> Insert. Begin Segment: " << &n.NB::_imap_begin << "   End Segment: "
+	//          << &n.NB::_imap_end << "\n";
+	n.NB::_imap_begin.point = NodeTraits::get_lower(n);
+	n.NB::_imap_end.point = NodeTraits::get_upper(n);
 
-	Segment * begin_head = this->insert_segment(&n._imap_begin);
-	Segment * end_head = this->insert_segment(&n._imap_end);
+	Segment * begin_head = this->insert_segment(&n.NB::_imap_begin);
+	Segment * end_head = this->insert_segment(&n.NB::_imap_end);
 
-	//std::cout << "Begin Head: " << begin_head << "    End Head: " << end_head << "\n";
 
 	bool begin_was_equal = begin_head->repr != begin_head;
 	bool end_was_equal = end_head->repr != end_head;
-	/*
-	bool end_was_equal = false;
-	if (end_head->repr == nullptr) {
-		end_was_equal = true;
-	} else if (this->l.iterator_to(*end_head) != this->l.back()) {
-		auto it = this->l.iterator_to(*end_head);
-		++it;
-		if (it->repr == end_head->repr) {
-			end_was_equal = true;
-		}
-	}
-	 */
 
 	auto it = this->t.iterator_to(*begin_head);
 
@@ -265,19 +252,11 @@ IntervalMap<Node, NodeTraits, Options, Tag>::insert(Node &n)
 	if ((end_it - 1)->aggregate == end_it->aggregate) {
 		end_now_equal = true;
 	}
-	/*
-	bool end_now_equal = true;
-	if ((end_it != this->l.back()) && ((end_it + 1)->aggregate != end_it->aggregate)) {
-		end_now_equal = false;
-	}
-	 */
+
 	// If we inserted at the very end, we're also 'not equal'…
 	if (end_head->repr == nullptr) {
 		end_now_equal = false;
 	}
-
-	//std::cout << "  ~~~ Begin was equal: " << begin_was_equal << "  /  is now equal: "
-	// << begin_now_equal << "\n";
 
 	if (begin_was_equal && ! begin_now_equal) {
 		Segment * predecessor = nullptr;
@@ -298,20 +277,6 @@ IntervalMap<Node, NodeTraits, Options, Tag>::insert(Node &n)
 		Segment * predecessor = &*(end_it - 1);
 		this->repr_now_equal(predecessor, end_head);
 	}
-
-	/*
-	if (end_was_equal && ! end_now_equal) {
-		Segment * successor = nullptr;
-		if (end_it != this->l.end()) {
-			successor = &*(end_it + 1);
-		}
-		this->repr_now_different(end_head, successor);
-	} else if (!end_was_equal && end_now_equal) {
-		Segment * successor = &*(end_it + 1);
-		this->repr_now_equal(end_head, successor);
-	}
-	 */
-
 }
 
 template <class Node, class NodeTraits, class Options, class Tag>
@@ -370,11 +335,11 @@ IntervalMap<Node, NodeTraits, Options, Tag>::remove(Node &n)
 {
 	this->s.reduce(1);
 
-  auto it = this->t.find(n._imap_begin.point);
+  auto it = this->t.find(n.NB::_imap_begin.point);
 	key_type stop_point = NodeTraits::get_upper(n);
 
-	Segment * begin_head = this->get_head(&n._imap_begin);
-	Segment * end_head = this->get_head(&n._imap_end);
+	Segment * begin_head = this->get_head(&n.NB::_imap_begin);
+	Segment * end_head = this->get_head(&n.NB::_imap_end);
 
 	bool begin_was_equal = begin_head->repr != begin_head;
 	bool end_was_equal = end_head->repr != end_head;
@@ -424,8 +389,8 @@ IntervalMap<Node, NodeTraits, Options, Tag>::remove(Node &n)
 		this->repr_now_equal(&*(end_it - 1), end_head);
 	}
 
-	this->remove_segment(& n._imap_end);
-	this->remove_segment(& n._imap_begin);
+	this->remove_segment(& n.NB::_imap_end);
+	this->remove_segment(& n.NB::_imap_begin);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag>
