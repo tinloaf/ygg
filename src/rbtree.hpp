@@ -216,6 +216,9 @@ public:
 	void insert(Node & node, Node & hint);
 	void insert(Node & node, iterator<false> hint);
 
+	void insert_left_leaning(Node & node);
+	void insert_right_leaning(Node & node);
+
 	/**
 	 * @brief Finds an element in the tree
 	 *
@@ -373,8 +376,6 @@ protected:
 
   template<bool on_equality_prefer_left>
   void insert_leaf_base(Node & node, Node * start);
-  void insert_leaf(Node & node, Node * start);
-  void insert_leaf_right_biased(Node & node, Node * start);
 
   void fixup_after_insert(Node * node);
   void rotate_left(Node * parent);
@@ -397,8 +398,8 @@ protected:
 	SizeHolder<Options::constant_time_size> s;
 };
 
-#include "rbtree.cpp"
-
 } // namespace ygg
+
+#include "rbtree.cpp"
 
 #endif // RBTREE_HPP
