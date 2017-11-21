@@ -15,7 +15,7 @@ target_link_libraries (run_tests LINK_PUBLIC ${GTEST_BOTH_LIBRARIES} ${CMAKE_THR
 
 # make CLion analyze all files
 add_custom_target(clion_test_dummy SOURCES test_intervaltree.hpp
-    test_rbtree.hpp test_list.hpp test_multi_rbtree.hpp test_intervalmap.hpp)
+    test_rbtree.hpp test_list.hpp test_multi_rbtree.hpp test_intervalmap.hpp test_interval_aggregator.hpp)
 
 enable_testing()
 add_test(NAME gtest COMMAND run_tests)

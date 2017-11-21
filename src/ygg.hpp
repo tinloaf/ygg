@@ -3,3 +3,4 @@
 #include "rbtree.hpp"
 #include "intervaltree.hpp"
 #include "intervalmap.hpp"
+#include "dynamic_segment_tree.hpp"
