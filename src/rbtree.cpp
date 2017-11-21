@@ -71,7 +71,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node &node, No
     this->fixup_after_insert(&node);
   }
 
-
   return;
 }
 
@@ -1226,6 +1225,31 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rend()
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+template <class Comparable, class Callbacks>
+typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template iterator<false>
+RBTree<Node, NodeTraits, Options, Tag, Compare>::find(const Comparable &query, Callbacks * cbs)
+{
+	Node *cur = this->root;
+	cbs->init_root(cur);
+
+	while (cur != nullptr) {
+		if (this->cmp(*cur, query)) {
+			cur = cur->NB::_rbt_right;
+			cbs->descend_right(cur);
+		} else if (this->cmp(query, *cur)) {
+			cur = cur->NB::_rbt_left;
+			cbs->descend_left(cur);
+		} else {
+			cbs->found(cur);
+			return iterator<false>(cur);
+		}
+	}
+
+	cbs->not_found();
+	return this->end();
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
 typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template iterator<false>
 RBTree<Node, NodeTraits, Options, Tag, Compare>::find(const Comparable &query)
@@ -1288,6 +1312,32 @@ typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterato
 RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable &query) const
 {
   return const_iterator<false>(this->upper_bound(query));
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+Node *
+RBTree<Node, NodeTraits, Options, Tag, Compare>::get_parent(Node * n)
+{
+	return n->NB::_rbt_parent;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+Node *
+RBTree<Node, NodeTraits, Options, Tag, Compare>::get_left_child(Node *n){
+	return n->NB::_rbt_left;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+Node *
+RBTree<Node, NodeTraits, Options, Tag, Compare>::get_right_child(Node *n){
+	return n->NB::_rbt_right;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+Node *
+RBTree<Node, NodeTraits, Options, Tag, Compare>::get_root() const
+{
+	return this->root;
 }
 
 /*

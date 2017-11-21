@@ -12,3 +12,8 @@
 * When we pass NB around, we probably don't need NodeTraits anymore?
 * Multi-Trees: add more tests
 * Add layer on top of IntervalMap segments to access borders etc.
+* rename internal-namespaces to respective classes
+* add tags to inner nodes in interval map
+* rename ITree -> Tree in interval map
+* rename Segment -> InnerNode in interval map
+* replace accessing _rbt_* in IntervalTree

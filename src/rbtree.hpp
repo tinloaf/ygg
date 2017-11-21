@@ -30,6 +30,19 @@ namespace ygg {
   } // namespace utilities
 
 
+// TODO document
+template<class Node>
+class DefaultFindCallbacks {
+public:
+	void init_root(Node * root) {};
+	void descend_left(Node * child) {};
+	void descend_right(Node * child) {};
+	void found(Node * node) {};
+	void not_found() {};
+
+	static DefaultFindCallbacks<Node> dummy;
+};
+
 /**
  * @brief Base class (template) to supply your node class with metainformation
  *
@@ -59,8 +72,8 @@ class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Tag> {};
 template<class Node>
 class RBDefaultNodeTraits {
 public:
+	// TODO document
   static void leaf_inserted(Node & node) { (void)node; };
-  static void fix_node(Node & node) { (void)node; };
   static void rotated_left(Node & node) { (void)node; };
   static void rotated_right(Node & node) { (void)node; };
   static void deleted_below(Node & node) { (void)node; };
@@ -216,6 +229,7 @@ public:
 	void insert(Node & node, Node & hint);
 	void insert(Node & node, iterator<false> hint);
 
+	// TODO document
 	void insert_left_leaning(Node & node);
 	void insert_right_leaning(Node & node);
 
@@ -240,6 +254,11 @@ public:
 	const_iterator<false> find(const Comparable & query) const;
 	template<class Comparable>
 	iterator<false> find(const Comparable & query);
+
+	// TODO document
+	// TODO test
+	template<class Comparable, class Callbacks = DefaultFindCallbacks<Node>>
+	iterator<false> find(const Comparable & query, Callbacks * cbs);
 
 	/**
 	 * @brief Upper-bounds an element
@@ -356,6 +375,13 @@ public:
 	 * @return The number of elements in the tree.
 	 */
 	size_t size() const;
+
+
+	// TODO document
+	Node * get_root() const;
+	static Node * get_parent(Node * n);
+	static Node * get_left_child(Node * n);
+	static Node * get_right_child(Node * n);
 
 protected:
 	Node *root;
