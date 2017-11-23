@@ -664,6 +664,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node &node)
   Node *child = &node;
 
   if ((cur->NB::_rbt_right != nullptr) && (cur->NB::_rbt_left != nullptr)) {
+	  // TODO FIXME we assume larger-or-equal here. that is not true?
     // Find the minimum of the larger-or-equal children
     child = cur->NB::_rbt_right;
     while (child->NB::_rbt_left != nullptr) {
@@ -687,17 +688,20 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node &node)
     // replace node with its child and color the child black.
     auto right_child = node.NB::_rbt_right;
     this->swap_nodes(&node, right_child, true);
+
+    // TODO when this callback is not used, we don't need to actually swap…
+    NodeTraits::delete_leaf(node);
+
     right_child->NB::_rbt_color = Base::Color::BLACK;
     right_child->NB::_rbt_right = nullptr; // this stored the node to be deleted…
     // TODO null the pointers in node?
-
-    NodeTraits::deleted_below(*right_child);
 
     return; // no fixup necessary
   }
 
   // Node has no children, so we have to just delete it, which is no problem if we are red. Otherwise, we must start a fixup at the parent.
   bool deleted_left = false;
+  NodeTraits::delete_leaf(node);
   if (node.NB::_rbt_parent != nullptr) {
     if (node.NB::_rbt_parent->NB::_rbt_left == &node) {
       node.NB::_rbt_parent->NB::_rbt_left = nullptr;
@@ -706,7 +710,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node &node)
       node.NB::_rbt_parent->NB::_rbt_right = nullptr;
     }
 
-    NodeTraits::deleted_below(*node.NB::_rbt_parent);
   } else {
     this->root = nullptr; // Tree is now empty!
     return; // No fixup needed!

@@ -74,7 +74,7 @@ public:
 	static void rotated_right(Node &node)
 	{ (void)node; };
 
-	static void deleted_below(Node &node)
+	static void delete_leaf(Node &node)
 	{ (void)node; };
 
 	static void swapped(Node &n1, Node &n2)

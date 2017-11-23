@@ -34,7 +34,7 @@ namespace ygg {
 		  static void fix_node(Node & node);
 		  static void rotated_left(Node & node);
 		  static void rotated_right(Node & node);
-		  static void deleted_below(Node & node);
+		  static void delete_leaf(Node & node);
 		  static void swapped(Node & n1, Node & n2);
 
 		  // Make our DummyRange comparable

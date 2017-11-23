@@ -28,6 +28,9 @@ public:
 	KeyT point;
 	bool start;
 
+	InnerNode<KeyT, ValueT, AggValueT, Tag> * partner;
+
+	ValueT val; // TODO this can be removed!
 	AggValueT agg_left;
 	AggValueT agg_right;
 };
@@ -38,7 +41,7 @@ public:
 	static void leaf_inserted(InnerNode & node);
 	static void rotated_left(InnerNode & node);
 	static void rotated_right(InnerNode & node);
-	static void deleted_below(InnerNode & node) {};
+	static void delete_leaf(InnerNode & node);
 	static void swapped(InnerNode & n1, InnerNode & n2);
 };
 
@@ -74,6 +77,7 @@ public:
 
 	std::string get_name(InnerNode * node) const {
 		return std::string("[") + std::to_string(node->point) + std::string("]")
+		       + std::string("@") + std::to_string((unsigned long)node)
 						+ std::string("  ╭:") + std::to_string(node->agg_left) + std::string("  ╮:")
 						+ std::to_string(node->agg_right);
 	}
@@ -159,25 +163,31 @@ public:
 	              "Node class not properly derived from DynSegTreeNodeBase!");
 	static_assert(Options::multiple, "DynamicSegmentTree always allows multiple equal intervals.");
 
-	class Tree : public RBTree<InnerNode, dyn_segtree_internal::InnerNodeTraits<Tree, InnerNode>,
+	using KeyT = typename Node::KeyT;
+	using ValueT = typename Node::ValueT;
+	using AggValueT = typename Node::AggValueT;
+
+	class InnerTree : public RBTree<InnerNode, dyn_segtree_internal::InnerNodeTraits<InnerTree, InnerNode>,
 	                          TreeOptions<TreeFlags::MULTIPLE>,
 	                          dyn_segtree_internal::InnerRBTTag<Tag>, dyn_segtree_internal::Compare<InnerNode>>
 	{
 	public:
-		using BaseTree = RBTree<InnerNode, dyn_segtree_internal::InnerNodeTraits<Tree, InnerNode>,
+		using BaseTree = RBTree<InnerNode, dyn_segtree_internal::InnerNodeTraits<InnerTree, InnerNode>,
 		                        TreeOptions<TreeFlags::MULTIPLE>,
 		                        dyn_segtree_internal::InnerRBTTag<Tag>, dyn_segtree_internal::Compare<InnerNode>>;
 
 		using BaseTree::BaseTree;
+
+		static void modify_contour(InnerNode * left, InnerNode * right, ValueT val);
+
+		using Contour = std::pair<std::vector<InnerNode *>, std::vector<InnerNode *>>;
+		static Contour find_lca(InnerNode * left, InnerNode * right);
 	};
 
 	/*using Tree = RBTree<InnerNode, dyn_segtree_internal::InnerNodeTraits<InnerNode, Tree>,
 	                    TreeOptions<TreeFlags::MULTIPLE>,
 	                    dyn_segtree_internal::InnerRBTTag<Tag>, dyn_segtree_internal::Compare<InnerNode>>;
 	                    */
-	using KeyT = typename Node::KeyT;
-	using ValueT = typename Node::ValueT;
-	using AggValueT = typename Node::AggValueT;
 
 	void insert(Node &n);
 
@@ -187,10 +197,11 @@ public:
 
 private:
 	void apply_interval(Node & n);
-	using Contour = std::pair<std::vector<InnerNode *>, std::vector<InnerNode *>>;
-	Contour find_lca(InnerNode * left, InnerNode * right);
+	void unapply_interval(Node & n);
 
-	Tree t;
+
+
+	InnerTree t;
 };
 
 } // namespace ygg

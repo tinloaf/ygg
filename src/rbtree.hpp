@@ -76,8 +76,10 @@ public:
   static void leaf_inserted(Node & node) { (void)node; };
   static void rotated_left(Node & node) { (void)node; };
   static void rotated_right(Node & node) { (void)node; };
-  static void deleted_below(Node & node) { (void)node; };
-  static void swapped(Node & n1, Node & n2) { (void)n1; (void)n2; };
+  static void delete_leaf(Node &node) { (void)node; };
+  static void swapped(Node & old_ancestor, Node & old_descendant) {
+	  (void)old_ancestor; (void)old_descendant;
+  };
 };
 
 /**

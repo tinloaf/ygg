@@ -5,34 +5,58 @@
 #ifndef YGG_DEBUG_HPP
 #define YGG_DEBUG_HPP
 
-template<class Tree, class Node, class NodeNameGetter>
+namespace ygg {
+namespace debug {
+
+template<class Node>
+Node * dbg_find_root(Node * n) {
+	while (n->_rbt_parent != nullptr) {
+		n = n->_rbt_parent;
+	}
+
+	return n;
+}
+
+template <class Node, class NodeNameGetter>
 class TreePrinter
 {
 public:
-	TreePrinter(Tree * tree_in, NodeNameGetter nng_in) : tree(tree_in), nng(nng_in) {}
+	TreePrinter(Node *root_in, NodeNameGetter nng_in)
+					: root(root_in), nng(nng_in)
+	{}
 
-	void print() const
+	void reset_root(Node * new_root)
 	{
-		Node * root = this->tree->get_root();
+		this->root = new_root;
+	}
+
+	void
+	print() const
+	{
 		if (root == nullptr) {
 			std::cout << "(Empty)\n";
 		} else {
-			this->print_node(root, 0, 0);
+			std::vector<std::string> prefix;
+			this->print_node(root, prefix, 0);
 		}
 	}
+
 private:
-	void print_node(Node * node, unsigned int level, int direction) const
+	void
+	print_node(Node *node, std::vector<std::string> & prefix, int direction) const
 	{
-		for (int i = 0 ; i < (int)level ; ++i) {
-			std::cout << "│";
+		for (auto c : prefix) {
+			std::cout << c;
 		}
 
 		if (direction == 0) {
 			std::cout << "┌";
 		} else if (direction < 0) {
 			std::cout << "├";
+			prefix.push_back(std::string("│"));
 		} else {
 			std::cout << "└";
+			prefix.push_back(std::string(" "));
 		}
 
 		if (node == nullptr) {
@@ -43,13 +67,20 @@ private:
 			std::cout << " " << nng.get_name(node);
 			std::cout << "\n";
 
-			this->print_node(Tree::get_left_child(node), level + 1, -1);
-			this->print_node(Tree::get_right_child(node), level + 1, 1);
+
+			this->print_node(node->_rbt_left, prefix, -1);
+			this->print_node(node->_rbt_right, prefix, 1);
+		}
+		if (direction != 0) {
+			prefix.pop_back();
 		}
 	}
 
-	Tree * tree;
+	Node *root;
 	NodeNameGetter nng;
 };
+
+}
+}
 
 #endif //YGG_DEBUG_HPP

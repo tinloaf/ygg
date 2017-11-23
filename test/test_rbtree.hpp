@@ -48,7 +48,7 @@ public:
   static void leaf_inserted(Node & node) { (void)node ; };
   static void rotated_left(Node & node) { (void)node ; };
   static void rotated_right(Node & node) { (void)node ; };
-  static void deleted_below(Node & node) { (void)node ; };
+  static void delete_leaf(Node & node) { (void)node ; };
   static void swapped(Node & n1, Node & n2) { (void)n1 ; (void)n2 ; };
 };
 
@@ -61,7 +61,7 @@ public:
   static void leaf_inserted(EqualityNode & node) { (void)node ; };
   static void rotated_left(EqualityNode & node) { (void)node ; };
   static void rotated_right(EqualityNode & node) { (void)node ; };
-  static void deleted_below(EqualityNode & node) { (void)node ; };
+  static void delete_leaf(EqualityNode & node) { (void)node ; };
   static void swapped(EqualityNode & n1, EqualityNode & n2) { (void)n1 ; (void)n2 ; };
 };
 

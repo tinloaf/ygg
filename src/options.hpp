@@ -61,7 +61,7 @@ public:
  * @code{.c++}
  * using MyTreeOptions = TreeOptions<TreeFlags::MULTIPLE, TreeFlags::ORDER_QUERIES>;
  * class Node : public RBTreeNodeBase<Node, MyTreeOptions> { … };
- * using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
+ * using MyTree = RBTree<Node, RBDefaultNodeTraits<MyTree, Node>, MyTreeOptions>;
  * @endcode
  *
  * @tparam Opts List of the options that should be set in the tree.

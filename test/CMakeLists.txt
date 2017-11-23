@@ -2,6 +2,11 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 find_package( Threads )
 
+# Find Boost
+find_package(Boost REQUIRED)
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+set(LIBS ${LIBS} ${Boost_LIBRARIES})
+
 add_executable (run_tests main.cpp)
 
 set_target_properties(run_tests
@@ -11,11 +16,11 @@ set_target_properties(run_tests
                       PROPERTIES LINK_FLAGS "-fprofile-arcs -ftest-coverage"
                       )
 
-target_link_libraries (run_tests LINK_PUBLIC ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (run_tests LINK_PUBLIC ${LIBS} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 # make CLion analyze all files
 add_custom_target(clion_test_dummy SOURCES test_intervaltree.hpp
-    test_rbtree.hpp test_list.hpp test_multi_rbtree.hpp test_intervalmap.hpp test_interval_aggregator.hpp)
+    test_rbtree.hpp test_list.hpp test_multi_rbtree.hpp test_intervalmap.hpp test_dynamic_segment_tree.hpp)
 
 enable_testing()
 add_test(NAME gtest COMMAND run_tests)

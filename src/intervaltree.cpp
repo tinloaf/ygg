@@ -75,9 +75,12 @@ ExtendedNodeTraits<Node, INB, NodeTraits>::rotated_right(Node &node)
 
 template <class Node, class INB, class NodeTraits>
 void
-ExtendedNodeTraits<Node, INB, NodeTraits>::deleted_below(Node &node)
+ExtendedNodeTraits<Node, INB, NodeTraits>::delete_leaf(Node &node)
 {
-	fix_node(node);
+	Node * parent = node._rbt_parent;
+	if (parent != nullptr) {
+		fix_node(*parent);
+	}
 }
 
 template <class Node, class INB, class NodeTraits>
