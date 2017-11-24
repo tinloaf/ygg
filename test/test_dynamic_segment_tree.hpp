@@ -300,7 +300,7 @@ TEST(IAggTest, ComprehensiveTest)
 	});
 
 	for (auto index : indices) {
-		//agg.insert(transient_nodes[index]);
+		agg.insert(transient_nodes[index]);
 	}
 
 	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
@@ -318,7 +318,7 @@ TEST(IAggTest, ComprehensiveTest)
 	});
 
 	for (auto index : indices) {
-		//agg.remove(transient_nodes[index]);
+		agg.remove(transient_nodes[index]);
 	}
 
 	// Reference data structure
