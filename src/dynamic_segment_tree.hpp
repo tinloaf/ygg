@@ -86,13 +86,26 @@ public:
 /// @endcond
 } // namespace internal
 
-template<class KeyT_in, class ValueT_in, class AggValueT_in, class Tag = int>
+/**
+ * @brief Base class (template) to supply your node class with metainformation
+ *
+ * The class you use as nodes for the Dynamic Segment Tree *must* derive from this
+ * class (template). It supplies your class with the necessary members to
+ * contain the linking between the tree nodes.
+ *
+ * @tparam KeyType				The type of the key, i.e., the interval borders
+ * @tparam ValueType 			The type of the values that every interval is associated with
+ * @tparam AggValueType		The typo of an aggregate of multiple ValueT_in's. See DOCTODO for details.
+ * @tparam Tag 						The tag used to identify the tree that this node should be inserted into. See
+ * RBTree for details.
+ */
+template<class KeyType, class ValueType, class AggValueType, class Tag = int>
 class DynSegTreeNodeBase {
 public:
 	/// @cond INTERNAL
-	using KeyT = KeyT_in;
-	using ValueT = ValueT_in;
-	using AggValueT = AggValueT_in;
+	using KeyT = KeyType;
+	using ValueT = ValueType;
+	using AggValueT = AggValueType;
 
 	using InnerNode = dyn_segtree_internal::InnerNode<KeyT, ValueT, AggValueT, Tag>;
 
@@ -110,17 +123,17 @@ public:
  * class. At the least, you have to implement the methods get_lower, get_upper and get_value for
  * the DynamicSegmentTree to work. See the respective methods' documentation for details.
  *
- * @tparam Node 	Your node class to be used in the DynamicSegmentTree
+ * @tparam Node 	Your node class to be used in the DynamicSegmentTree, derived from DynSegTreeNodeBase
  */
 template<class Node>
 class DynSegTreeNodeTraits {
 public:
 	/**
-	 * The type of the keys of intervals / segments in the DynamicSegmentTree
+	 * The type of the borders of intervals / segments in the DynamicSegmentTree
 	 */
 	using KeyT = typename Node::KeyT;
 	/**
-	 * The type of the values / aggregates in the DynamicSegmentTree
+	 * The type of the values associated with the intervals in the DynamicSegmentTree
 	 */
 	using ValueT = typename Node::ValueT;
 
@@ -149,10 +162,34 @@ public:
 	static ValueT get_value(const Node & n);
 };
 
+/**
+ * @brief The Dynamic Segment Tree class
+ *
+ * This class provides a dynamic version of a segment tree. For details on the implementation,
+ * see DOCTODO. The dynamic segment tree provides the following operations:
+ *
+ * * Querying for the aggregate value ta a point x (a "stabbing query") in O(log n) * A
+ * * Insertion of a new interval in O(log n) * A
+ * * Deletion of an interval in O(log n) * A
+ *
+ * where n is the number of intervals in the dynamic segment tree and A is the time it takes to
+ * aggregate a value, i.e., compute operator+(AggValueT, ValueT).
+ *
+ * DOCTODO aggregators
+ *
+ * @tparam Node					The node class in your tree, must be derived from DynSegTreeNodeBase
+ * @tparam NodeTraits		The node traits for your node class, must be derived from DynSegTreeNodeTraits
+ * @tparam Options			Options for this tree. See DOCTODO for details.
+ * @tparam Tag					The tag of this tree. Allows to insert the same node in multiple dynamic
+ * 											segment trees. See DOCTODO for details.
+ */
+// TODO DOC right-open intervals
+
+// TODO constant-time size
 template <class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int>
 class DynamicSegmentTree
 {
-public:
+private:
 	using NB = DynSegTreeNodeBase<typename Node::KeyT, typename Node::ValueT,
 	                        typename Node::AggValueT, Tag>;
 	using InnerNode = typename NB::InnerNode;
@@ -163,10 +200,12 @@ public:
 	              "Node class not properly derived from DynSegTreeNodeBase!");
 	static_assert(Options::multiple, "DynamicSegmentTree always allows multiple equal intervals.");
 
+public:
 	using KeyT = typename Node::KeyT;
 	using ValueT = typename Node::ValueT;
 	using AggValueT = typename Node::AggValueT;
 
+private:
 	class InnerTree : public RBTree<InnerNode, dyn_segtree_internal::InnerNodeTraits<InnerTree, InnerNode>,
 	                          TreeOptions<TreeFlags::MULTIPLE>,
 	                          dyn_segtree_internal::InnerRBTTag<Tag>, dyn_segtree_internal::Compare<InnerNode>>
@@ -184,22 +223,41 @@ public:
 		static Contour find_lca(InnerNode * left, InnerNode * right);
 	};
 
-	/*using Tree = RBTree<InnerNode, dyn_segtree_internal::InnerNodeTraits<InnerNode, Tree>,
-	                    TreeOptions<TreeFlags::MULTIPLE>,
-	                    dyn_segtree_internal::InnerRBTTag<Tag>, dyn_segtree_internal::Compare<InnerNode>>;
-	                    */
+public:
 
+	/**
+	 * @brief Insert an interval into the dynamic segment tree
+	 *
+	 * This inserts the interval represented by the node n into the dynamic segment tree.
+	 * The interval may not be empty.
+	 *
+	 * @param n		The node representing the interval being inserted
+	 */
 	void insert(Node &n);
 
+	/**
+	 * @brief Removes an intervals from the dynamic segment tree
+	 *
+	 * Removes the (previously inserted) node n from the dynamic segment tree
+	 *
+	 * @param n 	The node to be removed
+	 */
 	void remove(Node &n);
 
-	typename Node::AggValueT query(const typename Node::KeyT & x);
+	/**
+	 * @brief Perform a stabbing query at point x
+	 *
+	 * This query asks for the aggregate value over all intervals containing point x. This is a
+	 * "stabbing query".
+	 *
+	 * @param 		x The point to query for
+	 * @return 		The aggregated value for all intervals containing x
+	 */
+	AggValueT query(const typename Node::KeyT & x);
 
 private:
 	void apply_interval(Node & n);
 	void unapply_interval(Node & n);
-
-
 
 	InnerTree t;
 };
