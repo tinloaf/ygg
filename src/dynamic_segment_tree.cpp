@@ -15,23 +15,26 @@ namespace dyn_segtree_internal {
 template<class InnerTree, class InnerNode>
 void
 InnerNodeTraits<InnerTree, InnerNode>::leaf_inserted(InnerNode & node){
-	//std::cout << "### Leaf inserted: " << node.point << "\n";
+	////std::cout << "### Leaf inserted: " << node.point << "\n";
 }
 
 template<class InnerTree, class InnerNode>
 void
 InnerNodeTraits<InnerTree, InnerNode>::delete_leaf(InnerNode & node)
 {
-	std::cout << "### Deleting leaf " << node.point << "\n";
+	//std::cout << "### Deleting leaf " << node.point << "\n";
+
+	// TODO DEBUG
+	assert(node.agg_left == node.agg_right);
 
 	InnerNode * parent = InnerTree::get_parent(&node);
 	if (parent != nullptr) {
 		if (InnerTree::get_left_child(parent) == &node) {
-			parent->agg_left += (node.agg_left + node.agg_right);
+			parent->agg_left += node.agg_left;
 		} else {
 			// TODO DEBUG
 			assert(InnerTree::get_right_child(parent) == &node);
-			parent->agg_right += (node.agg_left + node.agg_right);
+			parent->agg_right += node.agg_left;
 		}
 	}
 }
@@ -40,7 +43,7 @@ template<class InnerTree, class InnerNode>
 void
 InnerNodeTraits<InnerTree, InnerNode>::rotated_left(InnerNode & node)
 {
-	std::cout << "### Rotating left around " << node.point << "\n";
+	//std::cout << "### Rotating left around " << node.point << "\n";
 
 	// TODO FIXME DEBUG
 
@@ -64,7 +67,7 @@ template<class InnerTree, class InnerNode>
 void
 InnerNodeTraits<InnerTree, InnerNode>::rotated_right(InnerNode & node)
 {
-	std::cout << "### Rotating right around " << node.point << "\n";
+	//std::cout << "### Rotating right around " << node.point << "\n";
 	// TODO FIXME DEBUG
 
 	InnerNode * old_left = InnerTree::get_parent(&node);
@@ -87,7 +90,7 @@ template<class InnerTree, class InnerNode>
 void
 InnerNodeTraits<InnerTree, InnerNode>::swapped(InnerNode & old_ancestor, InnerNode & old_descendant)
 {
-	std::cout << "Swapped " << old_ancestor.point << " and " << old_descendant.point << "\n";
+	//std::cout << "Swapped " << old_ancestor.point << " and " << old_descendant.point << "\n";
 
 	// Swap labels to their old places in the tree
 	std::swap(old_ancestor.InnerNode::agg_left, old_descendant.InnerNode::agg_left);
@@ -120,9 +123,12 @@ template <class Node, class NodeTraits, class Options, class Tag>
 void
 DynamicSegmentTree<Node, NodeTraits, Options, Tag>::insert(Node &n)
 {
+	// TODO remove this requirement?
+	assert(NodeTraits::get_lower(n) < NodeTraits::get_upper(n));
+
 	// TODO why are we doing this every time? Should be done once in the constructor!
 
-	//std::cout << "========================================\n";
+	////std::cout << "========================================\n";
 	n.NB::start.val = NodeTraits::get_value(n);
 	n.NB::start.point = NodeTraits::get_lower(n);
 	n.NB::start.agg_left = AggValueT();
@@ -144,7 +150,7 @@ DynamicSegmentTree<Node, NodeTraits, Options, Tag>::insert(Node &n)
 	this->t.insert(n.NB::end);
 
 	this->apply_interval(n);
-	//std::cout << "========================================\n";
+	////std::cout << "========================================\n";
 }
 
 template <class Node, class NodeTraits, class Options, class Tag>
@@ -153,7 +159,7 @@ DynamicSegmentTree<Node, NodeTraits, Options, Tag>::remove(Node &n)
 {
 	this->unapply_interval(n);
 
-	std::cout << "===== Tree before first remove (" << n.NB::start.point << "): \n";
+	//std::cout << "===== Tree before first remove (" << n.NB::start.point << "): \n";
 	debug::TreePrinter<InnerNode,
 	                   typename dyn_segtree_internal::template InnerNodeNameGetter<InnerNode>>	tp(
 					this->t.get_root(), typename dyn_segtree_internal::InnerNodeNameGetter<InnerNode>());
@@ -161,13 +167,13 @@ DynamicSegmentTree<Node, NodeTraits, Options, Tag>::remove(Node &n)
 
 	this->t.remove(n.NB::start);
 
-	std::cout << "===== Tree after first remove (" << n.NB::start.point << "): \n";
+	//std::cout << "===== Tree after first remove (" << n.NB::start.point << "): \n";
 	tp.reset_root(this->t.get_root());
 	//tp.print();
 
 	this->t.remove(n.NB::end);
 
-	std::cout << "===== Tree after second remove (" << n.NB::end.point << "): \n";
+	//std::cout << "===== Tree after second remove (" << n.NB::end.point << "): \n";
 	tp.reset_root(this->t.get_root());
 	//tp.print();
 }
@@ -271,37 +277,36 @@ DynamicSegmentTree<Node, NodeTraits, Options, Tag>::InnerTree::modify_contour(In
 	                                                           Tag>::InnerTree::find_lca(left, right);
 
 
-	std::cout << "Tree: \n";
+	//std::cout << "Tree: \n";
 	debug::TreePrinter<InnerNode,
 	                   typename dyn_segtree_internal::template InnerNodeNameGetter<InnerNode>>	tp(
 					debug::dbg_find_root(left),
 					typename dyn_segtree_internal::InnerNodeNameGetter<InnerNode>());
 	//tp.print();
 
-	std::cout << "==> Applying interval: " << left->point << " -> "
-	          << right->point << " @ " << val << "\n";
+	//std::cout << "==> Applying interval: " << left->point << " -> " << right->point << " @ " << val << "\n";
 
 	// left contour
-	std::cout << "Left contour: ";
+	//std::cout << "Left contour: ";
 	for (size_t i = 0 ; i < left_contour.size() - 1 ; ++i) {
 		InnerNode * cur = left_contour[i];
-		std::cout << " [" << cur->InnerNode::point << "] ";
+		//std::cout << " [" << cur->InnerNode::point << "] ";
 		if ((i == 0) || (InnerTree::get_right_child(cur) != left_contour[i-1])) {
 			cur->InnerNode::agg_right += val;
 		}
 	}
 
 	// right contour
-	std::cout <<"\nRight contour: ";
+	//std::cout <<"\nRight contour: ";
 	for (size_t i = 0 ; i < right_contour.size() - 1 ; ++i) {
 		InnerNode * cur = right_contour[i];
-		std::cout << " [" << cur->InnerNode::point << "] ";
+		//std::cout << " [" << cur->InnerNode::point << "] ";
 		if ((i == 0) || (InnerTree::get_left_child(cur) != right_contour[i-1])) {
 			cur->InnerNode::agg_left += val;
 		}
 	}
 
-	std::cout << "\n\n";
+	//std::cout << "\n\n";
 	tp.reset_root(debug::dbg_find_root(left));
 	//tp.print();
 }
@@ -311,7 +316,7 @@ typename Node::AggValueT
 DynamicSegmentTree<Node, NodeTraits, Options, Tag>::query(const typename Node::KeyT & x)
 {
 
-	std::cout << "\nQuery in Tree at " << std::to_string(x) << ": \n";
+	//std::cout << "\nQuery in Tree at " << std::to_string(x) << ": \n";
 	debug::TreePrinter<InnerNode,
 	                   typename dyn_segtree_internal::template InnerNodeNameGetter<InnerNode>>	tp(
 					this->t.get_root(), typename dyn_segtree_internal::InnerNodeNameGetter<InnerNode>());
@@ -325,11 +330,11 @@ DynamicSegmentTree<Node, NodeTraits, Options, Tag>::query(const typename Node::K
 	while (cur != nullptr) {
 		if (cmp(x, *cur)) {
 			agg += cur->agg_left;
-			std::cout << "Left. Agg now " << agg << "\n";
+			//std::cout << "Left. Agg now " << agg << "\n";
 			cur = InnerTree::get_left_child(cur);
 		} else {
 			agg += cur->agg_right;
-			std::cout << "Right. Agg now " << agg << "\n";
+			//std::cout << "Right. Agg now " << agg << "\n";
 			cur = InnerTree::get_right_child(cur);
 		}
 	}

@@ -39,30 +39,18 @@ public:
   }
 };
 
-class NodeTraits {
+class NodeTraits : public RBDefaultNodeTraits<Node> {
 public:
   static std::string get_id(const Node * node) {
     return std::to_string(node->data);
   }
-
-  static void leaf_inserted(Node & node) { (void)node ; };
-  static void rotated_left(Node & node) { (void)node ; };
-  static void rotated_right(Node & node) { (void)node ; };
-  static void delete_leaf(Node & node) { (void)node ; };
-  static void swapped(Node & n1, Node & n2) { (void)n1 ; (void)n2 ; };
 };
 
-class EqualityNodeTraits {
+class EqualityNodeTraits : public RBDefaultNodeTraits<EqualityNode> {
 public:
   static std::string get_id(const EqualityNode * node) {
     return std::string("(") + std::to_string(node->data) + std::string("/") + std::to_string(node->sub_data) + std::string(")");
   }
-
-  static void leaf_inserted(EqualityNode & node) { (void)node ; };
-  static void rotated_left(EqualityNode & node) { (void)node ; };
-  static void rotated_right(EqualityNode & node) { (void)node ; };
-  static void delete_leaf(EqualityNode & node) { (void)node ; };
-  static void swapped(EqualityNode & n1, EqualityNode & n2) { (void)n1 ; (void)n2 ; };
 };
 
 TEST(RBTreeTest, TrivialInsertionTest) {

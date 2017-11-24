@@ -696,6 +696,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node &node)
     right_child->NB::_rbt_right = nullptr; // this stored the node to be deleted…
     // TODO null the pointers in node?
 
+	  NodeTraits::deleted_below(*right_child);
+
     return; // no fixup necessary
   }
 
@@ -710,6 +712,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node &node)
       node.NB::_rbt_parent->NB::_rbt_right = nullptr;
     }
 
+		NodeTraits::deleted_below(*node.NB::_rbt_parent);
   } else {
     this->root = nullptr; // Tree is now empty!
     return; // No fixup needed!

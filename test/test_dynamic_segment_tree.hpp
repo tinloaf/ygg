@@ -14,7 +14,9 @@
 
 #include "../src/ygg.hpp"
 
-#define IAGG_TESTSIZE 4
+#define IAGG_TESTSIZE 2000
+#define IAGG_DELETION_TESTSIZE 500
+#define IAGG_DELETION_ITERATIONS 100
 
 namespace test_interval_agg {
 using namespace boost::icl;
@@ -108,6 +110,68 @@ TEST(IAggTest, OverlappingTest)
 	}
 }
 
+TEST(IAggTest, DeletionTest)
+{
+	Node n[IAGG_DELETION_TESTSIZE];
+	for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+		n[i].lower = i;
+		n[i].upper = IAGG_DELETION_TESTSIZE + i;
+		n[i].value = 1;
+	}
+
+	IAgg agg;
+
+	for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+		agg.insert(n[i]);
+	}
+
+	std::mt19937 rng(5); // chosen by fair xkcd plus one
+
+	for (unsigned int j = 0 ; j < IAGG_DELETION_ITERATIONS ; ++j) {
+		//std::cout << "\n\n\n=================================================\n\n\n";
+		std::uniform_int_distribution<unsigned int> bounds_distr(0, 2 * IAGG_DELETION_TESTSIZE);
+		unsigned int lower = bounds_distr(rng);
+		unsigned int upper = lower + bounds_distr(rng) + 1;
+
+		Node deleteme(lower, upper, 42);
+		//std::cout << "Test interval: " << lower << "->" << upper << "\n\n";
+
+		//std::cout << "================= INSERT ====================\n";
+
+		agg.insert(deleteme);
+
+		for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+			auto val = agg.query(i);
+			if ((i >= lower) && (i < upper)) {
+				ASSERT_EQ(val, i + 1 + 42);
+			} else {
+				ASSERT_EQ(val, i + 1);
+			}
+		}
+		for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+			auto val = agg.query(i + IAGG_DELETION_TESTSIZE);
+				if ((i  + IAGG_DELETION_TESTSIZE >= lower) && (i  + IAGG_DELETION_TESTSIZE < upper)) {
+					ASSERT_EQ(val, IAGG_DELETION_TESTSIZE - i - 1 + 42);
+				} else {
+					ASSERT_EQ(val, IAGG_DELETION_TESTSIZE - i - 1);
+				}
+		}
+
+		//std::cout << "================= REMOVE ====================\n";
+
+		agg.remove(deleteme);
+
+		for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+			auto val = agg.query(i);
+			ASSERT_EQ(val, i + 1);
+		}
+		for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+			auto val = agg.query(i + IAGG_DELETION_TESTSIZE);
+			ASSERT_EQ(val, IAGG_DELETION_TESTSIZE - i - 1);
+		}
+	}
+}
+
 TEST(IAggTest, NestingTestInsertionOverlappingDeletionTest)
 {
 	Node n[IAGG_TESTSIZE];
@@ -137,7 +201,7 @@ TEST(IAggTest, NestingTestInsertionOverlappingDeletionTest)
 	agg.remove(transient[0]);
 	val = agg.query(1);
 	ASSERT_EQ(val, 12);
-	std::cout << "\n\n###################################################\n\n";
+	//std::cout << "\n\n###################################################\n\n";
 	agg.remove(transient[1]);
 	val = agg.query(1);
 	ASSERT_EQ(val, 2);
@@ -215,7 +279,7 @@ TEST(IAggTest, ComprehensiveTest)
 	for (unsigned int i = 0; i < IAGG_TESTSIZE; ++i) {
 		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IAGG_TESTSIZE / 2);
 		unsigned int lower = bounds_distr(rng);
-		unsigned int upper = lower + bounds_distr(rng);
+		unsigned int upper = lower + 1 + bounds_distr(rng);
 
 		persistent_nodes[i] = Node(lower, upper, i);
 		indices.push_back(i);
@@ -225,7 +289,7 @@ TEST(IAggTest, ComprehensiveTest)
 	for (unsigned int i = 0; i < IAGG_TESTSIZE; ++i) {
 		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IAGG_TESTSIZE / 2);
 		unsigned int lower = bounds_distr(rng);
-		unsigned int upper = lower + bounds_distr(rng);
+		unsigned int upper = lower + 1 + bounds_distr(rng);
 
 		transient_nodes[i] = Node(lower, upper, IAGG_TESTSIZE + i);
 	}
@@ -236,7 +300,7 @@ TEST(IAggTest, ComprehensiveTest)
 	});
 
 	for (auto index : indices) {
-		agg.insert(transient_nodes[index]);
+		//agg.insert(transient_nodes[index]);
 	}
 
 	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
@@ -254,7 +318,7 @@ TEST(IAggTest, ComprehensiveTest)
 	});
 
 	for (auto index : indices) {
-		agg.remove(transient_nodes[index]);
+		//agg.remove(transient_nodes[index]);
 	}
 
 	// Reference data structure
