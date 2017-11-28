@@ -16,8 +16,8 @@ namespace dyn_segtree_internal {
 template<class Tag>
 class InnerRBTTag {};
 
-template<class KeyT_in, class ValueT_in, class AggValueT_in, class Tag>
-class InnerNode : public RBTreeNodeBase<InnerNode<KeyT_in, ValueT_in, AggValueT_in, Tag>,
+template<class KeyT_in, class ValueT_in, class AggValueT_in, class Combiners, class Tag>
+class InnerNode : public RBTreeNodeBase<InnerNode<KeyT_in, ValueT_in, AggValueT_in, Combiners, Tag>,
                                         TreeOptions<TreeFlags::MULTIPLE>, InnerRBTTag<Tag>>
 {
 public:
@@ -28,11 +28,13 @@ public:
 	KeyT point;
 	bool start;
 
-	InnerNode<KeyT, ValueT, AggValueT, Tag> * partner;
+	InnerNode<KeyT, ValueT, AggValueT, Combiners, Tag> * partner;
 
 	ValueT val; // TODO this can be removed!
 	AggValueT agg_left;
 	AggValueT agg_right;
+
+	Combiners combiners;
 };
 
 template<class InnerTree, class InnerNode>
@@ -86,6 +88,44 @@ public:
 /// @endcond
 } // namespace internal
 
+template<class Node>
+class MaxCombiner {
+public:
+	using ValueT = typename Node::AggValueT;
+
+	explicit MaxCombiner(typename Node::AggValueT val);
+	void combine_with(typename Node::AggValueT a);
+	bool rebuild(typename Node::AggValueT a, typename Node::AggValueT a_edge_val,
+	             typename Node::AggValueT b, typename Node::AggValueT b_edge_val);
+
+	ValueT get();
+private:
+	typename Node::AggValueT val;
+};
+
+template<class AggValueT, class ... Combiners>
+class CombinerPack {
+public:
+	explicit CombinerPack(AggValueT val);
+	CombinerPack() = default;
+
+	bool rebuild(CombinerPack<AggValueT, Combiners...> * a,
+	             AggValueT a_edge_val,
+	             CombinerPack<AggValueT, Combiners...> * b,
+	             AggValueT b_edge_val);
+
+	void combine_with(CombinerPack<AggValueT, Combiners...> * other);
+
+	template<class Combiner>
+	typename Combiner::ValueT get();
+
+private:
+	std::tuple<Combiners ...> data;
+};
+
+template<class AggValueT>
+using EmptyCombinerPack = CombinerPack<AggValueT>;
+
 /**
  * @brief Base class (template) to supply your node class with metainformation
  *
@@ -99,7 +139,7 @@ public:
  * @tparam Tag 						The tag used to identify the tree that this node should be inserted into. See
  * RBTree for details.
  */
-template<class KeyType, class ValueType, class AggValueType, class Tag = int>
+template<class KeyType, class ValueType, class AggValueType, class Combiners, class Tag = int>
 class DynSegTreeNodeBase {
 public:
 	/// @cond INTERNAL
@@ -107,7 +147,7 @@ public:
 	using ValueT = ValueType;
 	using AggValueT = AggValueType;
 
-	using InnerNode = dyn_segtree_internal::InnerNode<KeyT, ValueT, AggValueT, Tag>;
+	using InnerNode = dyn_segtree_internal::InnerNode<KeyT, ValueT, AggValueT, Combiners, Tag>;
 
 	InnerNode start;
 	InnerNode end;
@@ -186,12 +226,13 @@ public:
 // TODO DOC right-open intervals
 
 // TODO constant-time size
-template <class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int>
+template <class Node, class NodeTraits, class Combiners, class Options = DefaultOptions,
+					class Tag = int>
 class DynamicSegmentTree
 {
 private:
 	using NB = DynSegTreeNodeBase<typename Node::KeyT, typename Node::ValueT,
-	                        typename Node::AggValueT, Tag>;
+	                        typename Node::AggValueT, Combiners, Tag>;
 	using InnerNode = typename NB::InnerNode;
 
 	static_assert(std::is_base_of<DynSegTreeNodeTraits<Node>, NodeTraits>::value,
@@ -221,6 +262,9 @@ private:
 
 		using Contour = std::pair<std::vector<InnerNode *>, std::vector<InnerNode *>>;
 		static Contour find_lca(InnerNode * left, InnerNode * right);
+
+		static bool rebuild_combiners_at(InnerNode * n);
+		static void rebuild_combiners_recursively(InnerNode * n);
 	};
 
 public:

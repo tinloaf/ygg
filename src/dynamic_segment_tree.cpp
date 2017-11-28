@@ -3,10 +3,13 @@
 //
 
 #include "dynamic_segment_tree.hpp"
+#include "util.hpp"
+
 #include "debug.hpp"
 
 #include <iostream>
 #include <tuple>
+#include <algorithm>
 
 namespace ygg {
 
@@ -15,7 +18,7 @@ namespace dyn_segtree_internal {
 template<class InnerTree, class InnerNode>
 void
 InnerNodeTraits<InnerTree, InnerNode>::leaf_inserted(InnerNode & node){
-	(void)node;
+	(void) node;
 }
 
 template<class InnerTree, class InnerNode>
@@ -48,6 +51,9 @@ InnerNodeTraits<InnerTree, InnerNode>::rotated_left(InnerNode & node)
 
 	old_right->agg_left = typename InnerNode::AggValueT();
 	old_right->agg_right += old_right_agg;
+
+	InnerTree::rebuild_combiners_at(&node);
+	InnerTree::rebuild_combiners_at(old_right);
 }
 
 template<class InnerTree, class InnerNode>
@@ -61,6 +67,9 @@ InnerNodeTraits<InnerTree, InnerNode>::rotated_right(InnerNode & node)
 
 	old_left->agg_right = typename InnerNode::AggValueT();
 	old_left->agg_left += old_left_agg;
+
+	InnerTree::rebuild_combiners_at(&node);
+	InnerTree::rebuild_combiners_at(old_left);
 }
 
 template<class InnerTree, class InnerNode>
@@ -73,6 +82,8 @@ InnerNodeTraits<InnerTree, InnerNode>::swapped(InnerNode & old_ancestor, InnerNo
 
 	if (old_ancestor.InnerNode::partner == &old_descendant) {
 		// we are done. They have their contour nulled
+		InnerTree::rebuild_combiners_at(&old_ancestor);
+		InnerTree::rebuild_combiners_at(&old_descendant); // TODO is this necessary?
 		return;
 	}
 
@@ -93,9 +104,9 @@ InnerNodeTraits<InnerTree, InnerNode>::swapped(InnerNode & old_ancestor, InnerNo
 } // namespace dyn_segtree_internal
 
 
-template <class Node, class NodeTraits, class Options, class Tag>
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 void
-DynamicSegmentTree<Node, NodeTraits, Options, Tag>::insert(Node &n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 {
 	// TODO remove this requirement?
 	assert(NodeTraits::get_lower(n) < NodeTraits::get_upper(n));
@@ -125,9 +136,9 @@ DynamicSegmentTree<Node, NodeTraits, Options, Tag>::insert(Node &n)
 	this->apply_interval(n);
 }
 
-template <class Node, class NodeTraits, class Options, class Tag>
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 void
-DynamicSegmentTree<Node, NodeTraits, Options, Tag>::remove(Node &n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::remove(Node &n)
 {
 	this->unapply_interval(n);
 
@@ -135,9 +146,9 @@ DynamicSegmentTree<Node, NodeTraits, Options, Tag>::remove(Node &n)
 	this->t.remove(n.NB::end);
 }
 
-template <class Node, class NodeTraits, class Options, class Tag>
-typename DynamicSegmentTree<Node, NodeTraits, Options, Tag>::InnerTree::Contour
-DynamicSegmentTree<Node, NodeTraits, Options, Tag>::InnerTree::find_lca(InnerNode *left, InnerNode *right)
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::Contour
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::find_lca(InnerNode *left, InnerNode *right)
 {
 	// TODO speed this up when nodes can be mapped to integers
 	// TODO nonsense! Put a flag into the nodes!
@@ -208,51 +219,60 @@ DynamicSegmentTree<Node, NodeTraits, Options, Tag>::InnerTree::find_lca(InnerNod
 	return {left_path, right_path};
 }
 
-template <class Node, class NodeTraits, class Options, class Tag>
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 void
-DynamicSegmentTree<Node, NodeTraits, Options, Tag>::apply_interval(Node &n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::apply_interval(Node &n)
 {
 	InnerTree::modify_contour(&n.NB::start, &n.NB::end, NodeTraits::get_value(n));
 }
 
-template <class Node, class NodeTraits, class Options, class Tag>
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 void
-DynamicSegmentTree<Node, NodeTraits, Options, Tag>::unapply_interval(Node &n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::unapply_interval(Node &n)
 {
 	InnerTree::modify_contour(&n.NB::start, &n.NB::end, -1 * NodeTraits::get_value(n));
 }
 
-template <class Node, class NodeTraits, class Options, class Tag>
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 void
-DynamicSegmentTree<Node, NodeTraits, Options, Tag>::InnerTree::modify_contour(InnerNode *left,
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify_contour(InnerNode *left,
                                                                               InnerNode *right,
                                                                               ValueT val)
 {
 	std::vector<InnerNode *> left_contour;
 	std::vector<InnerNode *> right_contour;
-	std::tie(left_contour, right_contour) = DynamicSegmentTree<Node, NodeTraits, Options,
-	                                                           Tag>::InnerTree::find_lca(left, right);
+	std::tie(left_contour, right_contour) = find_lca(left, right);
 
 	// left contour
+	bool last_changed_left = false;
 	for (size_t i = 0 ; i < left_contour.size() - 1 ; ++i) {
 		InnerNode * cur = left_contour[i];
 		if ((i == 0) || (InnerTree::get_right_child(cur) != left_contour[i-1])) {
 			cur->InnerNode::agg_right += val;
+			last_changed_left = rebuild_combiners_at(cur);
 		}
 	}
 
 	// right contour
+	bool last_changed_right = false;
 	for (size_t i = 0 ; i < right_contour.size() - 1 ; ++i) {
 		InnerNode * cur = right_contour[i];
 		if ((i == 0) || (InnerTree::get_left_child(cur) != right_contour[i-1])) {
 			cur->InnerNode::agg_left += val;
+			last_changed_right = rebuild_combiners_at(cur);
 		}
+	}
+
+	if (last_changed_left || last_changed_right) {
+		InnerNode * lca = left_contour.size() > 0 ? left_contour[left_contour.size() - 1] :
+		             right_contour[right_contour.size() - 1];
+		rebuild_combiners_recursively(lca);
 	}
 }
 
-template <class Node, class NodeTraits, class Options, class Tag>
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 typename Node::AggValueT
-DynamicSegmentTree<Node, NodeTraits, Options, Tag>::query(const typename Node::KeyT & x)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::query(const typename Node::KeyT & x)
 {
 	InnerNode *cur = this->t.get_root();
 	AggValueT agg = AggValueT();
@@ -272,5 +292,120 @@ DynamicSegmentTree<Node, NodeTraits, Options, Tag>::query(const typename Node::K
 	return agg;
 }
 
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+bool
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
+				rebuild_combiners_at(InnerNode *n)
+{
+	Combiners * cmb_left = nullptr;
+	if (n->_rbt_left != nullptr) {
+		cmb_left = & n->_rbt_left->combiners;
+	}
+	Combiners * cmb_right = nullptr;
+	if (n->_rbt_right != nullptr) {
+		cmb_right = & n->_rbt_right->combiners;
+	}
+	return n->combiners.rebuild(cmb_left, n->agg_left, cmb_right, n->agg_right);
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+void
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
+				rebuild_combiners_recursively(InnerNode *n)
+{
+	Combiners * cmb_left = nullptr;
+	if (n->_rbt_left != nullptr) {
+		cmb_left = & n->_rbt_left->combiners;
+	}
+	Combiners * cmb_right = nullptr;
+	if (n->_rbt_right != nullptr) {
+		cmb_right = & n->_rbt_right->combiners;
+	}
+
+	while(n->InnerNode::combiners.rebuild(cmb_left, n->agg_left, cmb_right, n->agg_right)) {
+		if (n != nullptr) {
+			n = n->_rbt_parent;
+
+			if (n->_rbt_left != nullptr) {
+				cmb_left = & n->_rbt_left->combiners;
+			} else {
+				cmb_left = nullptr;
+			}
+			if (n->_rbt_right != nullptr) {
+				cmb_right = & n->_rbt_right->combiners;
+			} else {
+				cmb_right = nullptr;
+			}
+		} else {
+			break;
+		}
+	}
+}
+
+template<class Node>
+void
+MaxCombiner<Node>::combine_with(typename Node::AggValueT a)
+{
+	this->val = std::max(this->val, a);
+}
+
+template<class Node>
+typename MaxCombiner<Node>::ValueT
+MaxCombiner<Node>::get()
+{
+	return this->val;
+}
+
+template<class Node>
+bool
+MaxCombiner<Node>::rebuild(typename Node::AggValueT a, typename Node::AggValueT a_edge_val,
+                           typename Node::AggValueT b, typename Node::AggValueT b_edge_val)
+{
+	auto old_val = this->val;
+	this->val = std::max(a + a_edge_val, b + b_edge_val);
+	return old_val != val;
+}
+
+template<class Node>
+MaxCombiner<Node>::MaxCombiner(typename Node::AggValueT val_in)
+	: val(val_in)
+{}
+
+template<class AggValueT, class ... Combiners>
+CombinerPack<AggValueT, Combiners...>::CombinerPack(AggValueT val)
+	: data { Combiners(val) ... }
+{}
+
+template<class AggValueT, class ... Combiners>
+bool
+CombinerPack<AggValueT, Combiners...>::rebuild(CombinerPack<AggValueT, Combiners...> * a,
+                                          AggValueT a_edge_val,
+                                          CombinerPack<AggValueT, Combiners...> * b,
+                                          AggValueT b_edge_val)
+{
+	// TODO replace vector by templated std::any_of?
+	std::vector<bool> changed { std::get<Combiners>(this->data).rebuild(
+																	a != nullptr ? a->get<Combiners>() : AggValueT(),
+																	a_edge_val,
+																	b != nullptr ? b->get<Combiners>() : AggValueT())
+					                            ...};
+	return std::any_of(changed.begin(), changed.end(), [](bool b) { return b ;});
+}
+
+template<class AggValueT, class ... Combiners>
+void
+CombinerPack<AggValueT, Combiners...>::combine_with(CombinerPack<AggValueT, Combiners...> *other)
+{
+	utilities::throw_away(std::get<Combiners>(this->data).combine_with(other->get<Combiners>()) ...);
+}
+
+template<class Node, class ... Combiners>
+template<class Combiner>
+typename Combiner::ValueT
+CombinerPack<Node, Combiners...>::get()
+{
+	return std::get<Combiner>(this->data).get();
+}
 
 } // namespace ygg

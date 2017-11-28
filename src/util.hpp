@@ -24,6 +24,9 @@ public:
 	}
 };
 
+template<class ... Ts>
+void throw_away(Ts ...) {}
+
 /*
  * This is inspired by
  *
