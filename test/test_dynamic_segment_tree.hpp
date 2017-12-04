@@ -22,7 +22,9 @@ namespace test_interval_agg {
 using namespace boost::icl;
 using namespace ygg;
 
-class Node : public DynSegTreeNodeBase<int, int, int, EmptyCombinerPack<int>> {
+using Combiners = CombinerPack<int, MaxCombiner<int>>;
+
+class Node : public DynSegTreeNodeBase<int, int, int, Combiners> {
 public:
 	Node(int lower_in, int upper_in, int value_in) : lower(lower_in), upper(upper_in),
 	                                                 value(value_in) {};
@@ -51,7 +53,7 @@ public:
 };
 
 
-using IAgg = DynamicSegmentTree<Node, NodeTraits, EmptyCombinerPack<int>>;
+using IAgg = DynamicSegmentTree<Node, NodeTraits, Combiners>;
 
 TEST(IAggTest, TrivialTest)
 {

@@ -324,9 +324,9 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 	}
 
 	while(n->InnerNode::combiners.rebuild(cmb_left, n->agg_left, cmb_right, n->agg_right)) {
-		if (n != nullptr) {
-			n = n->_rbt_parent;
+		n = n->_rbt_parent;
 
+		if (n != nullptr) {
 			if (n->_rbt_left != nullptr) {
 				cmb_left = & n->_rbt_left->combiners;
 			} else {
@@ -343,32 +343,32 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 	}
 }
 
-template<class Node>
+template<class ValueT>
 void
-MaxCombiner<Node>::combine_with(typename Node::AggValueT a)
+MaxCombiner<ValueT>::combine_with(ValueT a)
 {
 	this->val = std::max(this->val, a);
 }
 
-template<class Node>
-typename MaxCombiner<Node>::ValueT
-MaxCombiner<Node>::get()
+template<class ValueT>
+ValueT
+MaxCombiner<ValueT>::get()
 {
 	return this->val;
 }
 
-template<class Node>
+template<class ValueT>
 bool
-MaxCombiner<Node>::rebuild(typename Node::AggValueT a, typename Node::AggValueT a_edge_val,
-                           typename Node::AggValueT b, typename Node::AggValueT b_edge_val)
+MaxCombiner<ValueT>::rebuild(ValueT a, ValueT a_edge_val, ValueT b, ValueT b_edge_val)
 {
 	auto old_val = this->val;
 	this->val = std::max(a + a_edge_val, b + b_edge_val);
 	return old_val != val;
 }
 
-template<class Node>
-MaxCombiner<Node>::MaxCombiner(typename Node::AggValueT val_in)
+
+template<class ValueT>
+MaxCombiner<ValueT>::MaxCombiner(ValueT val_in)
 	: val(val_in)
 {}
 
@@ -388,7 +388,8 @@ CombinerPack<AggValueT, Combiners...>::rebuild(CombinerPack<AggValueT, Combiners
 	std::vector<bool> changed { std::get<Combiners>(this->data).rebuild(
 																	a != nullptr ? a->get<Combiners>() : AggValueT(),
 																	a_edge_val,
-																	b != nullptr ? b->get<Combiners>() : AggValueT())
+																	b != nullptr ? b->get<Combiners>() : AggValueT(),
+																	b_edge_val)
 					                            ...};
 	return std::any_of(changed.begin(), changed.end(), [](bool b) { return b ;});
 }

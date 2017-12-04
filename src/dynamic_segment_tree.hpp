@@ -88,19 +88,20 @@ public:
 /// @endcond
 } // namespace internal
 
-template<class Node>
+template<class ValueType>
 class MaxCombiner {
 public:
-	using ValueT = typename Node::AggValueT;
+	using ValueT = ValueType;
 
-	explicit MaxCombiner(typename Node::AggValueT val);
-	void combine_with(typename Node::AggValueT a);
-	bool rebuild(typename Node::AggValueT a, typename Node::AggValueT a_edge_val,
-	             typename Node::AggValueT b, typename Node::AggValueT b_edge_val);
+	explicit MaxCombiner(ValueT val);
+	MaxCombiner() = default;
+
+	void combine_with(ValueT a);
+	bool rebuild(ValueT a, ValueT a_edge_val, ValueT b, ValueT b_edge_val);
 
 	ValueT get();
 private:
-	typename Node::AggValueT val;
+	ValueT val;
 };
 
 template<class AggValueT, class ... Combiners>
