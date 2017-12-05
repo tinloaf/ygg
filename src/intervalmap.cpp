@@ -604,9 +604,10 @@ IntervalMap<Node, NodeTraits, Options, Tag>::end()
 
 template <class Node, class NodeTraits, class Options, class Tag>
 typename IntervalMap<Node, NodeTraits, Options, Tag>::iterator
-IntervalMap<Node, NodeTraits, Options, Tag>::find_upper_bound_representative(typename Node::key_type point)
+IntervalMap<Node, NodeTraits, Options, Tag>::find_lower_bound_representative(
+																										typename Node::key_type point)
 {
-	typename SegList::iterator inner_iterator = this->l.iterator_to(*this->t.upper_bound(point));
+	typename SegList::iterator inner_iterator = this->l.iterator_to(*this->t.lower_bound(point));
 	return iterator(inner_iterator, & this->l);
 }
 

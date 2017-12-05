@@ -267,7 +267,7 @@ public:
 	 * @brief Upper-bounds an element
 	 *
 	 * Returns an iterator to the smallest element to which <query> compares as
-	 * "less or equal", i.e. the smallest element that is considered to not go before <query>.
+	 * "less", i.e. the smallest element that is considered go strictly after <query>.
 	 *
 	 * Note that <query> does not have to be a Node, but can be anything that can
 	 * be compared to a Node, i.e., for which
@@ -280,13 +280,38 @@ public:
    * @warning Not available for explicitly ordered trees
    *
 	 * @param query An object comparable to Node that should be upper-bounded
-	 * @returns An iterator to the first element comparing greater-or-equally to <query>, or end() if
+	 * @returns An iterator to the first element comparing "greater" to <query>, or end() if
 	 * no such element exists
 	 */
 	template<class Comparable>
 	const_iterator<false> upper_bound(const Comparable & query) const;
 	template<class Comparable>
 	iterator<false> upper_bound(const Comparable & query);
+
+	/**
+	 * @brief Lower-bounds an element
+	 *
+	 * Returns an iterator to the first element to which <query> compares as
+	 * "greater or equal", i.e. the largest element that is considered to not go before <query>.
+	 *
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default ygg::utilities::flexible_less as
+	 * Compare, that means you have to implement operator<() for both types.
+		*
+	 * @warning Not available for explicitly ordered trees
+	 *
+	 * @param query An object comparable to Node that should be lower-bounded
+	 * @returns An iterator to the first element comparing greater-or-equally to <query>, or end() if
+	 * no such element exists
+	 */
+	template<class Comparable>
+	const_iterator<false> lower_bound(const Comparable & query) const;
+	template<class Comparable>
+	iterator<false> lower_bound(const Comparable & query);
 
   /**
    * @brief Removes <node> from the tree

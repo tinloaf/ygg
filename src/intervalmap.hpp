@@ -360,7 +360,8 @@ private:
 	void repr_now_different(Segment *a, Segment *b);
 	void repr_replaced(Segment *old, Segment *replacement);
 
-	iterator find_upper_bound_representative(typename Node::key_type point);
+	// TODO FIXME is this needed?
+	iterator find_lower_bound_representative(typename Node::key_type point);
 
 	ITree t;
 	SegList l;

@@ -1290,7 +1290,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::find(const Comparable &query) c
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
 typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template iterator<false>
-RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable &query)
+RBTree<Node, NodeTraits, Options, Tag, Compare>::lower_bound(const Comparable &query)
 {
   Node *cur = this->root;
   Node *last_left = nullptr;
@@ -1311,6 +1311,41 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable &q
   }
 }
 
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+template <class Comparable>
+typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template iterator<false>
+RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable &query)
+{
+  Node *cur = this->root;
+  Node *last_left = nullptr;
+
+  while (cur != nullptr) {
+    if (this->cmp(query, *cur)) {
+      last_left = cur;
+      cur = cur->_rbt_left;
+    } else {
+      cur = cur->_rbt_right;
+    }
+  }
+
+  /*
+    while (cur != nullptr) {
+    if (this->cmp(*cur, query)) {
+      cur = cur->NB::_rbt_right;
+    } else {
+      last_left = cur;
+      cur = cur->NB::_rbt_left;
+    }
+  }
+   */
+
+  if (last_left != nullptr) {
+    return iterator<false>(last_left);
+  } else {
+    return this->end();
+  }
+}
+
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
@@ -1318,6 +1353,14 @@ typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterato
 RBTree<Node, NodeTraits, Options, Tag, Compare>::upper_bound(const Comparable &query) const
 {
   return const_iterator<false>(this->upper_bound(query));
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+template <class Comparable>
+typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template const_iterator<false>
+RBTree<Node, NodeTraits, Options, Tag, Compare>::lower_bound(const Comparable &query) const
+{
+  return const_iterator<false>(this->lower_bound(query));
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>

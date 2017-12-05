@@ -10,7 +10,7 @@
 
 using namespace ygg;
 
-#define RBTREE_TESTSIZE 5000
+#define RBTREE_TESTSIZE 2000
 
 class Node : public RBTreeNodeBase<Node, TreeOptions<>> { // No multi-nodes!
 public:
@@ -291,6 +291,34 @@ TEST(RBTreeTest, LinearNextHintedInsertionTest) {
   }
 }
 
+TEST(RBTreeTest, LowerBoundTest) {
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+
+  Node nodes[RBTREE_TESTSIZE];
+
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE ; ++i) {
+    nodes[i] = Node(2*i);
+    tree.insert(nodes[i]);
+  }
+
+  ASSERT_TRUE(tree.verify_integrity());
+
+  for (unsigned int i = 0 ; i < RBTREE_TESTSIZE - 1 ; ++i) {
+    Node query_next(2*i + 1);
+    auto it_next = tree.lower_bound(query_next);
+    ASSERT_EQ(it_next->data, nodes[i+1].data);
+
+    Node query(2*i);
+    auto it = tree.lower_bound(query);
+    // We look for "not less"
+    ASSERT_EQ(it->data, nodes[i].data);
+  }
+
+  Node query(2*(RBTREE_TESTSIZE - 1) + 1);
+  auto it = tree.lower_bound(query);
+  ASSERT_EQ(it, tree.end());
+}
+
 TEST(RBTreeTest, UpperBoundTest) {
   auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
 
@@ -310,7 +338,8 @@ TEST(RBTreeTest, UpperBoundTest) {
 
     Node query(2*i);
     auto it = tree.upper_bound(query);
-    ASSERT_EQ(it->data, nodes[i].data);
+    // We look for "truly greater"
+    ASSERT_EQ(it->data, nodes[i+1].data);
   }
 
   Node query(2*(RBTREE_TESTSIZE - 1) + 1);
