@@ -62,6 +62,76 @@ constexpr bool pack_contains() {
 	return pack_contains_forward<QueryT, std::is_same<QueryT, First>::value, Rest...>();
 }
 
+/*
+ * Generic class to contain a template parameter pack
+ */
+template<class ...> struct pack {};
+
+/*
+ * Template parameter currying
+ */
+//template<template <class ...> class In, class ... CurriedTs>
+//struct pack_curry {
+//	template<class ... Ts>
+//	using type = In<CurriedTs ..., Ts ...>;
+//};
+
+/*
+ * Removes RemoveMe... from the beginning of the parameter pack in From<InTs...>
+ */
+//template<class From, class ... RemoveMe>
+//struct pack_remove_prefix;
+//
+//template<template <class ...> class From,
+//				 class ... Ts,
+//				 class ... RemoveMe>
+//struct pack_remove_prefix<From<RemoveMe..., Ts...>, RemoveMe...>
+//{
+//	using type = pack<Ts...>;
+//};
+
+/*
+ * Removes RemoveMe... from the end of the parameter pack in From<InTs...>
+ */
+//template<class From, class ... RemoveMe>
+//struct pack_remove_postfix;
+//
+//template<template <class ...> class From,
+//                              class ... Ts,
+//                              class ... RemoveMe>
+//struct pack_remove_postfix<From<Ts..., RemoveMe...>, RemoveMe...>
+//{
+//	using type = pack<Ts...>;
+//};
+
+/*
+ * Passes around a parameter pack.
+ */
+template<class From, template <class ...> class To>
+struct pass_pack;
+
+template<template <class ...> class From,
+				template <class ...> class To,
+				                      class ... Ts>
+struct pass_pack<From<Ts...>, To>
+{
+	using type = To<Ts...>;
+};
+
+/*
+ * Cut out a number of parameters and pass from one template to another
+ */
+//template<class From,
+//				 template <class ...> class To,
+//				 class prefix_skip_pack,
+//				 class postfix_skip_pack>
+//struct pack_transfer {
+//	using type = pass_pack<pack_remove_postfix<
+//					pack_remove_prefix<From, prefix_skip_pack>::type,
+//					                   postfix_skip_pack>::type,
+//								          To>::type;
+//};
+
 } // namespace utilities
 } // namespace ygg
 

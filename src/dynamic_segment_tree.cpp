@@ -6,6 +6,7 @@
 #include "util.hpp"
 
 #include "debug.hpp"
+#include "ygg.hpp"
 
 #include <iostream>
 #include <tuple>
@@ -111,6 +112,10 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 	// TODO remove this requirement?
 	assert(NodeTraits::get_lower(n) < NodeTraits::get_upper(n));
 
+	//TreePrinter tp(this->t.get_root(), NodeNameGetter());
+	//std::cout << "\n------- Before Insertion -----------\n";
+	//tp.print();
+
 	// TODO why are we doing this every time? Should be done once in the constructor!
 
 	n.NB::start.val = NodeTraits::get_value(n);
@@ -133,7 +138,15 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 
 	this->t.insert(n.NB::end);
 
+	//std::cout << "\n------- Before Application -----------\n";
+	//tp.reset_root(this->t.get_root());
+	//tp.print();
+
 	this->apply_interval(n);
+
+	//std::cout << "\n------- After Insertion -----------\n";
+	//tp.reset_root(this->t.get_root());
+	//tp.print();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
@@ -239,6 +252,8 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
                                                                               InnerNode *right,
                                                                               ValueT val)
 {
+	//std::cout << "======= Applying between " << left->point << " and " << right->point << " "
+	//				"==========\n\n";
 	std::vector<InnerNode *> left_contour;
 	std::vector<InnerNode *> right_contour;
 	std::tie(left_contour, right_contour) = find_lca(left, right);
@@ -248,8 +263,14 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
 	for (size_t i = 0 ; i < left_contour.size() - 1 ; ++i) {
 		InnerNode * cur = left_contour[i];
 		if ((i == 0) || (InnerTree::get_right_child(cur) != left_contour[i-1])) {
+			//std::cout << "Modifying left contour at " << cur->point << ": ";
 			cur->InnerNode::agg_right += val;
-			last_changed_left = rebuild_combiners_at(cur);
+			//std::cout << " agg_right now " << cur->InnerNode::agg_right << " ";
+		}
+		//std::cout << "  Rebuilding combiner at " << cur->point;
+		last_changed_left = rebuild_combiners_at(cur);
+		if (last_changed_left) {
+			//std::cout << " -> Combiner changed!\n";
 		}
 	}
 
@@ -258,14 +279,21 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
 	for (size_t i = 0 ; i < right_contour.size() - 1 ; ++i) {
 		InnerNode * cur = right_contour[i];
 		if ((i == 0) || (InnerTree::get_left_child(cur) != right_contour[i-1])) {
+			//std::cout << "Modifying right contour at " << cur->point << ": ";
 			cur->InnerNode::agg_left += val;
-			last_changed_right = rebuild_combiners_at(cur);
+			//std::cout << " agg_left now " << cur->InnerNode::agg_left << " ";
+		}
+		//std::cout << "  Rebuilding combiner at " << cur->point;
+		last_changed_right = rebuild_combiners_at(cur);
+		if (last_changed_right) {
+			//std::cout << " -> Combiner changed!\n";
 		}
 	}
 
 	if (last_changed_left || last_changed_right) {
 		InnerNode * lca = left_contour.size() > 0 ? left_contour[left_contour.size() - 1] :
 		             right_contour[right_contour.size() - 1];
+		//std::cout << "## Rebuilding recursively at " << lca->point << "\n";
 		rebuild_combiners_recursively(lca);
 	}
 }
@@ -407,6 +435,19 @@ typename Combiner::ValueT
 CombinerPack<Node, Combiners...>::get()
 {
 	return std::get<Combiner>(this->data).get();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+template<class Combiner>
+typename Combiner::ValueT
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined()
+const
+{
+	if (this->t.get_root() == nullptr) {
+		return typename Combiner::ValueT();
+	}
+
+	return this->t.get_root()->combiners.template get<Combiner>();
 }
 
 } // namespace ygg

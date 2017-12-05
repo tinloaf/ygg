@@ -8,6 +8,8 @@
 #include "rbtree.hpp"
 #include "options.hpp"
 #include "size_holder.hpp"
+#include "util.hpp"
+#include "debug.hpp"
 
 namespace ygg {
 
@@ -72,7 +74,7 @@ public:
 };
 
 // TODO Debug
-template<class InnerNode>
+template<class InnerNode, class ... Combiners>
 class InnerNodeNameGetter {
 public:
 	InnerNodeNameGetter() {};
@@ -81,7 +83,13 @@ public:
 		return std::string("[") + std::to_string(node->point) + std::string("]")
 		       + std::string("@") + std::to_string((unsigned long)node)
 						+ std::string("  ╭:") + std::to_string(node->agg_left) + std::string("  ╮:")
-						+ std::to_string(node->agg_right);
+						+ std::to_string(node->agg_right) + std::string("  {")
+						+ std::string {
+								Combiners::get_name() + std::string(": ")
+								+ std::to_string(node->combiners.template get<Combiners>()) + std::string(" ")
+								...
+							}
+						+ std::string("}");
 	}
 };
 
@@ -100,6 +108,11 @@ public:
 	bool rebuild(ValueT a, ValueT a_edge_val, ValueT b, ValueT b_edge_val);
 
 	ValueT get();
+
+	// TODO DEBUG
+	static std::string get_name() {
+		return "MaxCombiner";
+	}
 private:
 	ValueT val;
 };
@@ -120,6 +133,7 @@ public:
 	template<class Combiner>
 	typename Combiner::ValueT get();
 
+	using pack = utilities::pack<Combiners ...>;
 private:
 	std::tuple<Combiners ...> data;
 };
@@ -299,6 +313,21 @@ public:
 	 * @return 		The aggregated value for all intervals containing x
 	 */
 	AggValueT query(const typename Node::KeyT & x);
+
+	template<class Combiner>
+	typename Combiner::ValueT get_combined() const;
+
+	/*
+	 * DEBUGGING
+	 */
+private:
+	// TODO build a generic function for this
+	template<class ... Ts>
+	using NodeNameGetterCurried = dyn_segtree_internal::InnerNodeNameGetter<InnerNode, Ts ...>;
+	using NodeNameGetter = typename utilities::pass_pack<typename Combiners::pack,
+	                                                     NodeNameGetterCurried>::type;
+public:
+	using TreePrinter = debug::TreePrinter<InnerNode, NodeNameGetter>;
 
 private:
 	void apply_interval(Node & n);

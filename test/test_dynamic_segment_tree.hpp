@@ -14,7 +14,7 @@
 
 #include "../src/ygg.hpp"
 
-#define IAGG_TESTSIZE 2000
+#define IAGG_TESTSIZE 1000
 #define IAGG_DELETION_TESTSIZE 500
 #define IAGG_DELETION_ITERATIONS 100
 
@@ -22,7 +22,8 @@ namespace test_interval_agg {
 using namespace boost::icl;
 using namespace ygg;
 
-using Combiners = CombinerPack<int, MaxCombiner<int>>;
+using MCombiner = MaxCombiner<int>;
+using Combiners = CombinerPack<int, MCombiner>;
 
 class Node : public DynSegTreeNodeBase<int, int, int, Combiners> {
 public:
@@ -64,6 +65,8 @@ TEST(IAggTest, TrivialTest)
 
 	int agg_val = agg.query(3);
 	ASSERT_EQ(agg_val, 10);
+	int combined = agg.get_combined<MCombiner>();
+	ASSERT_EQ(combined, 10);
 }
 
 TEST(IAggTest, NestingTest)
@@ -85,6 +88,9 @@ TEST(IAggTest, NestingTest)
 		auto val = agg.query(i);
 		ASSERT_EQ(val, i + 1);
 	}
+
+	int combined = agg.get_combined<MCombiner>();
+	ASSERT_EQ(combined, IAGG_TESTSIZE);
 }
 
 TEST(IAggTest, OverlappingTest)
@@ -101,6 +107,9 @@ TEST(IAggTest, OverlappingTest)
 	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
 		agg.insert(n[i]);
 	}
+
+	int combined = agg.get_combined<MCombiner>();
+	ASSERT_EQ(combined, IAGG_TESTSIZE);
 
 	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
 		auto val = agg.query(i);
@@ -171,6 +180,9 @@ TEST(IAggTest, DeletionTest)
 			auto val = agg.query(i + IAGG_DELETION_TESTSIZE);
 			ASSERT_EQ(val, IAGG_DELETION_TESTSIZE - i - 1);
 		}
+
+		int combined = agg.get_combined<MCombiner>();
+		ASSERT_EQ(combined, IAGG_DELETION_TESTSIZE);
 	}
 }
 
@@ -330,6 +342,8 @@ TEST(IAggTest, ComprehensiveTest)
 		reference += std::make_pair(interval<int>::right_open(node.lower, node.upper), node.value);
 	}
 
+	int maxval = 0;
+
 	auto it = reference.begin();
 	while (it != reference.end()) {
 		int lower = it->first.lower();
@@ -339,10 +353,14 @@ TEST(IAggTest, ComprehensiveTest)
 		for (int i = lower ; i < upper ; ++i) {
 			int result = agg.query(i);
 			ASSERT_EQ(val, result);
+			maxval = std::max(result, maxval);
 		}
 
 		++it;
 	}
+
+	int combined = agg.get_combined<MCombiner>();
+	ASSERT_EQ(combined, maxval);
 }
 
 }
