@@ -104,7 +104,8 @@ public:
 	explicit MaxCombiner(ValueT val);
 	MaxCombiner() = default;
 
-	void combine_with(ValueT a);
+	// TODO the bool is only returned for sake of expansion! Fix that!
+	bool combine_with(ValueT a, ValueT edge_val);
 	bool rebuild(ValueT a, ValueT a_edge_val, ValueT b, ValueT b_edge_val);
 
 	ValueT get();
@@ -128,7 +129,8 @@ public:
 	             CombinerPack<AggValueT, Combiners...> * b,
 	             AggValueT b_edge_val);
 
-	void combine_with(CombinerPack<AggValueT, Combiners...> * other);
+	// TODO the bool is only returned for sake of expansion! Fix that!
+	bool combine_with(CombinerPack<AggValueT, Combiners...> * other, AggValueT edge_val);
 
 	template<class Combiner>
 	typename Combiner::ValueT get();
@@ -316,6 +318,10 @@ public:
 
 	template<class Combiner>
 	typename Combiner::ValueT get_combined() const;
+
+	template<class Combiner>
+	typename Combiner::ValueT get_combined(const typename Node::KeyT & lower,
+	                                       const typename Node::KeyT & upper) const;
 
 	/*
 	 * DEBUGGING

@@ -322,6 +322,85 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::query(const typen
 
 
 template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+template<class Combiner>
+typename Combiner::ValueT
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(const typename Node::KeyT & lower,
+                                                                            const typename Node::KeyT & upper) const
+{
+	TreePrinter tp(this->t.get_root(), NodeNameGetter());
+	std::cout << "\n------- Query Tree -----------\n";
+	tp.print();
+
+	dyn_segtree_internal::Compare<InnerNode> cmp;
+
+	InnerNode *lower_node;
+	InnerNode *cur = this->t.get_root();
+	while (cur != nullptr) {
+		lower_node = cur;
+		if (cmp(lower, *cur)) {
+			cur = InnerTree::get_left_child(cur);
+		} else {
+			cur = InnerTree::get_right_child(cur);
+		}
+	}
+
+	cur = this->t.get_root();
+	InnerNode *upper_node;
+	while (cur != nullptr) {
+		upper_node = cur;
+		if (!cmp(upper, *cur)) {
+			cur = InnerTree::get_right_child(cur);
+		} else {
+			cur = InnerTree::get_left_child(cur);
+		}
+	}
+
+	std::cout << "Query Nodes: " << lower_node->point << " -> " << upper_node->point << "\n";
+
+	std::vector<InnerNode *> left_contour;
+	std::vector<InnerNode *> right_contour;
+	std::tie(left_contour, right_contour) = this->t.find_lca(lower_node, upper_node);
+
+	std::cout << "Left Countour: ";
+	for (auto node : left_contour) {
+		std::cout << node->point << ", ";
+	}
+	// TODO inefficient: We don't need to build all the combiners!
+	Combiners dummy_cp;
+	Combiners cp;
+	for (size_t i = 0 ; i < left_contour.size() - 1 ; ++i) {
+		InnerNode * cur = left_contour[i];
+		InnerNode * right_child = InnerTree::get_right_child(cur);
+		if ((i == 0) || (right_child != left_contour[i-1])) {
+			if (right_child != nullptr) {
+				cp.combine_with(&right_child->combiners, cur->agg_right);
+			} else {
+				cp.combine_with(&dummy_cp, cur->agg_right);
+			}
+		}
+	}
+
+	std::cout << "Right Countour: ";
+	for (auto node : left_contour) {
+		std::cout << node->point << ", ";
+	}
+	for (size_t i = 0 ; i < right_contour.size() - 1 ; ++i) {
+		InnerNode * cur = right_contour[i];
+		InnerNode * left_child = InnerTree::get_left_child(cur);
+		if ((i == 0) || (left_child != right_contour[i-1])) {
+			if (left_child != nullptr) {
+				cp.combine_with(&left_child->combiners, cur->agg_left);
+			} else {
+				cp.combine_with(&dummy_cp, cur->agg_left);
+			}
+		}
+	}
+
+	return cp.template get<Combiner>();
+}
+
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 bool
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 				rebuild_combiners_at(InnerNode *n)
@@ -372,10 +451,11 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 }
 
 template<class ValueT>
-void
-MaxCombiner<ValueT>::combine_with(ValueT a)
+bool
+MaxCombiner<ValueT>::combine_with(ValueT a, ValueT edge_val)
 {
-	this->val = std::max(this->val, a);
+	this->val = std::max(this->val, a + edge_val);
+	return false;
 }
 
 template<class ValueT>
@@ -423,10 +503,13 @@ CombinerPack<AggValueT, Combiners...>::rebuild(CombinerPack<AggValueT, Combiners
 }
 
 template<class AggValueT, class ... Combiners>
-void
-CombinerPack<AggValueT, Combiners...>::combine_with(CombinerPack<AggValueT, Combiners...> *other)
+bool
+CombinerPack<AggValueT, Combiners...>::combine_with(CombinerPack<AggValueT, Combiners...> *other,
+																			              AggValueT edge_val)
 {
-	utilities::throw_away(std::get<Combiners>(this->data).combine_with(other->get<Combiners>()) ...);
+	utilities::throw_away(std::get<Combiners>(this->data).combine_with(other->get<Combiners>(),
+	                                                                   edge_val) ...);
+	return false;
 }
 
 template<class Node, class ... Combiners>

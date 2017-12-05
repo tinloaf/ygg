@@ -67,6 +67,9 @@ TEST(IAggTest, TrivialTest)
 	ASSERT_EQ(agg_val, 10);
 	int combined = agg.get_combined<MCombiner>();
 	ASSERT_EQ(combined, 10);
+
+	int combined_range = agg.get_combined<MCombiner>(3,4);
+	ASSERT_EQ(combined_range, 10);
 }
 
 TEST(IAggTest, NestingTest)
