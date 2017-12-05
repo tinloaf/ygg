@@ -115,14 +115,14 @@ IntervalMap<Node, NodeTraits, Options, Tag>::insert_segment(Segment *seg)
 	//std::cout << "   Inserting " << seg << "\n";
 	key_type & point = seg->point;
 
-	auto upper_bound_it = this->t.upper_bound(point);
-	Segment * ub_head = nullptr;
-	if (upper_bound_it != this->t.end()) {
-		ub_head = &*upper_bound_it;
+	auto lower_bound_it = this->t.lower_bound(point);
+	Segment * lb_head = nullptr;
+	if (lower_bound_it != this->t.end()) {
+		lb_head = &*lower_bound_it;
 	}
-	auto head_it = this->t.iterator_to(*ub_head);
+	auto head_it = this->t.iterator_to(*lb_head);
 
-	//std::cout << "     Uppper-Bounded Head: " << &*ub_head << "\n";
+	//std::cout << "     Uppper-Bounded Head: " << &*lb_head << "\n";
 
 	this->t.insert(*seg);
 
@@ -131,8 +131,8 @@ IntervalMap<Node, NodeTraits, Options, Tag>::insert_segment(Segment *seg)
 	/*
 	 * Insert begin segment into the segment list
 	 */
-	if (ub_head != nullptr) {
-		if (ub_head->point > point) {
+	if (lb_head != nullptr) {
+		if (lb_head->point > point) {
 			//std::cout << "     Not at the same point!\n";
 			/* We are not at the same point as the upper-bounded header; it is truly after us.
 			 * This means two things:
@@ -141,7 +141,7 @@ IntervalMap<Node, NodeTraits, Options, Tag>::insert_segment(Segment *seg)
 			 *    - If it has no predecessor, we are the first in the list and initialize to 0
 			 * - We must insert ourselves as new header before the upper-bounded head
 			 */
-			this->l.insert(ub_head, seg);
+			this->l.insert(lb_head, seg);
 			NodeTraits::on_length_changed(*seg);
 
 			auto list_it = this->l.iterator_to(*seg);
@@ -166,27 +166,27 @@ IntervalMap<Node, NodeTraits, Options, Tag>::insert_segment(Segment *seg)
 			 * - can take the value of the upper-bounded head.
 			 * - must replace the upper-bounded head iff we were inserted directly before it in the tree
 			 */
-			seg->aggregate = upper_bound_it->aggregate;
+			seg->aggregate = lower_bound_it->aggregate;
 
 			auto seg_it = this->t.iterator_to(*seg);
 			if (++seg_it == head_it) {
 				//std::cout << "     Replacing the head!\n";
 				// we were inserted directly before the header and have to replace it!
-				this->l.insert(ub_head, seg);
-				this->l.remove(ub_head);
+				this->l.insert(lb_head, seg);
+				this->l.remove(lb_head);
 
 				// TODO FIXME these should be called with representatives!
-				NodeTraits::on_length_changed(*ub_head);
+				NodeTraits::on_length_changed(*lb_head);
 				NodeTraits::on_length_changed(*seg);
 
-				seg->repr = ub_head->repr;
-				this->repr_replaced(ub_head, seg);
+				seg->repr = lb_head->repr;
+				this->repr_replaced(lb_head, seg);
 
 				return seg;
 			} else {
 				// the upper-bounded header is our header!
-				seg->repr = ub_head->repr;
-				return ub_head;
+				seg->repr = lb_head->repr;
+				return lb_head;
 			}
 		}
 	} else {
