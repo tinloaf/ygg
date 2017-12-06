@@ -14,7 +14,7 @@
 
 #include "../src/ygg.hpp"
 
-#define IAGG_TESTSIZE 1000
+#define IAGG_TESTSIZE 2000
 #define IAGG_DELETION_TESTSIZE 500
 #define IAGG_DELETION_ITERATIONS 100
 
@@ -70,6 +70,17 @@ TEST(IAggTest, TrivialTest)
 
 	int combined_range = agg.get_combined<MCombiner>(3,4);
 	ASSERT_EQ(combined_range, 10);
+
+	combined_range = agg.get_combined<MCombiner>(0,1);
+	ASSERT_EQ(combined_range, 0);
+	combined_range = agg.get_combined<MCombiner>(0,3);
+	ASSERT_EQ(combined_range, 10);
+	combined_range = agg.get_combined<MCombiner>(2,5);
+	ASSERT_EQ(combined_range, 10);
+	combined_range = agg.get_combined<MCombiner>(2,7);
+	ASSERT_EQ(combined_range, 10);
+	combined_range = agg.get_combined<MCombiner>(8,10);
+	ASSERT_EQ(combined_range, 0);
 }
 
 TEST(IAggTest, NestingTest)
@@ -94,6 +105,11 @@ TEST(IAggTest, NestingTest)
 
 	int combined = agg.get_combined<MCombiner>();
 	ASSERT_EQ(combined, IAGG_TESTSIZE);
+
+	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+		int combined_range = agg.get_combined<MCombiner>(0,i+1);
+		ASSERT_EQ(combined_range, i+1);
+	}
 }
 
 TEST(IAggTest, OverlappingTest)

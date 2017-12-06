@@ -113,7 +113,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 	assert(NodeTraits::get_lower(n) < NodeTraits::get_upper(n));
 
 	//TreePrinter tp(this->t.get_root(), NodeNameGetter());
-	//std::cout << "\n------- Before Insertion -----------\n";
+	////std::cout << "\n------- Before Insertion -----------\n";
 	//tp.print();
 
 	// TODO why are we doing this every time? Should be done once in the constructor!
@@ -138,13 +138,13 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 
 	this->t.insert(n.NB::end);
 
-	//std::cout << "\n------- Before Application -----------\n";
+	////std::cout << "\n------- Before Application -----------\n";
 	//tp.reset_root(this->t.get_root());
 	//tp.print();
 
 	this->apply_interval(n);
 
-	//std::cout << "\n------- After Insertion -----------\n";
+	////std::cout << "\n------- After Insertion -----------\n";
 	//tp.reset_root(this->t.get_root());
 	//tp.print();
 }
@@ -252,7 +252,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
                                                                               InnerNode *right,
                                                                               ValueT val)
 {
-	//std::cout << "======= Applying between " << left->point << " and " << right->point << " "
+	////std::cout << "======= Applying between " << left->point << " and " << right->point << " "
 	//				"==========\n\n";
 	std::vector<InnerNode *> left_contour;
 	std::vector<InnerNode *> right_contour;
@@ -263,14 +263,14 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
 	for (size_t i = 0 ; i < left_contour.size() - 1 ; ++i) {
 		InnerNode * cur = left_contour[i];
 		if ((i == 0) || (InnerTree::get_right_child(cur) != left_contour[i-1])) {
-			//std::cout << "Modifying left contour at " << cur->point << ": ";
+			////std::cout << "Modifying left contour at " << cur->point << ": ";
 			cur->InnerNode::agg_right += val;
-			//std::cout << " agg_right now " << cur->InnerNode::agg_right << " ";
+			////std::cout << " agg_right now " << cur->InnerNode::agg_right << " ";
 		}
-		//std::cout << "  Rebuilding combiner at " << cur->point;
+		////std::cout << "  Rebuilding combiner at " << cur->point;
 		last_changed_left = rebuild_combiners_at(cur);
 		if (last_changed_left) {
-			//std::cout << " -> Combiner changed!\n";
+			////std::cout << " -> Combiner changed!\n";
 		}
 	}
 
@@ -279,21 +279,21 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
 	for (size_t i = 0 ; i < right_contour.size() - 1 ; ++i) {
 		InnerNode * cur = right_contour[i];
 		if ((i == 0) || (InnerTree::get_left_child(cur) != right_contour[i-1])) {
-			//std::cout << "Modifying right contour at " << cur->point << ": ";
+			////std::cout << "Modifying right contour at " << cur->point << ": ";
 			cur->InnerNode::agg_left += val;
-			//std::cout << " agg_left now " << cur->InnerNode::agg_left << " ";
+			////std::cout << " agg_left now " << cur->InnerNode::agg_left << " ";
 		}
-		//std::cout << "  Rebuilding combiner at " << cur->point;
+		////std::cout << "  Rebuilding combiner at " << cur->point;
 		last_changed_right = rebuild_combiners_at(cur);
 		if (last_changed_right) {
-			//std::cout << " -> Combiner changed!\n";
+			////std::cout << " -> Combiner changed!\n";
 		}
 	}
 
 	if (last_changed_left || last_changed_right) {
 		InnerNode * lca = left_contour.size() > 0 ? left_contour[left_contour.size() - 1] :
 		             right_contour[right_contour.size() - 1];
-		//std::cout << "## Rebuilding recursively at " << lca->point << "\n";
+		////std::cout << "## Rebuilding recursively at " << lca->point << "\n";
 		rebuild_combiners_recursively(lca);
 	}
 }
@@ -327,74 +327,135 @@ typename Combiner::ValueT
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(const typename Node::KeyT & lower,
                                                                             const typename Node::KeyT & upper) const
 {
-	TreePrinter tp(this->t.get_root(), NodeNameGetter());
-	std::cout << "\n------- Query Tree -----------\n";
-	tp.print();
+	//std::cout << "\n======= Query: Low " << lower << " / High " << upper << "============\n";
+
+	//TreePrinter tp(this->t.get_root(), NodeNameGetter());
+	//std::cout << "\n------- Query Tree -----------\n";
+	//tp.print();
 
 	dyn_segtree_internal::Compare<InnerNode> cmp;
 
-	InnerNode *lower_node;
-	InnerNode *cur = this->t.get_root();
-	while (cur != nullptr) {
-		lower_node = cur;
-		if (cmp(lower, *cur)) {
-			cur = InnerTree::get_left_child(cur);
-		} else {
-			cur = InnerTree::get_right_child(cur);
+	auto lower_node_it = this->t.lower_bound(lower);
+	InnerNode * lower_node;
+
+	if (lower_node_it == this->t.end()) {
+		auto lower_node_rit = this->t.rbegin();
+		lower_node = const_cast<InnerNode  *>(&*lower_node_rit);
+	} else {
+		if (cmp(lower, *lower_node_it)) {
+			// we must go one further back
+			if (lower_node_it != this->t.begin()) {
+				lower_node_it--;
+			}
 		}
+		lower_node = const_cast<InnerNode *>(&*lower_node_it);
 	}
 
-	cur = this->t.get_root();
-	InnerNode *upper_node;
-	while (cur != nullptr) {
-		upper_node = cur;
-		if (!cmp(upper, *cur)) {
-			cur = InnerTree::get_right_child(cur);
-		} else {
-			cur = InnerTree::get_left_child(cur);
+	auto upper_node_it = this->t.upper_bound(upper);
+	InnerNode * upper_node;
+	if (upper_node_it == this->t.end()) {
+		auto upper_node_rit = this->t.rbegin();
+		upper_node = const_cast<InnerNode  *>(&*upper_node_rit);
+	} else {
+		if (upper_node_it != this->t.begin()) {
+			auto next_smaller = upper_node_it - 1;
+			if (!cmp(*next_smaller, upper)) {
+				// the next smaller has exactly the value of upper!
+				assert(next_smaller->point == upper);
+				upper_node_it = next_smaller;
+			}
 		}
+
+		upper_node = const_cast<InnerNode *>(&*upper_node_it);
 	}
 
-	std::cout << "Query Nodes: " << lower_node->point << " -> " << upper_node->point << "\n";
+	//std::cout << "Query Nodes: " << lower_node->point << " -> " << upper_node->point << "\n";
 
 	std::vector<InnerNode *> left_contour;
 	std::vector<InnerNode *> right_contour;
 	std::tie(left_contour, right_contour) = this->t.find_lca(lower_node, upper_node);
 
-	std::cout << "Left Countour: ";
-	for (auto node : left_contour) {
-		std::cout << node->point << ", ";
-	}
+	//std::cout << "Left Contour: ";
+	//for (auto node : left_contour) {
+		//std::cout << node->point << ", ";
+	//}
 	// TODO inefficient: We don't need to build all the combiners!
 	Combiners dummy_cp;
 	Combiners cp;
-	for (size_t i = 0 ; i < left_contour.size() - 1 ; ++i) {
-		InnerNode * cur = left_contour[i];
-		InnerNode * right_child = InnerTree::get_right_child(cur);
-		if ((i == 0) || (right_child != left_contour[i-1])) {
-			if (right_child != nullptr) {
-				cp.combine_with(&right_child->combiners, cur->agg_right);
-			} else {
-				cp.combine_with(&dummy_cp, cur->agg_right);
+	if (left_contour.size() > 1) {
+		for (size_t i = 0; i < left_contour.size(); ++i) {
+			InnerNode *cur = left_contour[i];
+			//std::cout << "\nHandling left: " << cur->point;
+			InnerNode *right_child = InnerTree::get_right_child(cur);
+
+			// Factor in the edge we just traversed up
+			if (i > 0) {
+				// TODO inefficient!
+				Combiners new_cp;
+				if (right_child == left_contour[i - 1]) {
+					// we traversed the right edge
+					new_cp.combine_with(&cp, cur->agg_right);
+				} else {
+					// we traversed the left edge
+					new_cp.combine_with(&cp, cur->agg_left);
+				}
+				cp = new_cp;
+			}
+
+			// Combine with descending across the contour, if we traversed a left edge
+			if ((i != left_contour.size() - 1) && ((i == 0) || (right_child != left_contour[i - 1]))) {
+				if (right_child != nullptr) {
+					//std::cout << " Case A\n";
+					cp.combine_with(&right_child->combiners, cur->agg_right);
+				} else {
+					//std::cout << " Case B\n";
+					cp.combine_with(&dummy_cp, cur->agg_right);
+				}
 			}
 		}
 	}
 
-	std::cout << "Right Countour: ";
-	for (auto node : left_contour) {
-		std::cout << node->point << ", ";
-	}
-	for (size_t i = 0 ; i < right_contour.size() - 1 ; ++i) {
-		InnerNode * cur = right_contour[i];
-		InnerNode * left_child = InnerTree::get_left_child(cur);
-		if ((i == 0) || (left_child != right_contour[i-1])) {
-			if (left_child != nullptr) {
-				cp.combine_with(&left_child->combiners, cur->agg_left);
-			} else {
-				cp.combine_with(&dummy_cp, cur->agg_left);
+	// TODO is this necessary?
+	Combiners left_cp = cp;
+	cp = Combiners();
+
+	// Traverse the last left-edge into the root
+
+	//std::cout << "Right Countour: ";
+	//for (auto node : right_contour) {
+		//std::cout << node->point << ", ";
+	//}
+	if (right_contour.size() > 1) {
+		for (size_t i = 0; i < right_contour.size(); ++i) {
+			InnerNode *cur = right_contour[i];
+			InnerNode *left_child = InnerTree::get_left_child(cur);
+
+			// Factor in the edge we just traversed up
+			if (i > 0) {
+				// TODO inefficient!
+				Combiners new_cp;
+				if (left_child == right_contour[i - 1]) {
+					// we traversed the left edge
+					new_cp.combine_with(&cp, cur->agg_left);
+				} else {
+					// we traversed the right edge
+					new_cp.combine_with(&cp, cur->agg_right);
+				}
+				cp = new_cp;
+			}
+
+			// Combine with descending across the contour, if we traversed a right edge
+			if ((i != right_contour.size() - 1) && ((i == 0) || (left_child != right_contour[i - 1]))) {
+				if (left_child != nullptr) {
+					cp.combine_with(&left_child->combiners, cur->agg_left);
+				} else {
+					cp.combine_with(&dummy_cp, cur->agg_left);
+				}
 			}
 		}
 	}
+
+	cp.combine_with(&left_cp, typename Node::AggValueT());
 
 	return cp.template get<Combiner>();
 }

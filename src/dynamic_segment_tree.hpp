@@ -69,7 +69,7 @@ public:
 
 	bool operator()(const InnerNode & lhs, typename InnerNode::KeyT rhs) const
 	{
-		return lhs.point <= rhs;
+		return lhs.point < rhs;
 	}
 };
 
