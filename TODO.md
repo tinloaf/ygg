@@ -18,3 +18,4 @@
 * rename Segment -> InnerNode in interval map
 * replace accessing _rbt_* in IntervalTree
 * More testing for the range-combiners
+* Add combiner for collecting intervals
