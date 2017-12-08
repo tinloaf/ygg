@@ -560,7 +560,7 @@ CombinerPack<AggValueT, Combiners...>::rebuild(CombinerPack<AggValueT, Combiners
 																	b != nullptr ? b->get<Combiners>() : AggValueT(),
 																	b_edge_val)
 					                            ...};
-	return std::any_of(changed.begin(), changed.end(), [](bool b) { return b ;});
+	return std::any_of(changed.begin(), changed.end(), [](bool changed_flag) { return changed_flag;});
 }
 
 template<class AggValueT, class ... Combiners>

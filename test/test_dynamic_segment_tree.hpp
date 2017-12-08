@@ -244,7 +244,7 @@ TEST(IAggTest, NestingTestInsertionOverlappingDeletionTest)
 	}
 
 	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
-		auto val = agg.query(i);
+		val = agg.query(i);
 		ASSERT_EQ(val, i + 1);
 	}
 }

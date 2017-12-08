@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 	Node nodes[5];
 
 	// Initialize the nodes with some values
-	for (size_t i = 0 ; i < 5 ; ++i) {
+	for (int i = 0 ; i < 5 ; ++i) {
 		nodes[i].lower = i;
 		nodes[i].upper = i + 10;
 		nodes[i].value = std::string("The interval is [") + std::to_string(i) + std::string("]");
