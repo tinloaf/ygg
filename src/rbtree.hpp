@@ -34,10 +34,10 @@ namespace ygg {
 template<class Node>
 class DefaultFindCallbacks {
 public:
-	void init_root(Node * root) {};
-	void descend_left(Node * child) {};
-	void descend_right(Node * child) {};
-	void found(Node * node) {};
+	void init_root(Node * root) { (void)root; };
+	void descend_left(Node * child) { (void)child; };
+	void descend_right(Node * child) { (void)child; };
+	void found(Node * node) { (void)node; };
 	void not_found() {};
 
 	static DefaultFindCallbacks<Node> dummy;
