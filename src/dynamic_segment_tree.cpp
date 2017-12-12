@@ -532,7 +532,10 @@ MaxCombiner<ValueT>::rebuild(ValueT a, ValueT a_edge_val, ValueT b, ValueT b_edg
 {
 	auto old_val = this->val;
 	this->val = std::max(a + a_edge_val, b + b_edge_val);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 	return old_val != val;
+#pragma GCC diagnostic pop
 }
 
 
