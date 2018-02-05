@@ -190,6 +190,13 @@ public:
 	 */
 	bool empty() const;
 
+	/**
+	 * @brief Removes all elements from this list
+	 *
+	 * This method runs in O(1).
+	 */
+	void clear();
+
 private:
 	Node * head;
 	Node * tail;

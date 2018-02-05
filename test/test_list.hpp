@@ -45,9 +45,7 @@ TEST(ListTest, SimpleTest) {
 	ASSERT_EQ(it, l.end());
 	ASSERT_EQ(l.size(), 3);
 
-	l.remove(&n1);
-	l.remove(&n2);
-	l.remove(&n3);
+	l.clear();
 
 	ASSERT_TRUE(l.empty());
 }
@@ -83,6 +81,10 @@ TEST(ListTest, ComprehensiveTest) {
 	for (auto & n : l) {
 		ASSERT_EQ(n.data, i++);
 	}
+
+	l.clear();
+	ASSERT_EQ(l.size(), 0);
+	ASSERT_TRUE(l.empty());
 }
 
 #endif //YGG_TEST_LIST_HPP

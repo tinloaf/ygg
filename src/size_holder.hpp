@@ -25,6 +25,10 @@ public:
 		return this->n;
 	}
 
+	void set(size_t i) {
+		this->n = i;
+	}
+
 private:
 	size_t n;
 };
@@ -37,6 +41,10 @@ public:
 	}
 
 	void reduce(size_t i) {
+		(void)i;
+	}
+
+	void set(size_t i) {
 		(void)i;
 	}
 private:

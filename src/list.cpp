@@ -282,4 +282,14 @@ List<Node, Options, Tag>::empty() const
 	return this->head == nullptr;
 }
 
+template<class Node, class Options, class Tag>
+void
+List<Node, Options, Tag>::clear()
+{
+	this->head = nullptr;
+	this->tail = nullptr;
+	this->s.set(0);
+}
+
+
 } // namespace ygg
