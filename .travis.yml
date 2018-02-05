@@ -8,13 +8,14 @@ addons:
             - g++-5
             - gcc-5
             - libboost1.54-all-dev
-	    - cmake
 
 
 # before_install:
 #     - eval "${MATRIX_EVAL}"
 
 sudo: required
+dist: trusty
+group: deprecated-2017Q4
 
 before_install:
   - sudo apt-get -qq update
