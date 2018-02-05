@@ -59,7 +59,7 @@ TEST(RBTreeTest, TrivialInsertionTest) {
   Node n;
   n.data = 0;
   tree.insert(n);
-
+	ASSERT_FALSE(tree.empty());
   ASSERT_TRUE(tree.verify_integrity());
 }
 
@@ -76,6 +76,10 @@ TEST(RBTreeTest, TrivialSizeTest) {
 
   ASSERT_EQ(tree.size(), 1);
   ASSERT_FALSE(tree.empty());
+
+	tree.clear();
+	ASSERT_EQ(tree.size(), 0);
+	ASSERT_TRUE(tree.empty());
 }
 
 TEST(RBTreeTest, RandomInsertionTest) {

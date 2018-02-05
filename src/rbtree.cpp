@@ -268,6 +268,7 @@ void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::clear()
 {
   this->root = nullptr;
+  this->s.set(0);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
