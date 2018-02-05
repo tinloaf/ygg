@@ -27,9 +27,13 @@ TEST(ListTest, SimpleTest) {
 
 	MyList l;
 
+	ASSERT_TRUE(l.empty());
+
 	l.insert(nullptr, &n3);
 	l.insert(&n3, &n1);
 	l.insert(&n3, &n2);
+
+	ASSERT_FALSE(l.empty());
 
 	auto it = l.begin();
 	ASSERT_EQ(it->data, 1);
@@ -40,6 +44,12 @@ TEST(ListTest, SimpleTest) {
 	++it;
 	ASSERT_EQ(it, l.end());
 	ASSERT_EQ(l.size(), 3);
+
+	l.remove(&n1);
+	l.remove(&n2);
+	l.remove(&n3);
+
+	ASSERT_TRUE(l.empty());
 }
 
 TEST(ListTest, ComprehensiveTest) {

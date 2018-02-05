@@ -550,6 +550,13 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::size() const
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+bool
+RBTree<Node, NodeTraits, Options, Tag, Compare>::empty() const
+{
+	return this->root == nullptr;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node *n1, Node *n2, bool swap_colors)
 {

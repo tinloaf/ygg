@@ -181,6 +181,15 @@ public:
 	 */
 	size_t size() const;
 
+	/**
+	 * @brief Returns whether the list is empty
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @return true if the list is empty, false otherwise
+	 */
+	bool empty() const;
+
 private:
 	Node * head;
 	Node * tail;

@@ -40,8 +40,10 @@ public:
 TEST(ITreeTest, TrivialInsertionTest) {
   auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
+  ASSERT_TRUE(tree.empty());
   ITNode n(0, 10, 0);
   tree.insert(n);
+  ASSERT_FALSE(tree.empty());
 
   ASSERT_TRUE(tree.verify_integrity());
 }

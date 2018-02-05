@@ -68,9 +68,14 @@ TEST(RBTreeTest, TrivialSizeTest) {
 
   EqualityNode n;
   n.data = 0;
+
+  ASSERT_EQ(tree.size(), 0);
+  ASSERT_TRUE(tree.empty());
+
   tree.insert(n);
 
   ASSERT_EQ(tree.size(), 1);
+  ASSERT_FALSE(tree.empty());
 }
 
 TEST(RBTreeTest, RandomInsertionTest) {
@@ -358,6 +363,7 @@ TEST(RBTreeTest, TrivialDeletionTest) {
   n2.data = 1;
   tree.insert(n2);
 
+  ASSERT_FALSE(tree.empty());
   ASSERT_TRUE(tree.verify_integrity());
 
   tree.remove(n2);
@@ -367,6 +373,7 @@ TEST(RBTreeTest, TrivialDeletionTest) {
   tree.remove(n1);
 
   ASSERT_TRUE(tree.verify_integrity());
+  ASSERT_TRUE(tree.empty());
 }
 
 TEST(RBTreeTest, LinearInsertionLinearDeletionTest) {

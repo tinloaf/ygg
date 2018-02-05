@@ -61,7 +61,9 @@ TEST(IAggTest, TrivialTest)
 	Node n(2,5,10);
 
 	IAgg agg;
+	ASSERT_TRUE(agg.empty());
 	agg.insert(n);
+	ASSERT_FALSE(agg.empty());
 
 	int agg_val = agg.query(3);
 	ASSERT_EQ(agg_val, 10);

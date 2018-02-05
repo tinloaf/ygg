@@ -299,6 +299,13 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+bool
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::empty() const
+{
+	return this->t.empty();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 typename Node::AggValueT
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::query(const typename Node::KeyT & x)
 {

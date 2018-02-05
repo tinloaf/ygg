@@ -404,6 +404,14 @@ public:
 	 */
 	size_t size() const;
 
+	/**
+	 * @brief Returns whether the tree is empty
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @return true if the tree is empty, false otherwise
+	 */
+	bool empty() const;
 
 	// TODO document
 	Node * get_root() const;

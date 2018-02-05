@@ -306,6 +306,15 @@ public:
 	void remove(Node &n);
 
 	/**
+	 * @brief Returns whether the dynamic segment tree is empty
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @return true if the dynamic segment tree is empty, false otherwise
+	 */
+	bool empty() const;
+
+	/**
 	 * @brief Perform a stabbing query at point x
 	 *
 	 * This query asks for the aggregate value over all intervals containing point x. This is a

@@ -275,4 +275,11 @@ List<Node, Options, Tag>::size() const
 	return this->s.get();
 }
 
+template<class Node, class Options, class Tag>
+bool
+List<Node, Options, Tag>::empty() const
+{
+	return this->head == nullptr;
+}
+
 } // namespace ygg

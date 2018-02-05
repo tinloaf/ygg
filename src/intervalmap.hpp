@@ -277,6 +277,15 @@ public:
 	size_t size() const;
 
 	/**
+	 * @brief Returns whether the interval map is empty
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @return true if the interval map is empty, false otherwise
+	 */
+	 bool empty() const;
+
+	/**
 	 * @brief Returns the aggregate value during a segment
 	 *
 	 * @param s 	The segment the aggregate value of which should be returned

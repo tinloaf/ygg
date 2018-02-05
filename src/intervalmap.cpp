@@ -330,6 +330,13 @@ IntervalMap<Node, NodeTraits, Options, Tag>::size() const
 }
 
 template <class Node, class NodeTraits, class Options, class Tag>
+bool
+IntervalMap<Node, NodeTraits, Options, Tag>::empty() const
+{
+	return this->t.empty();
+}
+
+template <class Node, class NodeTraits, class Options, class Tag>
 void
 IntervalMap<Node, NodeTraits, Options, Tag>::remove(Node &n)
 {

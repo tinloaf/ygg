@@ -51,11 +51,13 @@ using IMap = IntervalMap<Node, NodeTraits>;
 TEST(IMapTest, TrivialTest)
 {
 	IMap m;
+	ASSERT_TRUE(m.empty());
 }
 
 TEST(IMapTest, SimpleInsertionTest)
 {
 	IMap m;
+	ASSERT_TRUE(m.empty());
 
 	Node n;
 	n.lower = 1;
@@ -63,6 +65,8 @@ TEST(IMapTest, SimpleInsertionTest)
 	n.value = 10;
 
 	m.insert(n);
+	ASSERT_FALSE(m.empty());
+
 	m.dbg_verify();
 
 	auto it = m.begin();
@@ -78,6 +82,7 @@ TEST(IMapTest, SimpleInsertionTest)
 	it = m.begin();
 	ASSERT_EQ(it, m.end());
 	ASSERT_EQ(m.size(), 0);
+	ASSERT_TRUE(m.empty());
 }
 
 TEST(IMapTest, SegmentMergingTest)
