@@ -18,6 +18,9 @@ namespace dyn_segtree_internal {
 template<class Tag>
 class InnerRBTTag {};
 
+/**
+ * @brief An inner node, representing either a start or an end of an interval
+ */
 template<class KeyT_in, class ValueT_in, class AggValueT_in, class Combiners, class Tag>
 class InnerNode : public RBTreeNodeBase<InnerNode<KeyT_in, ValueT_in, AggValueT_in, Combiners, Tag>,
                                         TreeOptions<TreeFlags::MULTIPLE>, InnerRBTTag<Tag>>
@@ -96,18 +99,69 @@ public:
 /// @endcond
 } // namespace internal
 
+/**
+ * @brief A combiner that allows to retrieve the maximum value over any range
+ *
+ * This is a combiner (see TODO for what a combiner is) that, when added to a Dynamic Segment
+ * Tree, allows you to efficiently retrieve the maximum aggregate value over any range in your
+ * segment tree.
+ *
+ * @tparam ValueType The type of values associated with your intervals
+ */
 template<class ValueType>
 class MaxCombiner {
 public:
 	using ValueT = ValueType;
 
+	/**
+	 * @brief Build this combiner from just this node, i.e., as if it didn't have any children
+	 *
+	 * @param val The value associated with this node TODO CAN BE REMOVED
+	 */
 	explicit MaxCombiner(ValueT val);
+
 	MaxCombiner() = default;
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
+	/**
+	 * @brief Combines this MaxCombiner with a value, possibly of a child node
+	 *
+	 * This sets the maximum currently stored at this combiner to the maximum of the currently
+	 * stored value and (a + edge_val).
+	 *
+	 * Usually, a will be the value of the MaxCombiner of a child of the node that this combiner
+	 * belongs to. edge_val will then be the agg_left or agg_right
+	 * value of the node this combiner belongs to.
+	 *
+	 * @param a 				See above
+	 * @param edge_val 	See above
+	 * @return FIXME ignored for now
+	 */
 	bool combine_with(ValueT a, ValueT edge_val);
+
+	/**
+	 * @brief Rebuilds the value in this MaxCombiner from values of its two children's MaxCombiners
+	 *
+	 * This sets the maximum currently stored at this combiner to the maximum of (a + a_edge_val) and
+	 * (b + b_edge_val).
+	 *
+	 * Usually, a and b will be the values of the MaxCombiners of the two children of the node that
+	 * this  combiner belongs to. a_edge_val  and b_edge_val will then be the agg_left resp. agg_right
+	 * values of the node this combiner belongs to.
+	 *
+	 * @param a 				See above
+	 * @param a_edge_val 	See above
+	 * @param b 				See above
+	 * @param b_edge_val 	See above
+	 * @return FIXME ignored for now
+	 */
 	bool rebuild(ValueT a, ValueT a_edge_val, ValueT b, ValueT b_edge_val);
 
+	/**
+	 * @brief Returns the currently stored combined value in this combiner
+	 *
+	 * @return the currently stored combined value in this combiner
+	 */
 	ValueT get();
 
 	// TODO DEBUG
@@ -118,12 +172,39 @@ private:
 	ValueT val;
 };
 
+/**
+ * @brief This class represents the pack of combiners associated with every node of a Dynamic
+ * Segment Tree
+ *
+ * A DynamicSegmentTree can have multiple combiners associated with each node. See TODO for
+ * details. Every combiner allows to retrieve a different combined metric (such as maximum,
+ * minimum, …) of the aggregate values over arbitrary ranges in the Dynamic Segment Tree.
+ *
+ * @tparam AggValueT	The type of the aggregate values in your DynamicSegmentTree
+ * @tparam Combiners	A list of combiner classes
+ */
 template<class AggValueT, class ... Combiners>
 class CombinerPack {
 public:
+	/**
+	 * @brief Initialize all combiners at this node as if this node did not have any children
+	 * @param val TODO CAN BE REMOVED
+	 */
 	explicit CombinerPack(AggValueT val);
 	CombinerPack() = default;
 
+	/**
+	 * @brief Rebuilds all combiners at this node from its children's combiners
+	 *
+	 * This method calls the rebuild() method on all combiners attached to this node with the
+	 * respective combined values from the left / right child.
+	 *
+	 * @param a						The combiner pack of our node's left child
+	 * @param a_edge_val	The agg_left value of our node
+	 * @param b						The combiner pack of our node's right child
+	 * @param b_edge_val	The agg_right value of our node
+	 * @return TODO IGNORED
+	 */
 	bool rebuild(CombinerPack<AggValueT, Combiners...> * a,
 	             AggValueT a_edge_val,
 	             CombinerPack<AggValueT, Combiners...> * b,
@@ -158,6 +239,7 @@ using EmptyCombinerPack = CombinerPack<AggValueT>;
  */
 template<class KeyType, class ValueType, class AggValueType, class Combiners, class Tag = int>
 class DynSegTreeNodeBase {
+	// TODO why is all of this public?
 public:
 	/// @cond INTERNAL
 	using KeyT = KeyType;
@@ -166,7 +248,16 @@ public:
 
 	using InnerNode = dyn_segtree_internal::InnerNode<KeyT, ValueT, AggValueT, Combiners, Tag>;
 
+	/**
+	 * @brief RBTree node that represents the start of the interval represented by this
+	 * DynSegTreeNodeBase
+	 */
 	InnerNode start;
+
+	/**
+	 * @brief RBTree node that represents the end of the interval represented by this
+	 * DynSegTreeNodeBase
+	 */
 	InnerNode end;
 	/// @endcond
 };
@@ -232,7 +323,7 @@ public:
  * where n is the number of intervals in the dynamic segment tree and A is the time it takes to
  * aggregate a value, i.e., compute operator+(AggValueT, ValueT).
  *
- * DOCTODO aggregators
+ * DOCTODO combiners
  *
  * @tparam Node					The node class in your tree, must be derived from DynSegTreeNodeBase
  * @tparam NodeTraits		The node traits for your node class, must be derived from DynSegTreeNodeTraits
