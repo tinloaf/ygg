@@ -199,7 +199,8 @@ public:
 	public:
 		using IteratorBase<iterator<reverse>, Node, reverse>::IteratorBase;
 		iterator(const iterator<reverse> & orig)
-		: IteratorBase<iterator<reverse>, Node, reverse>(orig.n) {}
+		: IteratorBase<iterator<reverse>, Node, reverse>(orig.n) {};
+		iterator() : IteratorBase<iterator<reverse>, Node, reverse>() {};
 	private:
 		friend class const_iterator<reverse>;
 	};
@@ -212,6 +213,7 @@ public:
 		: IteratorBase<const_iterator<reverse>, const Node, reverse>(orig.n) {};
 		const_iterator(const iterator<reverse> & orig)
 		: IteratorBase<const_iterator<reverse>, const Node, reverse>(orig.n) {};
+		const_iterator() : IteratorBase<const_iterator<reverse>, const Node, reverse>() {};
 	};
 
 	/**
@@ -291,8 +293,8 @@ public:
 	/**
 	 * @brief Lower-bounds an element
 	 *
-	 * Returns an iterator to the first element to which <query> compares as
-	 * "greater or equal", i.e. the largest element that is considered to not go before <query>.
+	 * Returns an iterator to the first element that is not less that <query>, i.e., that does
+	 * not have to go before <query>.
 	 *
 	 * Note that <query> does not have to be a Node, but can be anything that can
 	 * be compared to a Node, i.e., for which
