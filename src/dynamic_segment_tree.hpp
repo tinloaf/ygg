@@ -30,9 +30,13 @@ public:
 	using ValueT = ValueT_in;
 	using AggValueT = AggValueT_in;
 
+	// TODO instead of storing all of these, store a pointer to the containing interval and use
+	// interval traits?
 	KeyT point;
 	bool start;
+	bool closed;
 
+	// TODO remove this
 	InnerNode<KeyT, ValueT, AggValueT, Combiners, Tag> * partner;
 
 	ValueT val; // TODO this can be removed!
@@ -55,32 +59,116 @@ public:
 template<class InnerNode>
 class Compare {
 public:
+	using PointDescription = std::pair<const typename InnerNode::KeyT, const int_fast8_t>;
+
 	bool operator()(const InnerNode & lhs,
 	                const InnerNode & rhs) const
 	{
 		if (lhs.point != rhs.point) {
 			return lhs.point < rhs.point;
 		} else {
-			return (!lhs.start && rhs.start);
+			/*
+			 * At the same point, the order is: open ends, closed starts, closed ends, open starts
+			 */
+			int_fast8_t lhs_priority;
+			if (lhs.closed) {
+				if (lhs.start) {
+					lhs_priority = -1;
+				} else {
+					lhs_priority = 1;
+				}
+			} else {
+				if (lhs.start) {
+					lhs_priority = 2;
+				} else {
+					lhs_priority = -2;
+				}
+			}
+
+			int_fast8_t rhs_priority;
+			if (rhs.closed) {
+				if (rhs.start) {
+					rhs_priority = -1;
+				} else {
+					rhs_priority = 1;
+				}
+			} else {
+				if (rhs.start) {
+					rhs_priority = 2;
+				} else {
+					rhs_priority = -2;
+				}
+			}
+
+			return lhs_priority < rhs_priority;
 		}
 	}
 
-	bool operator()(typename InnerNode::KeyT lhs, const InnerNode & rhs) const
+	bool operator()(const typename InnerNode::KeyT & lhs, const InnerNode & rhs) const
 	{
-		return lhs < rhs.point;
+		if (lhs != rhs.point) {
+			return lhs < rhs.point;
+		}
+
+		// only open starts are strictly larger than the key
+		return (rhs.start && !rhs.closed);
 	}
 
-	bool operator()(const InnerNode & lhs, typename InnerNode::KeyT rhs) const
+	bool operator()(const InnerNode & lhs, const typename InnerNode::KeyT & rhs) const
 	{
-		return lhs.point < rhs;
+		if (lhs.point != rhs) {
+			return lhs.point < rhs;
+		}
+
+		// only open ends must strictly go before the key
+		return (!lhs.start && !lhs.closed);
+	}
+
+
+	bool operator()(const PointDescription & lhs, const InnerNode & rhs) const
+	{
+		if (lhs.first != rhs.point) {
+			return lhs.first < rhs.point;
+		}
+
+		if (lhs.second > 0) {
+			// the query is left-open, i.e., it should not to before anything
+			return false;
+		} else if (lhs.second < 0) {
+			// the query is right-open. It should go before everything but open end nodes
+			return rhs.start || rhs.closed;
+		} else {
+			// The query is closed.
+			// only open starts are strictly larger than the key
+			return (rhs.start && !rhs.closed);
+		}
+	}
+
+	bool operator()(const InnerNode & lhs, const PointDescription & rhs) const
+	{
+		if (lhs.point != rhs.first) {
+			return lhs.point < rhs.first;
+		}
+
+		if (rhs.second > 0) {
+			// the query is left-open, i.e., everything but left-open is before it
+			return !(lhs.start && !lhs.closed);
+		} else if (rhs.second > 0) {
+			// the query is right-open, i.e., nothing must ever strictly go before it
+			return false;
+		} else {
+			// the query is closed
+			// only open ends must strictly go before the key
+			return (!lhs.start && !lhs.closed);
+		}
 	}
 };
 
 // TODO Debug
 template<class InnerNode, class ... Combiners>
-class InnerNodeNameGetter {
+class ASCIIInnerNodeNameGetter {
 public:
-	InnerNodeNameGetter() {};
+	ASCIIInnerNodeNameGetter() {};
 
 	std::string get_name(InnerNode * node) const {
 		return std::string("[") + std::to_string(node->point) + std::string("]")
@@ -93,6 +181,58 @@ public:
 								...
 							}
 						+ std::string("}");
+	}
+};
+
+template<class InnerNode, class ... Combiners>
+class DOTInnerNodeNameGetter {
+public:
+	DOTInnerNodeNameGetter() {};
+
+	std::string get_name(InnerNode * node) const {
+		std::stringstream name;
+
+		std::string combiner_str {
+						Combiners::get_name() + std::string(": ")
+						+ std::to_string(node->combiners.template get<Combiners>()) + std::string(" ")
+										...
+		};
+
+		if (node->start) {
+			if (node->closed) {
+				name << "[";
+			} else {
+				name << "(";
+			}
+		}
+		name << node->point;
+		if (!node->start) {
+			if (node->closed) {
+				name << "]";
+			} else {
+				name << ")";
+			}
+		}
+
+		name << " @" << node->val;
+		name << "\\n {->" << node->partner->point << "} \\n<";
+		name << combiner_str << ">";
+
+		return name.str();
+	}
+};
+
+template<class InnerNode>
+class DOTInnerEdgeNameGetter {
+public:
+	DOTInnerEdgeNameGetter() {};
+
+	std::string get_name(InnerNode * node, bool left) const {
+		if (left) {
+			return std::to_string(node->agg_left);
+		} else {
+			return std::to_string(node->agg_right);
+		}
 	}
 };
 
@@ -248,6 +388,7 @@ public:
 
 	using InnerNode = dyn_segtree_internal::InnerNode<KeyT, ValueT, AggValueT, Combiners, Tag>;
 
+	// TODO make these private
 	/**
 	 * @brief RBTree node that represents the start of the interval represented by this
 	 * DynSegTreeNodeBase
@@ -300,6 +441,20 @@ public:
 	 * @return Must return the upper interval bound of n
 	 */
 	static KeyT get_upper(const Node & n);
+
+	/**
+	 * Should be implemented to indicate whether an interval contains its lower border or not.
+	 *
+	 * The default (if this method is not implemented) is true.
+	 */
+	static bool is_lower_closed(const Node & n) { (void)n; return true; };
+
+	/**
+	 * Should be implemented to indicate whether an interval contains its upper border or not.
+	 *
+	 * The default (if this method is not implemented) is false.
+	 */
+	static bool is_upper_closed(const Node & n) { (void)n; return false; };
 
 	/**
 	 * Must be implemented to return the value associated with the interval represented by n.
@@ -421,7 +576,9 @@ public:
 
 	template<class Combiner>
 	typename Combiner::ValueT get_combined(const typename Node::KeyT & lower,
-	                                       const typename Node::KeyT & upper) const;
+	                                       const typename Node::KeyT & upper,
+																				 bool lower_closed = true,
+																			   bool upper_closed = false) const;
 
 	/*
 	 * DEBUGGING
@@ -429,11 +586,22 @@ public:
 private:
 	// TODO build a generic function for this
 	template<class ... Ts>
-	using NodeNameGetterCurried = dyn_segtree_internal::InnerNodeNameGetter<InnerNode, Ts ...>;
+	using NodeNameGetterCurried = dyn_segtree_internal::ASCIIInnerNodeNameGetter<InnerNode, Ts ...>;
 	using NodeNameGetter = typename utilities::pass_pack<typename Combiners::pack,
 	                                                     NodeNameGetterCurried>::type;
-public:
+	template<class ... Ts>
+	using DotNameGetterCurried = dyn_segtree_internal::DOTInnerNodeNameGetter<InnerNode, Ts...>;
+	using DotNameGetter = typename utilities::pass_pack<typename Combiners::pack,
+	                                                    DotNameGetterCurried>::type;
+
 	using TreePrinter = debug::TreePrinter<InnerNode, NodeNameGetter>;
+	using TreeDotExporter = debug::TreeDotExport<InnerNode,
+	                                             DotNameGetter,
+	                                             dyn_segtree_internal::DOTInnerEdgeNameGetter<InnerNode>>;
+public:
+	// TODO Debugging only!
+	void dbg_print_inner_tree() const;
+	std::stringstream & dbg_get_dot() const;
 
 private:
 	void apply_interval(Node & n);

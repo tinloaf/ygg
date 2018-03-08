@@ -104,6 +104,23 @@ InnerNodeTraits<InnerTree, InnerNode>::swapped(InnerNode & old_ancestor, InnerNo
 
 } // namespace dyn_segtree_internal
 
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+void
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::dbg_print_inner_tree() const
+{
+	TreePrinter tp(this->t.get_root(), NodeNameGetter());
+	tp.print();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+std::stringstream &
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::dbg_get_dot() const
+{
+	TreeDotExporter tdot(this->t.get_root(),
+	                     DotNameGetter(),
+	                      dyn_segtree_internal::DOTInnerEdgeNameGetter<InnerNode>());
+	return tdot.get();
+}
 
 template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 void
@@ -120,6 +137,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 
 	n.NB::start.val = NodeTraits::get_value(n);
 	n.NB::start.point = NodeTraits::get_lower(n);
+	n.NB::start.closed = NodeTraits::is_lower_closed(n);
 	n.NB::start.agg_left = AggValueT();
 	n.NB::start.agg_right = AggValueT();
 
@@ -130,6 +148,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 
 	n.NB::end.val = NodeTraits::get_value(n);
 	n.NB::end.point = NodeTraits::get_upper(n);
+	n.NB::end.closed = NodeTraits::is_upper_closed(n);
 	n.NB::end.agg_left = AggValueT();
 	n.NB::end.agg_right = AggValueT();
 
@@ -332,7 +351,10 @@ template <class Node, class NodeTraits, class Combiners, class Options, class Ta
 template<class Combiner>
 typename Combiner::ValueT
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(const typename Node::KeyT & lower,
-                                                                            const typename Node::KeyT & upper) const
+                                                                            const typename Node::KeyT & upper,
+                                                                            bool lower_closed,
+                                                                            bool upper_closed)
+													const
 {
 	//std::cout << "\n======= Query: Low " << lower << " / High " << upper << "============\n";
 
@@ -342,7 +364,13 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 
 	dyn_segtree_internal::Compare<InnerNode> cmp;
 
-	auto lower_node_it = this->t.lower_bound(lower);
+	decltype(this->t.lower_bound(lower)) lower_node_it;
+	if (lower_closed) {
+		lower_node_it = this->t.lower_bound(lower);
+	} else {
+		lower_node_it = this->t.lower_bound(
+						std::pair<const typename Node::KeyT &, const int_fast8_t>{lower, +1});
+	}
 	InnerNode * lower_node;
 
 	if (lower_node_it == this->t.end()) {
@@ -358,41 +386,43 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 		lower_node = const_cast<InnerNode *>(&*lower_node_it);
 	}
 
-	auto upper_node_it = this->t.upper_bound(upper);
+	decltype(this->t.upper_bound(upper)) upper_node_it;
+	if (upper_closed) {
+		upper_node_it = this->t.upper_bound(upper);
+	} else {
+		upper_node_it = this->t.upper_bound(
+						std::pair<const typename Node::KeyT &, const int_fast8_t>{upper, -1});
+	}
+
 	InnerNode * upper_node;
 	if (upper_node_it == this->t.end()) {
 		auto upper_node_rit = this->t.rbegin();
 		upper_node = const_cast<InnerNode  *>(&*upper_node_rit);
 	} else {
 		if (upper_node_it != this->t.begin()) {
-			auto next_smaller = upper_node_it - 1;
+			/*auto next_smaller = upper_node_it - 1;
 			if (!cmp(*next_smaller, upper)) {
 				// the next smaller has exactly the value of upper!
 				assert(next_smaller->point == upper);
 				upper_node_it = next_smaller;
 			}
+			 */
 		}
 
 		upper_node = const_cast<InnerNode *>(&*upper_node_it);
 	}
 
-	//std::cout << "Query Nodes: " << lower_node->point << " -> " << upper_node->point << "\n";
 
 	std::vector<InnerNode *> left_contour;
 	std::vector<InnerNode *> right_contour;
 	std::tie(left_contour, right_contour) = this->t.find_lca(lower_node, upper_node);
 
-	//std::cout << "Left Contour: ";
-	//for (auto node : left_contour) {
-		//std::cout << node->point << ", ";
-	//}
 	// TODO inefficient: We don't need to build all the combiners!
 	Combiners dummy_cp;
 	Combiners cp;
 	if (left_contour.size() > 1) {
 		for (size_t i = 0; i < left_contour.size(); ++i) {
 			InnerNode *cur = left_contour[i];
-			//std::cout << "\nHandling left: " << cur->point;
 			InnerNode *right_child = InnerTree::get_right_child(cur);
 
 			// Factor in the edge we just traversed up
@@ -412,10 +442,8 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 			// Combine with descending across the contour, if we traversed a left edge
 			if ((i != left_contour.size() - 1) && ((i == 0) || (right_child != left_contour[i - 1]))) {
 				if (right_child != nullptr) {
-					//std::cout << " Case A\n";
 					cp.combine_with(&right_child->combiners, cur->agg_right);
 				} else {
-					//std::cout << " Case B\n";
 					cp.combine_with(&dummy_cp, cur->agg_right);
 				}
 			}
@@ -427,11 +455,6 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 	cp = Combiners();
 
 	// Traverse the last left-edge into the root
-
-	//std::cout << "Right Countour: ";
-	//for (auto node : right_contour) {
-		//std::cout << node->point << ", ";
-	//}
 	if (right_contour.size() > 1) {
 		for (size_t i = 0; i < right_contour.size(); ++i) {
 			InnerNode *cur = right_contour[i];
@@ -463,6 +486,24 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 	}
 
 	cp.combine_with(&left_cp, typename Node::AggValueT());
+
+	/*
+	 * Step 3: Take the combined value and "combine it up" to the root
+	 */
+	InnerNode * cur = right_contour[right_contour.size() - 1];
+	while (cur != this->t.get_root()) {
+		// TODO is a temporary copy necessary here?
+		Combiners tmp = cp;
+		InnerNode * old = cur;
+
+		cur = cur->_rbt_parent;
+		if (cur->_rbt_left == old) {
+			cp.combine_with(&tmp, cur->agg_left);
+		} else {
+			// TODO assert?
+			cp.combine_with(&tmp, cur->agg_right);
+		}
+	}
 
 	return cp.template get<Combiner>();
 }

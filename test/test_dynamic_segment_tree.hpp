@@ -18,6 +18,9 @@
 #define IAGG_DELETION_TESTSIZE 500
 #define IAGG_DELETION_ITERATIONS 100
 
+// chosen by fair xkcd
+#define IAGG_SEED 4
+
 namespace test_interval_agg {
 using namespace boost::icl;
 using namespace ygg;
@@ -109,7 +112,7 @@ TEST(IAggTest, NestingTest)
 	ASSERT_EQ(combined, IAGG_TESTSIZE);
 
 	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
-		int combined_range = agg.get_combined<MCombiner>(0,i+1);
+		int combined_range = agg.get_combined<MCombiner>(0,i+1,true,false);
 		ASSERT_EQ(combined_range, i+1);
 	}
 }
@@ -157,7 +160,7 @@ TEST(IAggTest, DeletionTest)
 		agg.insert(n[i]);
 	}
 
-	std::mt19937 rng(5); // chosen by fair xkcd plus one
+	std::mt19937 rng(IAGG_SEED);
 
 	for (unsigned int j = 0 ; j < IAGG_DELETION_ITERATIONS ; ++j) {
 		//std::cout << "\n\n\n=================================================\n\n\n";
@@ -307,7 +310,7 @@ TEST(IAggTest, ComprehensiveTest)
 {
 	Node persistent_nodes[IAGG_TESTSIZE];
 	std::vector<unsigned int> indices;
-	std::mt19937 rng(4); // chosen by fair xkcd
+	std::mt19937 rng(IAGG_SEED);
 
 	IAgg agg;
 
@@ -382,6 +385,114 @@ TEST(IAggTest, ComprehensiveTest)
 
 	int combined = agg.get_combined<MCombiner>();
 	ASSERT_EQ(combined, maxval);
+}
+
+TEST(IAggTest, ComprehensiveCombinerTest)
+{
+	std::mt19937 rng(IAGG_SEED);
+
+	Node persistent_nodes[IAGG_TESTSIZE];
+	std::vector<unsigned int> indices;
+
+	IAgg agg;
+
+	for (unsigned int i = 0; i < IAGG_TESTSIZE; ++i) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IAGG_TESTSIZE / 2);
+		unsigned int lower = bounds_distr(rng);
+		unsigned int upper = lower + 1 + bounds_distr(rng);
+
+		persistent_nodes[i] = Node(lower, upper, i);
+		indices.push_back(i);
+	}
+
+	Node transient_nodes[IAGG_TESTSIZE];
+	for (unsigned int i = 0; i < IAGG_TESTSIZE; ++i) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IAGG_TESTSIZE / 2);
+		unsigned int lower = bounds_distr(rng);
+		unsigned int upper = lower + 1 + bounds_distr(rng);
+
+		transient_nodes[i] = Node(lower, upper, IAGG_TESTSIZE + i);
+	}
+
+	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+		std::uniform_int_distribution<unsigned int> uni(0, i - 1);
+		return uni(rng);
+	});
+
+	for (auto index : indices) {
+		agg.insert(transient_nodes[index]);
+	}
+
+	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+		std::uniform_int_distribution<unsigned int> uni(0, i - 1);
+		return uni(rng);
+	});
+
+
+	for (auto index : indices) {
+		agg.insert(persistent_nodes[index]);
+	}
+
+	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
+		std::uniform_int_distribution<unsigned int> uni(0, i - 1);
+		return uni(rng);
+	});
+
+	for (auto index : indices) {
+		agg.remove(transient_nodes[index]);
+	}
+
+	// Reference data structure
+	using BoostMap = interval_map<int, int>;
+	BoostMap reference;
+
+	/*
+	for (auto node : persistent_nodes) {
+		std::cout << "Node: " << node.lower << " -> " << node.upper << " @ " << node.value << "\n";
+		reference += std::make_pair(interval<int>::closed(node.lower, node.upper), node.value);
+	}
+	std::cout << "Resulting Tree: \n";
+	std::cout << agg.dbg_get_dot().str();
+	*/
+
+	auto start_it = reference.begin();
+	while (start_it != reference.end()) {
+		auto end_it = start_it;
+		++end_it;
+
+		while (end_it != reference.end()) {
+			auto it = start_it;
+			int max_seen = it->second;
+			int range_lower = start_it->first.lower();
+			int range_upper = start_it->first.upper();
+
+			bool upper_closed = false;
+			while (it != end_it) {
+				max_seen = std::max(max_seen, it->second);
+				range_upper = it->first.upper();
+				if (boost::icl::contains(it->first, it->first.upper())) {
+					upper_closed = true;
+				} else {
+					upper_closed = false;
+				}
+				++it;
+			}
+
+			bool lower_closed = false;
+			if (boost::icl::contains(start_it->first, start_it->first.lower())) {
+				lower_closed = true;
+			}
+
+			int combined = agg.get_combined<MCombiner>(range_lower,
+			                                           range_upper,
+			                                           lower_closed,
+			                                           upper_closed);
+			ASSERT_EQ(combined, max_seen);
+
+			++end_it;
+		}
+		++start_it;
+	}
 }
 
 }
