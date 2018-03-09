@@ -1,4 +1,4 @@
-namespace utilities {
+namespace rbtree_internal {
 
 template <class Node, class NodeTraits>
 template <class T1, class T2>
@@ -22,10 +22,10 @@ ExtendedNodeTraits<Node, INB, NodeTraits>::leaf_inserted(Node &node)
 	node.INB::_it_max_upper = NodeTraits::get_upper(node);
 
 	// Propagate up
-	Node *cur = node._rbt_parent;
+	Node *cur = node.get_parent();
 	while ((cur != nullptr) && (cur->INB::_it_max_upper < node.INB::_it_max_upper)) {
 		cur->INB::_it_max_upper = node.INB::_it_max_upper;
-		cur = cur->_rbt_parent;
+		cur = cur->get_parent();
 	}
 }
 
@@ -46,7 +46,7 @@ ExtendedNodeTraits<Node, INB, NodeTraits>::fix_node(Node &node)
 
 	if (old_val != node.INB::_it_max_upper) {
 		// propagate up
-		Node *cur = node._rbt_parent;
+		Node *cur = node.get_parent();
 		if (cur != nullptr) {
 			if ((cur->INB::_it_max_upper < node.INB::_it_max_upper) || (cur->INB::_it_max_upper == old_val)) {
 				fix_node(*cur);
@@ -61,7 +61,7 @@ ExtendedNodeTraits<Node, INB, NodeTraits>::rotated_left(Node &node)
 {
 	// 'node' is the node that was the old parent.
 	fix_node(node);
-	fix_node(*(node._rbt_parent));
+	fix_node(*(node.get_parent()));
 }
 
 template <class Node, class INB, class NodeTraits>
@@ -70,7 +70,7 @@ ExtendedNodeTraits<Node, INB, NodeTraits>::rotated_right(Node &node)
 {
 	// 'node' is the node that was the old parent.
 	fix_node(node);
-	fix_node(*(node._rbt_parent));
+	fix_node(*(node.get_parent()));
 }
 
 template <class Node, class INB, class NodeTraits>
@@ -85,20 +85,20 @@ void
 ExtendedNodeTraits<Node, INB, NodeTraits>::swapped(Node &n1, Node &n2)
 {
 	fix_node(n1);
-	if (n1._rbt_parent != nullptr) {
-		fix_node(*(n1._rbt_parent));
+	if (n1.get_parent() != nullptr) {
+		fix_node(*(n1.get_parent()));
 	}
 
 	fix_node(n2);
-	if (n2._rbt_parent != nullptr) {
-		fix_node(*(n2._rbt_parent));
+	if (n2.get_parent() != nullptr) {
+		fix_node(*(n2.get_parent()));
 	}
 }
 
 template <class Node, class INB, class NodeTraits>
 typename NodeTraits::key_type
 ExtendedNodeTraits<Node, INB, NodeTraits>::get_lower(
-				const utilities::DummyRange<typename NodeTraits::key_type> &range)
+				const rbtree_internal::DummyRange<typename NodeTraits::key_type> &range)
 {
 	return std::get<0>(range);
 }
@@ -106,7 +106,7 @@ ExtendedNodeTraits<Node, INB, NodeTraits>::get_lower(
 template <class Node, class INB, class NodeTraits>
 typename NodeTraits::key_type
 ExtendedNodeTraits<Node, INB, NodeTraits>::get_upper(
-				const utilities::DummyRange<typename NodeTraits::key_type> &range)
+				const rbtree_internal::DummyRange<typename NodeTraits::key_type> &range)
 {
 	return std::get<1>(range);
 }
@@ -176,7 +176,7 @@ IntervalTree<Node, NodeTraits, Options, Tag>::query(const Comparable & q) const
       (NodeTraits::get_upper(q) >= NodeTraits::get_lower(*cur))) {
     hit = cur;
   } else {
-    hit = utilities::find_next_overlapping<Node, INB, NodeTraits, false, Comparable>(cur, q);
+    hit = rbtree_internal::find_next_overlapping<Node, INB, NodeTraits, false, Comparable>(cur, q);
   }
 	// TODO FIXME make sure that we always find the first one!
 	/*
@@ -194,13 +194,13 @@ IntervalTree<Node, NodeTraits, Options, Tag>::interval_upper_bound(const Compara
 {
   // An interval lying strictly after <query> is an upper-bound (in the RBTree sense) of the
   // interval that just spans the last point of <query>
-  utilities::DummyRange<typename NodeTraits::key_type> dummy_range(NodeTraits::get_upper(query_range), NodeTraits::get_upper(query_range));
+  rbtree_internal::DummyRange<typename NodeTraits::key_type> dummy_range(NodeTraits::get_upper(query_range), NodeTraits::get_upper(query_range));
 
   return this->upper_bound(dummy_range);
 }
 
 // TODO move stuff here
-namespace utilities {
+namespace rbtree_internal {
 
 template <class KeyType>
 DummyRange<KeyType>::DummyRange(KeyType lower, KeyType upper)
@@ -228,19 +228,19 @@ find_next_overlapping(Node * cur, const Comparable & q)
         //std::cout << "Pruning 1…";
         // Prune!
         // Nothing starting from this node can overlap b/c of upper limit. Backtrack.
-        while ((cur->_rbt_parent != nullptr) && (cur->_rbt_parent->_rbt_right == cur)) { // these are the nodes which are smaller and were already visited
+        while ((cur->get_parent() != nullptr) && (cur->get_parent()->_rbt_right == cur)) { // these are the nodes which are smaller and were already visited
           //std::cout << "backtracking…";
-          cur = cur->_rbt_parent;
+          cur = cur->get_parent();
         }
 
         // go one further up
-        if (cur->_rbt_parent == nullptr) {
+        if (cur->get_parent() == nullptr) {
           //std::cout << "backtracked out of root.\n";
           return nullptr;
         } else {
           // go up
           //std::cout << "backtracking one more…";
-          cur = cur->_rbt_parent;
+          cur = cur->get_parent();
         }
       } else {
         //std::cout << "searching for smallest…";
@@ -251,7 +251,7 @@ find_next_overlapping(Node * cur, const Comparable & q)
             //std::cout << "Pruning 2…";
             // Prune!
             // Nothing starting from this node can overlap. Backtrack.
-            cur = cur->_rbt_parent;
+            cur = cur->get_parent();
             break;
           }
         }
@@ -260,18 +260,18 @@ find_next_overlapping(Node * cur, const Comparable & q)
       // go up
       //std::cout << "going up…";
       // skip over the nodes already visited
-      while ((cur->_rbt_parent != nullptr) && (cur->_rbt_parent->_rbt_right == cur)) { // these are the nodes which are smaller and were already visited
+      while ((cur->get_parent() != nullptr) && (cur->get_parent()->_rbt_right == cur)) { // these are the nodes which are smaller and were already visited
         //std::cout << "backtracking…";
-        cur = cur->_rbt_parent;
+        cur = cur->get_parent();
       }
 
       // go one further up
-      if (cur->_rbt_parent == nullptr) {
+      if (cur->get_parent() == nullptr) {
         //std::cout << "Backtracked into root.\n";
         return nullptr;
       } else {
         // go up
-        cur = cur->_rbt_parent;
+        cur = cur->get_parent();
       }
     }
 
@@ -361,7 +361,7 @@ typename IntervalTree<Node, NodeTraits, Options, Tag>::template QueryResult<Comp
 IntervalTree<Node, NodeTraits, Options, Tag>::QueryResult<Comparable>::const_iterator::operator++()
 {
   ////std::cout << "Old n: " << this->n << "\n";
-  this->n = utilities::find_next_overlapping<Node, INB, NodeTraits, false, Comparable>
+  this->n = rbtree_internal::find_next_overlapping<Node, INB, NodeTraits, false, Comparable>
 				  (this->n,  this->q);
   ////std::cout << "New n: " << this->n << "\n";
 

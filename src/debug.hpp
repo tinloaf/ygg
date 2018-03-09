@@ -13,8 +13,8 @@ namespace debug {
 
 template<class Node>
 Node * dbg_find_root(Node * n) {
-	while (n->_rbt_parent != nullptr) {
-		n = n->_rbt_parent;
+	while (n->get_parent() != nullptr) {
+		n = n->get_parent();
 	}
 
 	return n;

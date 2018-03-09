@@ -241,7 +241,7 @@ public:
 			return lhs.get_point() < rhs.first;
 		}
 #pragma GCC diagnostic pop
-		
+
 		if (rhs.second > 0) {
 			// the query is left-open, i.e., everything but left-open is before it
 			return !(lhs.is_start() && !lhs.is_closed());
@@ -701,7 +701,7 @@ public:
 	template<class Combiner>
 	const Combiner & get_combiner() const;
 
-	using pack = utilities::pack<Combiners ...>;
+	using pack = rbtree_internal::pack<Combiners ...>;
 private:
 
 	template<class Combiner>
@@ -1027,11 +1027,11 @@ private:
 	// TODO build a generic function for this
 	template<class ... Ts>
 	using NodeNameGetterCurried = dyn_segtree_internal::ASCIIInnerNodeNameGetter<InnerNode, Ts ...>;
-	using NodeNameGetter = typename utilities::pass_pack<typename Combiners::pack,
+	using NodeNameGetter = typename rbtree_internal::pass_pack<typename Combiners::pack,
 	                                                     NodeNameGetterCurried>::type;
 	template<class ... Ts>
 	using DotNameGetterCurried = dyn_segtree_internal::DOTInnerNodeNameGetter<InnerNode, Ts...>;
-	using DotNameGetter = typename utilities::pass_pack<typename Combiners::pack,
+	using DotNameGetter = typename rbtree_internal::pass_pack<typename Combiners::pack,
 	                                                    DotNameGetterCurried>::type;
 
 	using TreePrinter = debug::TreePrinter<InnerNode, NodeNameGetter>;

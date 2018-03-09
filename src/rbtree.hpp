@@ -14,20 +14,66 @@
 #include <vector>
 
 namespace ygg {
-  namespace utilities {
+  namespace rbtree_internal {
 	  /// @cond INTERNAL
-	  template<class Node, class Tag>
+
+	  enum class Color { RED, BLACK };
+
+    template<class Node, bool compress_color>
+	  class ColorParentStorage;
+
+	  template<class Node>
+	  class ColorParentStorage<Node, true>
+	  {
+	  public:
+		  void set_color(Color new_color);
+		  Color get_color() const;
+		  void set_parent(Node * new_parent);
+		  Node * get_parent() const;
+
+		  void swap_parent_with(ColorParentStorage<Node, true> & other);
+		  void swap_color_with(ColorParentStorage<Node, true> & other);
+	  private:
+		  Node * parent;
+	  };
+
+	  template<class Node>
+	  class ColorParentStorage<Node, false> {
+	  public:
+		  void set_color(Color new_color);
+		  Color get_color() const;
+		  void set_parent(Node * new_parent);
+		  Node * get_parent() const;
+
+		  void swap_parent_with(ColorParentStorage<Node, false> & other);
+		  void swap_color_with(ColorParentStorage<Node, false> & other);
+	  private:
+		  Node * parent = nullptr;
+		  Color  color;
+	  };
+
+	  template<class Node, class Tag, bool compress_color>
 	  class RBTreeNodeBaseImpl {
 	  public:
-		  enum class Color { RED, BLACK };
-
-		  Node *                      _rbt_parent = nullptr;
 		  Node *                      _rbt_left = nullptr;
 		  Node *                      _rbt_right = nullptr;
-		  RBTreeNodeBaseImpl::Color   _rbt_color;
+
+		  ColorParentStorage<Node, compress_color> _color_and_parent;
+
+		  // TODO namespaceing!
+		  void set_color(Color new_color);
+		  Color get_color() const;
+		  void set_parent(Node * new_parent);
+		  Node * get_parent() const;
+
+		  void swap_parent_with(Node * other);
+		  void swap_color_with(Node * other);
 	  };
+
+
+
 	  /// @endcond
-  } // namespace utilities
+  } // namespace rbtree_internal
 
 
 // TODO document
@@ -58,7 +104,7 @@ public:
  * RBTree for details.
  */
 template<class Node, class Options = DefaultOptions, class Tag = int>
-class RBTreeNodeBase : public utilities::RBTreeNodeBaseImpl<Node, Tag> {};
+class RBTreeNodeBase : public rbtree_internal::RBTreeNodeBaseImpl<Node, Tag, false> {};
 
 /**
  * @brief   Helper base class for the NodeTraits you need to implement
@@ -99,11 +145,11 @@ public:
  * Defaults to ygg::utilities::flexible_less. Implement operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
 template<class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int,
-         class Compare = ygg::utilities::flexible_less>
+         class Compare = ygg::rbtree_internal::flexible_less>
 class RBTree
 {
 public:
-  using Base = utilities::RBTreeNodeBaseImpl<Node, Tag>; // TODO rename
+  using Base = rbtree_internal::RBTreeNodeBaseImpl<Node, Tag, false>; // TODO rename
 
 	RBTree();
 

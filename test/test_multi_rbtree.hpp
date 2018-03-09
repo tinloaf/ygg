@@ -121,21 +121,21 @@ TEST(MultiRBTreeTest, MinimalInteractionTest)
 
 	ASSERT_EQ(n1.NodeBaseA::_rbt_right, nullptr);
 	ASSERT_EQ(n1.NodeBaseA::_rbt_left, &n2);
-	ASSERT_EQ(n1.NodeBaseA::_rbt_parent, nullptr);
-	ASSERT_EQ(n2.NodeBaseA::_rbt_parent, &n1);
+	ASSERT_EQ(n1.NodeBaseA::get_parent(), nullptr);
+	ASSERT_EQ(n2.NodeBaseA::get_parent(), &n1);
 
 	tb.insert(n1);
 	tb.insert(n2);
 
 	ASSERT_EQ(n1.NodeBaseA::_rbt_right, nullptr);
 	ASSERT_EQ(n1.NodeBaseA::_rbt_left, &n2);
-	ASSERT_EQ(n1.NodeBaseA::_rbt_parent, nullptr);
-	ASSERT_EQ(n2.NodeBaseA::_rbt_parent, &n1);
+	ASSERT_EQ(n1.NodeBaseA::get_parent(), nullptr);
+	ASSERT_EQ(n2.NodeBaseA::get_parent(), &n1);
 
 	ASSERT_EQ(n1.NodeBaseB::_rbt_right, &n2);
 	ASSERT_EQ(n1.NodeBaseB::_rbt_left, nullptr);
-	ASSERT_EQ(n1.NodeBaseB::_rbt_parent, nullptr);
-	ASSERT_EQ(n2.NodeBaseB::_rbt_parent, &n1);
+	ASSERT_EQ(n1.NodeBaseB::get_parent(), nullptr);
+	ASSERT_EQ(n2.NodeBaseB::get_parent(), &n1);
 
 	ASSERT_TRUE(ta.verify_integrity());
 	ASSERT_TRUE(tb.verify_integrity());

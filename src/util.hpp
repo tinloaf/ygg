@@ -7,7 +7,7 @@
 #include <type_traits>
 
 namespace ygg {
-namespace utilities {
+namespace rbtree_internal {
 
 /**
  * @brief A more flexible version of std::less

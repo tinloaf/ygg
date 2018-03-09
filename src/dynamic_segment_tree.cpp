@@ -500,7 +500,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(cons
 	InnerNode * cur = right_contour[right_contour.size() - 1];
 	while (cur != this->t.get_root()) {
 		InnerNode * old = cur;
-		cur = cur->_rbt_parent;
+		cur = cur->get_parent();
 		if (cur->_rbt_left == old) {
 			cp.traverse_left_edge_up(cur->get_point(), cur->agg_left);
 		} else {
@@ -556,7 +556,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 
 	while(n->InnerNode::combiners.rebuild(n->get_point(),
 	                                      cmb_left, n->agg_left, cmb_right, n->agg_right)) {
-		n = n->_rbt_parent;
+		n = n->get_parent();
 
 		if (n != nullptr) {
 			if (n->_rbt_left != nullptr) {

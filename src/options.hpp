@@ -71,10 +71,10 @@ class TreeOptions
 {
 public:
 	/// @cond INTERNAL
-	static constexpr bool multiple = utilities::pack_contains<TreeFlags::MULTIPLE, Opts...>();
-	static constexpr bool order_queries = utilities::pack_contains<TreeFlags::ORDER_QUERIES,
+	static constexpr bool multiple = rbtree_internal::pack_contains<TreeFlags::MULTIPLE, Opts...>();
+	static constexpr bool order_queries = rbtree_internal::pack_contains<TreeFlags::ORDER_QUERIES,
 	                                                               Opts...>();
-	static constexpr bool constant_time_size = utilities::pack_contains<TreeFlags::CONSTANT_TIME_SIZE,
+	static constexpr bool constant_time_size = rbtree_internal::pack_contains<TreeFlags::CONSTANT_TIME_SIZE,
 	                                                                    Opts...>();
 	/// @endcond
 private:

@@ -10,7 +10,7 @@
 #define LIST_TESTSIZE 1000
 
 using namespace ygg;
-using namespace ygg::utilities;
+using namespace ygg::rbtree_internal;
 
 class LNode : public ListNodeBase<LNode> {
 public:
