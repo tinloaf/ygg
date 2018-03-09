@@ -64,7 +64,10 @@ public:
 	bool operator()(const InnerNode & lhs,
 	                const InnerNode & rhs) const
 	{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if (lhs.point != rhs.point) {
+#pragma GCC diagnostic pop
 			return lhs.point < rhs.point;
 		} else {
 			/*
@@ -106,9 +109,12 @@ public:
 
 	bool operator()(const typename InnerNode::KeyT & lhs, const InnerNode & rhs) const
 	{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if (lhs != rhs.point) {
 			return lhs < rhs.point;
 		}
+#pragma GCC diagnostic pop
 
 		// only open starts are strictly larger than the key
 		return (rhs.start && !rhs.closed);
@@ -116,9 +122,12 @@ public:
 
 	bool operator()(const InnerNode & lhs, const typename InnerNode::KeyT & rhs) const
 	{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if (lhs.point != rhs) {
 			return lhs.point < rhs;
 		}
+#pragma GCC diagnostic pop
 
 		// only open ends must strictly go before the key
 		return (!lhs.start && !lhs.closed);
@@ -127,9 +136,12 @@ public:
 
 	bool operator()(const PointDescription & lhs, const InnerNode & rhs) const
 	{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if (lhs.first != rhs.point) {
 			return lhs.first < rhs.point;
 		}
+#pragma GCC diagnostic pop
 
 		if (lhs.second > 0) {
 			// the query is left-open, i.e., it should not to before anything
@@ -146,10 +158,13 @@ public:
 
 	bool operator()(const InnerNode & lhs, const PointDescription & rhs) const
 	{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 		if (lhs.point != rhs.first) {
 			return lhs.point < rhs.first;
 		}
-
+#pragma GCC diagnostic pop
+		
 		if (rhs.second > 0) {
 			// the query is left-open, i.e., everything but left-open is before it
 			return !(lhs.start && !lhs.closed);
