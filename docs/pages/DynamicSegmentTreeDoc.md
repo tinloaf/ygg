@@ -1,7 +1,8 @@
 @page dynamicsegmenttreedoc Introduction to the Dynamic Segment Tree
 
 The dynamic segment tree is something between a classic segment tree and Boost ICL's 
-[interval_map](http://www.boost.org/doc/libs/1_66_0/libs/icl/doc/html/index.html#boost_icl.introduction.definition_and_basic_example).
+[interval_map](http://www.boost.org/doc/libs/1_66_0/libs/icl/doc/html/index.html#boost_icl.introduction.definition_and_basic_example). 
+You can find an example of its usage at @ref dynamicsegmenttreeexample.
 
 It allows you to insert (and remove) intervals that are associated with a *value*. For every point 
 **x**

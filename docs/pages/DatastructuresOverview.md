@@ -1,7 +1,7 @@
 @page datastructuresoverview Overview over the Data Structures
 
-This page roughly explains what a Red-Black-Tree, an Interval Tree and an Interval Map can do for
- you.
+This page roughly explains what a Red-Black-Tree, an Interval Tree, an Interval Map or 
+a Dynamic Segment Tree can do for you.
  
 Red-Black-Tree
 ==============
@@ -41,3 +41,11 @@ intervals (the second and third), but since they have the same value, there is n
 at 15.
 
 For an example on how to use the interval map, see @ref intervalmapexample .
+
+Dynamic Segment Tree
+====================
+
+The dynamic segment tree is something between a classic segment tree and Boost ICL's 
+[interval_map](http://www.boost.org/doc/libs/1_66_0/libs/icl/doc/html/index.html#boost_icl.introduction.definition_and_basic_example). 
+You can find a more detailed description at @ref dynamicsegmenttreedoc and an example of its usage 
+at @ref dynamicsegmenttreeexample.

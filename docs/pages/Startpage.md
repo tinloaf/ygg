@@ -1,17 +1,21 @@
 @mainpage
 
 This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++11 
-implementation of intrusive search tree and interval datastructures. It currently contains:
+implementation of intrusive search tree and interval data structures. It currently contains:
 
 * a red-black tree
 * an interval tree
 * an interval map
+* a dynamic segment tree
 * a doubly-linked list
 
 
 If you need a Red-Black-Tree, an Interval Tree or an Interval Map in your C++ application, and for 
 some reason the existing implementations (like std::set or boost::instrusive::rbtree) are not 
-suited for you, Ygg may be the answer. See the list of features below for why it's awesome!
+suited for you, Ygg may be the answer. Also, I do not know of any other implementation of what I 
+call the "Dynamic Segment Tree" (if you know something similar, please let me know!)
+
+See the list of features below for why Ygg is awesome!
 
 If you are not sure whether one of these data structures is right for your application, check out
  the @ref datastructuresoverview.
@@ -43,6 +47,7 @@ the easiest way to get started:
 * Example of using the red-black tree: @ref rbtreeexample
 * Example of using the interval tree: @ref intervaltreeexample
 * Example of using the interval map: @ref intervalmapexample
+* Example of using the dynamic segment tree: @ref dynamicsegmenttreeexample
 
 There's also a @ref quickstart page that walks you through the examples for the red-black tree 
 and the interval tree.
@@ -52,7 +57,6 @@ Documentation
 
 The API is somewhat documented. Check out the menu above for documentation on the individual 
 classes.
-
 
 License
 =======
