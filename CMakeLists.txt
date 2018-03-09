@@ -23,10 +23,9 @@ endif()
 add_subdirectory(test)
 add_subdirectory(examples)
 
-FIND_LIBRARY(CELERO_LIB_DIR libcelero.so)
-if (DEFINED ${CELERO_LIB_DIR})
-  FIND_PATH(CELERO_HEADERS celero/Celero.h)
-  add_subdirectory (timing)
+find_library(CELERO_LIB_DIR libcelero.so)
+if (CELERO_LIB_DIR)
+  add_subdirectory (benchmark)
 endif()
 
 # make CLion analyze all files

@@ -2,4 +2,4 @@
 
 #include "bench_rbtree.hpp"
 
-CELERO_MAIN;
+CELERO_MAIN

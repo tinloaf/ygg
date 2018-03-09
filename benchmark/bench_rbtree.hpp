@@ -13,16 +13,19 @@
 
 using namespace ygg;
 
+constexpr size_t TEST_SIZES = 9;
+constexpr size_t TEST_SIZE_BASE_EXPONENT = 7;
+
 template<bool distinct>
 class RBTreeBaseFixture : public celero::TestFixture {
 public:
 	RBTreeBaseFixture() {
-		const int totalNumberOfTests = 8;
-
 		this->instance_sizes.clear();
-		for(int i = 0; i < totalNumberOfTests; i++)
+		for(size_t i = 0; i < TEST_SIZES; i++)
 		{
-			this->instance_sizes.push_back({static_cast<int32_t>(std::pow(2, (i+6)+1)), 0u});
+			this->instance_sizes.emplace_back(
+							static_cast<int32_t>(std::pow(2, (i + TEST_SIZE_BASE_EXPONENT))),
+											0u);
 		}
 	}
 
@@ -86,12 +89,12 @@ public:
 
 	using Tree = RBTree<Node, RBDefaultNodeTraits<Node>, TreeOptions<>>;
 
-	virtual void setUp(const int64_t value_count) override
+	virtual void setUp(const int64_t number_of_nodes) override
 	{
-		this->RBTreeBaseFixture<true>::setUp(value_count);
+		this->RBTreeBaseFixture<true>::setUp(number_of_nodes);
 
-		this->nodes.resize(value_count);
-		for (int i = 0 ; i < value_count ; ++i) {
+		this->nodes.resize(number_of_nodes);
+		for (int i = 0 ; i < number_of_nodes ; ++i) {
 			this->nodes[i].value = this->values[i];
 		}
 	}
@@ -122,12 +125,12 @@ public:
 
 	using Tree = RBTree<Node, RBDefaultNodeTraits<Node>, TreeOptions<TreeFlags::MULTIPLE>>;
 
-	virtual void setUp(const int64_t value_count) override
+	virtual void setUp(const int64_t number_of_nodes) override
 	{
-		this->RBTreeBaseFixture<false>::setUp(value_count);
+		this->RBTreeBaseFixture<false>::setUp(number_of_nodes);
 
-		this->nodes.resize(value_count);
-		for (int i = 0 ; i < value_count ; ++i) {
+		this->nodes.resize(number_of_nodes);
+		for (int i = 0 ; i < number_of_nodes ; ++i) {
 			this->nodes[i].value = this->values[i];
 		}
 	}
@@ -150,9 +153,9 @@ class YggTreeInsertFixture : public YggTreeBaseFixture
 class YggTreeSearchFixture : public YggTreeBaseFixture
 {
 public:
-	virtual void setUp(const int64_t value_count) override
+	virtual void setUp(const int64_t number_of_nodes) override
 	{
-		this->YggTreeBaseFixture::setUp(value_count);
+		this->YggTreeBaseFixture::setUp(number_of_nodes);
 
 		for (auto & n : this->nodes) {
 			this->t.insert(n);
@@ -180,9 +183,9 @@ class YggMultiTreeInsertFixture : public YggMultiTreeBaseFixture
 class YggMultiTreeSearchFixture : public YggMultiTreeBaseFixture
 {
 public:
-	virtual void setUp(const int64_t value_count) override
+	virtual void setUp(const int64_t number_of_nodes) override
 	{
-		this->YggMultiTreeBaseFixture::setUp(value_count);
+		this->YggMultiTreeBaseFixture::setUp(number_of_nodes);
 
 		for (auto & n : this->nodes) {
 			this->t.insert(n);
@@ -222,12 +225,12 @@ public:
 
 	using Tree = boost::intrusive::set<Node>;
 
-	virtual void setUp(const int64_t value_count) override
+	virtual void setUp(const int64_t number_of_nodes) override
 	{
-		this->RBTreeBaseFixture<true>::setUp(value_count);
+		this->RBTreeBaseFixture<true>::setUp(number_of_nodes);
 
-		this->nodes.resize(value_count);
-		for (int i = 0 ; i < value_count ; ++i) {
+		this->nodes.resize(number_of_nodes);
+		for (int i = 0 ; i < number_of_nodes ; ++i) {
 			this->nodes[i].value = this->values[i];
 		}
 	}
@@ -258,12 +261,12 @@ public:
 
 	using Tree = boost::intrusive::multiset<Node>;
 
-	virtual void setUp(const int64_t value_count) override
+	virtual void setUp(const int64_t number_of_nodes) override
 	{
-		this->RBTreeBaseFixture<false>::setUp(value_count);
+		this->RBTreeBaseFixture<false>::setUp(number_of_nodes);
 
-		this->nodes.resize(value_count);
-		for (int i = 0 ; i < value_count ; ++i) {
+		this->nodes.resize(number_of_nodes);
+		for (int i = 0 ; i < number_of_nodes ; ++i) {
 			this->nodes[i].value = this->values[i];
 		}
 	}
@@ -285,9 +288,9 @@ class BoostSetInsertFixture : public BoostSetBaseFixture
 class BoostSetSearchFixture : public BoostSetBaseFixture
 {
 public:
-	virtual void setUp(const int64_t value_count) override
+	virtual void setUp(const int64_t number_of_nodes) override
 	{
-		this->BoostSetBaseFixture::setUp(value_count);
+		this->BoostSetBaseFixture::setUp(number_of_nodes);
 
 		for (auto & n : this->nodes) {
 			this->t.insert(n);
@@ -314,9 +317,9 @@ class BoostMultiSetInsertFixture : public BoostMultiSetBaseFixture
 class BoostMultiSetSearchFixture : public BoostMultiSetBaseFixture
 {
 public:
-	virtual void setUp(const int64_t value_count) override
+	virtual void setUp(const int64_t number_of_nodes) override
 	{
-		this->BoostMultiSetBaseFixture::setUp(value_count);
+		this->BoostMultiSetBaseFixture::setUp(number_of_nodes);
 
 		for (auto & n : this->nodes) {
 			this->t.insert(n);

@@ -1,4 +1,5 @@
 find_package(Boost REQUIRED)
+find_path(CELERO_HEADERS celero/Celero.h)
 
 include_directories(${CELERO_HEADERS} ${Boost_INCLUDE_DIRS})
 
