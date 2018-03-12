@@ -6,6 +6,66 @@ namespace rbtree_internal {
 
 template<class Node>
 void
+ColorParentStorage<Node, true>::set_color(Color new_color)
+{
+	if (new_color == Color::RED) {
+		this->parent = (Node *)((size_t)this->parent | 1);
+	} else {
+		this->parent = (Node *)((size_t)this->parent & ~((size_t)1));
+	}
+}
+
+template<class Node>
+ygg::rbtree_internal::Color
+ColorParentStorage<Node, true>::get_color() const
+{
+	if ((size_t)this->parent & 1) {
+		return Color::RED;
+	} else {
+		return Color::BLACK;
+	}
+}
+
+template<class Node>
+void
+ColorParentStorage<Node, true>::set_parent(Node * new_parent)
+{
+	this->parent = (Node *)((size_t)new_parent | ((size_t)this->parent & 1));
+}
+
+template<class Node>
+Node *
+ColorParentStorage<Node, true>::get_parent() const
+{
+	return (Node *)((size_t)this->parent & (~((size_t)1)));
+}
+
+template<class Node>
+void
+ColorParentStorage<Node, true>::swap_color_with(ColorParentStorage<Node, true> & other)
+{
+	// TODO make this more efficient?
+	Color tmp = other.get_color();
+	other.set_color(this->get_color());
+	this->set_color(tmp);
+}
+
+template<class Node>
+void
+ColorParentStorage<Node, true>::swap_parent_with(ColorParentStorage<Node, true> & other)
+{
+	// TODO make this more efficient?
+	Node * tmp = other.get_parent();
+	other.set_parent(this->get_parent());
+	this->set_parent(tmp);
+}
+
+// TODO have a 'swap both' operator!
+
+
+
+template<class Node>
+void
 ColorParentStorage<Node, false>::set_color(Color new_color)
 {
 	this->color = new_color;

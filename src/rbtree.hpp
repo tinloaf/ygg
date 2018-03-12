@@ -104,7 +104,9 @@ public:
  * RBTree for details.
  */
 template<class Node, class Options = DefaultOptions, class Tag = int>
-class RBTreeNodeBase : public rbtree_internal::RBTreeNodeBaseImpl<Node, Tag, false> {};
+class RBTreeNodeBase : public rbtree_internal::RBTreeNodeBaseImpl<Node, Tag,
+                                                                  Options::compress_color>
+{};
 
 /**
  * @brief   Helper base class for the NodeTraits you need to implement
@@ -149,7 +151,8 @@ template<class Node, class NodeTraits, class Options = DefaultOptions, class Tag
 class RBTree
 {
 public:
-  using Base = rbtree_internal::RBTreeNodeBaseImpl<Node, Tag, false>; // TODO rename
+  using Base = rbtree_internal::RBTreeNodeBaseImpl<Node, Tag, Options::compress_color>; // TODO
+	// rename
 
 	RBTree();
 

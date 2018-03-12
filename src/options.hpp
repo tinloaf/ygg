@@ -47,6 +47,16 @@ public:
 	 * down insert and remove operations minimally.
 	 */
 	class CONSTANT_TIME_SIZE {};
+
+	/**
+	 * @brief RBTree option: Indicates that color information should be compressed into the parent
+	 * pointer
+	 *
+	 * This saves a little memory and can in fact increase speed if your nodes are very small. It
+	 * uses some pointer magic which is technically not standard compliant but should work on
+	 * almost all systems.
+	 */
+	class COMPRESS_COLOR {};
 };
 
 /**
@@ -76,6 +86,8 @@ public:
 	                                                               Opts...>();
 	static constexpr bool constant_time_size = rbtree_internal::pack_contains<TreeFlags::CONSTANT_TIME_SIZE,
 	                                                                    Opts...>();
+	static constexpr bool compress_color =
+					rbtree_internal::pack_contains<TreeFlags::COMPRESS_COLOR, Opts...>();
 	/// @endcond
 private:
 	TreeOptions(); // Instantiation not allowed

@@ -12,7 +12,7 @@ using namespace ygg;
 
 #define RBTREE_TESTSIZE 2000
 
-class Node : public RBTreeNodeBase<Node, TreeOptions<>> { // No multi-nodes!
+class Node : public RBTreeNodeBase<Node, TreeOptions<TreeFlags::COMPRESS_COLOR>> { // No multi-nodes!
 public:
   int data;
 
@@ -54,7 +54,7 @@ public:
 };
 
 TEST(RBTreeTest, TrivialInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node n;
   n.data = 0;
@@ -83,7 +83,7 @@ TEST(RBTreeTest, TrivialSizeTest) {
 }
 
 TEST(RBTreeTest, RandomInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   std::mt19937 rng(4); // chosen by fair xkcd
   std::uniform_int_distribution<int> uni(std::numeric_limits<int>::min(),
@@ -110,7 +110,7 @@ TEST(RBTreeTest, RandomInsertionTest) {
 }
 
 TEST(RBTreeTest, LinearInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
 
@@ -217,7 +217,7 @@ TEST(RBTreeTest, RepeatedHintedPostEqualInsertionTest) {
 }
 
 TEST(RBTreeTest, LinearEndHintedInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
 
@@ -278,7 +278,7 @@ TEST(RBTreeTest, HinterOrderPreservationTest) {
 }
 
 TEST(RBTreeTest, LinearNextHintedInsertionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
 
@@ -301,7 +301,7 @@ TEST(RBTreeTest, LinearNextHintedInsertionTest) {
 }
 
 TEST(RBTreeTest, LowerBoundTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
 
@@ -329,7 +329,7 @@ TEST(RBTreeTest, LowerBoundTest) {
 }
 
 TEST(RBTreeTest, UpperBoundTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
 
@@ -357,7 +357,7 @@ TEST(RBTreeTest, UpperBoundTest) {
 }
 
 TEST(RBTreeTest, TrivialDeletionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node n1;
   n1.data = 0;
@@ -381,7 +381,7 @@ TEST(RBTreeTest, TrivialDeletionTest) {
 }
 
 TEST(RBTreeTest, LinearInsertionLinearDeletionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
 
@@ -402,7 +402,7 @@ TEST(RBTreeTest, LinearInsertionLinearDeletionTest) {
 }
 
 TEST(RBTreeTest, LinearInsertionRandomDeletionTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
   std::vector<unsigned int> indices;
@@ -473,7 +473,7 @@ TEST(RBTreeTest, LinearMultipleIterationTest) {
 }
 
 TEST(RBTreeTest, LinearIterationTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
   std::vector<size_t> indices;
@@ -502,7 +502,7 @@ TEST(RBTreeTest, LinearIterationTest) {
 }
 
 TEST(RBTreeTest, ReverseIterationTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
   std::vector<size_t> indices;
@@ -534,7 +534,7 @@ TEST(RBTreeTest, ReverseIterationTest) {
 }
 
 TEST(RBTreeTest, FindTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node nodes[RBTREE_TESTSIZE];
 
@@ -559,7 +559,7 @@ TEST(RBTreeTest, FindTest) {
 }
 
 TEST(RBTreeTest, ComprehensiveTest) {
-  auto tree = RBTree<Node, NodeTraits, TreeOptions<>>();
+  auto tree = RBTree<Node, NodeTraits, TreeOptions<TreeFlags::COMPRESS_COLOR>>();
 
   Node persistent_nodes[RBTREE_TESTSIZE];
   std::vector<unsigned int> indices;
