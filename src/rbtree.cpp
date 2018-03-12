@@ -232,14 +232,16 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node *parent)
     right_child->NB::_rbt_left->NB::set_parent(parent);
   }
 
-  right_child->NB::_rbt_left = parent;
-  right_child->NB::set_parent(parent->NB::get_parent());
+	Node * parents_parent = parent->NB::get_parent();
 
-  if (parent->NB::get_parent() != nullptr) {
-    if (parent->NB::get_parent()->NB::_rbt_left == parent) {
-      parent->NB::get_parent()->NB::_rbt_left = right_child;
+  right_child->NB::_rbt_left = parent;
+  right_child->NB::set_parent(parents_parent);
+
+  if (parents_parent != nullptr) {
+    if (parents_parent->NB::_rbt_left == parent) {
+      parents_parent->NB::_rbt_left = right_child;
     } else {
-      parent->NB::get_parent()->NB::_rbt_right = right_child;
+      parents_parent->NB::_rbt_right = right_child;
     }
   } else {
     this->root = right_child;
@@ -260,14 +262,16 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node *parent)
     left_child->NB::_rbt_right->NB::set_parent(parent);
   }
 
-  left_child->NB::_rbt_right = parent;
-  left_child->NB::set_parent(parent->NB::get_parent());
+	Node * parents_parent = parent->NB::get_parent();
 
-  if (parent->NB::get_parent() != nullptr) {
-    if (parent->NB::get_parent()->NB::_rbt_left == parent) {
-      parent->NB::get_parent()->NB::_rbt_left = left_child;
+  left_child->NB::_rbt_right = parent;
+  left_child->NB::set_parent(parents_parent);
+
+  if (parents_parent != nullptr) {
+    if (parents_parent->NB::_rbt_left == parent) {
+	    parents_parent->NB::_rbt_left = left_child;
     } else {
-      parent->NB::get_parent()->NB::_rbt_right = left_child;
+	    parents_parent->NB::_rbt_right = left_child;
     }
   } else {
     this->root = left_child;
@@ -293,13 +297,14 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(Node *node)
   while ((node->NB::get_parent()->NB::get_color() == rbtree_internal::Color::RED) &&
          (this->get_uncle(node) != nullptr) &&
          (this->get_uncle(node)->NB::get_color() == rbtree_internal::Color::RED)) {
-    node->NB::get_parent()->NB::set_color(rbtree_internal::Color::BLACK);
+	  Node * parent = node->NB::get_parent();
+    parent->NB::set_color(rbtree_internal::Color::BLACK);
     this->get_uncle(node)->NB::set_color(rbtree_internal::Color::BLACK);
 
-    if (node->NB::get_parent()->NB::get_parent()->NB::get_parent() !=
-        nullptr) { // never iterate into the root
-      node->NB::get_parent()->NB::get_parent()->NB::set_color(rbtree_internal::Color::RED);
-      node = node->NB::get_parent()->NB::get_parent();
+	  Node * grandparent = parent->NB::get_parent();
+    if (grandparent->NB::get_parent() != nullptr) { // never iterate into the root
+      grandparent->NB::set_color(rbtree_internal::Color::RED);
+      node = grandparent;
     } else {
       // Don't recurse into the root; don't color it red. We could immediately re-color it black.
       return;
@@ -587,6 +592,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::verify_tree() const
       // go up
 
       // skip over the nodes already visited
+	    // TODO have a 'parents_left_child_is' / 'parents_right_child_is' function?
       while ((cur->NB::get_parent() != nullptr) && (cur->NB::get_parent()->NB::_rbt_right ==
                                                    cur)) { // these are the nodes which are smaller and were already visited
         cur = cur->NB::get_parent();
