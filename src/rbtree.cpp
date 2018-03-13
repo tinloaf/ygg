@@ -622,14 +622,11 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::verify_integrity() const
   unsigned int dummy;
 
   bool tree_okay = this->verify_tree();
-  //std::cout << "Tree1: " << tree_okay << "\n";
   bool root_okay = this->verify_black_root();
   bool paths_okay = (this->root == nullptr) || this->verify_black_paths(this->root, &dummy);
   bool children_okay = this->verify_red_black(this->root);
 
   bool order_okay = this->verify_order();
-
-  //std::cout << "Root: " << root_okay << " Paths: " << paths_okay << " Children: " << children_okay << " Tree: " << tree_okay << "\n";
 
   assert(root_okay && paths_okay && children_okay && tree_okay && order_okay);
 
@@ -925,7 +922,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(Node *parent
   Node *sibling;
 
   while (propagating_up) {
-    //std::cout << "=> Parent has ID " << NodeTraits::get_id(parent) << " <= ";
     // We just deleted a black node from under parent.
     if (deleted_left) {
       sibling = parent->NB::_rbt_right;
@@ -942,7 +938,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(Node *parent
          (sibling->NB::_rbt_right->NB::get_color() == rbtree_internal::Color::BLACK))) {
 
       // We can recolor and propagate up! (Case 3)
-      //std::cout << "Case 3… ";
       sibling->NB::set_color(rbtree_internal::Color::RED);
       // Now everything below parent is okay, but the branch started in parent lost a black!
       if (parent->NB::get_parent() == nullptr) {
@@ -950,7 +945,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(Node *parent
         return;
       } else {
         // propagate up!
-        //std::cout << "propagating up…";
         deleted_left = parent->NB::get_parent()->NB::_rbt_left == parent;
         parent = parent->NB::get_parent();
       }
@@ -961,7 +955,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(Node *parent
 
   if (sibling->NB::get_color() == rbtree_internal::Color::RED) {
     // Case 2
-    //std::cout << "Case 2… ";
     sibling->NB::set_color(rbtree_internal::Color::BLACK);
     parent->NB::set_color(rbtree_internal::Color::RED);
     if (deleted_left) {
@@ -979,7 +972,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(Node *parent
       ((sibling->NB::_rbt_right == nullptr) ||
        (sibling->NB::_rbt_right->NB::get_color() == rbtree_internal::Color::BLACK))) {
     // case 4
-    //std::cout << "Case 4… ";
     parent->NB::set_color(rbtree_internal::Color::BLACK);
     sibling->NB::set_color(rbtree_internal::Color::RED);
 
@@ -990,7 +982,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(Node *parent
     if ((sibling->NB::_rbt_right == nullptr) ||
         (sibling->NB::_rbt_right->NB::get_color() == rbtree_internal::Color::BLACK)) {
       // left child of sibling must be red! This is the folded case. (Case 5) Unfold!
-      //std::cout << "Case 5 (L)… ";
       this->rotate_right(sibling);
       sibling->NB::set_color(rbtree_internal::Color::RED);
       // The new sibling is now the parent of the sibling
@@ -999,7 +990,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(Node *parent
     }
 
     // straight situation, case 6 applies!
-    //std::cout << "Case 6 (L)…";
     this->rotate_left(parent);
 
 	  parent->NB::swap_color_with(sibling);
@@ -1009,7 +999,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(Node *parent
     if ((sibling->NB::_rbt_left == nullptr) ||
         (sibling->NB::_rbt_left->NB::get_color() == rbtree_internal::Color::BLACK)) {
       // right child of sibling must be red! This is the folded case. (Case 5) Unfold!
-      //std::cout << "Case 5 (R)… ";
 
       this->rotate_left(sibling);
       sibling->NB::set_color(rbtree_internal::Color::RED);
@@ -1019,7 +1008,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(Node *parent
     }
 
     // straight situation, case 6 applies!
-    //std::cout << "Case 6 (R)…";
     this->rotate_right(parent);
 	  parent->NB::swap_color_with(sibling);
     sibling->NB::_rbt_left->NB::set_color(rbtree_internal::Color::BLACK);

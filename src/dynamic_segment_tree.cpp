@@ -176,9 +176,6 @@ template <class Node, class NodeTraits, class Combiners, class Options, class Ta
 void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 {
-	// TODO remove this requirement?
-	assert(NodeTraits::get_lower(n) < NodeTraits::get_upper(n));
-
 	// TODO why are we doing this every time? Should be done once in the constructor!
 	n.NB::start.point = NodeTraits::get_lower(n);
 	n.NB::start.closed = NodeTraits::is_lower_closed(n);

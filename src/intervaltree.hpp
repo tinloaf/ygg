@@ -8,7 +8,7 @@
 #include "rbtree.hpp"
 
 namespace ygg {
-  namespace rbtree_internal {
+  namespace intervaltree_internal {
     template<class Node, class INB, class NodeTraits, bool skipfirst, class Comparable>
     Node * find_next_overlapping(Node * cur, const Comparable & q);
 
@@ -39,8 +39,8 @@ namespace ygg {
 		  static void swapped(Node & n1, Node & n2);
 
 		  // Make our DummyRange comparable
-		  static typename NodeTraits::key_type get_lower(const rbtree_internal::DummyRange<typename NodeTraits::key_type> & range);
-		  static typename NodeTraits::key_type get_upper(const rbtree_internal::DummyRange<typename NodeTraits::key_type> & range);
+		  static typename NodeTraits::key_type get_lower(const intervaltree_internal::DummyRange<typename NodeTraits::key_type> & range);
+		  static typename NodeTraits::key_type get_upper(const intervaltree_internal::DummyRange<typename NodeTraits::key_type> & range);
 	  };
   } // namespace utilities
 
@@ -98,10 +98,10 @@ public:
  */
 template<class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int>
 class IntervalTree : public RBTree<Node,
-                                   rbtree_internal::ExtendedNodeTraits<Node,
+                                   intervaltree_internal::ExtendedNodeTraits<Node,
                                                                  ITreeNodeBase<Node, NodeTraits, Options, Tag>,
                                                                  NodeTraits>,
-                                   Options, Tag, rbtree_internal::IntervalCompare<Node, NodeTraits>>
+                                   Options, Tag, intervaltree_internal::IntervalCompare<Node, NodeTraits>>
 {
 public:
   using Key = typename NodeTraits::key_type;
@@ -114,9 +114,9 @@ public:
 	static_assert(std::is_base_of<ITreeNodeTraits<Node>, NodeTraits>::value,
 	              "NodeTraits not properly derived from ITreeNodeTraits!");
 
-  using ENodeTraits = rbtree_internal::ExtendedNodeTraits<Node, INB, NodeTraits>;
-  using BaseTree = RBTree<Node, rbtree_internal::ExtendedNodeTraits<Node, INB, NodeTraits>, Options, Tag,
-					                rbtree_internal::IntervalCompare<Node, NodeTraits>>;
+  using ENodeTraits = intervaltree_internal::ExtendedNodeTraits<Node, INB, NodeTraits>;
+  using BaseTree = RBTree<Node, intervaltree_internal::ExtendedNodeTraits<Node, INB, NodeTraits>, Options, Tag,
+                          intervaltree_internal::IntervalCompare<Node, NodeTraits>>;
 
 
 

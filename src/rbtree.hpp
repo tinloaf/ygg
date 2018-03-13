@@ -497,6 +497,7 @@ protected:
   Node * get_uncle(Node * node) const;
 
   void swap_nodes(Node * n1, Node * n2, bool swap_colors = true);
+	void replace_node(Node * to_be_replaced, Node * replace_with);
   void swap_unrelated_nodes(Node * n1, Node * n2);
   void swap_neighbors(Node * parent, Node * child);
 

@@ -13,7 +13,7 @@
 
 namespace ygg {
 
-namespace internal {
+namespace intervalmap_internal {
 	/// @cond INTERNAL
 	class SegListTag {};
 	class RepresentativeSegListTag {};
@@ -52,7 +52,7 @@ namespace internal {
 		};
 	};
 	/// @endcond
-} // namespace internal
+} // namespace intervalmap_internal
 
 /**
  * @brief Base class (template) to supply your node class with metainformation for inclusion in
@@ -79,7 +79,7 @@ public:
 	 * Inserting nodes into an IntervalMap results in the key space to be divided into Segments.
 	 * See DOCTODO for details and examples. This is the type that these segments will have.
 	 */
-	using Segment = internal::InnerNode<KeyT, ValueT>;
+	using Segment = intervalmap_internal::InnerNode<KeyT, ValueT>;
 
 	/// @cond INTERNAL
 	Segment _imap_begin;
@@ -228,7 +228,7 @@ public:
  * @note Internally, the IntervalMap contains more segments than described above. However, the
  * IntervalMap API presents the segments as described above.
  */
-	using Segment = internal::InnerNode<typename Node::key_type, typename Node::value_type>;
+	using Segment = intervalmap_internal::InnerNode<typename Node::key_type, typename Node::value_type>;
 
 	/// @cond internal
 	static_assert(std::is_base_of<IMapNodeTraits<Node>, NodeTraits>::value,
@@ -240,9 +240,9 @@ public:
 	static_assert(std::is_base_of<NB, Node>::value,
 	              "Node class not properly derived from IMapNodeBase!");
 	using ITree = RBTree<Segment, RBDefaultNodeTraits<Segment>, TreeOptions<TreeFlags::MULTIPLE>,
-	                     internal::InnerRBTTag, typename Segment::Compare>;
-	using SegList = List<Segment, TreeOptions<>, internal::SegListTag>;
-	using RepresentativeSegList = List<Segment, TreeOptions<>, internal::RepresentativeSegListTag>;
+	                     intervalmap_internal::InnerRBTTag, typename Segment::Compare>;
+	using SegList = List<Segment, TreeOptions<>, intervalmap_internal::SegListTag>;
+	using RepresentativeSegList = List<Segment, TreeOptions<>, intervalmap_internal::RepresentativeSegListTag>;
 	using value_type = typename Node::value_type;
 	using key_type = typename Node::key_type;
 	/// @endcond
