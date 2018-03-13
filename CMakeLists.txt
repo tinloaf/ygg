@@ -1,12 +1,7 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.8)
 project (YGG)
 
-set (CMAKE_CXX_STANDARD 14)
-
-set(CMAKE_C_FLAGS_DEBUG "-g -O0 -fno-omit-frame-pointer -Wall -Wextra -pedantic -Wfloat-equal \
--Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual \
--Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -Wswitch-default")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
+#set (CMAKE_CXX_STANDARD 14)
 
 # Set a default build type if none was specified
 set(default_build_type "Debug")
@@ -24,7 +19,9 @@ add_subdirectory(test)
 add_subdirectory(examples)
 
 find_library(CELERO_LIB_DIR libcelero.so)
-if (CELERO_LIB_DIR)
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag(-std=c++17 HASCPP17)
+if (CELERO_LIB_DIR AND HASCPP17)
   add_subdirectory (benchmark)
 endif()
 

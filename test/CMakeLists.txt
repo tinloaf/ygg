@@ -9,11 +9,20 @@ set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 add_executable (run_tests main.cpp)
 
+set(CMAKE_C_FLAGS_DEBUG "-fno-omit-frame-pointer -Wall -Wextra -pedantic -Wfloat-equal \
+-Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual \
+-Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -Wswitch-default")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
+
 set_target_properties(run_tests
-                      PROPERTIES COMPILE_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage -Wall -Wextra -pedantic"
+                      PROPERTIES COMPILE_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage \
+                      -Wall -Wextra -pedantic"
                       )
 set_target_properties(run_tests
                       PROPERTIES LINK_FLAGS "-fprofile-arcs -ftest-coverage"
+                      )
+set_target_properties(run_tests
+                      PROPERTIES CXX_STANDARD 14
                       )
 
 target_link_libraries (run_tests LINK_PUBLIC ${LIBS} ${GTEST_BOTH_LIBRARIES}
