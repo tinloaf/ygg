@@ -732,6 +732,26 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node *n1, Node *n2, 
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
+RBTree<Node, NodeTraits, Options, Tag, Compare>::replace_node(Node * to_be_replaced,
+                                                              Node * replace_with)
+{
+  Node * parent = to_be_replaced->get_parent();
+  if (parent != nullptr) {
+    if (parent->_rbt_left == to_be_replaced) {
+      parent->_rbt_left = replace_with;
+    } else {
+      parent->_rbt_right = replace_with;
+    }
+  } else {
+    this->root = replace_with;
+  }
+  replace_with->set_parent(parent);
+
+  // TODO callback?
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_neighbors(Node *parent, Node *child)
 {
   child->NB::set_parent(parent->NB::get_parent());
@@ -827,7 +847,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node &node)
   Node *child = &node;
 
   if ((cur->NB::_rbt_right != nullptr) && (cur->NB::_rbt_left != nullptr)) {
-	  // TODO FIXME we assume larger-or-equal here. that is not true?
     // Find the minimum of the larger-or-equal children
     child = cur->NB::_rbt_right;
     while (child->NB::_rbt_left != nullptr) {
@@ -837,8 +856,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node &node)
     // Only a left child. This must be red and cannot have further children (otherwise, black-balance would be violated)
     child = child->NB::_rbt_left;
   }
-
-  //std::cout << "Selected Child has ID " << NodeTraits::get_id(child) << "…";
 
   if (child != &node) {
     this->swap_nodes(&node, child, false);
@@ -850,16 +867,30 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node &node)
   if (node.NB::_rbt_right != nullptr) {
     // replace node with its child and color the child black.
     auto right_child = node.NB::_rbt_right;
-    this->swap_nodes(&node, right_child, true);
 
-    // TODO when this callback is not used, we don't need to actually swap…
-    NodeTraits::delete_leaf(node);
+    /*
+     * If the delete_leaf() callback is implemented, we need to actually swap the right
+     * child with the node to be deleted, s.t. we still have a node that we can call the
+     * callback on. If it is not implemented, we can just replace the node with its child, not
+     * caring to "swap back".
+     */
+    // TODO C++17 mark this if constexpr
+    if (&NodeTraits::delete_leaf == &RBDefaultNodeTraits<Node>::delete_leaf) {
+      // Not overridden
+      this->replace_node(&node, right_child);
+      right_child->NB::set_color(rbtree_internal::Color::BLACK);
+    } else {
+      // Overridden
+      this->swap_nodes(&node, right_child, true);
 
-    right_child->NB::set_color(rbtree_internal::Color::BLACK);
-    right_child->NB::_rbt_right = nullptr; // this stored the node to be deleted…
-    // TODO null the pointers in node?
+      NodeTraits::delete_leaf(node);
 
-	  NodeTraits::deleted_below(*right_child);
+      right_child->NB::set_color(rbtree_internal::Color::BLACK);
+      right_child->NB::_rbt_right = nullptr; // this stored the node to be deleted…
+      // TODO null the pointers in node?
+    }
+
+    NodeTraits::deleted_below(*right_child);
 
     return; // no fixup necessary
   }
