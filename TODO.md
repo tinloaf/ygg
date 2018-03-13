@@ -18,3 +18,4 @@
 * rename Segment -> InnerNode in interval map
 * replace accessing _rbt_* in IntervalTree
 * Add combiner for collecting intervals
+* List requirements: C++14, 17 for benchmarks

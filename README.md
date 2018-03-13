@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/tinloaf/ygg.svg?branch=master)](https://travis-ci.org/tinloaf/ygg)
 
-This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++11 
+This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++14
 implementation of several intrusive data structures:
 
 * a Red-Black Tree

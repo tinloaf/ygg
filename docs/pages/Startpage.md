@@ -1,6 +1,6 @@
 @mainpage
 
-This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++11 
+This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++14 
 implementation of intrusive search tree and interval data structures. It currently contains:
 
 * a red-black tree
