@@ -57,7 +57,7 @@ This creates a Node class for you (which just holds an int-to-std::string mappin
 using namespace ygg;
 
 // The tree options
-using MyTreeOptions = TreeOptions<TreeFlags::Multiple>;
+using MyTreeOptions = TreeOptions<TreeFlags::MULTIPLE>;
 
 // The node class
 class Node : public RBTreeNodeBase<Node, MyTreeOptions> {
