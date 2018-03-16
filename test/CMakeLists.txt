@@ -16,7 +16,8 @@ set_target_properties(run_tests
                       PROPERTIES LINK_FLAGS "-fprofile-arcs -ftest-coverage"
                       )
 
-target_link_libraries (run_tests LINK_PUBLIC ${LIBS} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (run_tests LINK_PUBLIC ${LIBS} ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT} gcov)
 
 # make CLion analyze all files
 add_custom_target(clion_test_dummy SOURCES test_intervaltree.hpp

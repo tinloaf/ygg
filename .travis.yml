@@ -44,4 +44,5 @@ script:
   - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cd test && make && ./run_tests
 
 after_success:
-  - cd build/test/CMakeFiles/run_tests.dir && coveralls --gcov-options '\-lp'
+  - ls -R
+  - cd CMakeFiles/run_tests.dir && coveralls --gcov-options '\-lp'
