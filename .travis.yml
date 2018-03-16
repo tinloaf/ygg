@@ -45,4 +45,4 @@ script:
 
 after_success:
   - ls -R
-  - cd CMakeFiles/run_tests.dir && coveralls --gcov-options '\-lp'
+  - cd CMakeFiles/run_tests.dir && coveralls --exclude /usr --gcov-options '\-lp'
