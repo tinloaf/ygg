@@ -28,6 +28,7 @@ before_install:
   - sudo cp -a include/gtest /usr/include
   - sudo cp -a libgtest_main.so libgtest.so /usr/lib/
   - cd "${TRAVIS_BUILD_DIR}"
+  - pip install --user cpp-coveralls
 
 install:
     - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
@@ -41,3 +42,6 @@ compiler:
 
 script:
   - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cd test && make && ./run_tests
+
+after_success:
+  - coveralls --exclude examples --exclude test --gcov-options '\-lp'
