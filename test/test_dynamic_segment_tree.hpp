@@ -14,7 +14,7 @@
 
 #include "../src/ygg.hpp"
 
-#define IAGG_TESTSIZE 2000
+#define IAGG_TESTSIZE 1500
 #define IAGG_DELETION_TESTSIZE 500
 #define IAGG_DELETION_ITERATIONS 100
 

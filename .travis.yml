@@ -41,7 +41,7 @@ compiler:
   - gcc
 
 script:
-  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cd test && make && ./run_tests
+  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cd test && make && travis_wait ./run_tests
 
 after_success:
   - ls -R
