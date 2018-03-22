@@ -294,6 +294,23 @@ public:
 	 */
 	bool combine_with(ValueT a, ValueT edge_val);
 
+	// TODO the bool is only returned for sake of expansion! Fix that!
+	/**
+	 * @brief Aggregates a value into the max value stored in this combiner
+	 *
+	 * This sets the maximum currently stored at this combiner to the maximum of the currently
+	 * stored value and (a + edge_val).
+	 *
+	 * Usually, a will be the value of the MaxCombiner of a child of the node that this combiner
+	 * belongs to. edge_val will then be the agg_left or agg_right
+	 * value of the node this combiner belongs to.
+	 *
+	 * @param a 				See above
+	 * @param edge_val 	See above
+	 * @return FIXME ignored for now
+	 */
+	 bool aggregate_with(ValueT a);
+
 	/**
 	 * @brief Rebuilds the value in this MaxCombiner from values of its two children's MaxCombiners
 	 *
@@ -367,6 +384,8 @@ public:
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	bool combine_with(CombinerPack<AggValueT, Combiners...> * other, AggValueT edge_val);
+	// TODO the bool is only returned for sake of expansion! Fix that!
+	bool aggregate_with(AggValueT a);
 
 	template<class Combiner>
 	typename Combiner::ValueT get();

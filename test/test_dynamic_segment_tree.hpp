@@ -446,14 +446,15 @@ TEST(IAggTest, ComprehensiveCombinerTest)
 	using BoostMap = interval_map<int, int>;
 	BoostMap reference;
 
-	/*
+
 	for (auto node : persistent_nodes) {
-		std::cout << "Node: " << node.lower << " -> " << node.upper << " @ " << node.value << "\n";
-		reference += std::make_pair(interval<int>::closed(node.lower, node.upper), node.value);
+		reference += std::make_pair(interval<int>::right_open(node.lower, node.upper), node.value);
+		//std::cout << " Interval: [" << node.lower << ", " << node.upper << ") (@" << node.value
+		//          << ")\n";
 	}
-	std::cout << "Resulting Tree: \n";
-	std::cout << agg.dbg_get_dot().str();
-	*/
+
+	//std::cout << "Resulting Tree: \n";
+	//std::cout << agg.dbg_get_dot().str();
 
 	auto start_it = reference.begin();
 	while (start_it != reference.end()) {
@@ -487,6 +488,21 @@ TEST(IAggTest, ComprehensiveCombinerTest)
 			                                           range_upper,
 			                                           lower_closed,
 			                                           upper_closed);
+			/*
+			std::cout << " -> Querying: ";
+			if (lower_closed) {
+				std::cout << " [";
+			} else {
+				std::cout << " (";
+			}
+			std::cout << range_lower << ", " << range_upper;
+			if (upper_closed) {
+				std::cout << "]";
+			} else {
+				std::cout << ")";
+			}
+			std::cout << "\n";
+			*/
 			ASSERT_EQ(combined, max_seen);
 
 			++end_it;

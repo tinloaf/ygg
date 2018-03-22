@@ -428,15 +428,13 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 			// Factor in the edge we just traversed up
 			if (i > 0) {
 				// TODO inefficient!
-				Combiners new_cp;
 				if (right_child == left_contour[i - 1]) {
 					// we traversed the right edge
-					new_cp.combine_with(&cp, cur->agg_right);
+					cp.aggregate_with(cur->agg_right);
 				} else {
 					// we traversed the left edge
-					new_cp.combine_with(&cp, cur->agg_left);
+					cp.aggregate_with(cur->agg_left);
 				}
-				cp = new_cp;
 			}
 
 			// Combine with descending across the contour, if we traversed a left edge
@@ -462,16 +460,13 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 
 			// Factor in the edge we just traversed up
 			if (i > 0) {
-				// TODO inefficient!
-				Combiners new_cp;
 				if (left_child == right_contour[i - 1]) {
 					// we traversed the left edge
-					new_cp.combine_with(&cp, cur->agg_left);
+					cp.aggregate_with(cur->agg_left);
 				} else {
 					// we traversed the right edge
-					new_cp.combine_with(&cp, cur->agg_right);
+					cp.aggregate_with(cur->agg_right);
 				}
-				cp = new_cp;
 			}
 
 			// Combine with descending across the contour, if we traversed a right edge
@@ -488,20 +483,18 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 	cp.combine_with(&left_cp, typename Node::AggValueT());
 
 	/*
-	 * Step 3: Take the combined value and "combine it up" to the root
+	 * Step 3: Take the combined value and aggregate into it everything on the way up to
+	 * the root.
 	 */
 	InnerNode * cur = right_contour[right_contour.size() - 1];
 	while (cur != this->t.get_root()) {
-		// TODO is a temporary copy necessary here?
-		Combiners tmp = cp;
 		InnerNode * old = cur;
-
 		cur = cur->_rbt_parent;
 		if (cur->_rbt_left == old) {
-			cp.combine_with(&tmp, cur->agg_left);
+			cp.aggregate_with(cur->agg_left);
 		} else {
 			// TODO assert?
-			cp.combine_with(&tmp, cur->agg_right);
+			cp.aggregate_with(cur->agg_right);
 		}
 	}
 
@@ -557,6 +550,14 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 			break;
 		}
 	}
+}
+
+template<class ValueT>
+bool
+MaxCombiner<ValueT>::aggregate_with(ValueT a)
+{
+	this->val += a;
+	return false;
 }
 
 template<class ValueT>
@@ -621,6 +622,15 @@ CombinerPack<AggValueT, Combiners...>::combine_with(CombinerPack<AggValueT, Comb
 {
 	utilities::throw_away(std::get<Combiners>(this->data).combine_with(other->get<Combiners>(),
 	                                                                   edge_val) ...);
+	return false;
+}
+
+
+template<class AggValueT, class ... Combiners>
+bool
+CombinerPack<AggValueT, Combiners...>::aggregate_with(AggValueT a)
+{
+	utilities::throw_away(std::get<Combiners>(this->data).aggregate_with(a) ...);
 	return false;
 }
 
