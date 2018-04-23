@@ -37,12 +37,12 @@ public:
 	virtual void setUp(const int64_t value_count_in) override
 	{
 		this->value_count = value_count_in;
-		this->values.resize(this->value_count);
+		this->values.resize((size_t)this->value_count);
 
 		if (distinct) {
 			std::set<int> seen;
 
-			for (int i = 0; i < this->value_count; ++i) {
+			for (size_t i = 0; i < (size_t)this->value_count; ++i) {
 				int val = rand();
 
 				while (seen.find(val) != seen.end()) {
@@ -53,7 +53,7 @@ public:
 				seen.insert(val);
 			}
 		} else {
-			for (int i = 0; i < this->value_count; ++i) {
+			for (size_t i = 0; i < (size_t)this->value_count; ++i) {
 				int val = rand();
 				this->values[i] = val;
 			}
@@ -93,8 +93,8 @@ public:
 	{
 		this->RBTreeBaseFixture<true>::setUp(number_of_nodes);
 
-		this->nodes.resize(number_of_nodes);
-		for (int i = 0 ; i < number_of_nodes ; ++i) {
+		this->nodes.resize((size_t)number_of_nodes);
+		for (size_t i = 0 ; i < (size_t)number_of_nodes ; ++i) {
 			this->nodes[i].value = this->values[i];
 		}
 	}
@@ -129,8 +129,8 @@ public:
 	{
 		this->RBTreeBaseFixture<false>::setUp(number_of_nodes);
 
-		this->nodes.resize(number_of_nodes);
-		for (int i = 0 ; i < number_of_nodes ; ++i) {
+		this->nodes.resize((size_t)number_of_nodes);
+		for (size_t i = 0 ; i < (size_t)number_of_nodes ; ++i) {
 			this->nodes[i].value = this->values[i];
 		}
 	}
@@ -229,8 +229,8 @@ public:
 	{
 		this->RBTreeBaseFixture<true>::setUp(number_of_nodes);
 
-		this->nodes.resize(number_of_nodes);
-		for (int i = 0 ; i < number_of_nodes ; ++i) {
+		this->nodes.resize((size_t)number_of_nodes);
+		for (size_t i = 0 ; i < (size_t)number_of_nodes ; ++i) {
 			this->nodes[i].value = this->values[i];
 		}
 	}
@@ -265,8 +265,8 @@ public:
 	{
 		this->RBTreeBaseFixture<false>::setUp(number_of_nodes);
 
-		this->nodes.resize(number_of_nodes);
-		for (int i = 0 ; i < number_of_nodes ; ++i) {
+		this->nodes.resize((size_t)number_of_nodes);
+		for (size_t i = 0 ; i < (size_t)number_of_nodes ; ++i) {
 			this->nodes[i].value = this->values[i];
 		}
 	}

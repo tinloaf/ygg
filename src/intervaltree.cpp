@@ -157,7 +157,7 @@ IntervalTree<Node, NodeTraits, Options, Tag>::fixup_maxima(Node & node) {
 
 template<class Node, class NodeTraits, class Options, class Tag>
 template<class Comparable>
-IntervalTree<Node, NodeTraits, Options, Tag>::QueryResult<Comparable>
+typename IntervalTree<Node, NodeTraits, Options, Tag>::template QueryResult<Comparable>
 IntervalTree<Node, NodeTraits, Options, Tag>::query(const Comparable & q) const
 {
   Node * cur = this->root;
