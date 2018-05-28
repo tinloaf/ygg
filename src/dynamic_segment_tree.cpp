@@ -16,15 +16,50 @@ namespace ygg {
 
 namespace dyn_segtree_internal {
 
-template<class InnerTree, class InnerNode>
+template<class OuterNode, class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+KeyT
+InnerNode<OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::get_point() const noexcept
+{
+	return this->point;
+}
+
+template<class OuterNode, class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+bool
+InnerNode<OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::is_start() const noexcept
+{
+	return this->start;
+}
+
+template<class OuterNode, class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+bool
+InnerNode<OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::is_end() const noexcept
+{
+	return ! this->start;
+}
+
+template<class OuterNode, class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+bool
+InnerNode<OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::is_closed() const noexcept
+{
+	return this->closed;
+}
+
+template<class OuterNode, class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+const OuterNode *
+InnerNode<OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::get_interval() const noexcept
+{
+	return this->container;
+}
+
+template<class InnerTree, class InnerNode, class Node, class NodeTraits>
 void
-InnerNodeTraits<InnerTree, InnerNode>::leaf_inserted(InnerNode & node){
+InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::leaf_inserted(InnerNode & node){
 	(void) node;
 }
 
-template<class InnerTree, class InnerNode>
+template<class InnerTree, class InnerNode, class Node, class NodeTraits>
 void
-InnerNodeTraits<InnerTree, InnerNode>::delete_leaf(InnerNode & node)
+InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::delete_leaf(InnerNode & node)
 {
 	// TODO DEBUG
 	//assert(node.agg_left == node.agg_right);
@@ -41,9 +76,9 @@ InnerNodeTraits<InnerTree, InnerNode>::delete_leaf(InnerNode & node)
 	}
 }
 
-template<class InnerTree, class InnerNode>
+template<class InnerTree, class InnerNode, class Node, class NodeTraits>
 void
-InnerNodeTraits<InnerTree, InnerNode>::rotated_left(InnerNode & node)
+InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_left(InnerNode & node)
 {
 	InnerNode *old_right = InnerTree::get_parent(&node);
 
@@ -57,9 +92,9 @@ InnerNodeTraits<InnerTree, InnerNode>::rotated_left(InnerNode & node)
 	InnerTree::rebuild_combiners_at(old_right);
 }
 
-template<class InnerTree, class InnerNode>
+template<class InnerTree, class InnerNode, class Node, class NodeTraits>
 void
-InnerNodeTraits<InnerTree, InnerNode>::rotated_right(InnerNode & node)
+InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_right(InnerNode & node)
 {
 	InnerNode * old_left = InnerTree::get_parent(&node);
 
@@ -73,32 +108,45 @@ InnerNodeTraits<InnerTree, InnerNode>::rotated_right(InnerNode & node)
 	InnerTree::rebuild_combiners_at(old_left);
 }
 
-template<class InnerTree, class InnerNode>
+template<class InnerTree, class InnerNode, class Node, class NodeTraits>
+InnerNode *
+InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::get_partner(const InnerNode & n)
+{
+	if (n.start) {
+		return &(n.container->end);
+	} else {
+		return &(n.container->start);
+	}
+}
+
+template<class InnerTree, class InnerNode, class Node, class NodeTraits>
 void
-InnerNodeTraits<InnerTree, InnerNode>::swapped(InnerNode & old_ancestor, InnerNode & old_descendant)
+InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(InnerNode & old_ancestor, InnerNode & old_descendant)
 {
 	// Swap labels to their old places in the tree
 	std::swap(old_ancestor.InnerNode::agg_left, old_descendant.InnerNode::agg_left);
 	std::swap(old_ancestor.InnerNode::agg_right, old_descendant.InnerNode::agg_right);
 
-	if (old_ancestor.InnerNode::partner == &old_descendant) {
+	if (get_partner(old_ancestor) == &old_descendant) {
 		// we are done. They have their contour nulled
 		InnerTree::rebuild_combiners_at(&old_ancestor);
 		InnerTree::rebuild_combiners_at(&old_descendant); // TODO is this necessary?
 		return;
 	}
 
-	// Unapply the contour between where the old descendant war and its partner
-	InnerNode * old_descendant_partner = old_descendant.InnerNode::partner;
+	// Unapply the contour between where the old descendant and its partner
+	InnerNode * old_descendant_partner = get_partner(old_descendant);
+	const Node * old_descendant_node = static_cast<const Node *>(old_descendant.container);
+	auto old_descendant_val = NodeTraits::get_value(*old_descendant_node);
 
 	if (old_descendant.InnerNode::point < old_descendant_partner->InnerNode::point) {
-		InnerTree::modify_contour(&old_ancestor, old_descendant_partner, -1 * old_descendant.val);
-		InnerTree::modify_contour(&old_descendant, old_descendant_partner, old_descendant.val);
+		InnerTree::modify_contour(&old_ancestor, old_descendant_partner, -1 * old_descendant_val);
+		InnerTree::modify_contour(&old_descendant, old_descendant_partner, old_descendant_val);
 	} else {
 		// TODO
 		// empty intervals break this currently
-		InnerTree::modify_contour(old_descendant_partner, &old_ancestor, -1 * old_descendant.val);
-		InnerTree::modify_contour(old_descendant_partner, &old_descendant, old_descendant.val);
+		InnerTree::modify_contour(old_descendant_partner, &old_ancestor, -1 * old_descendant_val);
+		InnerTree::modify_contour(old_descendant_partner, &old_descendant, old_descendant_val);
 	}
 }
 
@@ -135,25 +183,23 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 
 	// TODO why are we doing this every time? Should be done once in the constructor!
 
-	n.NB::start.val = NodeTraits::get_value(n);
 	n.NB::start.point = NodeTraits::get_lower(n);
 	n.NB::start.closed = NodeTraits::is_lower_closed(n);
 	n.NB::start.agg_left = AggValueT();
 	n.NB::start.agg_right = AggValueT();
 
 	n.NB::start.start = true;
-	n.NB::start.partner = &n.NB::end;
+	n.NB::start.container = static_cast<NB *>(&n);
 
 	this->t.insert(n.NB::start);
 
-	n.NB::end.val = NodeTraits::get_value(n);
 	n.NB::end.point = NodeTraits::get_upper(n);
 	n.NB::end.closed = NodeTraits::is_upper_closed(n);
 	n.NB::end.agg_left = AggValueT();
 	n.NB::end.agg_right = AggValueT();
 
 	n.NB::end.start = false;
-	n.NB::end.partner = &n.NB::start;
+	n.NB::end.container = static_cast<NB *>(&n);
 
 	this->t.insert(n.NB::end);
 
@@ -550,6 +596,50 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 			break;
 		}
 	}
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options,
+                            Tag>::template const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::cbegin() const
+{
+	return this->t.cbegin();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::cend() const
+{
+	return this->t.cend();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::begin() const
+{
+	return this->t.begin();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::begin()
+{
+	return this->t.begin();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::end()
+{
+	return this->t.end();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template
+        const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::end() const
+{
+	return this->t.end();
 }
 
 template<class ValueT>

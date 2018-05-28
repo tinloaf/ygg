@@ -13,40 +13,110 @@
 
 namespace ygg {
 
+// Forwards
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+class DynamicSegmentTree;
+
 namespace dyn_segtree_internal {
+
+// Forwards
+template<class InnerTree, class InnerNode, class Node, class NodeTraits>
+class InnerNodeTraits;
+
 /// @cond INTERNAL
 template<class Tag>
 class InnerRBTTag {};
+/// @endcond
 
 /**
- * @brief An inner node, representing either a start or an end of an interval
+ * @brief Representation of either a start or an end of an interval
+ *
+ * An object of this class represents either a start or an end of an interval you inserted
+ * into a DynamicSegmentTree. You can use get_interval() to retrieve a pointer to the node
+ * that you inserted into the DynamicSegmentTree.
  */
-template<class KeyT_in, class ValueT_in, class AggValueT_in, class Combiners, class Tag>
-class InnerNode : public RBTreeNodeBase<InnerNode<KeyT_in, ValueT_in, AggValueT_in, Combiners, Tag>,
+template<class OuterNode,
+         class KeyT_in, class ValueT_in, class AggValueT_in, class Combiners, class Tag>
+class InnerNode : public RBTreeNodeBase<InnerNode<OuterNode, KeyT_in, ValueT_in, AggValueT_in,
+                                                  Combiners, Tag>,
                                         TreeOptions<TreeFlags::MULTIPLE>, InnerRBTTag<Tag>>
 {
 public:
+	/**
+	 * @brief The type of the key (i.e., the interval bounds)
+	 */
 	using KeyT = KeyT_in;
+	/**
+	 * @brief The type of the value associated with the intervals
+	 */
 	using ValueT = ValueT_in;
+	/**
+	 * @brief The type of the aggregate value
+	 */
 	using AggValueT = AggValueT_in;
 
-	// TODO instead of storing all of these, store a pointer to the containing interval and use
-	// interval traits?
+	/**
+	 * @brief Returns the point at which the event represented by this InnerNode happens
+	 *
+	 * @return The point at which the event represented by this InnerNode happens
+	 */
+	KeyT get_point() const noexcept;
+
+	/**
+	 * @brief Returns true if this InnerNode represents an interval start
+	 *
+	 * @return true if this InnerNode represents an interval start
+	 */
+	bool is_start() const noexcept;
+
+	/**
+	 * @brief Returns true if this InnerNode represents an interval end
+	 *
+	 * @return true if this InnerNode represents an interval end
+	 */
+	bool is_end() const noexcept;
+
+	/**
+   * @brief Returns true if the interval border represented by this InnerNode is closed
+   *
+ 	 * @return true if the interval border represented by this InnerNode is closed
+   */
+	bool is_closed() const noexcept;
+
+	/**
+	 * @brief Returns a pointer to your interval node
+	 *
+	 * This returns a pointer to an DynSegTreeNodeBase, which is the base class from which you
+	 * have derived your Node class. You can up-cast this into your node class to get a pointer
+	 * to the interval node.
+	 *
+	 * @return a pointer to your interval node
+	 */
+	const OuterNode * get_interval() const noexcept;
+
+private:
+	// TODO instead of storing all of these, and use interval traits and container pointer?
 	KeyT point;
 	bool start;
 	bool closed;
 
 	// TODO remove this
-	InnerNode<KeyT, ValueT, AggValueT, Combiners, Tag> * partner;
+	OuterNode * container;
 
-	ValueT val; // TODO this can be removed!
 	AggValueT agg_left;
 	AggValueT agg_right;
 
 	Combiners combiners;
+
+	// The tree and the node traits have full access to the nodes
+	template<class FNode, class FNodeTraits, class FCombiners, class FOptions, class FTag>
+	friend class DynamicSegmentTree;
+	template<class FInnerTree, class FInnerNode, class FNode, class FNodeTraits>
+	friend class InnerNodeTraits;
 };
 
-template<class InnerTree, class InnerNode>
+/// @cond INTERNAL
+template<class InnerTree, class InnerNode, class Node, class NodeTraits>
 class InnerNodeTraits : public RBDefaultNodeTraits<InnerNode> {
 public:
 	static void leaf_inserted(InnerNode & node);
@@ -54,6 +124,8 @@ public:
 	static void rotated_right(InnerNode & node);
 	static void delete_leaf(InnerNode & node);
 	static void swapped(InnerNode & n1, InnerNode & n2);
+private:
+	static InnerNode * get_partner(const InnerNode & n);
 };
 
 template<class InnerNode>
@@ -66,22 +138,22 @@ public:
 	{
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs.point != rhs.point) {
+		if (lhs.get_point() != rhs.get_point()) {
 #pragma GCC diagnostic pop
-			return lhs.point < rhs.point;
+			return lhs.get_point() < rhs.get_point();
 		} else {
 			/*
 			 * At the same point, the order is: open ends, closed starts, closed ends, open starts
 			 */
 			int_fast8_t lhs_priority;
-			if (lhs.closed) {
-				if (lhs.start) {
+			if (lhs.is_closed()) {
+				if (lhs.is_start()) {
 					lhs_priority = -1;
 				} else {
 					lhs_priority = 1;
 				}
 			} else {
-				if (lhs.start) {
+				if (lhs.is_start()) {
 					lhs_priority = 2;
 				} else {
 					lhs_priority = -2;
@@ -89,14 +161,14 @@ public:
 			}
 
 			int_fast8_t rhs_priority;
-			if (rhs.closed) {
-				if (rhs.start) {
+			if (rhs.is_closed()) {
+				if (rhs.is_start()) {
 					rhs_priority = -1;
 				} else {
 					rhs_priority = 1;
 				}
 			} else {
-				if (rhs.start) {
+				if (rhs.is_start()) {
 					rhs_priority = 2;
 				} else {
 					rhs_priority = -2;
@@ -111,26 +183,26 @@ public:
 	{
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs != rhs.point) {
-			return lhs < rhs.point;
+		if (lhs != rhs.get_point()) {
+			return lhs < rhs.get_point();
 		}
 #pragma GCC diagnostic pop
 
 		// only open starts are strictly larger than the key
-		return (rhs.start && !rhs.closed);
+		return (rhs.is_start() && !rhs.is_closed());
 	}
 
 	bool operator()(const InnerNode & lhs, const typename InnerNode::KeyT & rhs) const
 	{
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs.point != rhs) {
-			return lhs.point < rhs;
+		if (lhs.get_point() != rhs) {
+			return lhs.get_point() < rhs;
 		}
 #pragma GCC diagnostic pop
 
 		// only open ends must strictly go before the key
-		return (!lhs.start && !lhs.closed);
+		return (!lhs.is_start() && !lhs.is_closed());
 	}
 
 
@@ -138,8 +210,8 @@ public:
 	{
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs.first != rhs.point) {
-			return lhs.first < rhs.point;
+		if (lhs.first != rhs.get_point()) {
+			return lhs.first < rhs.get_point();
 		}
 #pragma GCC diagnostic pop
 
@@ -148,11 +220,11 @@ public:
 			return false;
 		} else if (lhs.second < 0) {
 			// the query is right-open. It should go before everything but open end nodes
-			return rhs.start || rhs.closed;
+			return rhs.is_start() || rhs.is_closed();
 		} else {
 			// The query is closed.
 			// only open starts are strictly larger than the key
-			return (rhs.start && !rhs.closed);
+			return (rhs.is_start() && !rhs.is_closed());
 		}
 	}
 
@@ -160,21 +232,21 @@ public:
 	{
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs.point != rhs.first) {
-			return lhs.point < rhs.first;
+		if (lhs.get_point() != rhs.first) {
+			return lhs.get_point() < rhs.first;
 		}
 #pragma GCC diagnostic pop
 		
 		if (rhs.second > 0) {
 			// the query is left-open, i.e., everything but left-open is before it
-			return !(lhs.start && !lhs.closed);
+			return !(lhs.is_start() && !lhs.is_closed());
 		} else if (rhs.second > 0) {
 			// the query is right-open, i.e., nothing must ever strictly go before it
 			return false;
 		} else {
 			// the query is closed
 			// only open ends must strictly go before the key
-			return (!lhs.start && !lhs.closed);
+			return (!lhs.is_start() && !lhs.is_closed());
 		}
 	}
 };
@@ -419,8 +491,10 @@ public:
 	using KeyT = KeyType;
 	using ValueT = ValueType;
 	using AggValueT = AggValueType;
+	using my_type = DynSegTreeNodeBase<KeyType, ValueType, AggValueType, Combiners, Tag>;
 
-	using InnerNode = dyn_segtree_internal::InnerNode<KeyT, ValueT, AggValueT, Combiners, Tag>;
+	using InnerNode = dyn_segtree_internal::InnerNode<my_type,
+					KeyT, ValueT, AggValueT, Combiners, Tag>;
 
 	// TODO make these private
 	/**
@@ -544,12 +618,18 @@ public:
 	using AggValueT = typename Node::AggValueT;
 
 private:
-	class InnerTree : public RBTree<InnerNode, dyn_segtree_internal::InnerNodeTraits<InnerTree, InnerNode>,
+	class InnerTree : public RBTree<InnerNode,
+	                                dyn_segtree_internal::InnerNodeTraits<InnerTree,
+	                                                                      InnerNode,
+	                                                                      Node, NodeTraits>,
 	                          TreeOptions<TreeFlags::MULTIPLE>,
 	                          dyn_segtree_internal::InnerRBTTag<Tag>, dyn_segtree_internal::Compare<InnerNode>>
 	{
 	public:
-		using BaseTree = RBTree<InnerNode, dyn_segtree_internal::InnerNodeTraits<InnerTree, InnerNode>,
+		using BaseTree = RBTree<InnerNode,
+		                        dyn_segtree_internal::InnerNodeTraits<InnerTree,
+		                                                              InnerNode,
+		                                                              Node, NodeTraits>,
 		                        TreeOptions<TreeFlags::MULTIPLE>,
 		                        dyn_segtree_internal::InnerRBTTag<Tag>, dyn_segtree_internal::Compare<InnerNode>>;
 
@@ -613,6 +693,53 @@ public:
 	                                       const typename Node::KeyT & upper,
 																				 bool lower_closed = true,
 																			   bool upper_closed = false) const;
+
+	/*
+	 * Iteration
+	 */
+	template<bool reverse>
+	using const_iterator = typename InnerTree::template const_iterator<reverse>;
+	template<bool reverse>
+	using iterator = typename InnerTree::template iterator<reverse>;
+	/**
+   * Returns an iterator pointing to the smallest InnerNode representing a start or end event.
+   */
+	const_iterator<false> cbegin() const;
+	/**
+	 * Returns an iterator pointing after the largest InnerNode representing a start or end event.
+	 */
+	const_iterator<false> cend() const;
+	/**
+	 * Returns an iterator pointing to the smallest InnerNode representing a start or end event.
+	 */
+	const_iterator<false> begin() const;
+	iterator<false> begin();
+
+	/**
+   * Returns an iterator pointing after the largest InnerNode representing a start or end event.
+   */
+	const_iterator<false> end() const;
+	iterator<false> end();
+
+	/**
+   * Returns an reverse iterator pointing to the largest InnerNode representing a start or end event.
+   */
+	const_iterator<true> crbegin() const;
+	/**
+	 * Returns an reverse iterator pointing before the smallest InnerNode representing a start or end event.
+	 */
+	const_iterator<true> crend() const;
+	/**
+	 * Returns an reverse iterator pointing to the largest InnerNode representing a start or end event.
+	 */
+	const_iterator<true> rbegin() const;
+	iterator<true> rbegin();
+
+	/**
+   * Returns an reverse iterator pointing before the smallest InnerNode representing a start or end event.
+   */
+	const_iterator<true> rend() const;
+	iterator<true> rend();
 
 	/*
 	 * DEBUGGING

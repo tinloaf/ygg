@@ -86,6 +86,18 @@ TEST(IAggTest, TrivialTest)
 	ASSERT_EQ(combined_range, 10);
 	combined_range = agg.get_combined<MCombiner>(8,10);
 	ASSERT_EQ(combined_range, 0);
+
+	// Test iteration
+	auto it = agg.cbegin();
+	ASSERT_EQ(it->get_point(), 2);
+	ASSERT_EQ(it->is_start(), true);
+	ASSERT_EQ(static_cast<const Node *>(it->get_interval()), &n);
+	it++;
+	ASSERT_EQ(it->get_point(), 5);
+	ASSERT_EQ(it->is_end(), true);
+	ASSERT_EQ(static_cast<const Node *>(it->get_interval()), &n);
+	it++;
+	ASSERT_EQ(it, agg.cend());
 }
 
 TEST(IAggTest, NestingTest)
@@ -115,6 +127,20 @@ TEST(IAggTest, NestingTest)
 		int combined_range = agg.get_combined<MCombiner>(0,i+1,true,false);
 		ASSERT_EQ(combined_range, i+1);
 	}
+
+	// Test iteration
+	auto it = agg.cbegin();
+	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+		ASSERT_EQ(it->get_point(), i);
+		ASSERT_TRUE(it->is_start());
+		it++;
+	}
+	for (int i = IAGG_TESTSIZE - 1;  i >= 0 ; --i) {
+		ASSERT_EQ(it->get_point(), 2 * IAGG_TESTSIZE - i + 1);
+		ASSERT_TRUE(it->is_end());
+		it++;
+	}
+	ASSERT_EQ(it, agg.cend());
 }
 
 TEST(IAggTest, OverlappingTest)
