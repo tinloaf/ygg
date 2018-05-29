@@ -114,6 +114,42 @@ int main(int argc, char **argv) {
 	 * Point: 15	| Aggregate Value: 8
 	 * */
 
+	std::cout << "\n==============================\n\n";
+
+	 /* We can also iterate all start and end events. */
+	for (auto event : t) {
+		std::cout << "At point " << event.get_point();
+		if (event.is_closed()) {
+			std::cout << " (inclusive) ";
+		} else {
+			std::cout << " (exclusive) ";
+		}
+
+		std::cout << " there ";
+		if (event.is_start()) {
+			std::cout << " starts ";
+		} else {
+			std::cout << " ends ";
+		}
+
+		// We need to up-cast the pointer we get to our interval class
+		auto interval = static_cast<const Interval *>(event.get_interval());
+		std::cout << "the interval [" << interval->lower	<< "," << interval->upper << ")\n";
+	}
+
+	/* Should output:
+	 * At point 0 (inclusive)  there  starts the interval [0,10)
+	 * At point 0.5 (inclusive)  there  starts the interval [0.5,10)
+	 * At point 10 (exclusive)  there  ends the interval [0.5,10)
+	 * At point 10 (exclusive)  there  ends the interval [0,10)
+	 * At point 10 (inclusive)  there  starts the interval [10,15)
+	 * At point 12 (inclusive)  there  starts the interval [12,20)
+	 * At point 15 (exclusive)  there  ends the interval [10,15)
+	 * At point 20 (exclusive)  there  ends the interval [12,20)
+	 */
+
+	std::cout << "\n==============================\n\n";
+
 	/* Now, combiners. The max combiner first allows us to query (in O(1)) what the total maximum
 	 * value is: */
 	std::cout << "Maximum Value: " << t.get_combined<MCombiner>() << "\n";

@@ -642,6 +642,52 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::end() const
 	return this->t.end();
 }
 
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options,
+                            Tag>::template const_iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::crbegin() const
+{
+	return this->t.crbegin();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template
+        const_iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::crend() const
+{
+	return this->t.crend();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template
+        const_iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::rbegin() const
+{
+	return this->t.rbegin();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::rbegin()
+{
+	return this->t.rbegin();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::rend()
+{
+	return this->t.rend();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template
+        const_iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::rend() const
+{
+	return this->t.rend();
+}
+
 template<class ValueT>
 bool
 MaxCombiner<ValueT>::aggregate_with(ValueT a)

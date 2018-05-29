@@ -701,42 +701,48 @@ public:
 	using const_iterator = typename InnerTree::template const_iterator<reverse>;
 	template<bool reverse>
 	using iterator = typename InnerTree::template iterator<reverse>;
+
+	// TODO derive a non-internal class from the InnerNode, and make the iterator return a pointer
+	// to that.
+
 	/**
-   * Returns an iterator pointing to the smallest InnerNode representing a start or end event.
+   * Returns an iterator pointing to the smallest \ref dyn_segtree_internal::InnerNode "InnerNode" representing a
+   * start or end event.
    */
 	const_iterator<false> cbegin() const;
 	/**
-	 * Returns an iterator pointing after the largest InnerNode representing a start or end event.
+	 * Returns an iterator pointing after the largest \ref dyn_segtree_internal::InnerNode "InnerNode"
+	 * representing a start or end event.
 	 */
 	const_iterator<false> cend() const;
 	/**
-	 * Returns an iterator pointing to the smallest InnerNode representing a start or end event.
+	 * Returns an iterator pointing to the smallest \ref dyn_segtree_internal::InnerNode "InnerNode" representing a start or end event.
 	 */
 	const_iterator<false> begin() const;
 	iterator<false> begin();
 
 	/**
-   * Returns an iterator pointing after the largest InnerNode representing a start or end event.
+   * Returns an iterator pointing after the largest \ref dyn_segtree_internal::InnerNode "InnerNode" representing a start or end event.
    */
 	const_iterator<false> end() const;
 	iterator<false> end();
 
 	/**
-   * Returns an reverse iterator pointing to the largest InnerNode representing a start or end event.
+   * Returns an reverse iterator pointing to the largest \ref dyn_segtree_internal::InnerNode "InnerNode" representing a start or end event.
    */
 	const_iterator<true> crbegin() const;
 	/**
-	 * Returns an reverse iterator pointing before the smallest InnerNode representing a start or end event.
+	 * Returns an reverse iterator pointing before the smallest \ref dyn_segtree_internal::InnerNode "InnerNode" representing a start or end event.
 	 */
 	const_iterator<true> crend() const;
 	/**
-	 * Returns an reverse iterator pointing to the largest InnerNode representing a start or end event.
+	 * Returns an reverse iterator pointing to the largest \ref dyn_segtree_internal::InnerNode "InnerNode" representing a start or end event.
 	 */
 	const_iterator<true> rbegin() const;
 	iterator<true> rbegin();
 
 	/**
-   * Returns an reverse iterator pointing before the smallest InnerNode representing a start or end event.
+   * Returns an reverse iterator pointing before the smallest \ref dyn_segtree_internal::InnerNode "InnerNode" representing a start or end event.
    */
 	const_iterator<true> rend() const;
 	iterator<true> rend();
