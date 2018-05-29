@@ -151,6 +151,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a39da3aa6be68e1db0a412b0ff959b068"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1List.html#a39da3aa6be68e1db0a412b0ff959b068">size</a> () const </td></tr>
 <tr class="memdesc:a39da3aa6be68e1db0a412b0ff959b068"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of elements in the list.  <a href="#a39da3aa6be68e1db0a412b0ff959b068">More...</a><br /></td></tr>
 <tr class="separator:a39da3aa6be68e1db0a412b0ff959b068"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a393907d98850324e3c3ac25e1019fe8a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1List.html#a393907d98850324e3c3ac25e1019fe8a">empty</a> () const </td></tr>
+<tr class="memdesc:a393907d98850324e3c3ac25e1019fe8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the list is empty.  <a href="#a393907d98850324e3c3ac25e1019fe8a">More...</a><br /></td></tr>
+<tr class="separator:a393907d98850324e3c3ac25e1019fe8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd8f301bedc88d8498d13c7be78ad52c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1List.html#abd8f301bedc88d8498d13c7be78ad52c">clear</a> ()</td></tr>
+<tr class="memdesc:abd8f301bedc88d8498d13c7be78ad52c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all elements from this list.  <a href="#abd8f301bedc88d8498d13c7be78ad52c">More...</a><br /></td></tr>
+<tr class="separator:abd8f301bedc88d8498d13c7be78ad52c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class Node, class Options = DefaultOptions, class Tag = int&gt;<br />
@@ -220,6 +226,47 @@ template&lt;class Node, class Options = DefaultOptions, class Tag = int&gt; </di
 </div><div class="memdoc">
 <p>Returns an iterator pointing to the first element in the list.</p>
 <dl class="section return"><dt>Returns</dt><dd>An iterator pointing to the first element in the list. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="abd8f301bedc88d8498d13c7be78ad52c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Node, class Options = DefaultOptions, class Tag = int&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classygg_1_1List.html">ygg::List</a>&lt; Node, Options, Tag &gt;::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes all elements from this list. </p>
+<p>This method runs in O(1). </p>
+
+</div>
+</div>
+<a class="anchor" id="a393907d98850324e3c3ac25e1019fe8a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Node, class Options = DefaultOptions, class Tag = int&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classygg_1_1List.html">ygg::List</a>&lt; Node, Options, Tag &gt;::empty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns whether the list is empty. </p>
+<p>This method runs in O(1).</p>
+<dl class="section return"><dt>Returns</dt><dd>true if the list is empty, false otherwise </dd></dl>
 
 </div>
 </div>

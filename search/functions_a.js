@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['upper_5fbound',['upper_bound',['../classygg_1_1RBTree.html#ae68e9b9f51f8f703afb863f46bf89675',1,'ygg::RBTree']]]
+  ['query',['query',['../classygg_1_1DynamicSegmentTree.html#a59d78fa04b6fe9f2b1cf7db1a62f56fa',1,'ygg::DynamicSegmentTree']]]
 ];

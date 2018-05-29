@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['rbegin',['rbegin',['../classygg_1_1RBTree.html#ae6f2ec2fb38b759b6852a557adde543c',1,'ygg::RBTree']]],
-  ['remove',['remove',['../classygg_1_1RBTree.html#af1a4662fe92a39c0b56a2dbbc671341c',1,'ygg::RBTree::remove()'],['../classygg_1_1List.html#aa35b867f652247383c2ec23e0b7be780',1,'ygg::List::remove()']]],
-  ['rend',['rend',['../classygg_1_1RBTree.html#a2e0e82086fa010bc5f2235a8c330db06',1,'ygg::RBTree']]]
+  ['list',['List',['../classygg_1_1List.html#a4812118073a5da3b74d11a6c8d6ac97e',1,'ygg::List']]],
+  ['lower_5fbound',['lower_bound',['../classygg_1_1RBTree.html#a724c613e26c775e2e0341fa4e7b7154a',1,'ygg::RBTree']]]
 ];

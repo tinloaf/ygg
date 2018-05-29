@@ -92,6 +92,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
@@ -149,10 +150,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>verify_integrity</b> 
 <tr class="memitem:adb8e15dc912a093cfdcbe43a7ff12488"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adb8e15dc912a093cfdcbe43a7ff12488"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>dump_to_dot</b> (const std::string &amp;filename) const </td></tr>
 <tr class="separator:adb8e15dc912a093cfdcbe43a7ff12488"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af88451a5fcdbeb07d3002cfc8479db35"><td class="memTemplParams" colspan="2"><a class="anchor" id="af88451a5fcdbeb07d3002cfc8479db35"></a>
+<tr class="memitem:abaec0c5c7f05df5bce8a3518ae9a9a35"><td class="memTemplParams" colspan="2"><a class="anchor" id="abaec0c5c7f05df5bce8a3518ae9a9a35"></a>
 template&lt;class Comparable &gt; </td></tr>
-<tr class="memitem:af88451a5fcdbeb07d3002cfc8479db35"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1IntervalTree_1_1QueryResult.html">QueryResult</a>&lt; Comparable &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>query</b> (const Comparable &amp;q) const </td></tr>
-<tr class="separator:af88451a5fcdbeb07d3002cfc8479db35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abaec0c5c7f05df5bce8a3518ae9a9a35"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1IntervalTree_1_1QueryResult.html">QueryResult</a>&lt; Comparable &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>query</b> (const Comparable &amp;q) const </td></tr>
+<tr class="separator:abaec0c5c7f05df5bce8a3518ae9a9a35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16f4bc3b2aab5dc7eb727ec68a629f59"><td class="memTemplParams" colspan="2"><a class="anchor" id="a16f4bc3b2aab5dc7eb727ec68a629f59"></a>
 template&lt;class Comparable &gt; </td></tr>
 <tr class="memitem:a16f4bc3b2aab5dc7eb727ec68a629f59"><td class="memTemplItemLeft" align="right" valign="top">BaseTree::template const_iterator&lt; false &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>interval_upper_bound</b> (const Comparable &amp;query_range) const </td></tr>
@@ -160,6 +161,10 @@ template&lt;class Comparable &gt; </td></tr>
 <tr class="memitem:ab1c7ee65b66750ae10f16715c648570f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab1c7ee65b66750ae10f16715c648570f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>fixup_maxima</b> (Node &amp;lowest)</td></tr>
 <tr class="separator:ab1c7ee65b66750ae10f16715c648570f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b2670865f13c500e2d336e48e9b57f4"><td class="memTemplParams" colspan="2"><a class="anchor" id="a1b2670865f13c500e2d336e48e9b57f4"></a>
+template&lt;class Comparable &gt; </td></tr>
+<tr class="memitem:a1b2670865f13c500e2d336e48e9b57f4"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1IntervalTree.html">IntervalTree</a>&lt; Node, NodeTraits, Options, Tag &gt;::template <a class="el" href="classygg_1_1IntervalTree_1_1QueryResult.html">QueryResult</a>&lt; Comparable &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>query</b> (const Comparable &amp;q) const </td></tr>
+<tr class="separator:a1b2670865f13c500e2d336e48e9b57f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63a4bb342e2c916d69aa4a1d20d49d8e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a63a4bb342e2c916d69aa4a1d20d49d8e">insert</a> (Node &amp;node)</td></tr>
 <tr class="memdesc:a63a4bb342e2c916d69aa4a1d20d49d8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts &lt;node&gt; into the tree.  <a href="#a63a4bb342e2c916d69aa4a1d20d49d8e">More...</a><br /></td></tr>
 <tr class="separator:a63a4bb342e2c916d69aa4a1d20d49d8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,59 +174,92 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>insert</b> (Node &amp
 <tr class="memitem:ab5277073383e9c9e9fd0476667197eb7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab5277073383e9c9e9fd0476667197eb7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>insert</b> (Node &amp;node, iterator&lt; false &gt; hint)</td></tr>
 <tr class="separator:ab5277073383e9c9e9fd0476667197eb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c14b102738f486f2c4739c3cc6cd3dc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6c14b102738f486f2c4739c3cc6cd3dc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>insert_left_leaning</b> (Node &amp;node)</td></tr>
+<tr class="separator:a6c14b102738f486f2c4739c3cc6cd3dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a052e9722280cc2bef66cf1534a496888"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a052e9722280cc2bef66cf1534a496888"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>insert_right_leaning</b> (Node &amp;node)</td></tr>
+<tr class="separator:a052e9722280cc2bef66cf1534a496888"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42b61800d5608cd14a84e11bf905d9d8"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a42b61800d5608cd14a84e11bf905d9d8">find</a> (const Comparable &amp;query) const</td></tr>
 <tr class="memdesc:a42b61800d5608cd14a84e11bf905d9d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds an element in the tree.  <a href="#a42b61800d5608cd14a84e11bf905d9d8">More...</a><br /></td></tr>
 <tr class="separator:a42b61800d5608cd14a84e11bf905d9d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a255dcde63c5d84b2970b760b9a2bca35"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a255dcde63c5d84b2970b760b9a2bca35"></a>
 iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>find</b> (const Comparable &amp;query)</td></tr>
 <tr class="separator:a255dcde63c5d84b2970b760b9a2bca35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a978345da2be3df1b2e735ae46adc7988"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a978345da2be3df1b2e735ae46adc7988"></a>
+iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>find</b> (const Comparable &amp;query, Callbacks *cbs)</td></tr>
+<tr class="separator:a978345da2be3df1b2e735ae46adc7988"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae68e9b9f51f8f703afb863f46bf89675"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#ae68e9b9f51f8f703afb863f46bf89675">upper_bound</a> (const Comparable &amp;query) const</td></tr>
 <tr class="memdesc:ae68e9b9f51f8f703afb863f46bf89675"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upper-bounds an element.  <a href="#ae68e9b9f51f8f703afb863f46bf89675">More...</a><br /></td></tr>
 <tr class="separator:ae68e9b9f51f8f703afb863f46bf89675"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49a429fe9b02f5d9276d12a6bc432458"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a49a429fe9b02f5d9276d12a6bc432458"></a>
 iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>upper_bound</b> (const Comparable &amp;query)</td></tr>
 <tr class="separator:a49a429fe9b02f5d9276d12a6bc432458"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a724c613e26c775e2e0341fa4e7b7154a"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a724c613e26c775e2e0341fa4e7b7154a">lower_bound</a> (const Comparable &amp;query) const</td></tr>
+<tr class="memdesc:a724c613e26c775e2e0341fa4e7b7154a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lower-bounds an element.  <a href="#a724c613e26c775e2e0341fa4e7b7154a">More...</a><br /></td></tr>
+<tr class="separator:a724c613e26c775e2e0341fa4e7b7154a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9e2384696ec6f78bc7745f596a94c4a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9e2384696ec6f78bc7745f596a94c4a"></a>
+iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>lower_bound</b> (const Comparable &amp;query)</td></tr>
+<tr class="separator:ad9e2384696ec6f78bc7745f596a94c4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1a4662fe92a39c0b56a2dbbc671341c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#af1a4662fe92a39c0b56a2dbbc671341c">remove</a> (Node &amp;node)</td></tr>
 <tr class="memdesc:af1a4662fe92a39c0b56a2dbbc671341c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes &lt;node&gt; from the tree.  <a href="#af1a4662fe92a39c0b56a2dbbc671341c">More...</a><br /></td></tr>
 <tr class="separator:af1a4662fe92a39c0b56a2dbbc671341c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca24646244a9eaf091be513d10720be3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#aca24646244a9eaf091be513d10720be3">clear</a> ()</td></tr>
 <tr class="memdesc:aca24646244a9eaf091be513d10720be3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all elements from the tree.  <a href="#aca24646244a9eaf091be513d10720be3">More...</a><br /></td></tr>
 <tr class="separator:aca24646244a9eaf091be513d10720be3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0342fde53a428765032b0f0e6b18fb13"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a0342fde53a428765032b0f0e6b18fb13">cbegin</a> () const</td></tr>
-<tr class="separator:a0342fde53a428765032b0f0e6b18fb13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8700dafa0b61f877b4e81c3cdeb68f7d"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a8700dafa0b61f877b4e81c3cdeb68f7d">cend</a> () const</td></tr>
-<tr class="separator:a8700dafa0b61f877b4e81c3cdeb68f7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9067db44a397e924e3cc7ee3aff6a983"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a9067db44a397e924e3cc7ee3aff6a983">begin</a> () const</td></tr>
-<tr class="separator:a9067db44a397e924e3cc7ee3aff6a983"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9bb915b8588c8a6028b222cc8e96ef1f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9bb915b8588c8a6028b222cc8e96ef1f"></a>
+<tr class="memitem:ad6af80c5ed24a7ff43f7116094172c49"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#ad6af80c5ed24a7ff43f7116094172c49">cbegin</a> () const</td></tr>
+<tr class="separator:ad6af80c5ed24a7ff43f7116094172c49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab255518460ec0b72012c0cc4b873c27"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#aab255518460ec0b72012c0cc4b873c27">cend</a> () const</td></tr>
+<tr class="separator:aab255518460ec0b72012c0cc4b873c27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf204185ac814bf16533ff4a1855529b"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#abf204185ac814bf16533ff4a1855529b">begin</a> () const</td></tr>
+<tr class="separator:abf204185ac814bf16533ff4a1855529b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada733faf2e9a4f5a30490d4ad7f0aa2f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada733faf2e9a4f5a30490d4ad7f0aa2f"></a>
 iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> ()</td></tr>
-<tr class="separator:a9bb915b8588c8a6028b222cc8e96ef1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79d8dbdab48e8988b543b916789c010d"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a79d8dbdab48e8988b543b916789c010d">end</a> () const</td></tr>
-<tr class="separator:a79d8dbdab48e8988b543b916789c010d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab24a4fc5d557c5d19b56d05ed1bc7b9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab24a4fc5d557c5d19b56d05ed1bc7b9"></a>
+<tr class="separator:ada733faf2e9a4f5a30490d4ad7f0aa2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43e702bf1bf89ad430624846db8bf6ea"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a43e702bf1bf89ad430624846db8bf6ea">end</a> () const</td></tr>
+<tr class="separator:a43e702bf1bf89ad430624846db8bf6ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba16559dfb0486d1ce630052c3a16283"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba16559dfb0486d1ce630052c3a16283"></a>
 iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> ()</td></tr>
-<tr class="separator:aab24a4fc5d557c5d19b56d05ed1bc7b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9806552003d4d6a087844747711fbb48"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a9806552003d4d6a087844747711fbb48">crbegin</a> () const</td></tr>
-<tr class="separator:a9806552003d4d6a087844747711fbb48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07769c0e07b125cba1ffc5337edf8f5d"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a07769c0e07b125cba1ffc5337edf8f5d">crend</a> () const</td></tr>
-<tr class="separator:a07769c0e07b125cba1ffc5337edf8f5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6f2ec2fb38b759b6852a557adde543c"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#ae6f2ec2fb38b759b6852a557adde543c">rbegin</a> () const</td></tr>
-<tr class="separator:ae6f2ec2fb38b759b6852a557adde543c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae29626305936047ba5ed4ec9ec9e4090"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae29626305936047ba5ed4ec9ec9e4090"></a>
+<tr class="separator:aba16559dfb0486d1ce630052c3a16283"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae53e394a99c23810dc0a37f7b52ed386"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#ae53e394a99c23810dc0a37f7b52ed386">crbegin</a> () const</td></tr>
+<tr class="separator:ae53e394a99c23810dc0a37f7b52ed386"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf3e6aada0d521b78963a5e758bfbb0e"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#acf3e6aada0d521b78963a5e758bfbb0e">crend</a> () const</td></tr>
+<tr class="separator:acf3e6aada0d521b78963a5e758bfbb0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2e477855a801ad20f921c49a5b0b20e"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#af2e477855a801ad20f921c49a5b0b20e">rbegin</a> () const</td></tr>
+<tr class="separator:af2e477855a801ad20f921c49a5b0b20e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad145f80310379b71728962697682aac9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad145f80310379b71728962697682aac9"></a>
 iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rbegin</b> ()</td></tr>
-<tr class="separator:ae29626305936047ba5ed4ec9ec9e4090"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e0e82086fa010bc5f2235a8c330db06"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a2e0e82086fa010bc5f2235a8c330db06">rend</a> () const</td></tr>
-<tr class="separator:a2e0e82086fa010bc5f2235a8c330db06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9e52e8f2798f014d73a5104a734b1b5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9e52e8f2798f014d73a5104a734b1b5"></a>
+<tr class="separator:ad145f80310379b71728962697682aac9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8520bd5081360c0d5a06564a127a7fd6"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a8520bd5081360c0d5a06564a127a7fd6">rend</a> () const</td></tr>
+<tr class="separator:a8520bd5081360c0d5a06564a127a7fd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7994419899e0597f8381104493bd6ebf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7994419899e0597f8381104493bd6ebf"></a>
 iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rend</b> ()</td></tr>
-<tr class="separator:ae9e52e8f2798f014d73a5104a734b1b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a620536cca1ed37ddd52bb62469dbbe89"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a620536cca1ed37ddd52bb62469dbbe89">iterator_to</a> (const Node &amp;node) const</td></tr>
-<tr class="separator:a620536cca1ed37ddd52bb62469dbbe89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e2dce448b34b9dd39510a2fc31c4a18"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8e2dce448b34b9dd39510a2fc31c4a18"></a>
+<tr class="separator:a7994419899e0597f8381104493bd6ebf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a448fd39a99cc5287f5736e430eeb0d3c"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#a448fd39a99cc5287f5736e430eeb0d3c">iterator_to</a> (const Node &amp;node) const</td></tr>
+<tr class="separator:a448fd39a99cc5287f5736e430eeb0d3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cc584c874ee17a98364e36e2316015d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9cc584c874ee17a98364e36e2316015d"></a>
 iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>iterator_to</b> (Node &amp;node)</td></tr>
-<tr class="separator:a8e2dce448b34b9dd39510a2fc31c4a18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a9cc584c874ee17a98364e36e2316015d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedcdfba7b385f7c1e9f665d1807a31a5"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#aedcdfba7b385f7c1e9f665d1807a31a5">size</a> () const</td></tr>
 <tr class="separator:aedcdfba7b385f7c1e9f665d1807a31a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab012ff8942f388476276a2539c2f557c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1RBTree.html#ab012ff8942f388476276a2539c2f557c">empty</a> () const</td></tr>
+<tr class="memdesc:ab012ff8942f388476276a2539c2f557c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the tree is empty.  <a href="#ab012ff8942f388476276a2539c2f557c">More...</a><br /></td></tr>
+<tr class="separator:ab012ff8942f388476276a2539c2f557c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5620b412dc540c837d24b67d126f21e4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5620b412dc540c837d24b67d126f21e4"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_root</b> () const</td></tr>
+<tr class="separator:a5620b412dc540c837d24b67d126f21e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:aae105dddd42a52c34b4a222400ca28ae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aae105dddd42a52c34b4a222400ca28ae"></a>
+static Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> (Node *n)</td></tr>
+<tr class="separator:aae105dddd42a52c34b4a222400ca28ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a507233ae378ff2e53904aaaa0c2ec5a8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a507233ae378ff2e53904aaaa0c2ec5a8"></a>
+static Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_left_child</b> (Node *n)</td></tr>
+<tr class="separator:a507233ae378ff2e53904aaaa0c2ec5a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6b23bf226da559a6017635707328079"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6b23bf226da559a6017635707328079"></a>
+static Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_right_child</b> (Node *n)</td></tr>
+<tr class="separator:af6b23bf226da559a6017635707328079"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
 Protected Types</h2></td></tr>
@@ -237,12 +275,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>dump_to_dot_base</b> 
 <tr class="memitem:a14017f32708e12a5c7cf4e41c5e229d7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a14017f32708e12a5c7cf4e41c5e229d7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>output_node_base</b> (const Node *node, std::ofstream &amp;out, NodeNameGetter name_getter) const</td></tr>
 <tr class="separator:a14017f32708e12a5c7cf4e41c5e229d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5637b46a3713d155147b00a0d682303"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa5637b46a3713d155147b00a0d682303"></a>
+<tr class="memitem:a6e74730dcc66827c6d7874b0f5077534"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6e74730dcc66827c6d7874b0f5077534"></a>
 Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_smallest</b> () const</td></tr>
-<tr class="separator:aa5637b46a3713d155147b00a0d682303"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab924f5457e6dbeb38ff5b01e0e07ba16"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab924f5457e6dbeb38ff5b01e0e07ba16"></a>
+<tr class="separator:a6e74730dcc66827c6d7874b0f5077534"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acab63c219631eb3d6d7168ea1a10cebc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acab63c219631eb3d6d7168ea1a10cebc"></a>
 Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_largest</b> () const</td></tr>
-<tr class="separator:ab924f5457e6dbeb38ff5b01e0e07ba16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:acab63c219631eb3d6d7168ea1a10cebc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a730d5be77dc9c520a524485472fb5eee"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a730d5be77dc9c520a524485472fb5eee"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>remove_to_leaf</b> (Node &amp;node)</td></tr>
 <tr class="separator:a730d5be77dc9c520a524485472fb5eee"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -252,12 +290,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fixup_after_delete</b
 <tr class="memitem:adffd53895bc0f766482f8b752de557fd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adffd53895bc0f766482f8b752de557fd"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>insert_leaf_base</b> (Node &amp;node, Node *start)</td></tr>
 <tr class="separator:adffd53895bc0f766482f8b752de557fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3df11f624b9847731ce13b4dc361835"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab3df11f624b9847731ce13b4dc361835"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>insert_leaf</b> (Node &amp;node, Node *start)</td></tr>
-<tr class="separator:ab3df11f624b9847731ce13b4dc361835"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35c252483bfbe58a616290b71b4f6d06"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a35c252483bfbe58a616290b71b4f6d06"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>insert_leaf_right_biased</b> (Node &amp;node, Node *start)</td></tr>
-<tr class="separator:a35c252483bfbe58a616290b71b4f6d06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41a421750346b51ef671e82c471b951a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a41a421750346b51ef671e82c471b951a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>fixup_after_insert</b> (Node *node)</td></tr>
 <tr class="separator:a41a421750346b51ef671e82c471b951a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -267,9 +299,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>rotate_left</b> (Node
 <tr class="memitem:a5641a75050b42b633e5cbf2b8ad9d8bd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5641a75050b42b633e5cbf2b8ad9d8bd"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>rotate_right</b> (Node *parent)</td></tr>
 <tr class="separator:a5641a75050b42b633e5cbf2b8ad9d8bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74183aa004f11b5fe1a294311d58c3c4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a74183aa004f11b5fe1a294311d58c3c4"></a>
+<tr class="memitem:a52700226e42c0f9161df023943dbaac6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a52700226e42c0f9161df023943dbaac6"></a>
 Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_uncle</b> (Node *node) const</td></tr>
-<tr class="separator:a74183aa004f11b5fe1a294311d58c3c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a52700226e42c0f9161df023943dbaac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf352c31ac35af2249350afefda80c1d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf352c31ac35af2249350afefda80c1d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>swap_nodes</b> (Node *n1, Node *n2, bool swap_colors=true)</td></tr>
 <tr class="separator:acf352c31ac35af2249350afefda80c1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -323,7 +355,7 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
   </dd>
 </dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a9067db44a397e924e3cc7ee3aff6a983"></a>
+<a class="anchor" id="abf204185ac814bf16533ff4a1855529b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -347,7 +379,7 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
 
 </div>
 </div>
-<a class="anchor" id="a0342fde53a428765032b0f0e6b18fb13"></a>
+<a class="anchor" id="ad6af80c5ed24a7ff43f7116094172c49"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -371,7 +403,7 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
 
 </div>
 </div>
-<a class="anchor" id="a8700dafa0b61f877b4e81c3cdeb68f7d"></a>
+<a class="anchor" id="aab255518460ec0b72012c0cc4b873c27"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -421,7 +453,7 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
 
 </div>
 </div>
-<a class="anchor" id="a9806552003d4d6a087844747711fbb48"></a>
+<a class="anchor" id="ae53e394a99c23810dc0a37f7b52ed386"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -445,7 +477,7 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
 
 </div>
 </div>
-<a class="anchor" id="a07769c0e07b125cba1ffc5337edf8f5d"></a>
+<a class="anchor" id="acf3e6aada0d521b78963a5e758bfbb0e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -469,7 +501,34 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
 
 </div>
 </div>
-<a class="anchor" id="a79d8dbdab48e8988b543b916789c010d"></a>
+<a class="anchor" id="ab012ff8942f388476276a2539c2f557c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classygg_1_1RBTree.html">ygg::RBTree</a>&lt; Node, utilities::ExtendedNodeTraits&lt; Node, <a class="el" href="classygg_1_1ITreeNodeBase.html">ITreeNodeBase</a>&lt; Node, NodeTraits, Options, Tag &gt;, NodeTraits &gt; , Options, Tag, utilities::IntervalCompare&lt; Node, NodeTraits &gt;  &gt;::empty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns whether the tree is empty. </p>
+<p>This method runs in O(1).</p>
+<dl class="section return"><dt>Returns</dt><dd>true if the tree is empty, false otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a43e702bf1bf89ad430624846db8bf6ea"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -563,7 +622,7 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
 
 </div>
 </div>
-<a class="anchor" id="a620536cca1ed37ddd52bb62469dbbe89"></a>
+<a class="anchor" id="a448fd39a99cc5287f5736e430eeb0d3c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -594,7 +653,43 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
 
 </div>
 </div>
-<a class="anchor" id="ae6f2ec2fb38b759b6852a557adde543c"></a>
+<a class="anchor" id="a724c613e26c775e2e0341fa4e7b7154a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1RBTree.html">ygg::RBTree</a>&lt; Node, utilities::ExtendedNodeTraits&lt; Node, <a class="el" href="classygg_1_1ITreeNodeBase.html">ITreeNodeBase</a>&lt; Node, NodeTraits, Options, Tag &gt;, NodeTraits &gt; , Options, Tag, utilities::IntervalCompare&lt; Node, NodeTraits &gt;  &gt;::lower_bound </td>
+          <td>(</td>
+          <td class="paramtype">const Comparable &amp;&#160;</td>
+          <td class="paramname"><em>query</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Lower-bounds an element. </p>
+<p>Returns an iterator to the first element that is not less that &lt;query&gt;, i.e., that does not have to go before &lt;query&gt;.</p>
+<p>Note that &lt;query&gt; does not have to be a Node, but can be anything that can be compared to a Node, i.e., for which Compare()(const Node &amp;, const Comparable &amp;) and Compare()(const Comparable &amp;, const Node &amp;) are defined and implemented. In the case of using the default ygg::utilities::flexible_less as Compare, that means you have to implement operator&lt;() for both types.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Not available for explicitly ordered trees</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">query</td><td>An object comparable to Node that should be lower-bounded </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the first element comparing greater-or-equally to &lt;query&gt;, or end() if no such element exists </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af2e477855a801ad20f921c49a5b0b20e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -651,7 +746,7 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
 
 </div>
 </div>
-<a class="anchor" id="a2e0e82086fa010bc5f2235a8c330db06"></a>
+<a class="anchor" id="a8520bd5081360c0d5a06564a127a7fd6"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -725,7 +820,7 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
 </div><div class="memdoc">
 
 <p>Upper-bounds an element. </p>
-<p>Returns an iterator to the smallest element to which &lt;query&gt; compares as "less or equal", i.e. the smallest element that is considered to not go before &lt;query&gt;.</p>
+<p>Returns an iterator to the smallest element to which &lt;query&gt; compares as "less", i.e. the smallest element that is considered go strictly after &lt;query&gt;.</p>
 <p>Note that &lt;query&gt; does not have to be a Node, but can be anything that can be compared to a Node, i.e., for which Compare()(const Node &amp;, const Comparable &amp;) and Compare()(const Comparable &amp;, const Node &amp;) are defined and implemented. In the case of using the default ygg::utilities::flexible_less as Compare, that means you have to implement operator&lt;() for both types.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Not available for explicitly ordered trees</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -734,7 +829,7 @@ class ygg::IntervalTree&lt; Node, NodeTraits, Options, Tag &gt;</h3>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An iterator to the first element comparing greater-or-equally to &lt;query&gt;, or end() if no such element exists </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the first element comparing "greater" to &lt;query&gt;, or end() if no such element exists </dd></dl>
 
 </div>
 </div>

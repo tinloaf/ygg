@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['end',['end',['../classygg_1_1RBTree.html#a79d8dbdab48e8988b543b916789c010d',1,'ygg::RBTree::end()'],['../classygg_1_1List.html#a93574520d49ff9fa67d1beefa075554e',1,'ygg::List::end()']]]
+  ['dump_5fto_5fdot',['dump_to_dot',['../classygg_1_1RBTree.html#ab871c5798276ca7964f8e3e99084997f',1,'ygg::RBTree']]]
 ];

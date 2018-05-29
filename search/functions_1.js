@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['cbegin',['cbegin',['../classygg_1_1RBTree.html#a0342fde53a428765032b0f0e6b18fb13',1,'ygg::RBTree']]],
-  ['cend',['cend',['../classygg_1_1RBTree.html#a8700dafa0b61f877b4e81c3cdeb68f7d',1,'ygg::RBTree']]],
-  ['clear',['clear',['../classygg_1_1RBTree.html#aca24646244a9eaf091be513d10720be3',1,'ygg::RBTree']]],
-  ['crbegin',['crbegin',['../classygg_1_1RBTree.html#a9806552003d4d6a087844747711fbb48',1,'ygg::RBTree']]],
-  ['crend',['crend',['../classygg_1_1RBTree.html#a07769c0e07b125cba1ffc5337edf8f5d',1,'ygg::RBTree']]]
+  ['back',['back',['../classygg_1_1List.html#a61362828c7af086bcee9c966e21e51c3',1,'ygg::List']]],
+  ['begin',['begin',['../classygg_1_1RBTree.html#abf204185ac814bf16533ff4a1855529b',1,'ygg::RBTree::begin()'],['../classygg_1_1List.html#a9e5f7a15139fabea74a1b6a8838b4528',1,'ygg::List::begin()'],['../classygg_1_1DynamicSegmentTree.html#a4c624e2a2b5e29fc2f3085aed5cf78cb',1,'ygg::DynamicSegmentTree::begin()']]]
 ];

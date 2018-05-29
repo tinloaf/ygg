@@ -80,7 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Overview over the Data Structures </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This page roughly explains what a Red-Black-Tree, an Interval Tree and an Interval Map can do for you.</p>
+<div class="textblock"><p>This page roughly explains what a Red-Black-Tree, an Interval Tree, an Interval Map or a Dynamic Segment Tree can do for you.</p>
 <h1>Red-Black-Tree </h1>
 <p>A red-black tree is a search tree. It allows you to insert elements (nodes) into it, which are associated with some key. Inside the red-black tree, the elements will be held sorted according to their key. This makes two operations very efficient: Iterating all keys in sorted order, and finding a certain element by key.</p>
 <p>For an example on how to use the red-black tree, see rbtreexample .</p>
@@ -94,7 +94,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>A segment from 5 to 10 having the aggregated value 11 (both the first and the second interval participate here)</li>
 <li>A segment from 10 to 20 having the aggregated value 10. Note that this segment spans two intervals (the second and third), but since they have the same value, there is no segment border at 15.</li>
 </ul>
-<p>For an example on how to use the interval map, see <a class="el" href="intervalmapexample.html">IntervalMap Example</a> . </p>
+<p>For an example on how to use the interval map, see <a class="el" href="intervalmapexample.html">IntervalMap Example</a> .</p>
+<h1>Dynamic Segment Tree </h1>
+<p>The dynamic segment tree is something between a classic segment tree and Boost ICL's <a href="http://www.boost.org/doc/libs/1_66_0/libs/icl/doc/html/index.html#boost_icl.introduction.definition_and_basic_example">interval_map</a>. You can find a more detailed description at <a class="el" href="dynamicsegmenttreedoc.html">Introduction to the Dynamic Segment Tree</a> and an example of its usage at <a class="el" href="dynamicsegmenttreeexample.html">DynamicSegmentTree Example</a>. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
