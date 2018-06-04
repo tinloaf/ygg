@@ -688,6 +688,40 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::rend() const
 	return this->t.rend();
 }
 
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template
+const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::lower_bound_event(
+				const KeyT & key) const
+{
+	return this->t.lower_bound(key);
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::lower_bound_event(
+				const KeyT & key)
+{
+	return this->t.lower_bound(key);
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template
+const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::upper_bound_event(
+				const KeyT & key) const
+{
+	return this->t.upper_bound(key);
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::template iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::upper_bound_event(
+				const KeyT & key)
+{
+	return this->t.upper_bound(key);
+}
+
 template<class ValueT>
 bool
 MaxCombiner<ValueT>::aggregate_with(ValueT a)

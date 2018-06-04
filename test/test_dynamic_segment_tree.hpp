@@ -100,6 +100,35 @@ TEST(IAggTest, TrivialTest)
 	ASSERT_EQ(it, agg.cend());
 }
 
+TEST(IAggTest, TestEventBounding)
+{
+	Node n(2,5,10);
+
+	IAgg agg;
+	ASSERT_TRUE(agg.empty());
+	agg.insert(n);
+	ASSERT_FALSE(agg.empty());
+
+	// Test finding the [2 border via upper and lower bounding
+	auto it = agg.upper_bound_event(0);
+	ASSERT_EQ(it, agg.begin());
+	it = agg.lower_bound_event(0);
+	ASSERT_EQ(it, agg.begin());
+
+	// Test upper-bounding  vs lower bounding
+	it = agg.lower_bound_event(2);
+	ASSERT_EQ(it, agg.begin());
+	it = agg.upper_bound_event(2);
+	ASSERT_EQ(it, agg.begin() + 1);
+
+	// Note that the 5) border is open - thus, lower-bouding on 5 actually correctly gives the
+	// end iterator!
+	it = agg.lower_bound_event(5);
+	ASSERT_EQ(it, agg.end());
+	it = agg.upper_bound_event(5);
+	ASSERT_EQ(it, agg.end());
+}
+
 TEST(IAggTest, NestingTest)
 {
 	Node n[IAGG_TESTSIZE];

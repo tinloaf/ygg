@@ -747,6 +747,24 @@ public:
 	const_iterator<true> rend() const;
 	iterator<true> rend();
 
+	/**
+	 * Returns an iterator to the first event the key of which is not less than <key>
+	 *
+	 * @param key The key to search for.
+	 * @return	An iterator to the first event the key of which is not less than <key>
+	 */
+	const_iterator<false> lower_bound_event(const typename Node::KeyT & key) const;
+	iterator<false> lower_bound_event(const typename Node::KeyT & key);
+
+	/**
+	 * Returns an iterator to the first event the key of which is greater than <key>
+	 *
+	 * @param key The key to search for.
+	 * @return	An iterator to the first event the key of which is greater than <key>
+	 */
+	const_iterator<false> upper_bound_event(const typename Node::KeyT & key) const;
+	iterator<false> upper_bound_event(const typename Node::KeyT & key);
+
 	/*
 	 * DEBUGGING
 	 */
