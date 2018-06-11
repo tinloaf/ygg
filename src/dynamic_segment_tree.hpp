@@ -110,7 +110,7 @@ private:
 
 	// The tree and the node traits have full access to the nodes
 	template<class FNode, class FNodeTraits, class FCombiners, class FOptions, class FTag>
-	friend class DynamicSegmentTree;
+	friend class ::ygg::DynamicSegmentTree;
 	template<class FInnerTree, class FInnerNode, class FNode, class FNodeTraits>
 	friend class InnerNodeTraits;
 };
