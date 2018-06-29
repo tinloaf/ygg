@@ -395,19 +395,18 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::query(const typen
 
 template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 template<class Combiner>
-typename Combiner::ValueT
-DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(const typename Node::KeyT & lower,
+Combiner
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(const typename Node::KeyT & lower,
                                                                             const typename Node::KeyT & upper,
                                                                             bool lower_closed,
-                                                                            bool upper_closed)
-													const
+                                                                            bool upper_closed) const
 {
-	//std::cout << "\n======= Query: Low " << lower << " / High " << upper << "============\n";
+/*	std::cout << "\n======= Query: Low " << lower << " / High " << upper << "============\n";
 
-	//TreePrinter tp(this->t.get_root(), NodeNameGetter());
-	//std::cout << "\n------- Query Tree -----------\n";
-	//tp.print();
-
+	TreePrinter tp(this->t.get_root(), NodeNameGetter());
+	std::cout << "\n------- Query Tree -----------\n";
+	tp.print();
+*/
 	dyn_segtree_internal::Compare<InnerNode> cmp;
 
 	decltype(this->t.lower_bound(lower)) lower_node_it;
@@ -463,6 +462,19 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 	std::vector<InnerNode *> right_contour;
 	std::tie(left_contour, right_contour) = this->t.find_lca(lower_node, upper_node);
 
+/*
+	std::cout << "Left contour: \n";
+	for (auto n : left_contour) {
+		std::cout << std::string("[") + std::to_string(n->get_point()) + std::string("]")
+		             + std::string("@") + std::to_string((unsigned long)n) << ", ";
+	}
+	std::cout << "\nRight contour: \n";
+	for (auto n : right_contour) {
+		std::cout << std::string("[") + std::to_string(n->get_point()) + std::string("]")
+		             + std::string("@") + std::to_string((unsigned long)n) << ", ";
+	}
+	std::cout << "\n";
+*/
 	// TODO inefficient: We don't need to build all the combiners!
 	Combiners dummy_cp;
 	Combiners cp;
@@ -498,7 +510,10 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 
 		topmost_point = left_contour[left_contour.size()-1]->get_point();
 	}
-
+/*
+	std::cout << "Combiner-DBG after left contour: " << cp.template get_combiner<Combiner>()
+	        .get_dbg_value() << "\n";
+*/
 	// TODO is this necessary?
 	Combiners left_cp = cp;
 	cp = Combiners();
@@ -532,9 +547,15 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 
 		topmost_point = left_contour[left_contour.size()-1]->get_point();
 	}
-
+/*
+	std::cout << "Combiner-DBG after right contour: " << cp.template get_combiner<Combiner>()
+	                                                      .get_dbg_value() << "\n";
+*/
 	cp.collect_left(topmost_point, &left_cp, typename Node::AggValueT());
-
+/*
+	std::cout << "Combiner-DBG after combining both: " << cp.template get_combiner<Combiner>()
+	                                                      .get_dbg_value() << "\n";
+*/
 	/*
 	 * Step 3: Take the combined value and aggregate into it everything on the way up to
 	 * the root.
@@ -550,10 +571,23 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 			cp.traverse_right_edge_up(cur->get_point(), cur->agg_right);
 		}
 	}
-
-	return cp.template get<Combiner>();
+/*
+	std::cout << "Combiner-DBG after root traversal: " << cp.template get_combiner<Combiner>()
+	                                                        .get_dbg_value() << "\n";
+*/
+	return cp.template get_combiner<Combiner>();
 }
 
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+template<class Combiner>
+typename Combiner::ValueT
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(const typename Node::KeyT & lower,
+                                                                            const typename Node::KeyT & upper,
+                                                                            bool lower_closed,
+                                                                            bool upper_closed) const
+{
+	return this->get_combiner<Combiner>(lower, upper, lower_closed, upper_closed).get();
+}
 
 template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
 bool
@@ -730,6 +764,429 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::upper_bound_event
 	return this->t.upper_bound(key);
 }
 
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+template<class Combiner>
+Combiner
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combiner() const
+{
+	if (this->t.get_root() == nullptr) {
+		return Combiner();
+	}
+
+	return this->t.get_root()->combiners.template get_combiner<Combiner>();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+template<class Combiner>
+typename Combiner::ValueT
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined() const
+{
+	return this->get_combiner<Combiner>().get();
+}
+
+/********************************************************
+ *
+ * RangedMaxCombiner
+ *
+ ********************************************************
+ */
+
+template<class KeyT, class ValueT>
+RangedMaxCombiner<KeyT,ValueT>::RangedMaxCombiner()
+	: val(ValueT()), left_border(KeyT()), left_border_valid(false), right_border(KeyT()),
+	right_border_valid(false)
+{}
+
+template<class KeyT, class ValueT>
+bool
+RangedMaxCombiner<KeyT,ValueT>::traverse_left_edge_up(KeyT new_point, ValueT edge_val)
+{
+	this->val += edge_val;
+
+/*
+	std::cout << "# Traversing left edge up. Old right border: ";
+	if (this->right_border_valid) {
+		std::cout << this->right_border << "  / ";
+	} else {
+		std::cout << "-- / ";
+	}
+*/
+	if (this->right_border_valid) {
+		// TODO is this even necessary?
+		this->right_border = std::min(new_point, this->right_border);
+	} else {
+		this->right_border = new_point;
+		this->right_border_valid = true;
+	}
+/*
+	std::cout << " new right border: ";
+	if (this->right_border_valid) {
+		std::cout << this->right_border << "\n";
+	} else {
+		std::cout << "--\n";
+	}
+*/
+	return false;
+}
+
+template<class KeyT, class ValueT>
+bool
+RangedMaxCombiner<KeyT,ValueT>::traverse_right_edge_up(KeyT new_point, ValueT edge_val)
+{
+	this->val += edge_val;
+
+	if (this->left_border_valid) {
+		this->left_border = std::max(new_point, this->left_border);
+	}	else {
+		this->left_border = new_point;
+		this->left_border_valid = true;
+	}
+/*
+	std::cout << "# Traversing right edge up. New left border: ";
+	if (this->left_border_valid) {
+		std::cout << this->left_border << "\n";
+	} else {
+		std::cout << "--\n";
+	}
+*/
+	return false;
+}
+
+template<class KeyT, class ValueT>
+bool
+RangedMaxCombiner<KeyT,ValueT>::collect_left(KeyT my_point, const MyType * left_child_combiner,
+                                       ValueT edge_val)
+{
+	auto new_candidate_value = child_value(left_child_combiner) + edge_val;
+/*
+	std::cout << "# Collecting left. Old border: ";
+	if (this->left_border_valid) {
+		std::cout << this->left_border << ":";
+	} else {
+		std::cout << "--:";
+	}
+	if (this->right_border_valid) {
+		std::cout << this->right_border << "  /  ";
+	} else {
+		std::cout << "--  /  ";
+	}
+*/
+	// In case that neither border is valid, this object has not been initialized with a
+	// Value yet: We therefore take the offered value and set our first border!
+	if ((new_candidate_value > this->val) || (
+					!this->right_border_valid && !this->left_border_valid)) {
+		this->val = new_candidate_value;
+
+		if (left_child_combiner != nullptr) {
+			this->left_border = left_child_combiner->left_border;
+			this->left_border_valid = left_child_combiner->left_border_valid;
+
+			if (left_child_combiner->right_border_valid) {
+				this->right_border = std::min(my_point, left_child_combiner->right_border);
+			} else {
+				this->right_border = my_point;
+			}
+		} else {
+			this->left_border_valid = false;
+
+			this->right_border = my_point;
+		}
+		this->right_border_valid = true;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	} else if (new_candidate_value == this->val) {
+#pragma GCC diagnostic pop
+		// In case the values are equal, we need to check for merging of our ranges!
+
+		if (left_child_combiner != nullptr) {
+			if ((!this->left_border_valid ||
+			     (this->left_border <= my_point)) && // Compatible to merge from our point
+			    (!left_child_combiner->right_border_valid ||
+			     (left_child_combiner->right_border >= my_point)))
+				// Compatible to merge from left-childs point
+			{
+				// merging!
+				this->left_border = left_child_combiner->left_border;
+				this->left_border_valid = left_child_combiner->left_border_valid;
+			} else {
+				// Two disjunct intervals with the same max value. Prefer the left one!
+				this->left_border = left_child_combiner->left_border;
+				this->left_border_valid = left_child_combiner->left_border_valid;
+				this->right_border = left_child_combiner->right_border;
+				this->right_border_valid = true;
+			}
+		} else {
+			// We have an unlimited interval of the same value to our left
+			if (my_point >= this->left_border) {
+				// And it's compatible with our border!
+				this->left_border_valid = false;
+			} else {
+				// Take the unlimited value as new left-most maximum interval
+				this->right_border = my_point;
+				this->right_border_valid = true;
+				this->left_border_valid = false;
+			}
+		}
+	}
+/*
+	std::cout << "New border: ";
+	if (this->left_border_valid) {
+		std::cout << this->left_border << ":";
+	} else {
+		std::cout << "--:";
+	}
+	if (this->right_border_valid) {
+		std::cout << this->right_border << "\n";
+	} else {
+		std::cout << "--\n";
+	}
+*/
+	return false;
+}
+
+template<class KeyT, class ValueT>
+bool
+RangedMaxCombiner<KeyT,ValueT>::collect_right(KeyT my_point, const MyType * right_child_combiner,
+                                        ValueT edge_val)
+{
+	auto new_candidate_value = child_value(right_child_combiner) + edge_val;
+/*
+	std::cout << "# Collecting right at " << my_point << ". Old border: ";
+	if (this->left_border_valid) {
+		std::cout << this->left_border << ":";
+	} else {
+		std::cout << "--:";
+	}
+	if (this->right_border_valid) {
+		std::cout << this->right_border << "  /  ";
+	} else {
+		std::cout << "--  /  ";
+	}
+*/
+	if ((new_candidate_value > this->val) || (
+					!this->right_border_valid && !this->left_border_valid)) {
+		this->val = new_candidate_value;
+
+
+		if (right_child_combiner != nullptr) {
+			this->right_border_valid = right_child_combiner->right_border_valid;
+			this->right_border = right_child_combiner->right_border;
+
+			if (right_child_combiner->left_border_valid) {
+				this->left_border = std::max(my_point, right_child_combiner->left_border);
+			} else {
+				this->left_border = my_point;
+			}
+		} else {
+			this->right_border_valid = false;
+
+			this->left_border = my_point;
+		}
+
+		this->left_border_valid = true;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	} else if (new_candidate_value == this->val) {
+#pragma GCC diagnostic pop
+		// In case the values are equal, we need to check for merging of our ranges!
+
+		if (right_child_combiner != nullptr) {
+			if ((!this->right_border_valid ||
+			     (this->right_border >= my_point)) && // Compatible to merge from our point
+			    (!right_child_combiner->left_border_valid ||
+			     (right_child_combiner->left_border <= my_point)))
+				// Compatible to merge from right-childs point
+			{
+				// merging!
+				this->right_border = right_child_combiner->right_border;
+				this->right_border_valid = right_child_combiner->right_border_valid;
+			} else {
+				// Two disjunct intervals with the same max value. Prefer the left one (i.e., ours).
+				// Nothing to do!
+			}
+		} else {
+			// We have a unlimited interval of the same value to our right
+			if (my_point <= this->right_border) {
+				// And it's compatible with our border!
+				this->right_border_valid = false;
+			}
+		}
+	}
+/*
+	std::cout << "New border: ";
+	if (this->left_border_valid) {
+		std::cout << this->left_border << ":";
+	} else {
+		std::cout << "--:";
+	}
+	if (this->right_border_valid) {
+		std::cout << this->right_border << "\n";
+	} else {
+		std::cout << "--\n";
+	}
+*/
+	return false;
+}
+
+template<class KeyT, class ValueT>
+ValueT
+RangedMaxCombiner<KeyT,ValueT>::get() const noexcept
+{
+	return this->val;
+}
+
+template<class KeyT, class ValueT>
+bool
+RangedMaxCombiner<KeyT,ValueT>::rebuild(KeyT my_point,
+                                  const MyType * left_child_combiner, ValueT left_edge_val,
+                                  const MyType * right_child_combiner, ValueT right_edge_val)
+{
+	auto old_val = this->val;
+
+	auto left_val = child_value(left_child_combiner) + left_edge_val;
+	auto right_val = child_value(right_child_combiner) + right_edge_val;
+
+	if (left_val > right_val) {
+		this->val = left_val;
+
+		if (left_child_combiner != nullptr) {
+			this->left_border = left_child_combiner->left_border;
+			this->left_border_valid = left_child_combiner->left_border_valid;
+			if (left_child_combiner->right_border_valid) {
+				this->right_border = std::min(my_point, left_child_combiner->right_border);
+			} else {
+				this->right_border = my_point;
+			}
+			this->right_border_valid = true;
+		} else {
+			this->left_border_valid = false;
+			this->right_border = my_point;
+			this->right_border_valid = true;
+		}
+	} else if (right_val > left_val) {
+		this->val = right_val;
+
+		if (right_child_combiner != nullptr) {
+			this->right_border = right_child_combiner->right_border;
+			this->right_border_valid = right_child_combiner->right_border_valid;
+			if (right_child_combiner->left_border_valid) {
+				this->left_border = std::max(my_point, right_child_combiner->left_border);
+			} else {
+				this->left_border = my_point;
+			}
+			this->left_border_valid = true;
+		} else {
+			this->right_border_valid = false;
+			this->left_border = my_point;
+			this->left_border_valid = true;
+		}
+	} else {
+		// Both are equal!
+		this->val = left_val;
+
+		/* For merging, it must hold that the right border of the left interval is
+		 * greater or equal to our point (or unlimited), and the left border of the
+		 * right interval must be less or equal to our point (or unlimited).
+		 */
+
+		bool merge_candidate_left = (
+						(left_child_combiner == nullptr) ||
+						(!left_child_combiner->right_border_valid) ||
+						(left_child_combiner->right_border >= my_point));
+		bool merge_candidate_right = (
+						(right_child_combiner == nullptr) ||
+						(!right_child_combiner->left_border_valid) ||
+						(right_child_combiner->left_border <= my_point));
+
+		if (merge_candidate_left && merge_candidate_right) {
+			// Yes, we're merging!
+
+			if (right_child_combiner != nullptr) {
+				this->right_border = right_child_combiner->right_border;
+				this->right_border_valid = right_child_combiner->right_border_valid;
+			} else {
+				this->right_border_valid = false;
+			}
+
+			if (left_child_combiner != nullptr) {
+				this->left_border = left_child_combiner->left_border;
+				this->left_border_valid = left_child_combiner->left_border_valid;
+			} else {
+				this->left_border_valid = false;
+			}
+		} else {
+			// No merging - prefer left
+			if (left_child_combiner != nullptr) {
+				this->left_border = left_child_combiner->left_border;
+				this->left_border_valid = left_child_combiner->left_border_valid;
+
+				if (left_child_combiner->right_border_valid) {
+					this->right_border = std::min(my_point, left_child_combiner->right_border);
+				} else {
+					this->right_border = my_point;
+				}
+				this->right_border_valid = true;
+			} else {
+				this->left_border_valid = false;
+				this->right_border = my_point;
+				this->right_border_valid = true;
+			}
+		}
+	}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	return old_val != this->val;
+#pragma GCC diagnostic pop
+}
+
+template<class KeyT, class ValueT>
+ValueT
+RangedMaxCombiner<KeyT,ValueT>::child_value(const MyType * child) const noexcept
+{
+	if (child == nullptr) {
+		return ValueT();
+	}
+
+	return child->get();
+}
+
+template<class KeyT, class ValueT>
+KeyT
+RangedMaxCombiner<KeyT,ValueT>::get_left_border() const noexcept
+{
+	return this->left_border;
+}
+
+template<class KeyT, class ValueT>
+KeyT
+RangedMaxCombiner<KeyT,ValueT>::get_right_border() const noexcept
+{
+	return this->right_border;
+}
+
+template<class KeyT, class ValueT>
+bool
+RangedMaxCombiner<KeyT,ValueT>::is_left_border_valid() const noexcept
+{
+	return this->left_border_valid;
+}
+
+template<class KeyT, class ValueT>
+bool
+RangedMaxCombiner<KeyT,ValueT>::is_right_border_valid() const noexcept
+{
+	return this->right_border_valid;
+}
+
+/********************************************************
+ *
+ * MaxCombiner
+ *
+ ********************************************************
+ */
+
 template<class KeyT, class ValueT>
 bool
 MaxCombiner<KeyT,ValueT>::traverse_left_edge_up(KeyT new_point, ValueT edge_val)
@@ -805,6 +1262,13 @@ MaxCombiner<KeyT,ValueT>::child_value(const MaxCombiner::MyType * child) const n
 	return child->get();
 }
 
+/********************************************************
+ *
+ * CombinerPack
+ *
+ ********************************************************
+ */
+
 template<class KeyT, class AggValueT, class ... Combiners>
 bool
 CombinerPack<KeyT, AggValueT, Combiners...>::rebuild(KeyT my_point,
@@ -813,8 +1277,8 @@ CombinerPack<KeyT, AggValueT, Combiners...>::rebuild(KeyT my_point,
 {
 	// TODO replace vector by templated std::any_of?
 	std::vector<bool> changed { std::get<Combiners>(this->data).rebuild(my_point,
-																	child_combiner<Combiners...>(left_child), left_edge_val,
-																	child_combiner<Combiners...>(right_child), right_edge_val) ...};
+																	child_combiner<Combiners>(left_child), left_edge_val,
+																	child_combiner<Combiners>(right_child), right_edge_val) ...};
 	return std::any_of(changed.begin(), changed.end(), [](bool changed_flag) { return changed_flag;});
 }
 
@@ -864,19 +1328,6 @@ typename Combiner::ValueT
 CombinerPack<KeyT, AggValueT, Combiners...>::get() const
 {
 	return std::get<Combiner>(this->data).get();
-}
-
-template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
-template<class Combiner>
-typename Combiner::ValueT
-DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined()
-const
-{
-	if (this->t.get_root() == nullptr) {
-		return typename Combiner::ValueT();
-	}
-
-	return this->t.get_root()->combiners.template get<Combiner>();
 }
 
 template<class KeyT, class AggValueT, class ... Combiners>

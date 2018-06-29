@@ -113,6 +113,11 @@ private:
 	friend class ::ygg::DynamicSegmentTree;
 	template<class FInnerTree, class FInnerNode, class FNode, class FNodeTraits>
 	friend class InnerNodeTraits;
+	// Also, debugging classes are friends
+	template<class FInnerNode, class ... FCombiners>
+	friend class ASCIIInnerNodeNameGetter;
+	template<class FInnerNode, class ... FCombiners>
+	friend class DOTInnerNodeNameGette;
 };
 
 /// @cond INTERNAL
@@ -258,16 +263,28 @@ public:
 	ASCIIInnerNodeNameGetter() {};
 
 	std::string get_name(InnerNode * node) const {
-		return std::string("[") + std::to_string(node->point) + std::string("]")
-		       + std::string("@") + std::to_string((unsigned long)node)
-						+ std::string("  ╭:") + std::to_string(node->agg_left) + std::string("  ╮:")
-						+ std::to_string(node->agg_right) + std::string("  {")
-						+ std::string {
-								Combiners::get_name() + std::string(": ")
-								+ std::to_string(node->combiners.template get<Combiners>()) + std::string(" ")
-								...
-							}
-						+ std::string("}");
+		std::vector<std::string> combiner_txts {
+			Combiners::get_name() + std::string(": ")
+			+ node->combiners.template get_combiner<Combiners>().get_dbg_value() + std::string(" ") ...
+		};
+
+		std::string res =  std::string("[") + std::to_string(node->get_point()) + std::string("]")
+		                   + std::string("@") + std::to_string((unsigned long)node)
+		                   + std::string("  ╭:") + std::to_string(node->agg_left) + std::string("  ╮:")
+		                   + std::to_string(node->agg_right) + std::string("  {");
+
+		bool first = true;
+		for (auto & cmb_str : combiner_txts) {
+			if (! first) {
+				res += ", ";
+			}
+			first = false;
+			res += cmb_str;
+		}
+
+		res += std::string("}");
+
+		return res;
 	}
 };
 
@@ -415,11 +432,141 @@ public:
 	static std::string get_name() {
 		return "MaxCombiner";
 	}
+	// TODO DEBUG
+	std::string get_dbg_value() const {
+		return std::to_string(this->val);
+	}
 private:
 	ValueT val;
 
 	ValueT child_value(const MyType * child) const noexcept;
 };
+
+
+/**
+ * @brief A combiner that allows to retrieve the maximum value over any range
+ *
+ * This is a combiner (see TODO for what a combiner is) that, when added to a Dynamic Segment
+ * Tree, allows you to efficiently retrieve the maximum aggregate value over any range in your
+ * segment tree.
+ *
+ * @tparam ValueType The type of values associated with your intervals
+ */
+template<class KeyType, class ValueType>
+class RangedMaxCombiner {
+public:
+	using ValueT = ValueType;
+	using KeyT = KeyType;
+	using MyType = RangedMaxCombiner<KeyT, ValueT>;
+
+	RangedMaxCombiner();
+
+	// TODO the bool is only returned for sake of expansion! Fix that!
+	/**
+	 * @brief Combines this MaxCombiner with a value, possibly of a child node
+	 *
+	 * This sets the maximum currently stored at this combiner to the maximum of the currently
+	 * stored value and (a + edge_val).
+	 *
+	 * Usually, a will be the value of the MaxCombiner of a child of the node that this combiner
+	 * belongs to. edge_val will then be the agg_left or agg_right
+	 * value of the node this combiner belongs to.
+	 *
+	 * @param a 				See above
+	 * @param edge_val 	See above
+	 * @return FIXME ignored for now
+	 */
+	//bool combine_with(ValueT a, ValueT edge_val);
+
+	bool collect_left(KeyT my_point, const MyType * left_child_combiner, ValueType edge_val);
+	bool collect_right(KeyT my_point, const MyType * right_child_combiner, ValueType edge_val);
+
+	// TODO the bool is only returned for sake of expansion! Fix that!
+	/**
+	 * @brief Aggregates a value into the max value stored in this combiner
+	 *
+	 * This sets the maximum currently stored at this combiner to the maximum of the currently
+	 * stored value and (a + edge_val).
+	 *
+	 * Usually, a will be the value of the MaxCombiner of a child of the node that this combiner
+	 * belongs to. edge_val will then be the agg_left or agg_right
+	 * value of the node this combiner belongs to.
+	 *
+	 * @param a 				See above
+	 * @param edge_val 	See above
+	 * @return FIXME ignored for now
+	 */
+	bool traverse_left_edge_up(KeyT new_point, ValueT edge_val);
+	bool traverse_right_edge_up(KeyT new_point, ValueT edge_val);
+
+	//bool aggregate_with(ValueT a);
+
+	/**
+	 * @brief Rebuilds the value in this MaxCombiner from values of its two children's MaxCombiners
+	 *
+	 * This sets the maximum currently stored at this combiner to the maximum of (a + a_edge_val) and
+	 * (b + b_edge_val).
+	 *
+	 * Usually, a and b will be the values of the MaxCombiners of the two children of the node that
+	 * this  combiner belongs to. a_edge_val  and b_edge_val will then be the agg_left resp. agg_right
+	 * values of the node this combiner belongs to.
+	 *
+	 * @param a 				See above
+	 * @param a_edge_val 	See above
+	 * @param b 				See above
+	 * @param b_edge_val 	See above
+	 * @return FIXME ignored for now
+	 */
+	bool rebuild(KeyT my_point,
+	             const MyType * left_child_combiner, ValueT left_edge_val,
+	             const MyType * right_child_combiner, ValueT right_edge_val);
+
+	/**
+	 * @brief Returns the currently stored combined value in this combiner
+	 *
+	 * @return the currently stored combined value in this combiner
+	 */
+	ValueT get() const noexcept;
+
+	bool is_left_border_valid() const noexcept;
+	bool is_right_border_valid() const noexcept;
+	KeyT get_left_border() const noexcept;
+	KeyT get_right_border() const noexcept;
+
+	// TODO DEBUG
+	static std::string get_name() {
+		return "RangedMaxCombiner";
+	}
+	// TODO DEBUG
+	std::string get_dbg_value() const {
+		std::string res = std::to_string(this->val) + std::string("@[");
+		if (this->left_border_valid) {
+			res += std::to_string(this->left_border);
+		} else {
+			res += std::string("--");
+		}
+		res += ":";
+		if (this->right_border_valid) {
+			res += std::to_string(this->right_border);
+		} else {
+			res += "--";
+		}
+		res += "]";
+
+		return res;
+	}
+private:
+	ValueT val;
+
+	// TODO replace by std::optional when switching to C++17
+	KeyT left_border;
+	bool left_border_valid;
+	KeyT right_border;
+	bool right_border_valid;
+
+	ValueT child_value(const MyType * child) const noexcept;
+};
+
 
 /**
  * @brief This class represents the pack of combiners associated with every node of a Dynamic
@@ -697,6 +844,15 @@ public:
 	 * @return 		The aggregated value for all intervals containing x
 	 */
 	AggValueT query(const typename Node::KeyT & x);
+
+	template<class Combiner>
+	Combiner get_combiner() const;
+
+	template<class Combiner>
+	Combiner get_combiner(const typename Node::KeyT & lower,
+	                      const typename Node::KeyT & upper,
+	                      bool lower_closed = true,
+	                      bool upper_closed = false) const;
 
 	template<class Combiner>
 	typename Combiner::ValueT get_combined() const;
