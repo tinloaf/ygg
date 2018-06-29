@@ -466,6 +466,9 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 	// TODO inefficient: We don't need to build all the combiners!
 	Combiners dummy_cp;
 	Combiners cp;
+
+	decltype(InnerNode().get_point()) topmost_point;
+
 	if (left_contour.size() > 1) {
 		for (size_t i = 0; i < left_contour.size(); ++i) {
 			InnerNode *cur = left_contour[i];
@@ -476,22 +479,24 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 				// TODO inefficient!
 				if (right_child == left_contour[i - 1]) {
 					// we traversed the right edge
-					cp.aggregate_with(cur->agg_right);
+					cp.traverse_right_edge_up(cur->get_point(), cur->agg_right);
 				} else {
 					// we traversed the left edge
-					cp.aggregate_with(cur->agg_left);
+					cp.traverse_left_edge_up(cur->get_point(), cur->agg_left);
 				}
 			}
 
 			// Combine with descending across the contour, if we traversed a left edge
 			if ((i != left_contour.size() - 1) && ((i == 0) || (right_child != left_contour[i - 1]))) {
 				if (right_child != nullptr) {
-					cp.combine_with(&right_child->combiners, cur->agg_right);
+					cp.collect_right(cur->get_point(), &right_child->combiners, cur->agg_right);
 				} else {
-					cp.combine_with(&dummy_cp, cur->agg_right);
+					cp.collect_right(cur->get_point(), nullptr, cur->agg_right);
 				}
 			}
 		}
+
+		topmost_point = left_contour[left_contour.size()-1]->get_point();
 	}
 
 	// TODO is this necessary?
@@ -508,25 +513,27 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 			if (i > 0) {
 				if (left_child == right_contour[i - 1]) {
 					// we traversed the left edge
-					cp.aggregate_with(cur->agg_left);
+					cp.traverse_left_edge_up(cur->get_point(), cur->agg_left);
 				} else {
 					// we traversed the right edge
-					cp.aggregate_with(cur->agg_right);
+					cp.traverse_right_edge_up(cur->get_point(), cur->agg_right);
 				}
 			}
 
 			// Combine with descending across the contour, if we traversed a right edge
 			if ((i != right_contour.size() - 1) && ((i == 0) || (left_child != right_contour[i - 1]))) {
 				if (left_child != nullptr) {
-					cp.combine_with(&left_child->combiners, cur->agg_left);
+					cp.collect_left(cur->get_point(), &left_child->combiners, cur->agg_left);
 				} else {
-					cp.combine_with(&dummy_cp, cur->agg_left);
+					cp.collect_left(cur->get_point(), nullptr, cur->agg_left);
 				}
 			}
 		}
+
+		topmost_point = left_contour[left_contour.size()-1]->get_point();
 	}
 
-	cp.combine_with(&left_cp, typename Node::AggValueT());
+	cp.collect_left(topmost_point, &left_cp, typename Node::AggValueT());
 
 	/*
 	 * Step 3: Take the combined value and aggregate into it everything on the way up to
@@ -537,10 +544,10 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined(cons
 		InnerNode * old = cur;
 		cur = cur->_rbt_parent;
 		if (cur->_rbt_left == old) {
-			cp.aggregate_with(cur->agg_left);
+			cp.traverse_left_edge_up(cur->get_point(), cur->agg_left);
 		} else {
 			// TODO assert?
-			cp.aggregate_with(cur->agg_right);
+			cp.traverse_right_edge_up(cur->get_point(), cur->agg_right);
 		}
 	}
 
@@ -561,7 +568,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 	if (n->_rbt_right != nullptr) {
 		cmb_right = & n->_rbt_right->combiners;
 	}
-	return n->combiners.rebuild(cmb_left, n->agg_left, cmb_right, n->agg_right);
+	return n->combiners.rebuild(n->get_point(), cmb_left, n->agg_left, cmb_right, n->agg_right);
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
@@ -578,7 +585,8 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 		cmb_right = & n->_rbt_right->combiners;
 	}
 
-	while(n->InnerNode::combiners.rebuild(cmb_left, n->agg_left, cmb_right, n->agg_right)) {
+	while(n->InnerNode::combiners.rebuild(n->get_point(),
+	                                      cmb_left, n->agg_left, cmb_right, n->agg_right)) {
 		n = n->_rbt_parent;
 
 		if (n != nullptr) {
@@ -722,92 +730,138 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::upper_bound_event
 	return this->t.upper_bound(key);
 }
 
-template<class ValueT>
+template<class KeyT, class ValueT>
 bool
-MaxCombiner<ValueT>::aggregate_with(ValueT a)
+MaxCombiner<KeyT,ValueT>::traverse_left_edge_up(KeyT new_point, ValueT edge_val)
 {
-	this->val += a;
+	(void)new_point;
+	this->val += edge_val;
 	return false;
 }
 
-template<class ValueT>
+template<class KeyT, class ValueT>
 bool
-MaxCombiner<ValueT>::combine_with(ValueT a, ValueT edge_val)
+MaxCombiner<KeyT,ValueT>::traverse_right_edge_up(KeyT new_point, ValueT edge_val)
 {
-	this->val = std::max(this->val, a + edge_val);
+	(void)new_point;
+	this->val += edge_val;
 	return false;
 }
 
-template<class ValueT>
+template<class KeyT, class ValueT>
+bool
+MaxCombiner<KeyT,ValueT>::collect_left(KeyT my_point, const MyType * left_child_combiner,
+                                       ValueT edge_val)
+{
+	(void)my_point;
+	this->val = std::max(this->val, child_value(left_child_combiner) + edge_val);
+	return false;
+}
+
+template<class KeyT, class ValueT>
+bool
+MaxCombiner<KeyT,ValueT>::collect_right(KeyT my_point, const MyType * right_child_combiner,
+                                        ValueT edge_val)
+{
+	(void)my_point;
+	this->val = std::max(this->val, child_value(right_child_combiner) + edge_val);
+	return false;
+}
+
+template<class KeyT, class ValueT>
 ValueT
-MaxCombiner<ValueT>::get()
+MaxCombiner<KeyT,ValueT>::get() const noexcept
 {
 	return this->val;
 }
 
-template<class ValueT>
+template<class KeyT, class ValueT>
 bool
-MaxCombiner<ValueT>::rebuild(ValueT a, ValueT a_edge_val, ValueT b, ValueT b_edge_val)
+MaxCombiner<KeyT,ValueT>::rebuild(KeyT my_point,
+                                  const MyType * left_child_combiner, ValueT left_edge_val,
+                                  const MyType * right_child_combiner, ValueT right_edge_val)
 {
+	(void)my_point;
 	auto old_val = this->val;
-	this->val = std::max(a + a_edge_val, b + b_edge_val);
+
+	this->val = std::max(
+					child_value(left_child_combiner) + left_edge_val,
+					child_value(right_child_combiner) + right_edge_val);
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 	return old_val != val;
 #pragma GCC diagnostic pop
 }
 
+template<class KeyT, class ValueT>
+ValueT
+MaxCombiner<KeyT,ValueT>::child_value(const MaxCombiner::MyType * child) const noexcept
+{
+	if (child == nullptr) {
+		return ValueT();
+	}
 
-template<class ValueT>
-MaxCombiner<ValueT>::MaxCombiner(ValueT val_in)
-	: val(val_in)
-{}
+	return child->get();
+}
 
-template<class AggValueT, class ... Combiners>
-CombinerPack<AggValueT, Combiners...>::CombinerPack(AggValueT val)
-	: data { Combiners(val) ... }
-{}
-
-template<class AggValueT, class ... Combiners>
+template<class KeyT, class AggValueT, class ... Combiners>
 bool
-CombinerPack<AggValueT, Combiners...>::rebuild(CombinerPack<AggValueT, Combiners...> * a,
-                                          AggValueT a_edge_val,
-                                          CombinerPack<AggValueT, Combiners...> * b,
-                                          AggValueT b_edge_val)
+CombinerPack<KeyT, AggValueT, Combiners...>::rebuild(KeyT my_point,
+                                                     const MyType * left_child, AggValueT left_edge_val,
+                                                     const MyType * right_child, AggValueT right_edge_val)
 {
 	// TODO replace vector by templated std::any_of?
-	std::vector<bool> changed { std::get<Combiners>(this->data).rebuild(
-																	a != nullptr ? a->get<Combiners>() : AggValueT(),
-																	a_edge_val,
-																	b != nullptr ? b->get<Combiners>() : AggValueT(),
-																	b_edge_val)
-					                            ...};
+	std::vector<bool> changed { std::get<Combiners>(this->data).rebuild(my_point,
+																	child_combiner<Combiners...>(left_child), left_edge_val,
+																	child_combiner<Combiners...>(right_child), right_edge_val) ...};
 	return std::any_of(changed.begin(), changed.end(), [](bool changed_flag) { return changed_flag;});
 }
 
-template<class AggValueT, class ... Combiners>
+template<class KeyT, class AggValueT, class ... Combiners>
 bool
-CombinerPack<AggValueT, Combiners...>::combine_with(CombinerPack<AggValueT, Combiners...> *other,
-																			              AggValueT edge_val)
+CombinerPack<KeyT,AggValueT, Combiners...>::collect_left(
+				KeyT my_point, const MyType * left_child_combiner, AggValueT edge_val)
 {
-	utilities::throw_away(std::get<Combiners>(this->data).combine_with(other->get<Combiners>(),
-	                                                                   edge_val) ...);
+	utilities::throw_away(std::get<Combiners>(this->data).collect_left(
+					my_point, child_combiner<Combiners>(left_child_combiner), edge_val) ...);
 	return false;
 }
 
-
-template<class AggValueT, class ... Combiners>
+template<class KeyT, class AggValueT, class ... Combiners>
 bool
-CombinerPack<AggValueT, Combiners...>::aggregate_with(AggValueT a)
+CombinerPack<KeyT,AggValueT, Combiners...>::collect_right(
+				KeyT my_point, const MyType * right_child_combiner, AggValueT edge_val)
 {
-	utilities::throw_away(std::get<Combiners>(this->data).aggregate_with(a) ...);
+	utilities::throw_away(std::get<Combiners>(this->data).collect_right(
+					my_point, child_combiner<Combiners>(right_child_combiner), edge_val) ...);
 	return false;
 }
 
-template<class Node, class ... Combiners>
+template<class KeyT, class AggValueT, class ... Combiners>
+bool
+CombinerPack<KeyT, AggValueT, Combiners...>::traverse_left_edge_up(KeyT new_point,
+                                                                   AggValueT edge_val)
+{
+	utilities::throw_away(std::get<Combiners>(this->data).traverse_left_edge_up(
+					new_point, edge_val) ...);
+	return false;
+}
+
+template<class KeyT, class AggValueT, class ... Combiners>
+bool
+CombinerPack<KeyT, AggValueT, Combiners...>::traverse_right_edge_up(KeyT new_point,
+                                                                   AggValueT edge_val)
+{
+	utilities::throw_away(std::get<Combiners>(this->data).traverse_right_edge_up(
+					new_point, edge_val) ...);
+	return false;
+}
+
+template<class KeyT, class AggValueT, class ... Combiners>
 template<class Combiner>
 typename Combiner::ValueT
-CombinerPack<Node, Combiners...>::get()
+CombinerPack<KeyT, AggValueT, Combiners...>::get() const
 {
 	return std::get<Combiner>(this->data).get();
 }
@@ -823,6 +877,27 @@ const
 	}
 
 	return this->t.get_root()->combiners.template get<Combiner>();
+}
+
+template<class KeyT, class AggValueT, class ... Combiners>
+template<class Combiner>
+const Combiner *
+CombinerPack<KeyT, AggValueT, Combiners...>::child_combiner(const CombinerPack::MyType * child)
+const
+{
+	if (child == nullptr) {
+		return nullptr;
+	}
+
+	return & child->get_combiner<Combiner>();
+}
+
+template<class KeyT, class AggValueT, class ... Combiners>
+template<class Combiner>
+const Combiner &
+CombinerPack<KeyT, AggValueT, Combiners...>::get_combiner() const
+{
+	return std::get<Combiner>(this->data);
 }
 
 } // namespace ygg

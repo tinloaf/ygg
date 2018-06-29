@@ -14,19 +14,19 @@
 
 #include "../src/ygg.hpp"
 
-#define IAGG_TESTSIZE 1500
-#define IAGG_DELETION_TESTSIZE 500
-#define IAGG_DELETION_ITERATIONS 100
+#define DYNSEGTREE_TESTSIZE 1500
+#define DYNSEGTREE_DELETION_TESTSIZE 500
+#define DYNSEGTREE_DELETION_ITERATIONS 100
 
 // chosen by fair xkcd
-#define IAGG_SEED 4
+#define DYNSEGTREE_SEED 4
 
 namespace test_interval_agg {
 using namespace boost::icl;
 using namespace ygg;
 
-using MCombiner = MaxCombiner<int>;
-using Combiners = CombinerPack<int, MCombiner>;
+using MCombiner = MaxCombiner<int, int>;
+using Combiners = CombinerPack<int, int, MCombiner>;
 
 class Node : public DynSegTreeNodeBase<int, int, int, Combiners> {
 public:
@@ -57,13 +57,13 @@ public:
 };
 
 
-using IAgg = DynamicSegmentTree<Node, NodeTraits, Combiners>;
+using DynSegTree = DynamicSegmentTree<Node, NodeTraits, Combiners>;
 
-TEST(IAggTest, TrivialTest)
+TEST(DynSegTreeTest, TrivialTest)
 {
 	Node n(2,5,10);
 
-	IAgg agg;
+	DynSegTree agg;
 	ASSERT_TRUE(agg.empty());
 	agg.insert(n);
 	ASSERT_FALSE(agg.empty());
@@ -100,11 +100,11 @@ TEST(IAggTest, TrivialTest)
 	ASSERT_EQ(it, agg.cend());
 }
 
-TEST(IAggTest, TestEventBounding)
+TEST(DynSegTreeTest, TestEventBounding)
 {
 	Node n(2,5,10);
 
-	IAgg agg;
+	DynSegTree agg;
 	ASSERT_TRUE(agg.empty());
 	agg.insert(n);
 	ASSERT_FALSE(agg.empty());
@@ -129,97 +129,97 @@ TEST(IAggTest, TestEventBounding)
 	ASSERT_EQ(it, agg.end());
 }
 
-TEST(IAggTest, NestingTest)
+TEST(DynSegTreeTest, NestingTest)
 {
-	Node n[IAGG_TESTSIZE];
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	Node n[DYNSEGTREE_TESTSIZE];
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		n[i].lower = i;
-		n[i].upper = 2 * IAGG_TESTSIZE - i + 1;
+		n[i].upper = 2 * DYNSEGTREE_TESTSIZE - i + 1;
 		n[i].value = 1;
 	}
 
-	IAgg agg;
+	DynSegTree agg;
 
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		agg.insert(n[i]);
 	}
 
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		auto val = agg.query(i);
 		ASSERT_EQ(val, i + 1);
 	}
 
 	int combined = agg.get_combined<MCombiner>();
-	ASSERT_EQ(combined, IAGG_TESTSIZE);
+	ASSERT_EQ(combined, DYNSEGTREE_TESTSIZE);
 
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		int combined_range = agg.get_combined<MCombiner>(0,i+1,true,false);
 		ASSERT_EQ(combined_range, i+1);
 	}
 
 	// Test iteration
 	auto it = agg.cbegin();
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		ASSERT_EQ(it->get_point(), i);
 		ASSERT_TRUE(it->is_start());
 		it++;
 	}
-	for (int i = IAGG_TESTSIZE - 1;  i >= 0 ; --i) {
-		ASSERT_EQ(it->get_point(), 2 * IAGG_TESTSIZE - i + 1);
+	for (int i = DYNSEGTREE_TESTSIZE - 1;  i >= 0 ; --i) {
+		ASSERT_EQ(it->get_point(), 2 * DYNSEGTREE_TESTSIZE - i + 1);
 		ASSERT_TRUE(it->is_end());
 		it++;
 	}
 	ASSERT_EQ(it, agg.cend());
 }
 
-TEST(IAggTest, OverlappingTest)
+TEST(DynSegTreeTest, OverlappingTest)
 {
-	Node n[IAGG_TESTSIZE];
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	Node n[DYNSEGTREE_TESTSIZE];
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		n[i].lower = i;
-		n[i].upper = IAGG_TESTSIZE + i;
+		n[i].upper = DYNSEGTREE_TESTSIZE + i;
 		n[i].value = 1;
 	}
 
-	IAgg agg;
+	DynSegTree agg;
 
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		agg.insert(n[i]);
 	}
 
 	int combined = agg.get_combined<MCombiner>();
-	ASSERT_EQ(combined, IAGG_TESTSIZE);
+	ASSERT_EQ(combined, DYNSEGTREE_TESTSIZE);
 
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		auto val = agg.query(i);
 		ASSERT_EQ(val, i + 1);
 	}
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
-		auto val = agg.query(i + IAGG_TESTSIZE);
-		ASSERT_EQ(val, IAGG_TESTSIZE - i - 1);
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
+		auto val = agg.query(i + DYNSEGTREE_TESTSIZE);
+		ASSERT_EQ(val, DYNSEGTREE_TESTSIZE - i - 1);
 	}
 }
 
-TEST(IAggTest, DeletionTest)
+TEST(DynSegTreeTest, DeletionTest)
 {
-	Node n[IAGG_DELETION_TESTSIZE];
-	for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+	Node n[DYNSEGTREE_DELETION_TESTSIZE];
+	for (unsigned int i = 0 ; i < DYNSEGTREE_DELETION_TESTSIZE ; ++i) {
 		n[i].lower = i;
-		n[i].upper = IAGG_DELETION_TESTSIZE + i;
+		n[i].upper = DYNSEGTREE_DELETION_TESTSIZE + i;
 		n[i].value = 1;
 	}
 
-	IAgg agg;
+	DynSegTree agg;
 
-	for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_DELETION_TESTSIZE ; ++i) {
 		agg.insert(n[i]);
 	}
 
-	std::mt19937 rng(IAGG_SEED);
+	std::mt19937 rng(DYNSEGTREE_SEED);
 
-	for (unsigned int j = 0 ; j < IAGG_DELETION_ITERATIONS ; ++j) {
+	for (unsigned int j = 0 ; j < DYNSEGTREE_DELETION_ITERATIONS ; ++j) {
 		//std::cout << "\n\n\n=================================================\n\n\n";
-		std::uniform_int_distribution<unsigned int> bounds_distr(0, 2 * IAGG_DELETION_TESTSIZE);
+		std::uniform_int_distribution<unsigned int> bounds_distr(0, 2 * DYNSEGTREE_DELETION_TESTSIZE);
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + bounds_distr(rng) + 1;
 
@@ -230,7 +230,7 @@ TEST(IAggTest, DeletionTest)
 
 		agg.insert(deleteme);
 
-		for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+		for (unsigned int i = 0 ; i < DYNSEGTREE_DELETION_TESTSIZE ; ++i) {
 			auto val = agg.query(i);
 			if ((i >= lower) && (i < upper)) {
 				ASSERT_EQ(val, i + 1 + 42);
@@ -238,12 +238,12 @@ TEST(IAggTest, DeletionTest)
 				ASSERT_EQ(val, i + 1);
 			}
 		}
-		for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
-			auto val = agg.query(i + IAGG_DELETION_TESTSIZE);
-				if ((i  + IAGG_DELETION_TESTSIZE >= lower) && (i  + IAGG_DELETION_TESTSIZE < upper)) {
-					ASSERT_EQ(val, IAGG_DELETION_TESTSIZE - i - 1 + 42);
+		for (unsigned int i = 0 ; i < DYNSEGTREE_DELETION_TESTSIZE ; ++i) {
+			auto val = agg.query(i + DYNSEGTREE_DELETION_TESTSIZE);
+				if ((i  + DYNSEGTREE_DELETION_TESTSIZE >= lower) && (i  + DYNSEGTREE_DELETION_TESTSIZE < upper)) {
+					ASSERT_EQ(val, DYNSEGTREE_DELETION_TESTSIZE - i - 1 + 42);
 				} else {
-					ASSERT_EQ(val, IAGG_DELETION_TESTSIZE - i - 1);
+					ASSERT_EQ(val, DYNSEGTREE_DELETION_TESTSIZE - i - 1);
 				}
 		}
 
@@ -251,41 +251,41 @@ TEST(IAggTest, DeletionTest)
 
 		agg.remove(deleteme);
 
-		for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
+		for (unsigned int i = 0 ; i < DYNSEGTREE_DELETION_TESTSIZE ; ++i) {
 			auto val = agg.query(i);
 			ASSERT_EQ(val, i + 1);
 		}
-		for (unsigned int i = 0 ; i < IAGG_DELETION_TESTSIZE ; ++i) {
-			auto val = agg.query(i + IAGG_DELETION_TESTSIZE);
-			ASSERT_EQ(val, IAGG_DELETION_TESTSIZE - i - 1);
+		for (unsigned int i = 0 ; i < DYNSEGTREE_DELETION_TESTSIZE ; ++i) {
+			auto val = agg.query(i + DYNSEGTREE_DELETION_TESTSIZE);
+			ASSERT_EQ(val, DYNSEGTREE_DELETION_TESTSIZE - i - 1);
 		}
 
 		int combined = agg.get_combined<MCombiner>();
-		ASSERT_EQ(combined, IAGG_DELETION_TESTSIZE);
+		ASSERT_EQ(combined, DYNSEGTREE_DELETION_TESTSIZE);
 	}
 }
 
-TEST(IAggTest, NestingTestInsertionOverlappingDeletionTest)
+TEST(DynSegTreeTest, NestingTestInsertionOverlappingDeletionTest)
 {
-	Node n[IAGG_TESTSIZE];
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	Node n[DYNSEGTREE_TESTSIZE];
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		n[i].lower = i;
-		n[i].upper = 2 * IAGG_TESTSIZE - i + 1;
+		n[i].upper = 2 * DYNSEGTREE_TESTSIZE - i + 1;
 		n[i].value = 1;
 	}
 
-	Node transient[IAGG_TESTSIZE];
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	Node transient[DYNSEGTREE_TESTSIZE];
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		transient[i].lower = i;
-		transient[i].upper = IAGG_TESTSIZE + i;
+		transient[i].upper = DYNSEGTREE_TESTSIZE + i;
 		transient[i].value = 10;
 	}
 
-	IAgg agg;
+	DynSegTree agg;
 
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		agg.insert(n[i]);
-		agg.insert(transient[IAGG_TESTSIZE - i - 1]);
+		agg.insert(transient[DYNSEGTREE_TESTSIZE - i - 1]);
 	}
 
 	auto val = agg.query(1);
@@ -299,78 +299,78 @@ TEST(IAggTest, NestingTestInsertionOverlappingDeletionTest)
 	val = agg.query(1);
 	ASSERT_EQ(val, 2);
 
-	for (unsigned int i = 2 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 2 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		agg.remove(transient[i]);
 	}
 
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		val = agg.query(i);
 		ASSERT_EQ(val, i + 1);
 	}
 }
 
-TEST(IAggTest, ManyEqualTest)
+TEST(DynSegTreeTest, ManyEqualTest)
 {
-	Node n_middle[IAGG_TESTSIZE];
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	Node n_middle[DYNSEGTREE_TESTSIZE];
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		n_middle[i].lower = 10;
 		n_middle[i].upper = 20;
 		n_middle[i].value = 1;
 	}
 
-	Node n_left[IAGG_TESTSIZE];
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	Node n_left[DYNSEGTREE_TESTSIZE];
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		n_left[i].lower = 0;
 		n_left[i].upper = 15;
 		n_left[i].value = 7;
 	}
 
-	Node n_right[IAGG_TESTSIZE];
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	Node n_right[DYNSEGTREE_TESTSIZE];
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		n_right[i].lower = 15;
 		n_right[i].upper = 25;
 		n_right[i].value = 29;
 	}
 
 
-	IAgg agg;
+	DynSegTree agg;
 
-	for (unsigned int i = 0 ; i < IAGG_TESTSIZE ; ++i) {
+	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE ; ++i) {
 		agg.insert(n_middle[i]);
 		agg.insert(n_left[i]);
 		agg.insert(n_right[i]);
 	}
 
 	auto val = agg.query(0);
-	ASSERT_EQ(val, IAGG_TESTSIZE * 7);
+	ASSERT_EQ(val, DYNSEGTREE_TESTSIZE * 7);
 	val = agg.query(5);
-	ASSERT_EQ(val, IAGG_TESTSIZE * 7);
+	ASSERT_EQ(val, DYNSEGTREE_TESTSIZE * 7);
 	val = agg.query(10);
-	ASSERT_EQ(val, IAGG_TESTSIZE * 7 + IAGG_TESTSIZE * 1);
+	ASSERT_EQ(val, DYNSEGTREE_TESTSIZE * 7 + DYNSEGTREE_TESTSIZE * 1);
 	val = agg.query(12);
-	ASSERT_EQ(val, IAGG_TESTSIZE * 7 + IAGG_TESTSIZE * 1);
+	ASSERT_EQ(val, DYNSEGTREE_TESTSIZE * 7 + DYNSEGTREE_TESTSIZE * 1);
 	val = agg.query(15);
-	ASSERT_EQ(val, IAGG_TESTSIZE * 1 + IAGG_TESTSIZE * 29);
+	ASSERT_EQ(val, DYNSEGTREE_TESTSIZE * 1 + DYNSEGTREE_TESTSIZE * 29);
 	val = agg.query(17);
-	ASSERT_EQ(val, IAGG_TESTSIZE * 1 + IAGG_TESTSIZE * 29);
+	ASSERT_EQ(val, DYNSEGTREE_TESTSIZE * 1 + DYNSEGTREE_TESTSIZE * 29);
 	val = agg.query(20);
-	ASSERT_EQ(val, IAGG_TESTSIZE * 29);
+	ASSERT_EQ(val, DYNSEGTREE_TESTSIZE * 29);
 	val = agg.query(22);
-	ASSERT_EQ(val, IAGG_TESTSIZE * 29);
+	ASSERT_EQ(val, DYNSEGTREE_TESTSIZE * 29);
 	val = agg.query(25);
 	ASSERT_EQ(val, 0);
 }
 
-TEST(IAggTest, ComprehensiveTest)
+TEST(DynSegTreeTest, ComprehensiveTest)
 {
-	Node persistent_nodes[IAGG_TESTSIZE];
+	Node persistent_nodes[DYNSEGTREE_TESTSIZE];
 	std::vector<unsigned int> indices;
-	std::mt19937 rng(IAGG_SEED);
+	std::mt19937 rng(DYNSEGTREE_SEED);
 
-	IAgg agg;
+	DynSegTree agg;
 
-	for (unsigned int i = 0; i < IAGG_TESTSIZE; ++i) {
-		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IAGG_TESTSIZE / 2);
+	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * DYNSEGTREE_TESTSIZE / 2);
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
@@ -378,13 +378,13 @@ TEST(IAggTest, ComprehensiveTest)
 		indices.push_back(i);
 	}
 
-	Node transient_nodes[IAGG_TESTSIZE];
-	for (unsigned int i = 0; i < IAGG_TESTSIZE; ++i) {
-		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IAGG_TESTSIZE / 2);
+	Node transient_nodes[DYNSEGTREE_TESTSIZE];
+	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * DYNSEGTREE_TESTSIZE / 2);
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
-		transient_nodes[i] = Node(lower, upper, IAGG_TESTSIZE + i);
+		transient_nodes[i] = Node(lower, upper, DYNSEGTREE_TESTSIZE + i);
 	}
 
 	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
@@ -442,17 +442,17 @@ TEST(IAggTest, ComprehensiveTest)
 	ASSERT_EQ(combined, maxval);
 }
 
-TEST(IAggTest, ComprehensiveCombinerTest)
+TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 {
-	std::mt19937 rng(IAGG_SEED);
+	std::mt19937 rng(DYNSEGTREE_SEED);
 
-	Node persistent_nodes[IAGG_TESTSIZE];
+	Node persistent_nodes[DYNSEGTREE_TESTSIZE];
 	std::vector<unsigned int> indices;
 
-	IAgg agg;
+	DynSegTree agg;
 
-	for (unsigned int i = 0; i < IAGG_TESTSIZE; ++i) {
-		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IAGG_TESTSIZE / 2);
+	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * DYNSEGTREE_TESTSIZE / 2);
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
@@ -460,13 +460,13 @@ TEST(IAggTest, ComprehensiveCombinerTest)
 		indices.push_back(i);
 	}
 
-	Node transient_nodes[IAGG_TESTSIZE];
-	for (unsigned int i = 0; i < IAGG_TESTSIZE; ++i) {
-		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IAGG_TESTSIZE / 2);
+	Node transient_nodes[DYNSEGTREE_TESTSIZE];
+	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * DYNSEGTREE_TESTSIZE / 2);
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
-		transient_nodes[i] = Node(lower, upper, IAGG_TESTSIZE + i);
+		transient_nodes[i] = Node(lower, upper, DYNSEGTREE_TESTSIZE + i);
 	}
 
 	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {

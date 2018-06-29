@@ -335,19 +335,14 @@ public:
  *
  * @tparam ValueType The type of values associated with your intervals
  */
-template<class ValueType>
+template<class KeyType, class ValueType>
 class MaxCombiner {
 public:
 	using ValueT = ValueType;
+	using KeyT = KeyType;
+	using MyType = MaxCombiner<KeyT, ValueT>;
 
-	/**
-	 * @brief Build this combiner from just this node, i.e., as if it didn't have any children
-	 *
-	 * @param val The value associated with this node TODO CAN BE REMOVED
-	 */
-	explicit MaxCombiner(ValueT val);
-
-	MaxCombiner() = default;
+	 MaxCombiner() = default;
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
@@ -364,7 +359,10 @@ public:
 	 * @param edge_val 	See above
 	 * @return FIXME ignored for now
 	 */
-	bool combine_with(ValueT a, ValueT edge_val);
+	 //bool combine_with(ValueT a, ValueT edge_val);
+
+	bool collect_left(KeyT my_point, const MyType * left_child_combiner, ValueType edge_val);
+	bool collect_right(KeyT my_point, const MyType * right_child_combiner, ValueType edge_val);
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
@@ -381,7 +379,10 @@ public:
 	 * @param edge_val 	See above
 	 * @return FIXME ignored for now
 	 */
-	 bool aggregate_with(ValueT a);
+	bool traverse_left_edge_up(KeyT new_point, ValueT edge_val);
+	bool traverse_right_edge_up(KeyT new_point, ValueT edge_val);
+
+	 //bool aggregate_with(ValueT a);
 
 	/**
 	 * @brief Rebuilds the value in this MaxCombiner from values of its two children's MaxCombiners
@@ -399,14 +400,16 @@ public:
 	 * @param b_edge_val 	See above
 	 * @return FIXME ignored for now
 	 */
-	bool rebuild(ValueT a, ValueT a_edge_val, ValueT b, ValueT b_edge_val);
+	bool rebuild(KeyT my_point,
+	             const MyType * left_child_combiner, ValueT left_edge_val,
+	             const MyType * right_child_combiner, ValueT right_edge_val);
 
 	/**
 	 * @brief Returns the currently stored combined value in this combiner
 	 *
 	 * @return the currently stored combined value in this combiner
 	 */
-	ValueT get();
+	ValueT get() const noexcept;
 
 	// TODO DEBUG
 	static std::string get_name() {
@@ -414,6 +417,8 @@ public:
 	}
 private:
 	ValueT val;
+
+	ValueT child_value(const MyType * child) const noexcept;
 };
 
 /**
@@ -427,15 +432,12 @@ private:
  * @tparam AggValueT	The type of the aggregate values in your DynamicSegmentTree
  * @tparam Combiners	A list of combiner classes
  */
-template<class AggValueT, class ... Combiners>
+template<class KeyT, class AggValueT, class ... Combiners>
 class CombinerPack {
 public:
-	/**
-	 * @brief Initialize all combiners at this node as if this node did not have any children
-	 * @param val TODO CAN BE REMOVED
-	 */
-	explicit CombinerPack(AggValueT val);
-	CombinerPack() = default;
+	using MyType = CombinerPack<KeyT, AggValueT, Combiners...>;
+
+	 CombinerPack() = default;
 
 	/**
 	 * @brief Rebuilds all combiners at this node from its children's combiners
@@ -449,26 +451,37 @@ public:
 	 * @param b_edge_val	The agg_right value of our node
 	 * @return TODO IGNORED
 	 */
-	bool rebuild(CombinerPack<AggValueT, Combiners...> * a,
-	             AggValueT a_edge_val,
-	             CombinerPack<AggValueT, Combiners...> * b,
-	             AggValueT b_edge_val);
+	bool rebuild(KeyT my_point,
+	             const MyType * left_child, AggValueT left_edge_val,
+	             const MyType * right_child, AggValueT right_edge_val);
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
-	bool combine_with(CombinerPack<AggValueT, Combiners...> * other, AggValueT edge_val);
+	//bool combine_with(CombinerPack<AggValueT, Combiners...> * other, AggValueT edge_val);
+	bool collect_left(KeyT my_point, const MyType * left_child_combiner, AggValueT edge_val);
+	bool collect_right(KeyT my_point, const MyType * right_child_combiner, AggValueT edge_val);
+
 	// TODO the bool is only returned for sake of expansion! Fix that!
-	bool aggregate_with(AggValueT a);
+	//bool aggregate_with(AggValueT a);
+	bool traverse_left_edge_up(KeyT new_point, AggValueT edge_val);
+	bool traverse_right_edge_up(KeyT new_point, AggValueT edge_val);
+
 
 	template<class Combiner>
-	typename Combiner::ValueT get();
+	typename Combiner::ValueT get() const;
+	template<class Combiner>
+	const Combiner & get_combiner() const;
 
 	using pack = utilities::pack<Combiners ...>;
 private:
+
+	template<class Combiner>
+	const Combiner * child_combiner(const MyType * child) const;
+
 	std::tuple<Combiners ...> data;
 };
 
-template<class AggValueT>
-using EmptyCombinerPack = CombinerPack<AggValueT>;
+template<class KeyT, class AggValueT>
+using EmptyCombinerPack = CombinerPack<KeyT, AggValueT>;
 
 /**
  * @brief Base class (template) to supply your node class with metainformation
