@@ -90,6 +90,8 @@ InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_left(InnerNode 
 
 	InnerTree::rebuild_combiners_at(&node);
 	InnerTree::rebuild_combiners_at(old_right);
+
+	//std::cout << "Rotated left\n";
 }
 
 template<class InnerTree, class InnerNode, class Node, class NodeTraits>
@@ -106,6 +108,8 @@ InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_right(InnerNode
 
 	InnerTree::rebuild_combiners_at(&node);
 	InnerTree::rebuild_combiners_at(old_left);
+
+    //std::cout << "Rotated right\n";
 }
 
 template<class InnerTree, class InnerNode, class Node, class NodeTraits>
@@ -123,9 +127,15 @@ template<class InnerTree, class InnerNode, class Node, class NodeTraits>
 void
 InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(InnerNode & old_ancestor, InnerNode & old_descendant)
 {
+    /*
+    std::cout << "Swapping [" << old_ancestor.point << "]@" << (size_t)(&old_ancestor)
+    << " with [" << old_descendant.point << "]@" << (size_t)(&old_descendant) << "\n";
+    */
+
 	// Swap labels to their old places in the tree
 	std::swap(old_ancestor.InnerNode::agg_left, old_descendant.InnerNode::agg_left);
 	std::swap(old_ancestor.InnerNode::agg_right, old_descendant.InnerNode::agg_right);
+    //std::swap(old_ancestor.InnerNode::combiners, old_descendant.InnerNode::combiners);
 
 	if (get_partner(old_ancestor) == &old_descendant) {
 		// we are done. They have their contour nulled
@@ -139,8 +149,9 @@ InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(InnerNode & old
 	const Node * old_descendant_node = static_cast<const Node *>(old_descendant.container);
 	auto old_descendant_val = NodeTraits::get_value(*old_descendant_node);
 
+	//std::cout << "--> Modifying contours\n";
 	if (old_descendant.InnerNode::point < old_descendant_partner->InnerNode::point) {
-		InnerTree::modify_contour(&old_ancestor, old_descendant_partner, -1 * old_descendant_val);
+        InnerTree::modify_contour(&old_ancestor, old_descendant_partner, -1 * old_descendant_val);
 		InnerTree::modify_contour(&old_descendant, old_descendant_partner, old_descendant_val);
 	} else {
 		// TODO
@@ -148,6 +159,15 @@ InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(InnerNode & old
 		InnerTree::modify_contour(old_descendant_partner, &old_ancestor, -1 * old_descendant_val);
 		InnerTree::modify_contour(old_descendant_partner, &old_descendant, old_descendant_val);
 	}
+
+
+	//std::cout << "--> Rebuilding combiners\n";
+
+	// TODO FIXME why is this necessary? Should be done by modify_contour!
+    InnerTree::rebuild_combiners_at(&old_descendant);
+    InnerTree::rebuild_combiners_at(&old_ancestor);
+    InnerTree::rebuild_combiners_at(&old_descendant);
+    InnerTree::rebuild_combiners_at(old_descendant_partner);
 }
 
 } // namespace dyn_segtree_internal
@@ -594,6 +614,8 @@ bool
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 				rebuild_combiners_at(InnerNode *n)
 {
+    //std::cout << "==> Rebuilding at [" << n->get_point() << "]@" << (size_t)(n) << "\n";
+
 	Combiners * cmb_left = nullptr;
 	if (n->_rbt_left != nullptr) {
 		cmb_left = & n->_rbt_left->combiners;
@@ -602,6 +624,10 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 	if (n->_rbt_right != nullptr) {
 		cmb_right = & n->_rbt_right->combiners;
 	}
+	/*
+	std::cout << "  ====> Left: @" << (size_t)cmb_left << " - edge " << n->agg_left << "\n";
+    std::cout << "  ====> Right: @" << (size_t)cmb_right << " - edge " << n->agg_right << "\n";
+    */
 	return n->combiners.rebuild(n->get_point(), cmb_left, n->agg_left, cmb_right, n->agg_right);
 }
 
@@ -782,6 +808,26 @@ typename Combiner::ValueT
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combined() const
 {
 	return this->get_combiner<Combiner>().get();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
+template<class Combiner>
+void
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::dbg_verify_max_combiner() const
+{
+    for (auto & node : this->t) {
+        if (node._rbt_left != nullptr) {
+            auto left_child = node._rbt_left;
+            assert(node.combiners.template get<Combiner>() >=
+                    left_child->combiners.template get<Combiner>() + node.agg_left);
+        }
+
+        if (node._rbt_right != nullptr) {
+            auto right_child = node._rbt_right;
+            assert(node.combiners.template get<Combiner>() >=
+                    right_child->combiners.template get<Combiner>() + node.agg_right);
+        }
+    }
 }
 
 /********************************************************

@@ -937,6 +937,8 @@ public:
 	/*
 	 * DEBUGGING
 	 */
+	template<class Combiner>
+	void dbg_verify_max_combiner() const;
 private:
 	// TODO build a generic function for this
 	template<class ... Ts>
