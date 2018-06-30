@@ -350,6 +350,7 @@ public:
  * Tree, allows you to efficiently retrieve the maximum aggregate value over any range in your
  * segment tree.
  *
+ * @tparam KeyType	 The type of the interval borders
  * @tparam ValueType The type of values associated with your intervals
  */
 template<class KeyType, class ValueType>
@@ -366,37 +367,55 @@ public:
 	 * @brief Combines this MaxCombiner with a value, possibly of a child node
 	 *
 	 * This sets the maximum currently stored at this combiner to the maximum of the currently
-	 * stored value and (a + edge_val).
+	 * stored value and the value of left_child_combiner plus edge_val.
 	 *
 	 * Usually, a will be the value of the MaxCombiner of a child of the node that this combiner
-	 * belongs to. edge_val will then be the agg_left or agg_right
-	 * value of the node this combiner belongs to.
+	 * belongs to. edge_val will then be the agg_left value of the node this combiner belongs to.
 	 *
-	 * @param a 				See above
-	 * @param edge_val 	See above
+	 * @param my_point 					  The point of the inner node that this MaxCombiner is associated with
+	 * @param left_child_combiner The MaxCombiner belonging to the left child of this node
+	 * @param edge_val 				    The aggregate value of the left edge going out of this node
 	 * @return FIXME ignored for now
 	 */
-	 //bool combine_with(ValueT a, ValueT edge_val);
-
 	bool collect_left(KeyT my_point, const MyType * left_child_combiner, ValueType edge_val);
+	/**
+	 * @brief Combines this MaxCombiner with a value, possibly of a child node
+	 *
+	 * This sets the maximum currently stored at this combiner to the maximum of the currently
+	 * stored value and the value of right_child_combiner plus edge_val.
+	 *
+	 * Usually, a will be the value of the MaxCombiner of a child of the node that this combiner
+	 * belongs to. edge_val will then be the agg_right value of the node this combiner belongs to.
+	 *
+	 * @param my_point 					   The point of the inner node that this MaxCombiner is associated with
+	 * @param right_child_combiner The MaxCombiner belonging to the right child of this node
+	 * @param edge_val 				     The aggregate value of the right edge going out of this node
+	 * @return FIXME ignored for now
+	 */
 	bool collect_right(KeyT my_point, const MyType * right_child_combiner, ValueType edge_val);
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
 	 * @brief Aggregates a value into the max value stored in this combiner
 	 *
-	 * This sets the maximum currently stored at this combiner to the maximum of the currently
-	 * stored value and (a + edge_val).
+	 * This adds edge_val to the maximum currently stored in this combiner. This is used when traversing up
+	 * a left edge in the tree.
 	 *
-	 * Usually, a will be the value of the MaxCombiner of a child of the node that this combiner
-	 * belongs to. edge_val will then be the agg_left or agg_right
-	 * value of the node this combiner belongs to.
-	 *
-	 * @param a 				See above
-	 * @param edge_val 	See above
+	 * @param new_point 				The point of the node we traversed into
+	 * @param edge_val 					The value of the edge we traversed
 	 * @return FIXME ignored for now
 	 */
 	bool traverse_left_edge_up(KeyT new_point, ValueT edge_val);
+	/**
+	 * @brief Aggregates a value into the max value stored in this combiner
+	 *
+	 * This adds edge_val to the maximum currently stored in this combiner. This is used when traversing up
+	 * a right edge in the tree.
+	 *
+	 * @param new_point 				The point of the node we traversed into
+	 * @param edge_val 					The value of the edge we traversed
+	 * @return FIXME ignored for now
+	 */
 	bool traverse_right_edge_up(KeyT new_point, ValueT edge_val);
 
 	 //bool aggregate_with(ValueT a);
@@ -404,17 +423,14 @@ public:
 	/**
 	 * @brief Rebuilds the value in this MaxCombiner from values of its two children's MaxCombiners
 	 *
-	 * This sets the maximum currently stored at this combiner to the maximum of (a + a_edge_val) and
-	 * (b + b_edge_val).
+	 * This sets the maximum currently stored at this combiner to the maximum of the left_child_combiner's value plus
+	 * left_edge_val and right_child_combiner's value plus right_edge_val.
 	 *
-	 * Usually, a and b will be the values of the MaxCombiners of the two children of the node that
-	 * this  combiner belongs to. a_edge_val  and b_edge_val will then be the agg_left resp. agg_right
-	 * values of the node this combiner belongs to.
-	 *
-	 * @param a 				See above
-	 * @param a_edge_val 	See above
-	 * @param b 				See above
-	 * @param b_edge_val 	See above
+	 * @param my_point				       The point of the node this combiner belongs to
+	 * @param left_child_combiner		 The MaxCombiner of the left child of this node
+	 * @param left_edge_val					 The agg_left value of this node
+	 * @param right_child_combiner	 The MaxCombiner of the right child of this node
+	 * @param left_edge_val					 The agg_right value of this node
 	 * @return FIXME ignored for now
 	 */
 	bool rebuild(KeyT my_point,
@@ -444,12 +460,13 @@ private:
 
 
 /**
- * @brief A combiner that allows to retrieve the maximum value over any range
+ * @brief A combiner that allows to retrieve the maximum value over any range plus the range over which the maximum occucrs.
  *
  * This is a combiner (see TODO for what a combiner is) that, when added to a Dynamic Segment
  * Tree, allows you to efficiently retrieve the maximum aggregate value over any range in your
- * segment tree.
+ * segment tree. It will also tell you in which range the maximum occurs.
  *
+ * @tparam KeyType   The type of the interval borders
  * @tparam ValueType The type of values associated with your intervals
  */
 template<class KeyType, class ValueType>
@@ -463,75 +480,128 @@ public:
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
-	 * @brief Combines this MaxCombiner with a value, possibly of a child node
+	 * @brief Combines this RangedMaxCombiner with a value, possibly of a child node
 	 *
 	 * This sets the maximum currently stored at this combiner to the maximum of the currently
-	 * stored value and (a + edge_val).
+	 * stored value and the value of left_child_combiner plus edge_val.
 	 *
-	 * Usually, a will be the value of the MaxCombiner of a child of the node that this combiner
-	 * belongs to. edge_val will then be the agg_left or agg_right
-	 * value of the node this combiner belongs to.
+	 * Usually, a will be the value of the RangedMaxCombiner of a child of the node that this combiner
+	 * belongs to. edge_val will then be the agg_left value of the node this combiner belongs to.
 	 *
-	 * @param a 				See above
-	 * @param edge_val 	See above
+	 * @param my_point 					  The point of the inner node that this RangedMaxCombiner is associated with
+	 * @param left_child_combiner The RangedMaxCombiner belonging to the left child of this node
+	 * @param edge_val 				    The aggregate value of the left edge going out of this node
 	 * @return FIXME ignored for now
 	 */
-	//bool combine_with(ValueT a, ValueT edge_val);
-
 	bool collect_left(KeyT my_point, const MyType * left_child_combiner, ValueType edge_val);
+	/**
+	 * @brief Combines this RangedMaxCombiner with a value, possibly of a child node
+	 *
+	 * This sets the maximum currently stored at this combiner to the maximum of the currently
+	 * stored value and the value of right_child_combiner plus edge_val.
+	 *
+	 * Usually, a will be the value of the RangedMaxCombiner of a child of the node that this combiner
+	 * belongs to. edge_val will then be the agg_right value of the node this combiner belongs to.
+	 *
+	 * @param my_point 					   The point of the inner node that this RangedMaxCombiner is associated with
+	 * @param right_child_combiner The RangedMaxCombiner belonging to the right child of this node
+	 * @param edge_val 				     The aggregate value of the right edge going out of this node
+	 * @return FIXME ignored for now
+	 */
 	bool collect_right(KeyT my_point, const MyType * right_child_combiner, ValueType edge_val);
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
 	 * @brief Aggregates a value into the max value stored in this combiner
 	 *
-	 * This sets the maximum currently stored at this combiner to the maximum of the currently
-	 * stored value and (a + edge_val).
+	 * This adds edge_val to the maximum currently stored in this combiner. This is used when traversing up
+	 * a left edge in the tree.
 	 *
-	 * Usually, a will be the value of the MaxCombiner of a child of the node that this combiner
-	 * belongs to. edge_val will then be the agg_left or agg_right
-	 * value of the node this combiner belongs to.
-	 *
-	 * @param a 				See above
-	 * @param edge_val 	See above
+	 * @param new_point 				The point of the node we traversed into
+	 * @param edge_val 					The value of the edge we traversed
 	 * @return FIXME ignored for now
 	 */
 	bool traverse_left_edge_up(KeyT new_point, ValueT edge_val);
+	/**
+	 * @brief Aggregates a value into the max value stored in this combiner
+	 *
+	 * This adds edge_val to the maximum currently stored in this combiner. This is used when traversing up
+	 * a right edge in the tree.
+	 *
+	 * @param new_point 				The point of the node we traversed into
+	 * @param edge_val 					The value of the edge we traversed
+	 * @return FIXME ignored for now
+	 */
 	bool traverse_right_edge_up(KeyT new_point, ValueT edge_val);
 
 	//bool aggregate_with(ValueT a);
 
 	/**
-	 * @brief Rebuilds the value in this MaxCombiner from values of its two children's MaxCombiners
+	 * @brief Rebuilds the value in this RangedMaxCombiner from values of its two children's RangedMaxCombiner
 	 *
-	 * This sets the maximum currently stored at this combiner to the maximum of (a + a_edge_val) and
-	 * (b + b_edge_val).
+	 * This sets the maximum currently stored at this combiner to the maximum of the left_child_combiner's value plus
+	 * left_edge_val and right_child_combiner's value plus right_edge_val.
 	 *
-	 * Usually, a and b will be the values of the MaxCombiners of the two children of the node that
-	 * this  combiner belongs to. a_edge_val  and b_edge_val will then be the agg_left resp. agg_right
-	 * values of the node this combiner belongs to.
-	 *
-	 * @param a 				See above
-	 * @param a_edge_val 	See above
-	 * @param b 				See above
-	 * @param b_edge_val 	See above
+	 * @param my_point				       The point of the node this combiner belongs to
+	 * @param left_child_combiner		 The RangedMaxCombiner of the left child of this node
+	 * @param left_edge_val					 The agg_left value of this node
+	 * @param right_child_combiner	 The RangedMaxCombiner of the right child of this node
+	 * @param left_edge_val					 The agg_right value of this node
 	 * @return FIXME ignored for now
 	 */
 	bool rebuild(KeyT my_point,
-	             const MyType * left_child_combiner, ValueT left_edge_val,
-	             const MyType * right_child_combiner, ValueT right_edge_val);
+							 const MyType * left_child_combiner, ValueT left_edge_val,
+							 const MyType * right_child_combiner, ValueT right_edge_val);
 
-	/**
+		/**
 	 * @brief Returns the currently stored combined value in this combiner
 	 *
 	 * @return the currently stored combined value in this combiner
 	 */
 	ValueT get() const noexcept;
 
+	/**
+	 * @brief Returns whether the maximum stored in this RangedMaxCombiner is bounded to the left
+	 *
+	 * If this method returns false, the value of get_left_border() is not meaningful, and the maximum stored
+	 * in this combiner should be treated to extend all the way to the left.
+	 *
+	 * **Note**: This should never happen with combiners retrieved via get_combiner().
+	 *
+	 * @return See above
+	 */
 	bool is_left_border_valid() const noexcept;
+	/**
+	 * @brief Returns whether the maximum stored in this RangedMaxCombiner is bounded to the right
+	 *
+	 * If this method returns false, the value of get_right_border() is not meaningful, and the maximum stored
+	 * in this combiner should be treated to extend all the way to the right.
+	 *
+	 * **Note**: This should never happen with combiners retrieved via get_combiner().
+	 *
+	 * @return See above
+	 */
 	bool is_right_border_valid() const noexcept;
+
+	/**
+	 * @brief Returns the left border of the interval over which the maximum stored in this combiner occurs.
+	 *
+	 * If there are multiple disjunct intervals during which the maximum value occurs, the leftmost such interval
+	 * is returned.
+	 *
+	 * @return The left border of the maximum interval
+	 */
 	KeyT get_left_border() const noexcept;
-	KeyT get_right_border() const noexcept;
+
+	/**
+	 * @brief Returns the right border of the interval over which the maximum stored in this combiner occurs.
+	 *
+	 * If there are multiple disjunct intervals during which the maximum value occurs, the leftmost such interval
+	 * is returned.
+	 *
+	 * @return The right border of the maximum interval
+	 */
+	 KeyT get_right_border() const noexcept;
 
 	// TODO DEBUG
 	static std::string get_name() {

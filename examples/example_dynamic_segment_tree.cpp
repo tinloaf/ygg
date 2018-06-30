@@ -7,9 +7,9 @@
 using namespace ygg;
 
 /* First, we define which combiners we want to use. For this simple example, we use a
- * simple provided MaxCombiner. See TODO for other combiners.
+ * simple provided RangedMaxCombiner. See TODO for other combiners.
  */
-using MCombiner = MaxCombiner<double, int>;
+using MCombiner = RangedMaxCombiner<double, int>;
 using Combiners = CombinerPack<double, int, MCombiner>;
 
 /* The class representing our intervals and associated values.
@@ -146,22 +146,37 @@ int main(int argc, char **argv) {
 
 	std::cout << "\n==============================\n\n";
 
-	/* Now, combiners. The max combiner first allows us to query (in O(1)) what the total maximum
+	/* Now, combiners. The ranged max combiner first allows us to query (in O(1)) what the total maximum
 	 * value is: */
 	std::cout << "Maximum Value: " << t.get_combined<MCombiner>() << "\n";
 	/* Should output:
 	 * Maximum Value: 11
 	 */
 
+	/* Also, in contrast to its slightly faster, non-ranged brother, the MaxCombiner, it will also tell us over
+	 * which interval the maximum occurs: */
+	auto combiner = t.get_combiner<MCombiner>();
+	std::cout << "Maximum occurs between " << combiner.get_left_border() << " and " << combiner.get_right_border() << "\n";
+	/* This should output:
+	 * Maximum occurs between 12 and 15 */
+
 	/* But, we can also query (in O(log n)) the maximum over sub-ranges:*/
 	std::cout << "Maximum over [0, 10): " << t.get_combined<MCombiner>(0, 10) << "\n";
 	std::cout << "Maximum over [10, 12): " << t.get_combined<MCombiner>(10, 12) << "\n";
+
+	/* Again, we can get the actual combiner to tell us the maximum interval. Note that the reported
+	 * borders might be too large and must be clipped to your query range. */
+	combiner = t.get_combiner<MCombiner>(0, 10);
+	std::cout << "Maximum interval in the range [0,10) is between " << combiner.get_left_border() << " and "
+	          << combiner.get_right_border() << "\n";
+
 	// We also can specify to query an interval closed on both sides:
 	std::cout << "Maximum over [10, 12]: " << t.get_combined<MCombiner>(10, 12, true, true) << "\n";
 
 	/* Overall output should be:
 	 * Maximum over [0, 10): 3
 	 * Maximum over [10, 12): 3
+	 * Maximum interval in the range [0, 10) is between 0.5 and 10
 	 * Maximum over [10, 12]: 11
 	 */
 
