@@ -9,8 +9,8 @@ using namespace ygg;
 /* First, we define which combiners we want to use. For this simple example, we use a
  * simple provided MaxCombiner. See TODO for other combiners.
  */
-using MCombiner = MaxCombiner<int, int>;
-using Combiners = CombinerPack<int, int, MCombiner>;
+using MCombiner = MaxCombiner<double, int>;
+using Combiners = CombinerPack<double, int, MCombiner>;
 
 /* The class representing our intervals and associated values.
  *

@@ -61,16 +61,11 @@ template<class InnerTree, class InnerNode, class Node, class NodeTraits>
 void
 InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::delete_leaf(InnerNode & node)
 {
-	// TODO DEBUG
-	//assert(node.agg_left == node.agg_right);
-
 	InnerNode * parent = InnerTree::get_parent(&node);
 	if (parent != nullptr) {
 		if (InnerTree::get_left_child(parent) == &node) {
 			parent->agg_left += node.agg_left;
 		} else {
-			// TODO DEBUG
-			//assert(InnerTree::get_right_child(parent) == &node);
 			parent->agg_right += node.agg_left;
 		}
 	}
@@ -90,8 +85,6 @@ InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_left(InnerNode 
 
 	InnerTree::rebuild_combiners_at(&node);
 	InnerTree::rebuild_combiners_at(old_right);
-
-	//std::cout << "Rotated left\n";
 }
 
 template<class InnerTree, class InnerNode, class Node, class NodeTraits>
@@ -108,8 +101,6 @@ InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_right(InnerNode
 
 	InnerTree::rebuild_combiners_at(&node);
 	InnerTree::rebuild_combiners_at(old_left);
-
-    //std::cout << "Rotated right\n";
 }
 
 template<class InnerTree, class InnerNode, class Node, class NodeTraits>
@@ -127,15 +118,9 @@ template<class InnerTree, class InnerNode, class Node, class NodeTraits>
 void
 InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(InnerNode & old_ancestor, InnerNode & old_descendant)
 {
-    /*
-    std::cout << "Swapping [" << old_ancestor.point << "]@" << (size_t)(&old_ancestor)
-    << " with [" << old_descendant.point << "]@" << (size_t)(&old_descendant) << "\n";
-    */
-
 	// Swap labels to their old places in the tree
 	std::swap(old_ancestor.InnerNode::agg_left, old_descendant.InnerNode::agg_left);
 	std::swap(old_ancestor.InnerNode::agg_right, old_descendant.InnerNode::agg_right);
-    //std::swap(old_ancestor.InnerNode::combiners, old_descendant.InnerNode::combiners);
 
 	if (get_partner(old_ancestor) == &old_descendant) {
 		// we are done. They have their contour nulled
@@ -149,7 +134,6 @@ InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(InnerNode & old
 	const Node * old_descendant_node = static_cast<const Node *>(old_descendant.container);
 	auto old_descendant_val = NodeTraits::get_value(*old_descendant_node);
 
-	//std::cout << "--> Modifying contours\n";
 	if (old_descendant.InnerNode::point < old_descendant_partner->InnerNode::point) {
         InnerTree::modify_contour(&old_ancestor, old_descendant_partner, -1 * old_descendant_val);
 		InnerTree::modify_contour(&old_descendant, old_descendant_partner, old_descendant_val);
@@ -160,8 +144,6 @@ InnerNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(InnerNode & old
 		InnerTree::modify_contour(old_descendant_partner, &old_descendant, old_descendant_val);
 	}
 
-
-	//std::cout << "--> Rebuilding combiners\n";
 
 	// TODO FIXME why is this necessary? Should be done by modify_contour!
     InnerTree::rebuild_combiners_at(&old_descendant);
@@ -197,12 +179,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 	// TODO remove this requirement?
 	assert(NodeTraits::get_lower(n) < NodeTraits::get_upper(n));
 
-	//TreePrinter tp(this->t.get_root(), NodeNameGetter());
-	////std::cout << "\n------- Before Insertion -----------\n";
-	//tp.print();
-
 	// TODO why are we doing this every time? Should be done once in the constructor!
-
 	n.NB::start.point = NodeTraits::get_lower(n);
 	n.NB::start.closed = NodeTraits::is_lower_closed(n);
 	n.NB::start.agg_left = AggValueT();
@@ -223,15 +200,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::insert(Node &n)
 
 	this->t.insert(n.NB::end);
 
-	////std::cout << "\n------- Before Application -----------\n";
-	//tp.reset_root(this->t.get_root());
-	//tp.print();
-
 	this->apply_interval(n);
-
-	////std::cout << "\n------- After Insertion -----------\n";
-	//tp.reset_root(this->t.get_root());
-	//tp.print();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options, class Tag>
@@ -337,8 +306,6 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
                                                                               InnerNode *right,
                                                                               ValueT val)
 {
-	////std::cout << "======= Applying between " << left->point << " and " << right->point << " "
-	//				"==========\n\n";
 	std::vector<InnerNode *> left_contour;
 	std::vector<InnerNode *> right_contour;
 	std::tie(left_contour, right_contour) = find_lca(left, right);
@@ -348,15 +315,9 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
 	for (size_t i = 0 ; i < left_contour.size() - 1 ; ++i) {
 		InnerNode * cur = left_contour[i];
 		if ((i == 0) || (InnerTree::get_right_child(cur) != left_contour[i-1])) {
-			////std::cout << "Modifying left contour at " << cur->point << ": ";
 			cur->InnerNode::agg_right += val;
-			////std::cout << " agg_right now " << cur->InnerNode::agg_right << " ";
 		}
-		////std::cout << "  Rebuilding combiner at " << cur->point;
 		last_changed_left = rebuild_combiners_at(cur);
-		if (last_changed_left) {
-			////std::cout << " -> Combiner changed!\n";
-		}
 	}
 
 	// right contour
@@ -364,21 +325,14 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::modify
 	for (size_t i = 0 ; i < right_contour.size() - 1 ; ++i) {
 		InnerNode * cur = right_contour[i];
 		if ((i == 0) || (InnerTree::get_left_child(cur) != right_contour[i-1])) {
-			////std::cout << "Modifying right contour at " << cur->point << ": ";
 			cur->InnerNode::agg_left += val;
-			////std::cout << " agg_left now " << cur->InnerNode::agg_left << " ";
 		}
-		////std::cout << "  Rebuilding combiner at " << cur->point;
 		last_changed_right = rebuild_combiners_at(cur);
-		if (last_changed_right) {
-			////std::cout << " -> Combiner changed!\n";
-		}
 	}
 
 	if (last_changed_left || last_changed_right) {
 		InnerNode * lca = left_contour.size() > 0 ? left_contour[left_contour.size() - 1] :
 		             right_contour[right_contour.size() - 1];
-		////std::cout << "## Rebuilding recursively at " << lca->point << "\n";
 		rebuild_combiners_recursively(lca);
 	}
 }
@@ -421,12 +375,6 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(cons
                                                                             bool lower_closed,
                                                                             bool upper_closed) const
 {
-/*	std::cout << "\n======= Query: Low " << lower << " / High " << upper << "============\n";
-
-	TreePrinter tp(this->t.get_root(), NodeNameGetter());
-	std::cout << "\n------- Query Tree -----------\n";
-	tp.print();
-*/
 	dyn_segtree_internal::Compare<InnerNode> cmp;
 
 	decltype(this->t.lower_bound(lower)) lower_node_it;
@@ -464,16 +412,6 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(cons
 		auto upper_node_rit = this->t.rbegin();
 		upper_node = const_cast<InnerNode  *>(&*upper_node_rit);
 	} else {
-		if (upper_node_it != this->t.begin()) {
-			/*auto next_smaller = upper_node_it - 1;
-			if (!cmp(*next_smaller, upper)) {
-				// the next smaller has exactly the value of upper!
-				assert(next_smaller->point == upper);
-				upper_node_it = next_smaller;
-			}
-			 */
-		}
-
 		upper_node = const_cast<InnerNode *>(&*upper_node_it);
 	}
 
@@ -482,19 +420,6 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(cons
 	std::vector<InnerNode *> right_contour;
 	std::tie(left_contour, right_contour) = this->t.find_lca(lower_node, upper_node);
 
-/*
-	std::cout << "Left contour: \n";
-	for (auto n : left_contour) {
-		std::cout << std::string("[") + std::to_string(n->get_point()) + std::string("]")
-		             + std::string("@") + std::to_string((unsigned long)n) << ", ";
-	}
-	std::cout << "\nRight contour: \n";
-	for (auto n : right_contour) {
-		std::cout << std::string("[") + std::to_string(n->get_point()) + std::string("]")
-		             + std::string("@") + std::to_string((unsigned long)n) << ", ";
-	}
-	std::cout << "\n";
-*/
 	// TODO inefficient: We don't need to build all the combiners!
 	Combiners dummy_cp;
 	Combiners cp;
@@ -530,10 +455,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(cons
 
 		topmost_point = left_contour[left_contour.size()-1]->get_point();
 	}
-/*
-	std::cout << "Combiner-DBG after left contour: " << cp.template get_combiner<Combiner>()
-	        .get_dbg_value() << "\n";
-*/
+
 	// TODO is this necessary?
 	Combiners left_cp = cp;
 	cp = Combiners();
@@ -567,15 +489,10 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(cons
 
 		topmost_point = left_contour[left_contour.size()-1]->get_point();
 	}
-/*
-	std::cout << "Combiner-DBG after right contour: " << cp.template get_combiner<Combiner>()
-	                                                      .get_dbg_value() << "\n";
-*/
+
+	// Combine right and left contour
 	cp.collect_left(topmost_point, &left_cp, typename Node::AggValueT());
-/*
-	std::cout << "Combiner-DBG after combining both: " << cp.template get_combiner<Combiner>()
-	                                                      .get_dbg_value() << "\n";
-*/
+
 	/*
 	 * Step 3: Take the combined value and aggregate into it everything on the way up to
 	 * the root.
@@ -591,10 +508,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(cons
 			cp.traverse_right_edge_up(cur->get_point(), cur->agg_right);
 		}
 	}
-/*
-	std::cout << "Combiner-DBG after root traversal: " << cp.template get_combiner<Combiner>()
-	                                                        .get_dbg_value() << "\n";
-*/
+
 	return cp.template get_combiner<Combiner>();
 }
 
@@ -614,8 +528,6 @@ bool
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 				rebuild_combiners_at(InnerNode *n)
 {
-    //std::cout << "==> Rebuilding at [" << n->get_point() << "]@" << (size_t)(n) << "\n";
-
 	Combiners * cmb_left = nullptr;
 	if (n->_rbt_left != nullptr) {
 		cmb_left = & n->_rbt_left->combiners;
@@ -624,10 +536,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 	if (n->_rbt_right != nullptr) {
 		cmb_right = & n->_rbt_right->combiners;
 	}
-	/*
-	std::cout << "  ====> Left: @" << (size_t)cmb_left << " - edge " << n->agg_left << "\n";
-    std::cout << "  ====> Right: @" << (size_t)cmb_right << " - edge " << n->agg_right << "\n";
-    */
+
 	return n->combiners.rebuild(n->get_point(), cmb_left, n->agg_left, cmb_right, n->agg_right);
 }
 
@@ -849,14 +758,6 @@ RangedMaxCombiner<KeyT,ValueT>::traverse_left_edge_up(KeyT new_point, ValueT edg
 {
 	this->val += edge_val;
 
-/*
-	std::cout << "# Traversing left edge up. Old right border: ";
-	if (this->right_border_valid) {
-		std::cout << this->right_border << "  / ";
-	} else {
-		std::cout << "-- / ";
-	}
-*/
 	if (this->right_border_valid) {
 		// TODO is this even necessary?
 		this->right_border = std::min(new_point, this->right_border);
@@ -864,14 +765,7 @@ RangedMaxCombiner<KeyT,ValueT>::traverse_left_edge_up(KeyT new_point, ValueT edg
 		this->right_border = new_point;
 		this->right_border_valid = true;
 	}
-/*
-	std::cout << " new right border: ";
-	if (this->right_border_valid) {
-		std::cout << this->right_border << "\n";
-	} else {
-		std::cout << "--\n";
-	}
-*/
+
 	return false;
 }
 
@@ -887,14 +781,7 @@ RangedMaxCombiner<KeyT,ValueT>::traverse_right_edge_up(KeyT new_point, ValueT ed
 		this->left_border = new_point;
 		this->left_border_valid = true;
 	}
-/*
-	std::cout << "# Traversing right edge up. New left border: ";
-	if (this->left_border_valid) {
-		std::cout << this->left_border << "\n";
-	} else {
-		std::cout << "--\n";
-	}
-*/
+
 	return false;
 }
 
@@ -904,19 +791,7 @@ RangedMaxCombiner<KeyT,ValueT>::collect_left(KeyT my_point, const MyType * left_
                                        ValueT edge_val)
 {
 	auto new_candidate_value = child_value(left_child_combiner) + edge_val;
-/*
-	std::cout << "# Collecting left. Old border: ";
-	if (this->left_border_valid) {
-		std::cout << this->left_border << ":";
-	} else {
-		std::cout << "--:";
-	}
-	if (this->right_border_valid) {
-		std::cout << this->right_border << "  /  ";
-	} else {
-		std::cout << "--  /  ";
-	}
-*/
+
 	// In case that neither border is valid, this object has not been initialized with a
 	// Value yet: We therefore take the offered value and set our first border!
 	if ((new_candidate_value > this->val) || (
@@ -975,19 +850,7 @@ RangedMaxCombiner<KeyT,ValueT>::collect_left(KeyT my_point, const MyType * left_
 			}
 		}
 	}
-/*
-	std::cout << "New border: ";
-	if (this->left_border_valid) {
-		std::cout << this->left_border << ":";
-	} else {
-		std::cout << "--:";
-	}
-	if (this->right_border_valid) {
-		std::cout << this->right_border << "\n";
-	} else {
-		std::cout << "--\n";
-	}
-*/
+
 	return false;
 }
 
@@ -997,19 +860,7 @@ RangedMaxCombiner<KeyT,ValueT>::collect_right(KeyT my_point, const MyType * righ
                                         ValueT edge_val)
 {
 	auto new_candidate_value = child_value(right_child_combiner) + edge_val;
-/*
-	std::cout << "# Collecting right at " << my_point << ". Old border: ";
-	if (this->left_border_valid) {
-		std::cout << this->left_border << ":";
-	} else {
-		std::cout << "--:";
-	}
-	if (this->right_border_valid) {
-		std::cout << this->right_border << "  /  ";
-	} else {
-		std::cout << "--  /  ";
-	}
-*/
+
 	if ((new_candidate_value > this->val) || (
 					!this->right_border_valid && !this->left_border_valid)) {
 		this->val = new_candidate_value;
@@ -1059,19 +910,7 @@ RangedMaxCombiner<KeyT,ValueT>::collect_right(KeyT my_point, const MyType * righ
 			}
 		}
 	}
-/*
-	std::cout << "New border: ";
-	if (this->left_border_valid) {
-		std::cout << this->left_border << ":";
-	} else {
-		std::cout << "--:";
-	}
-	if (this->right_border_valid) {
-		std::cout << this->right_border << "\n";
-	} else {
-		std::cout << "--\n";
-	}
-*/
+
 	return false;
 }
 

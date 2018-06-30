@@ -761,6 +761,7 @@ template <class Node, class NodeTraits, class Combiners, class Options = Default
 					class Tag = int>
 class DynamicSegmentTree
 {
+	// TODO add a static assert that checks that the types in all combiners are right
 private:
 	using NB = DynSegTreeNodeBase<typename Node::KeyT, typename Node::ValueT,
 	                        typename Node::AggValueT, Combiners, Tag>;
