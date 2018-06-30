@@ -646,6 +646,7 @@ private:
  * details. Every combiner allows to retrieve a different combined metric (such as maximum,
  * minimum, …) of the aggregate values over arbitrary ranges in the Dynamic Segment Tree.
  *
+ * @tparam KeyT       The type of the interval borders
  * @tparam AggValueT	The type of the aggregate values in your DynamicSegmentTree
  * @tparam Combiners	A list of combiner classes
  */
@@ -662,10 +663,11 @@ public:
 	 * This method calls the rebuild() method on all combiners attached to this node with the
 	 * respective combined values from the left / right child.
 	 *
-	 * @param a						The combiner pack of our node's left child
-	 * @param a_edge_val	The agg_left value of our node
-	 * @param b						The combiner pack of our node's right child
-	 * @param b_edge_val	The agg_right value of our node
+	 * @param my_point				The point of the node this CombinerPack belongs to
+	 * @param left_child 			The CombinerPack of the left child (or nullptr)
+	 * @param left_edge_val   The agg_left value of this node
+	 * @param right_child			The CombinerPack of the right child (or nullptr)
+	 * @param right_edge_val	The agg_right value of this node
 	 * @return TODO IGNORED
 	 */
 	bool rebuild(KeyT my_point,
@@ -673,18 +675,29 @@ public:
 	             const MyType * right_child, AggValueT right_edge_val);
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
-	//bool combine_with(CombinerPack<AggValueT, Combiners...> * other, AggValueT edge_val);
 	bool collect_left(KeyT my_point, const MyType * left_child_combiner, AggValueT edge_val);
 	bool collect_right(KeyT my_point, const MyType * right_child_combiner, AggValueT edge_val);
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
-	//bool aggregate_with(AggValueT a);
 	bool traverse_left_edge_up(KeyT new_point, AggValueT edge_val);
 	bool traverse_right_edge_up(KeyT new_point, AggValueT edge_val);
 
 
+	/**
+	 * @brief Returns the combined value of a combiner contained in this CombinerPack
+	 *
+	 * @tparam Combiner The class of the combiner that you want the combined value of
+	 * @return The combined value of the combiner specified in the Combiner template parameter
+	 */
 	template<class Combiner>
 	typename Combiner::ValueT get() const;
+
+	/**
+	 * @brief Returns a combiner contained in this CombinerPack
+	 *
+	 * @tparam Combiner The class of the combiner that you want
+	 * @return The combiner specified in the Combiner template parameter
+	 */
 	template<class Combiner>
 	const Combiner & get_combiner() const;
 
