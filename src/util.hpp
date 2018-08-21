@@ -7,6 +7,14 @@
 #include <type_traits>
 
 namespace ygg {
+	
+namespace utilities {
+
+template<class ... Ts>
+void throw_away(Ts ...) {}
+
+} // namespace ygg::utilities
+	
 namespace rbtree_internal {
 
 /**
@@ -23,9 +31,6 @@ public:
 		return lhs < rhs;
 	}
 };
-
-template<class ... Ts>
-void throw_away(Ts ...) {}
 
 /*
  * This is inspired by
