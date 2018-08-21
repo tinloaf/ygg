@@ -14,13 +14,13 @@
 
 #include "../src/ygg.hpp"
 
-#define DYNSEGTREE_TESTSIZE 1500
-#define DYNSEGTREE_COMPREHENSIVE_TESTSIZE 5
+#define DYNSEGTREE_TESTSIZE 3000
+#define DYNSEGTREE_COMPREHENSIVE_TESTSIZE 500
 #define DYNSEGTREE_DELETION_TESTSIZE 500
-#define DYNSEGTREE_DELETION_ITERATIONS 10000
+#define DYNSEGTREE_DELETION_ITERATIONS 100
 
 // chosen by fair xkcd
-#define DYNSEGTREE_SEED 2072
+#define DYNSEGTREE_SEED 4
 
 namespace test_interval_agg {
 using namespace boost::icl;
@@ -100,6 +100,28 @@ TEST(DynSegTreeTest, TrivialTest)
 	ASSERT_EQ(static_cast<const Node *>(it->get_interval()), &n);
 	it++;
 	ASSERT_EQ(it, agg.cend());
+}
+
+TEST(DynSegTreeTest, TestDeletionBug)
+{
+	Node n1(2, 5, 10);
+	Node n2(3, 8, 15);
+	Node n3(4, 10, 15);
+	Node n4(4, 10, 15);
+
+	DynSegTree agg;
+	agg.insert(n1);
+	agg.insert(n2);
+	agg.insert(n3);
+	agg.insert(n4);
+
+	agg.dbg_verify_max_combiner<MCombiner>();
+
+	agg.remove(n2);
+	agg.remove(n1);
+	agg.remove(n3);
+
+	agg.dbg_verify_max_combiner<MCombiner>();
 }
 
 TEST(DynSegTreeTest, TestEventBounding)
@@ -220,15 +242,11 @@ TEST(DynSegTreeTest, DeletionTest)
 	std::mt19937 rng(DYNSEGTREE_SEED);
 
 	for (unsigned int j = 0 ; j < DYNSEGTREE_DELETION_ITERATIONS ; ++j) {
-		//std::cout << "\n\n\n=================================================\n\n\n";
 		std::uniform_int_distribution<unsigned int> bounds_distr(0, 2 * DYNSEGTREE_DELETION_TESTSIZE);
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + bounds_distr(rng) + 1;
 
 		Node deleteme(lower, upper, 42);
-		//std::cout << "Test interval: " << lower << "->" << upper << "\n\n";
-
-		//std::cout << "================= INSERT ====================\n";
 
 		agg.insert(deleteme);
 
@@ -249,9 +267,8 @@ TEST(DynSegTreeTest, DeletionTest)
 				}
 		}
 
-		//std::cout << "================= REMOVE ====================\n";
-
 		agg.remove(deleteme);
+        agg.dbg_verify_max_combiner<MCombiner>();
 
 		for (unsigned int i = 0 ; i < DYNSEGTREE_DELETION_TESTSIZE ; ++i) {
 			auto val = agg.query(i);
@@ -296,7 +313,6 @@ TEST(DynSegTreeTest, NestingTestInsertionOverlappingDeletionTest)
 	agg.remove(transient[0]);
 	val = agg.query(1);
 	ASSERT_EQ(val, 12);
-	//std::cout << "\n\n###################################################\n\n";
 	agg.remove(transient[1]);
 	val = agg.query(1);
 	ASSERT_EQ(val, 2);
@@ -406,6 +422,7 @@ TEST(DynSegTreeTest, ComprehensiveTest)
 	for (auto index : indices) {
 		agg.insert(persistent_nodes[index]);
 	}
+    agg.dbg_verify_max_combiner<MCombiner>();
 
 	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
 		std::uniform_int_distribution<unsigned int> uni(0, i - 1);
@@ -415,6 +432,7 @@ TEST(DynSegTreeTest, ComprehensiveTest)
 	for (auto index : indices) {
 		agg.remove(transient_nodes[index]);
 	}
+    agg.dbg_verify_max_combiner<MCombiner>();
 
 	// Reference data structure
 	using BoostMap = interval_map<int, int>;
@@ -446,9 +464,7 @@ TEST(DynSegTreeTest, ComprehensiveTest)
 
 TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 {
-	for (int t = 0 ; t < DYNSEGTREE_DELETION_ITERATIONS ; ++t) {
-		std::cout << "----- Seed is: " << DYNSEGTREE_SEED + t << "\n\n";
-	std::mt19937 rng(DYNSEGTREE_SEED + t);
+	std::mt19937 rng(DYNSEGTREE_SEED+1);
 
 	Node persistent_nodes[DYNSEGTREE_COMPREHENSIVE_TESTSIZE];
 	std::vector<unsigned int> indices;
@@ -461,7 +477,6 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
 		persistent_nodes[i] = Node(lower, upper, i);
-		std::cout << "Interval: " << lower << " -> " << upper << "  Value " << i << "\n";
 		indices.push_back(i);
 	}
 
@@ -470,8 +485,6 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 		std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * DYNSEGTREE_COMPREHENSIVE_TESTSIZE / 2);
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
-
-		std::cout << "Transient Interval: " << lower << " -> " << upper << "  Value " << DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i << "\n";
 
 		transient_nodes[i] = Node(lower, upper, DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i);
 	}
@@ -483,7 +496,7 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 
 	for (auto index : indices) {
 		agg.insert(transient_nodes[index]);
-		std::cout << "Inserting Transient node No. " << index << "\n";
+		agg.dbg_verify_max_combiner<MCombiner>();
 	}
 
 	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
@@ -494,7 +507,7 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 
 	for (auto index : indices) {
 		agg.insert(persistent_nodes[index]);
-		std::cout << "Inserting Persistent node No. " << index << "\n";
+        agg.dbg_verify_max_combiner<MCombiner>();
 	}
 
 	std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
@@ -504,7 +517,7 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 
 	for (auto index : indices) {
 		agg.remove(transient_nodes[index]);
-		std::cout << "Removing Transient node No. " << index << "\n";
+        agg.dbg_verify_max_combiner<MCombiner>();
 	}
 
 	// Reference data structure
@@ -514,12 +527,7 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 
 	for (auto node : persistent_nodes) {
 		reference += std::make_pair(interval<int>::right_open(node.lower, node.upper), node.value);
-		//std::cout << " Interval: [" << node.lower << ", " << node.upper << ") (@" << node.value
-		//          << ")\n";
 	}
-
-	//std::cout << "Resulting Tree: \n";
-	//std::cout << agg.dbg_get_dot().str();
 
 	auto start_it = reference.begin();
 	while (start_it != reference.end()) {
@@ -563,18 +571,6 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 			                                           range_upper,
 			                                           lower_closed,
 			                                           upper_closed);
-			std::cout << "Max Val between " << range_lower << " and " << range_upper << " reported as "
-																																							 << combined << "\n";
-			if (lower_closed) {
-				std::cout << "Lower closed.\n";
-			} else {
-				std::cout << "Lower open.\n";
-			}
-			if (upper_closed) {
-				std::cout << "upper closed.\n";
-			} else {
-				std::cout << "Upper open.\n";
-			}
 
 			ASSERT_EQ(combined, max_seen);
 
@@ -585,40 +581,9 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 			std::pair<int, int> max_range{std::max(range_combiner.get_left_border(), range_lower),
 			                              std::min(range_combiner.get_right_border(), range_upper)};
 
-
-			std::cout << "Max Range between " << range_lower << " and " << range_upper << " reported as "
-							<< range_combiner.get_left_border() << "->" << range_combiner.get_right_border()
-							  << "\n";
-
-
-			std::cout << "Ranges seen: ";
-			for (auto & seen_range : max_seen_ranges) {
-				std::cout << seen_range.first << ":" << seen_range.second << "  ";
-			}
-			std::cout << "\n";
-			std::cout << "Looking for: " << max_range.first << ":" << max_range.second << "\n";
-			ASSERT_TRUE(max_seen_ranges.find(max_range) != max_seen_ranges.end());
-
-			/*
-			std::cout << " -> Querying: ";
-			if (lower_closed) {
-				std::cout << " [";
-			} else {
-				std::cout << " (";
-			}
-			std::cout << range_lower << ", " << range_upper;
-			if (upper_closed) {
-				std::cout << "]";
-			} else {
-				std::cout << ")";
-			}
-			std::cout << "\n";
-			*/
-
 			++end_it;
 		}
 		++start_it;
-	}
 	}
 }
 
@@ -643,39 +608,6 @@ TEST(RangedMaxCombinerTest, TrivialTest)
 	ASSERT_TRUE(combiner.is_right_border_valid());
 	ASSERT_EQ(combiner.get_left_border(), 2);
 	ASSERT_EQ(combiner.get_right_border(), 5);
-}
-
-TEST(RangedMaxCombinerTest, BuggyRangeTest)
-{
-	Node n1(15,30,0);
-	Node n2(8,11,1);
-	Node n3(15,29,2);
-
-	Node tn1(11, 21, 3);
-	Node tn2(11, 21, 4);
-	Node tn3(3, 6, 5);
-
-	DynSegTree agg;
-
-	agg.insert(tn3);
-	agg.insert(tn2);
-	agg.insert(tn1);
-
-	agg.insert(n2);
-	agg.insert(n3);
-	agg.insert(n1);
-
-	agg.remove(tn3);
-	agg.remove(tn2);
-	agg.remove(tn1);
-
-	auto combiner = agg.get_combiner<RMCombiner>(8, 11, true, false);
-
-	ASSERT_EQ(combiner.get(), 1);
-	ASSERT_TRUE(combiner.is_left_border_valid());
-	ASSERT_TRUE(combiner.is_right_border_valid());
-	ASSERT_EQ(combiner.get_left_border(), 8);
-	ASSERT_EQ(combiner.get_right_border(), 11);
 }
 
 TEST(RangedMaxCombinerTest, StepTest)
@@ -805,7 +737,7 @@ TEST(RangedMaxCombinerTest, NestingTest)
 	ASSERT_EQ(combiner.get_left_border(), DYNSEGTREE_TESTSIZE - 1);
 	ASSERT_EQ(combiner.get_right_border(), 2 * DYNSEGTREE_TESTSIZE - (DYNSEGTREE_TESTSIZE - 1) + 1);
 
-	for (unsigned int i = 0 ; i < DYNSEGTREE_TESTSIZE - 1 ; ++i) {
+	for (int i = 0 ; i < DYNSEGTREE_TESTSIZE - 1 ; ++i) {
 		combiner = agg.get_combiner<RMCombiner>(i, i+1, true, false);
 		ASSERT_EQ(combiner.get(), i + 1);
 		ASSERT_EQ(combiner.get_left_border(), i);
