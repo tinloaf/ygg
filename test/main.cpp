@@ -6,6 +6,7 @@
 #include "test_intervalmap.hpp"
 #include "test_list.hpp"
 #include "test_dynamic_segment_tree.hpp"
+#include "test_ziptree.hpp"
 
 //#include "test_orderlist.hpp"
 

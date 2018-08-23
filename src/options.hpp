@@ -6,6 +6,7 @@
 #define YGG_OPTIONS_HPP
 
 #include <type_traits>
+#include <cstddef>
 
 #include "util.hpp"
 
@@ -57,6 +58,14 @@ public:
 	 * almost all systems.
 	 */
 	class COMPRESS_COLOR {};
+	
+	class ZTREE_USE_HASH {};
+	
+	template<class T>
+	class ZTREE_RANK_TYPE {
+	public:
+		using type = T;
+	};
 };
 
 /**
@@ -88,6 +97,12 @@ public:
 	                                                                    Opts...>();
 	static constexpr bool compress_color =
 					rbtree_internal::pack_contains<TreeFlags::COMPRESS_COLOR, Opts...>();
+	
+	static constexpr bool ztree_use_hash =
+	                rbtree_internal::pack_contains<TreeFlags::ZTREE_USE_HASH, Opts...>();
+	
+	using ztree_rank_type = typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE, size_t, Opts...>::type;
+	
 	/// @endcond
 private:
 	TreeOptions(); // Instantiation not allowed
