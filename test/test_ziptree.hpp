@@ -18,10 +18,11 @@ using namespace ygg;
 class Node : public ZTreeNodeBase<Node> {
 public:
   int data;
+  int rank;
 
-  Node() : data(0){};
-  explicit Node(int data_in) : data(data_in){};
-  Node(const Node & other) : data(other.data){};
+  Node() : data(0), rank(0){};
+  Node(int data_in, int rank_in) : data(data_in), rank(rank_in){};
+  Node(const Node & other) : data(other.data), rank(other.rank){};
 
   bool
   operator<(const Node & other) const
@@ -34,20 +35,31 @@ public:
   {
     return this->data;
   }
+
+  int
+  get_rank() const noexcept
+  {
+    return this->rank;
+  }
 };
 
 class NodeTraits {
 public:
-  static std::string get_id(const Node * node) {
-    return std::to_string(node->get_data());
+  static std::string
+  get_id(const Node * node)
+  {
+    return std::to_string(node->get_data()) + std::string("@") +
+           std::to_string(node->get_rank());
   }
 };
-  
+
 class DataRankGetter {
 public:
-  static size_t get_rank(const Node & n) {
-    return n.get_data();
-  } 
+  static size_t
+  get_rank(const Node & n)
+  {
+    return n.get_rank();
+  }
 };
 
 } // namespace ziptree
@@ -73,34 +85,73 @@ TEST(ZipTreeTest, TrivialInsertionTest)
 {
   auto tree = ZTree<Node, NodeTraits>();
 
-  Node n;
-  n.data = 0;
+  Node n(0,0);
   tree.insert(n);
   tree.dbg_verify();
 }
 
 TEST(ZipTreeTest, TrivialUnzippingTest)
 {
-  auto tree = ZTree<Node, NodeTraits, DefaultOptions, int, ygg::rbtree_internal::flexible_less, DataRankGetter>();
+  auto tree = ZTree<Node, NodeTraits, DefaultOptions, int,
+                    ygg::rbtree_internal::flexible_less, DataRankGetter>();
 
-  Node n0(0);
-  Node n1(1);
-  Node n2(2);
-  Node n3(3);
-  
+  Node n0(0,1);
+  Node n1(1,2);
+  Node n2(2,0);
+  Node n3(3,1);
+
   tree.insert(n0);
   tree.dump_to_dot("/tmp/dots/after-0.dot");
+  tree.dbg_verify();
+
   tree.insert(n1);
   tree.dump_to_dot("/tmp/dots/after-1.dot");
   tree.dbg_verify();
+
   tree.insert(n2);
   tree.dump_to_dot("/tmp/dots/after-2.dot");
   tree.dbg_verify();
+
   tree.insert(n3);
-  tree.dump_to_dot("/tmp/dots/after-3.dot");  
+  tree.dump_to_dot("/tmp/dots/after-3.dot");
   tree.dbg_verify();
 }
 
+TEST(ZipTreeTest, TrivialZippingTest)
+{
+  auto tree = ZTree<Node, NodeTraits, DefaultOptions, int,
+                    ygg::rbtree_internal::flexible_less, DataRankGetter>();
+
+  Node n0(0,1);
+  Node n1(1,2);
+  Node n2(2,0);
+  Node n3(3,1);
+
+  tree.insert(n0);
+  tree.insert(n1);
+  tree.insert(n2);
+  tree.insert(n3);
+
+  tree.dump_to_dot("/tmp/dots/before-delete-1.dot");
+
+  tree.remove(n1);
+  tree.dump_to_dot("/tmp/dots/after-delete-1.dot");
+  tree.dbg_verify();
+
+  tree.remove(n3);
+  tree.dump_to_dot("/tmp/dots/after-delete-3.dot");
+  tree.dbg_verify();
+
+  tree.remove(n2);
+  tree.dump_to_dot("/tmp/dots/after-delete-2.dot");
+  tree.dbg_verify();
+
+  tree.remove(n0);
+  tree.dump_to_dot("/tmp/dots/after-delete-0.dot");
+  tree.dbg_verify();
+}
+
+  
 } // namespace ziptree
 } // namespace test
 

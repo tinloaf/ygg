@@ -71,20 +71,20 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
   while (cur != nullptr) {
     if (this->cmp(newn, *cur)) {
       // Add to the right spine
-      
+
       if (right_head != &newn) {
 	right_head->_zt_left = cur;
       } else {
 	right_head->_zt_right = cur;
       }
-      
+
       cur->_zt_parent = right_head;
       right_head = cur;
 
       cur = cur->_zt_left;
     } else {
       // Add to the left spine
-      
+
       if (left_head != &newn) {
 	left_head->_zt_right = cur;
       } else {
@@ -114,6 +114,15 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
+void
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::remove(
+    Node & n) noexcept
+{
+  this->zip(n);
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
 Node *
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     Node & old_root) noexcept
@@ -122,7 +131,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
   Node * right_head = old_root._zt_right;
 
   Node * new_root = nullptr;
-  Node * cur = old_root._pt_parent;
+  Node * cur = old_root._zt_parent;
 
   bool last_from_left;
 
@@ -131,7 +140,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
   if ((left_head != nullptr) && (right_head != nullptr)) {
     // Both are there, use the one with the smaller rank
 
-    if (RankGetter::get_rank(*left_head) < RankGetter::get_rank(*right_head)) {
+    if (RankGetter::get_rank(*left_head) > RankGetter::get_rank(*right_head)) {
       last_from_left = true;
 
       if (cur == nullptr) {
@@ -141,7 +150,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 	if (cur->_zt_left == &old_root) {
 	  cur->_zt_left = left_head;
 	} else {
-	  assert(cur->_zt_rigt == &old_root);
+	  assert(cur->_zt_right == &old_root);
 	  cur->_zt_right = left_head;
 	}
 	left_head->_zt_parent = cur;
@@ -180,7 +189,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
       if (cur->_zt_left == &old_root) {
 	cur->_zt_left = left_head;
       } else {
-	assert(cur->_zt_rigt == &old_root);
+	assert(cur->_zt_right == &old_root);
 	cur->_zt_right = left_head;
       }
       left_head->_zt_parent = cur;
@@ -213,8 +222,9 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 
   // Now, walk down left and right
   while ((left_head != nullptr) || (right_head != nullptr)) {
-    if ((right_head == nullptr) || (RankGetter::get_rank(*left_head) <
-                                    RankGetter::get_rank(*right_head))) {
+    if ((right_head == nullptr) ||
+        ((left_head != nullptr) && (RankGetter::get_rank(*left_head) >
+                                    RankGetter::get_rank(*right_head)))) {
       // Use left
 
       if (new_root == nullptr) { // TODO we don't need to check this every time
@@ -318,6 +328,9 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::dump_to_dot_base(
 {
   std::ofstream dotfile;
   dotfile.open(filename);
+
+  std::cout << "Root is: " << name_getter(this->root) << "\n";
+
   dotfile << "digraph G {\n";
   this->output_node_base(this->root, dotfile, name_getter);
   dotfile << "}\n";
