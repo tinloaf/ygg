@@ -21,7 +21,7 @@ class ZTreeRankFromHash;
 template <class Node, class RankType>
 class ZTreeRankFromHash<Node, RankType, true> {
 public:
-  ZTreeRankFromHash() {};
+  ZTreeRankFromHash(){};
 
   static int
   get_rank(const Node & node) noexcept
@@ -33,12 +33,13 @@ public:
 template <class Node, class RankType>
 class ZTreeRankFromHash<Node, RankType, false> {
 public:
-  ZTreeRankFromHash() {}; // TODO FIXME randomize!
+  ZTreeRankFromHash(){}; // TODO FIXME randomize!
 
+  // TODO is int the right type here?
   static int
   get_rank(const Node & node) noexcept
   {
-    return node._zt_rank.rank;
+    return (int)node._zt_rank.rank;
   }
 
 private:
@@ -78,6 +79,77 @@ public:
   static_assert(std::is_base_of<NB, Node>::value,
                 "Node class not properly derived from node base!");
 
+private:
+  // Class to tell the abstract search tree iterator how to handle
+  // our nodes
+  class NodeInterface {
+    static Node *
+    get_parent(Node * n)
+    {
+      return n->NB::_zt_parent;
+    }
+    static Node *
+    get_left(Node * n)
+    {
+      return n->NB::_zt_left;
+    }
+    static Node *
+    get_right(Node * n)
+    {
+      return n->NB::_zt_right;
+    }
+
+    static const Node *
+    get_parent(const Node * n)
+    {
+      return n->NB::_zt_parent;
+    }
+    static const Node *
+    get_left(const Node * n)
+    {
+      return n->NB::_zt_left;
+    }
+    static const Node *
+    get_right(const Node * n)
+    {
+      return n->NB::_zt_right;
+    }
+  };
+
+public:
+  // forward, for friendship
+  template <bool reverse>
+  class const_iterator;
+
+  template <bool reverse>
+  class iterator : public internal::IteratorBase<iterator<reverse>, Node,
+                                                 NodeInterface, reverse> {
+  public:
+    using internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
+                                 reverse>::IteratorBase;
+    iterator(const iterator<reverse> & orig)
+      : internal::IteratorBase<iterator<reverse>, Node, NodeInterface, reverse>(
+              orig.n){};
+    iterator() : internal::IteratorBase<iterator<reverse>, Node, NodeInterface, reverse>(){};
+
+  private:
+    friend class const_iterator<reverse>;
+  };
+
+  template <bool reverse>
+  class const_iterator
+    : public internal::IteratorBase<const_iterator<reverse>, const Node, NodeInterface, reverse> {
+  public:
+    using internal::IteratorBase<const_iterator<reverse>, const Node,
+                       NodeInterface, reverse>::IteratorBase;
+    const_iterator(const const_iterator<reverse> & orig)
+      : internal::IteratorBase<const_iterator<reverse>, const Node, NodeInterface, reverse>(orig.n){};
+    const_iterator(const iterator<reverse> & orig)
+      : internal::IteratorBase<const_iterator<reverse>, const Node, NodeInterface, reverse>(orig.n){};
+    const_iterator()
+      : internal::IteratorBase<const_iterator<reverse>, const Node, NodeInterface, reverse>(){};
+  };
+
   void insert(Node & node) noexcept;
   void insert(Node & node, Node & hint) noexcept;
 
@@ -95,7 +167,7 @@ public:
    * @param filename  The file path where to write the .dot file.
    */
   void dump_to_dot(const std::string & filename) const;
-  
+
 private:
   Node * root;
   Compare cmp;
@@ -106,12 +178,13 @@ private:
   // Debugging methods
   void dbg_verify_consistency(Node * sub_root) const;
 
-  template<class NodeNameGetter>
-  void dump_to_dot_base(const std::string & filename, NodeNameGetter name_getter) const;
+  template <class NodeNameGetter>
+  void dump_to_dot_base(const std::string & filename,
+                        NodeNameGetter name_getter) const;
 
-  template<class NodeNameGetter>
-  void output_node_base(const Node * node, std::ofstream & out, NodeNameGetter name_getter) const;
-
+  template <class NodeNameGetter>
+  void output_node_base(const Node * node, std::ofstream & out,
+                        NodeNameGetter name_getter) const;
 };
 
 } // namespace ygg

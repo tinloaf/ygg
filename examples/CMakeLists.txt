@@ -1,5 +1,6 @@
 add_executable (example_rbtree example_rbtree.cpp)
-
+set_target_properties(example_rbtree
+        PROPERTIES CXX_STANDARD 14)
 set_target_properties(example_rbtree
                       PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
                       )

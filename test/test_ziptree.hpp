@@ -58,7 +58,7 @@ public:
   static size_t
   get_rank(const Node & n)
   {
-    return n.get_rank();
+    return (size_t)n.get_rank();
   }
 };
 

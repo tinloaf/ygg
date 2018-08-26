@@ -7,21 +7,26 @@ using namespace ygg;
 
 #define IT_TESTSIZE 2000
 
-template<class Node>
+template <class Node>
 class MyNodeTraits : public ITreeNodeTraits<Node> {
 public:
   using key_type = unsigned int;
 
-  static unsigned int get_lower(const Node & node) {
+  static unsigned int
+  get_lower(const Node & node)
+  {
     return node.lower;
   }
 
-
-  static unsigned int get_upper(const Node & node) {
+  static unsigned int
+  get_upper(const Node & node)
+  {
     return node.upper;
   }
 
-  static std::string get_id(const Node * node) {
+  static std::string
+  get_id(const Node * node)
+  {
     return std::to_string(node->data);
   }
 };
@@ -32,12 +37,15 @@ public:
   unsigned int lower;
   unsigned int upper;
 
-  ITNode () : data(0), lower(0), upper(0) {};
-  explicit ITNode(unsigned int lower_in, unsigned int upper_in, int data_in) : data(data_in), lower(lower_in), upper(upper_in) {};
-  ITNode(const ITNode &other) : data(other.data), lower(other.lower), upper(other.upper) {};
+  ITNode() : data(0), lower(0), upper(0){};
+  explicit ITNode(unsigned int lower_in, unsigned int upper_in, int data_in)
+      : data(data_in), lower(lower_in), upper(upper_in){};
+  ITNode(const ITNode & other)
+      : data(other.data), lower(other.lower), upper(other.upper){};
 };
 
-TEST(ITreeTest, TrivialInsertionTest) {
+TEST(ITreeTest, TrivialInsertionTest)
+{
   auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ASSERT_TRUE(tree.empty());
@@ -48,76 +56,76 @@ TEST(ITreeTest, TrivialInsertionTest) {
   ASSERT_TRUE(tree.verify_integrity());
 }
 
-TEST(ITreeTest, RandomInsertionTest) {
+TEST(ITreeTest, RandomInsertionTest)
+{
   auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode nodes[IT_TESTSIZE];
   std::mt19937 rng(4); // chosen by fair xkcd
 
-  for (unsigned int i = 0 ; i < IT_TESTSIZE ; ++i) {
-    std::uniform_int_distribution<unsigned int> bounds_distr(0,
-                      std::numeric_limits<unsigned int>::max() / 2);
+  for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
+    std::uniform_int_distribution<unsigned int> bounds_distr(
+        0, std::numeric_limits<unsigned int>::max() / 2);
     unsigned int lower = bounds_distr(rng);
     unsigned int upper = lower + bounds_distr(rng);
 
-    nodes[i] = ITNode(lower, upper, i);
+    nodes[i] = ITNode(lower, upper, (int)i);
 
-    std::string fname = std::string("/tmp/trees/before-") + std::to_string(i) + std::string(".dot");
+    std::string fname = std::string("/tmp/trees/before-") + std::to_string(i) +
+                        std::string(".dot");
     tree.dump_to_dot(fname);
 
     tree.insert(nodes[i]);
 
-    fname = std::string("/tmp/trees/after-") + std::to_string(i) + std::string(".dot");
+    fname = std::string("/tmp/trees/after-") + std::to_string(i) +
+            std::string(".dot");
     tree.dump_to_dot(fname);
 
     ASSERT_TRUE(tree.verify_integrity());
-
   }
 }
 
-TEST(ITreeTest, RandomInsertionRandomDeletionTest) {
+TEST(ITreeTest, RandomInsertionRandomDeletionTest)
+{
   auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode nodes[IT_TESTSIZE];
   std::vector<unsigned int> indices;
   std::mt19937 rng(4); // chosen by fair xkcd
 
-  for (unsigned int i = 0 ; i < IT_TESTSIZE ; ++i) {
-    std::uniform_int_distribution<unsigned int> bounds_distr(0,
-                      std::numeric_limits<unsigned int>::max() / 2);
+  for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
+    std::uniform_int_distribution<unsigned int> bounds_distr(
+        0, std::numeric_limits<unsigned int>::max() / 2);
     unsigned int lower = bounds_distr(rng);
     unsigned int upper = lower + bounds_distr(rng);
 
-    nodes[i] = ITNode(lower, upper, i);
+    nodes[i] = ITNode(lower, upper, (int)i);
 
     tree.insert(nodes[i]);
     indices.push_back(i);
   }
 
-  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
-    std::uniform_int_distribution<unsigned int> uni(0,
-                                           i - 1);
-    return uni(rng);
-  });
+  std::shuffle(indices.begin(), indices.end(), std::random_device());
 
   ASSERT_TRUE(tree.verify_integrity());
 
-  for (unsigned int i = 0 ; i < IT_TESTSIZE ; ++i) {
-    std::string fname = std::string("/tmp/trees/before-") + std::to_string(i) + std::string(".dot");
+  for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
+    std::string fname = std::string("/tmp/trees/before-") + std::to_string(i) +
+                        std::string(".dot");
     tree.dump_to_dot(fname);
 
     tree.remove(nodes[indices[i]]);
 
-    fname = std::string("/tmp/trees/after-") + std::to_string(i) + std::string(".dot");
+    fname = std::string("/tmp/trees/after-") + std::to_string(i) +
+            std::string(".dot");
     tree.dump_to_dot(fname);
 
     ASSERT_TRUE(tree.verify_integrity());
   }
 }
 
-
-
-TEST(ITreeTest, TrivialQueryTest) {
+TEST(ITreeTest, TrivialQueryTest)
+{
   auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode n(10, 20, 0);
@@ -174,8 +182,8 @@ TEST(ITreeTest, TrivialQueryTest) {
   ASSERT_FALSE(found);
 }
 
-
-TEST(ITreeTest, SimpleQueryTest) {
+TEST(ITreeTest, SimpleQueryTest)
+{
   auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode n1(10, 20, 1);
@@ -186,7 +194,6 @@ TEST(ITreeTest, SimpleQueryTest) {
   tree.insert(n3);
   ITNode n4(40, 50, 4);
   tree.insert(n4);
-
 
   ASSERT_TRUE(tree.verify_integrity());
 
@@ -245,26 +252,23 @@ TEST(ITreeTest, SimpleQueryTest) {
   ASSERT_EQ(it, container.end());
 }
 
-TEST(ITreeTest, ComprehensiveTest) {
+TEST(ITreeTest, ComprehensiveTest)
+{
   auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
   ITNode persistent_nodes[IT_TESTSIZE];
   std::vector<unsigned int> indices;
   std::mt19937 rng(4); // chosen by fair xkcd
 
-  for (unsigned int i = 0 ; i < IT_TESTSIZE ; ++i) {
+  for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
     unsigned int lower = 10 * i;
     unsigned int upper = lower + 50;
 
-    persistent_nodes[i] = ITNode(lower, upper, i);
+    persistent_nodes[i] = ITNode(lower, upper, (int)i);
     indices.push_back(i);
   }
 
-  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
-    std::uniform_int_distribution<unsigned int> uni(0,
-                                           i - 1);
-    return uni(rng);
-  });
+  std::shuffle(indices.begin(), indices.end(), std::random_device());
 
   for (auto index : indices) {
     tree.insert(persistent_nodes[index]);
@@ -273,19 +277,16 @@ TEST(ITreeTest, ComprehensiveTest) {
   ASSERT_TRUE(tree.verify_integrity());
 
   ITNode transient_nodes[IT_TESTSIZE];
-  for (unsigned int i = 0 ; i < IT_TESTSIZE ; ++i) {
-    std::uniform_int_distribution<unsigned int> bounds_distr(0, 10 * IT_TESTSIZE / 2);
+  for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
+    std::uniform_int_distribution<unsigned int> bounds_distr(
+        0, 10 * IT_TESTSIZE / 2);
     unsigned int lower = bounds_distr(rng);
     unsigned int upper = lower + bounds_distr(rng);
 
-    transient_nodes[i] = ITNode(lower, upper, IT_TESTSIZE + i);
+    transient_nodes[i] = ITNode(lower, upper, (int)(IT_TESTSIZE + i));
   }
 
-  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
-    std::uniform_int_distribution<unsigned int> uni(0,
-                                           i - 1);
-    return uni(rng);
-  });
+  std::shuffle(indices.begin(), indices.end(), std::random_device());
 
   for (auto index : indices) {
     tree.insert(transient_nodes[index]);
@@ -293,22 +294,22 @@ TEST(ITreeTest, ComprehensiveTest) {
 
   ASSERT_TRUE(tree.verify_integrity());
 
-  for (int i = 0 ; i < IT_TESTSIZE ; ++i) {
+  for (int i = 0; i < IT_TESTSIZE; ++i) {
     tree.remove(transient_nodes[i]);
   }
 
   ASSERT_TRUE(tree.verify_integrity());
 
-//std::string fname = std::string("/tmp/trees/comprehensive.dot");
-  //tree.dump_to_dot(fname);
+  // std::string fname = std::string("/tmp/trees/comprehensive.dot");
+  // tree.dump_to_dot(fname);
 
   // Query prefixes
-  for (int i = 0 ; i < IT_TESTSIZE ; ++i) {
-    ITNode query(0, ((i+1) * 10) - 1, 0);
+  for (int i = 0; i < IT_TESTSIZE; ++i) {
+    ITNode query(0, (unsigned int)((i + 1) * 10) - 1, 0);
     auto container = tree.query(query);
     auto it = container.begin();
 
-    for (int expected = 0 ; expected <= i ; ++expected) {
+    for (int expected = 0; expected <= i; ++expected) {
       assert(&(*it) == &(persistent_nodes[expected]));
       ASSERT_EQ(&(*it), &(persistent_nodes[expected]));
       ++it;
@@ -316,48 +317,35 @@ TEST(ITreeTest, ComprehensiveTest) {
     assert(it == container.end());
     ASSERT_EQ(it, container.end());
   }
-
 }
 
-
-TEST(ITreeTest, RandomEqualInsertionRandomDeletionTest) {
+TEST(ITreeTest, RandomEqualInsertionRandomDeletionTest)
+{
   auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 
-  ITNode nodes[IT_TESTSIZE*5];
+  ITNode nodes[IT_TESTSIZE * 5];
   std::vector<unsigned int> indices;
   std::mt19937 rng(4); // chosen by fair xkcd
 
-  for (unsigned int i = 0 ; i < IT_TESTSIZE ; ++i) {
-    std::uniform_int_distribution<unsigned int> bounds_distr(0,
-                std::numeric_limits<unsigned int>::max() / 2);
+  for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
+    std::uniform_int_distribution<unsigned int> bounds_distr(
+        0, std::numeric_limits<unsigned int>::max() / 2);
     unsigned int lower = bounds_distr(rng);
     unsigned int upper = lower + bounds_distr(rng);
 
-    for (unsigned int j = 0; j < 5 ; ++ j) {
-      nodes[5*i + j] = ITNode(lower, upper, 5*i + j);
-      tree.insert(nodes[5*i + j]);
-      indices.push_back(5*i + j);
+    for (unsigned int j = 0; j < 5; ++j) {
+      nodes[5 * i + j] = ITNode(lower, upper, (int)(5 * i + j));
+      tree.insert(nodes[5 * i + j]);
+      indices.push_back(5 * i + j);
     }
-
   }
 
-  std::random_shuffle(indices.begin(), indices.end(), [&](int i) {
-    std::uniform_int_distribution<unsigned int> uni(0,
-                                           i - 1);
-    return uni(rng);
-  });
+  std::shuffle(indices.begin(), indices.end(), std::random_device());
 
   ASSERT_TRUE(tree.verify_integrity());
 
-  for (unsigned int i = 0 ; i < 5*IT_TESTSIZE ; ++i) {
-    //std::string fname = std::string("/tmp/trees/before-") + std::to_string(i) + std::string(".dot");
-    //tree.dump_to_dot(fname);
-
+  for (unsigned int i = 0; i < 5 * IT_TESTSIZE; ++i) {
     tree.remove(nodes[indices[i]]);
-
-    //fname = std::string("/tmp/trees/after-") + std::to_string(i) + std::string(".dot");
-    //tree.dump_to_dot(fname);
-
     ASSERT_TRUE(tree.verify_integrity());
   }
 }
