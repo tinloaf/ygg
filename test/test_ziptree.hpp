@@ -85,7 +85,7 @@ TEST(ZipTreeTest, TrivialInsertionTest)
 {
   auto tree = ZTree<Node, NodeTraits>();
 
-  Node n(0,0);
+  Node n(0, 0);
   tree.insert(n);
   tree.dbg_verify();
 }
@@ -95,10 +95,10 @@ TEST(ZipTreeTest, TrivialUnzippingTest)
   auto tree = ZTree<Node, NodeTraits, DefaultOptions, int,
                     ygg::rbtree_internal::flexible_less, DataRankGetter>();
 
-  Node n0(0,1);
-  Node n1(1,2);
-  Node n2(2,0);
-  Node n3(3,1);
+  Node n0(0, 1);
+  Node n1(1, 2);
+  Node n2(2, 0);
+  Node n3(3, 1);
 
   tree.insert(n0);
   tree.dump_to_dot("/tmp/dots/after-0.dot");
@@ -122,10 +122,10 @@ TEST(ZipTreeTest, TrivialZippingTest)
   auto tree = ZTree<Node, NodeTraits, DefaultOptions, int,
                     ygg::rbtree_internal::flexible_less, DataRankGetter>();
 
-  Node n0(0,1);
-  Node n1(1,2);
-  Node n2(2,0);
-  Node n3(3,1);
+  Node n0(0, 1);
+  Node n1(1, 2);
+  Node n2(2, 0);
+  Node n3(3, 1);
 
   tree.insert(n0);
   tree.insert(n1);
@@ -151,7 +151,6 @@ TEST(ZipTreeTest, TrivialZippingTest)
   tree.dbg_verify();
 }
 
-  
 } // namespace ziptree
 } // namespace test
 

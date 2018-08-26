@@ -128,9 +128,11 @@ public:
     using internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
                                  reverse>::IteratorBase;
     iterator(const iterator<reverse> & orig)
-      : internal::IteratorBase<iterator<reverse>, Node, NodeInterface, reverse>(
-              orig.n){};
-    iterator() : internal::IteratorBase<iterator<reverse>, Node, NodeInterface, reverse>(){};
+        : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
+                                 reverse>(orig.n){};
+    iterator()
+        : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
+                                 reverse>(){};
 
   private:
     friend class const_iterator<reverse>;
@@ -138,16 +140,20 @@ public:
 
   template <bool reverse>
   class const_iterator
-    : public internal::IteratorBase<const_iterator<reverse>, const Node, NodeInterface, reverse> {
+      : public internal::IteratorBase<const_iterator<reverse>, const Node,
+                                      NodeInterface, reverse> {
   public:
     using internal::IteratorBase<const_iterator<reverse>, const Node,
-                       NodeInterface, reverse>::IteratorBase;
+                                 NodeInterface, reverse>::IteratorBase;
     const_iterator(const const_iterator<reverse> & orig)
-      : internal::IteratorBase<const_iterator<reverse>, const Node, NodeInterface, reverse>(orig.n){};
+        : internal::IteratorBase<const_iterator<reverse>, const Node,
+                                 NodeInterface, reverse>(orig.n){};
     const_iterator(const iterator<reverse> & orig)
-      : internal::IteratorBase<const_iterator<reverse>, const Node, NodeInterface, reverse>(orig.n){};
+        : internal::IteratorBase<const_iterator<reverse>, const Node,
+                                 NodeInterface, reverse>(orig.n){};
     const_iterator()
-      : internal::IteratorBase<const_iterator<reverse>, const Node, NodeInterface, reverse>(){};
+        : internal::IteratorBase<const_iterator<reverse>, const Node,
+                                 NodeInterface, reverse>(){};
   };
 
   void insert(Node & node) noexcept;

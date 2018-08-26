@@ -182,7 +182,8 @@ TEST(DynSegTreeTest, NestingTest)
   ASSERT_EQ(combined, DYNSEGTREE_TESTSIZE);
 
   for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-    int combined_range = agg.get_combined<MCombiner>(0, (int)(i + 1), true, false);
+    int combined_range =
+        agg.get_combined<MCombiner>(0, (int)(i + 1), true, false);
     ASSERT_EQ(combined_range, i + 1);
   }
 
@@ -410,7 +411,8 @@ TEST(DynSegTreeTest, ComprehensiveTest)
     unsigned int lower = bounds_distr(rng);
     unsigned int upper = lower + 1 + bounds_distr(rng);
 
-    transient_nodes[i] = Node((int)lower, (int)upper, (int)(DYNSEGTREE_TESTSIZE + i));
+    transient_nodes[i] =
+        Node((int)lower, (int)upper, (int)(DYNSEGTREE_TESTSIZE + i));
   }
 
   std::shuffle(indices.begin(), indices.end(), std::random_device());
@@ -488,8 +490,8 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
     unsigned int lower = bounds_distr(rng);
     unsigned int upper = lower + 1 + bounds_distr(rng);
 
-    transient_nodes[i] =
-      Node((int)lower, (int)upper, (int)(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
+    transient_nodes[i] = Node((int)lower, (int)upper,
+                              (int)(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
   }
 
   std::shuffle(indices.begin(), indices.end(), std::random_device());

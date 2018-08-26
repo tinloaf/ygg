@@ -12,58 +12,68 @@ using namespace ygg;
 using MyTreeOptions = TreeOptions<TreeFlags::MULTIPLE>;
 
 /* The node class
- * Provides a simple key -> value mapping, where the key is an integer and the value is a string.
+ * Provides a simple key -> value mapping, where the key is an integer and the
+ * value is a string.
  */
 class Node : public RBTreeNodeBase<Node, MyTreeOptions> {
 public:
-	int key;
-	std::string value;
+  int key;
+  std::string value;
 
-	// need to implement this s.t. we can use the default ygg::utilities::flexible_less as comparator
-	bool operator<(const Node & other) const {
-		return this->key < other.key;
-	}
+  // need to implement this s.t. we can use the default
+  // ygg::utilities::flexible_less as comparator
+  bool
+  operator<(const Node & other) const
+  {
+    return this->key < other.key;
+  }
 };
 
 // Configure the RBTree based on Node and the default NodeTraits
 using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
 
 // We need this s.t. we can query by key value (i.e, an int) directly
-bool operator<(const Node & lhs, const int rhs) {
-	return lhs.key < rhs;
+bool
+operator<(const Node & lhs, const int rhs)
+{
+  return lhs.key < rhs;
 }
-bool operator<(const int lhs, const Node & rhs) {
-	return lhs < rhs.key;
+bool
+operator<(const int lhs, const Node & rhs)
+{
+  return lhs < rhs.key;
 }
 
-int main(int argc, char **argv) {
-	(void)argc;
-	(void)argv;
+int
+main(int argc, char ** argv)
+{
+  (void)argc;
+  (void)argv;
 
-	MyTree t;
+  MyTree t;
 
-	// Storage for the actual nodes.
-	// WARNING: using STL containers here can backfire badly. See TODO.
-	Node nodes[5];
+  // Storage for the actual nodes.
+  // WARNING: using STL containers here can backfire badly. See TODO.
+  Node nodes[5];
 
-	// Initialize the nodes with some values
-	for (int i = 0 ; i < 5 ; ++i) {
-		nodes[i].key = i;
-		nodes[i].value = std::string("The key is ") + std::to_string(i);
-	}
+  // Initialize the nodes with some values
+  for (int i = 0; i < 5; ++i) {
+    nodes[i].key = i;
+    nodes[i].value = std::string("The key is ") + std::to_string(i);
+  }
 
-	// Insert them
-	for (size_t i = 0 ; i < 5 ; ++i) {
-		t.insert(nodes[i]);
-	}
+  // Insert them
+  for (size_t i = 0; i < 5; ++i) {
+    t.insert(nodes[i]);
+  }
 
-	// What was the string for i = 3 again?
-	auto it = t.find(3); // Note we're using a int to query here, not a Node
-	assert(it != t.end());
-	std::string retrieved_value = it->value; // *it is the Node
+  // What was the string for i = 3 again?
+  auto it = t.find(3); // Note we're using a int to query here, not a Node
+  assert(it != t.end());
+  std::string retrieved_value = it->value; // *it is the Node
 
-	// Okay, we don't need that Node anymore.
-	t.remove(*it);
+  // Okay, we don't need that Node anymore.
+  t.remove(*it);
 
-	return 0;
+  return 0;
 }
