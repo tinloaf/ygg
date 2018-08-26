@@ -83,6 +83,7 @@ private:
   // Class to tell the abstract search tree iterator how to handle
   // our nodes
   class NodeInterface {
+  public:
     static Node *
     get_parent(Node * n)
     {
@@ -161,6 +162,65 @@ public:
 
   void remove(Node & node) noexcept;
 
+  // TODO add rank-shortened search
+  
+  template <class Comparable>
+  const_iterator<false> find(const Comparable & query) const;
+  template <class Comparable>
+  iterator<false> find(const Comparable & query);
+  
+  // Iteration
+  /**
+   * Returns an iterator pointing to the smallest element in the tree.
+   */
+  const_iterator<false> cbegin() const;
+  /**
+   * Returns an iterator pointing after the largest element in the tree.
+   */
+  const_iterator<false> cend() const;
+  /**
+   * Returns an iterator pointing to the smallest element in the tree.
+   */
+  const_iterator<false> begin() const;
+  iterator<false> begin();
+
+  /**
+   * Returns an iterator pointing after the largest element in the tree.
+   */
+  const_iterator<false> end() const;
+  iterator<false> end();
+
+  /**
+   * Returns an reverse iterator pointing to the largest element in the tree.
+   */
+  const_iterator<true> crbegin() const;
+  /**
+   * Returns an reverse iterator pointing before the smallest element in the
+   * tree.
+   */
+  const_iterator<true> crend() const;
+  /**
+   * Returns an reverse iterator pointing to the largest element in the tree.
+   */
+  const_iterator<true> rbegin() const;
+  iterator<true> rbegin();
+
+  /**
+   * Returns an reverse iterator pointing before the smallest element in the
+   * tree.
+   */
+  const_iterator<true> rend() const;
+  iterator<true> rend();
+
+  /**
+   * Returns an iterator pointing to the entry held in node.
+   *
+   * @param node  The node the iterator should point to.
+   */
+  const_iterator<false> iterator_to(const Node & node) const;
+  iterator<false> iterator_to(Node & node);
+
+
   // Debugging methods
   void dbg_verify() const;
 
@@ -181,6 +241,9 @@ private:
   void unzip(Node & oldn, Node & newn) noexcept;
   Node * zip(Node & old_root) noexcept;
 
+  Node * get_smallest() const;
+  Node * get_largest() const;
+  
   // Debugging methods
   void dbg_verify_consistency(Node * sub_root) const;
 

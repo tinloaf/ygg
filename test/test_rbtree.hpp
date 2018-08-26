@@ -139,9 +139,6 @@ TEST(RBTreeTest, LinearInsertionTest)
 
     tree.insert(nodes[i]);
 
-    // std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i) +
-    // std::string(".dot"); tree.dump_to_dot(fname);
-
     ASSERT_TRUE(tree.verify_integrity());
   }
 }

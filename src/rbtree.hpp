@@ -496,6 +496,7 @@ public:
   bool empty() const;
 
   // TODO document
+  // TODO do we need them anymore?
   Node * get_root() const;
   static Node * get_parent(Node * n);
   static Node * get_left_child(Node * n);

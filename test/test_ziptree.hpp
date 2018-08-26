@@ -8,10 +8,10 @@
 
 #include "../src/ziptree.hpp"
 
-#define ZIPTREE_TESTSIZE 2000
-
 namespace test {
 namespace ziptree {
+
+constexpr size_t ZIPTREE_TESTSIZE = 200;
 
 using namespace ygg;
 
@@ -149,6 +149,28 @@ TEST(ZipTreeTest, TrivialZippingTest)
   tree.remove(n0);
   tree.dump_to_dot("/tmp/dots/after-delete-0.dot");
   tree.dbg_verify();
+}
+
+TEST(ZipTreeTest, LinearInsertionTest)
+{
+  auto tree = ZTree<Node, NodeTraits, DefaultOptions, int,
+                    ygg::rbtree_internal::flexible_less, DataRankGetter>();
+
+  Node nodes[ZIPTREE_TESTSIZE];
+
+  for (size_t i = 0; i < ZIPTREE_TESTSIZE; ++i) {
+    nodes[i] = Node((int)i, (int)i);
+
+    tree.insert(nodes[i]);
+    tree.dbg_verify();
+  }
+
+  int i = 0;
+  for (auto & node : tree) {
+    ASSERT_EQ(node.get_data(), i);
+    ASSERT_EQ(node.get_rank(), i);
+    i++;
+  }
 }
 
 } // namespace ziptree
