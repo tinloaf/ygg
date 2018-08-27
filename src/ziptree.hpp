@@ -15,6 +15,34 @@ class ZTreeNodeBase;
 
 namespace ztree_internal {
 
+template <class Tree, bool enable>
+struct dbg_verify_size_helper
+{
+  void operator()(const Tree & t, size_t node_count);
+};
+
+template <class Tree>
+struct dbg_verify_size_helper<Tree, true>
+{
+  void
+  operator()(const Tree & t, size_t node_count)
+  {
+    assert(t.size() == node_count);
+    // Usage in assertion is not enough for GCC to realize that the variable is
+    // being used.
+    (void)t;
+    (void)node_count;
+  }
+};
+
+template <class Tree>
+struct dbg_verify_size_helper<Tree, false>
+{
+  void
+  operator()(const Tree & t, size_t node_count)
+  {}
+};
+
 template <class Node, class RankType, bool use_hash>
 class ZTreeRankFromHash;
 
@@ -26,7 +54,8 @@ public:
   static int
   get_rank(const Node & node) noexcept
   {
-    return __builtin_ffs(std::hash<Node>{}(node));
+    // TODO ffsl? ffs?
+    return __builtin_ffsl((long int)std::hash<Node>{}(node));
   }
 };
 
@@ -74,6 +103,7 @@ template <class Node, class NodeTraits, class Options = DefaultOptions,
 class ZTree {
 public:
   using NB = ZTreeNodeBase<Node, Options, Tag>;
+  using my_type = ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>;
 
   ZTree() noexcept;
   static_assert(std::is_base_of<NB, Node>::value,
@@ -163,12 +193,12 @@ public:
   void remove(Node & node) noexcept;
 
   // TODO add rank-shortened search
-  
+
   template <class Comparable>
   const_iterator<false> find(const Comparable & query) const;
   template <class Comparable>
   iterator<false> find(const Comparable & query);
-  
+
   // Iteration
   /**
    * Returns an iterator pointing to the smallest element in the tree.
@@ -220,7 +250,6 @@ public:
   const_iterator<false> iterator_to(const Node & node) const;
   iterator<false> iterator_to(Node & node);
 
-
   // Debugging methods
   void dbg_verify() const;
 
@@ -234,6 +263,27 @@ public:
    */
   void dump_to_dot(const std::string & filename) const;
 
+  /**
+   * Return the number of elements in the tree.
+   *
+   * This method runs in O(1).
+   *
+   * @warning This method is only available if CONSTANT_TIME_SIZE is set as
+   * option!
+   *
+   * @return The number of elements in the tree.
+   */
+  size_t size() const;
+
+  /**
+   * @brief Returns whether the tree is empty
+   *
+   * This method runs in O(1).
+   *
+   * @return true if the tree is empty, false otherwise
+   */
+  bool empty() const;
+
 private:
   Node * root;
   Compare cmp;
@@ -243,9 +293,11 @@ private:
 
   Node * get_smallest() const;
   Node * get_largest() const;
-  
+
   // Debugging methods
-  void dbg_verify_consistency(Node * sub_root) const;
+  void dbg_verify_consistency(Node * sub_root, Node * lower_bound,
+                              Node * upper_bound) const;
+  void dbg_verify_size() const;
 
   template <class NodeNameGetter>
   void dump_to_dot_base(const std::string & filename,
@@ -254,6 +306,8 @@ private:
   template <class NodeNameGetter>
   void output_node_base(const Node * node, std::ofstream & out,
                         NodeNameGetter name_getter) const;
+
+  SizeHolder<Options::constant_time_size> s;
 };
 
 } // namespace ygg
