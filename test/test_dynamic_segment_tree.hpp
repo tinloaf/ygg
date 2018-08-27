@@ -13,18 +13,22 @@
 #include <boost/icl/interval_map.hpp>
 
 #include "../src/ygg.hpp"
+#include "randomizer.hpp"
 
-#define DYNSEGTREE_TESTSIZE 3000
-#define DYNSEGTREE_COMPREHENSIVE_TESTSIZE 500
-#define DYNSEGTREE_DELETION_TESTSIZE 500
-#define DYNSEGTREE_DELETION_ITERATIONS 100
+namespace ygg {
+namespace testing {
+namespace dynamic_segment_tree {
 
-// chosen by fair xkcd
-#define DYNSEGTREE_SEED 4
-
-namespace test_interval_agg {
 using namespace boost::icl;
 using namespace ygg;
+
+constexpr int DYNSEGTREE_TESTSIZE = 3000;
+constexpr int DYNSEGTREE_COMPREHENSIVE_TESTSIZE = 500;
+constexpr int DYNSEGTREE_DELETION_TESTSIZE = 500;
+constexpr int DYNSEGTREE_DELETION_ITERATIONS = 100;
+
+// chosen by fair xkcd
+constexpr int DYNSEGTREE_SEED = 4;
 
 using MCombiner = MaxCombiner<int, int>;
 using RMCombiner = RangedMaxCombiner<int, int>;
@@ -415,20 +419,23 @@ TEST(DynSegTreeTest, ComprehensiveTest)
         Node((int)lower, (int)upper, (int)(DYNSEGTREE_TESTSIZE + i));
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     agg.insert(transient_nodes[index]);
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     agg.insert(persistent_nodes[index]);
   }
   agg.dbg_verify_max_combiner<MCombiner>();
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     agg.remove(transient_nodes[index]);
@@ -494,21 +501,24 @@ TEST(DynSegTreeTest, ComprehensiveCombinerTest)
                               (int)(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     agg.insert(transient_nodes[index]);
     agg.dbg_verify_max_combiner<MCombiner>();
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     agg.insert(persistent_nodes[index]);
     agg.dbg_verify_max_combiner<MCombiner>();
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     agg.remove(transient_nodes[index]);
@@ -745,6 +755,8 @@ TEST(RangedMaxCombinerTest, NestingTest)
   }
 }
 
-} // namespace test_interval_agg
+} // namespace dynamic_segment_tree
+} // namespace testing
+} // namespace ygg
 
 #endif // YGG_TEST_INTERVAL_AGGREGATOR_HPP

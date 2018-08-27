@@ -11,13 +11,17 @@
 #include <vector>
 
 #include "../src/ygg.hpp"
-
-#define IMAP_TESTSIZE 1000
-#define IMAP_MULTIPLICITY 3
+#include "randomizer.hpp"
 
 // TODO test all the callbacks
 
-namespace test_intervalmap {
+namespace ygg {
+namespace testing {
+namespace intervalmap {
+
+constexpr int IMAP_TESTSIZE = 1000;
+constexpr int IMAP_MULTIPLICITY = 3;
+
 using namespace ygg;
 
 class Node : public IMapNodeBase<int, int> {
@@ -196,7 +200,8 @@ TEST(IMapTest, BasedSegmentMergingTest)
   insert_me.push_back(&base_left);
   insert_me.push_back(&base_right);
 
-  std::shuffle(insert_me.begin(), insert_me.end(), std::random_device());
+  std::shuffle(insert_me.begin(), insert_me.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto n : insert_me) {
     m.insert(*n);
@@ -349,6 +354,9 @@ TEST(IMapTest, MultipleNestedInsertionTest)
     it++;
   }
 }
-} // namespace test_intervalmap
+
+} // namespace intervalmap
+} // namespace testing
+} // namespace ygg
 
 #endif // YGG_TEST_INTERVALMAP_HPP

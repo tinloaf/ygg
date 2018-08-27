@@ -810,12 +810,14 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options,
       auto left_child = node._rbt_left;
       assert(node.combiners.template get<Combiner>() >=
              left_child->combiners.template get<Combiner>() + node.agg_left);
+      (void)left_child; // GCC complains about the variable not being used
     }
 
     if (node._rbt_right != nullptr) {
       auto right_child = node._rbt_right;
       assert(node.combiners.template get<Combiner>() >=
              right_child->combiners.template get<Combiner>() + node.agg_right);
+      (void)right_child;
     }
   }
 }

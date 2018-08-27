@@ -2,10 +2,15 @@
 #define TEST_INTERVALTREE_HPP
 
 #include "../src/intervaltree.hpp"
+#include "randomizer.hpp"
+
+namespace ygg {
+namespace testing {
+namespace intervaltree {
 
 using namespace ygg;
 
-#define IT_TESTSIZE 2000
+constexpr int IT_TESTSIZE = 2000;
 
 template <class Node>
 class MyNodeTraits : public ITreeNodeTraits<Node> {
@@ -105,7 +110,8 @@ TEST(ITreeTest, RandomInsertionRandomDeletionTest)
     indices.push_back(i);
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   ASSERT_TRUE(tree.verify_integrity());
 
@@ -268,7 +274,8 @@ TEST(ITreeTest, ComprehensiveTest)
     indices.push_back(i);
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     tree.insert(persistent_nodes[index]);
@@ -286,7 +293,8 @@ TEST(ITreeTest, ComprehensiveTest)
     transient_nodes[i] = ITNode(lower, upper, (int)(IT_TESTSIZE + i));
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     tree.insert(transient_nodes[index]);
@@ -340,7 +348,8 @@ TEST(ITreeTest, RandomEqualInsertionRandomDeletionTest)
     }
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   ASSERT_TRUE(tree.verify_integrity());
 
@@ -349,4 +358,9 @@ TEST(ITreeTest, RandomEqualInsertionRandomDeletionTest)
     ASSERT_TRUE(tree.verify_integrity());
   }
 }
+
+} // namespace intervaltree
+} // namespace testing
+} // namespace ygg
+
 #endif // TEST_INTERVALTREE_HPP

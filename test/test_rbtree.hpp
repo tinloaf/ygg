@@ -7,10 +7,15 @@
 #include <vector>
 
 #include "../src/rbtree.hpp"
+#include "randomizer.hpp"
+
+namespace ygg {
+namespace testing {
+namespace rbtree {
 
 using namespace ygg;
 
-#define RBTREE_TESTSIZE 2000
+constexpr int RBTREE_TESTSIZE = 2000;
 
 class Node
     : public RBTreeNodeBase<
@@ -448,7 +453,8 @@ TEST(RBTreeTest, LinearInsertionRandomDeletionTest)
   }
 
   std::mt19937 rng(4); // chosen by fair xkcd
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   ASSERT_TRUE(tree.verify_integrity());
 
@@ -480,7 +486,8 @@ TEST(RBTreeTest, LinearMultipleIterationTest)
     }
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   size_t size = 0;
   for (auto index : indices) {
@@ -510,7 +517,8 @@ TEST(RBTreeTest, LinearIterationTest)
     indices.push_back(i);
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     tree.insert(nodes[index]);
@@ -538,7 +546,8 @@ TEST(RBTreeTest, ReverseIterationTest)
   }
 
   std::mt19937 rng(4); // chosen by fair xkcd
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     tree.insert(nodes[index]);
@@ -600,7 +609,8 @@ TEST(RBTreeTest, ComprehensiveTest)
     values_seen.insert(data);
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     tree.insert(persistent_nodes[index]);
@@ -623,7 +633,8 @@ TEST(RBTreeTest, ComprehensiveTest)
     values_seen.insert(data);
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     tree.insert(transient_nodes[index]);
@@ -659,7 +670,8 @@ TEST(RBTreeTest, ComprehensiveMultipleTest)
     indices.push_back(i);
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   size_t size = 0;
   for (auto index : indices) {
@@ -679,7 +691,8 @@ TEST(RBTreeTest, ComprehensiveMultipleTest)
     // std::cout << "Inserting random value: " << data << "\n";
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     tree.insert(transient_nodes[index]);
@@ -716,5 +729,9 @@ TEST(RBTreeTest, ComprehensiveMultipleTest)
   }
 }
 // TODO test equal elements
+
+} // namespace rbtree
+} // namespace testing
+} // namespace ygg
 
 #endif // TEST_RBTREE_HPP

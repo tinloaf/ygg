@@ -7,10 +7,13 @@
 
 #include "../src/list.hpp"
 
-#define LIST_TESTSIZE 1000
+namespace ygg {
+namespace testing {
+namespace list {
+
+constexpr int LIST_TESTSIZE = 1000;
 
 using namespace ygg;
-using namespace ygg::rbtree_internal;
 
 class LNode : public ListNodeBase<LNode> {
 public:
@@ -88,5 +91,9 @@ TEST(ListTest, ComprehensiveTest)
   ASSERT_EQ(l.size(), 0);
   ASSERT_TRUE(l.empty());
 }
+
+} // namespace list
+} // namespace testing
+} // namespace ygg
 
 #endif // YGG_TEST_LIST_HPP

@@ -7,17 +7,20 @@
 #include <vector>
 
 #include "../src/rbtree.hpp"
+#include "randomizer.hpp"
+
+namespace ygg {
+namespace testing {
+namespace rbtree_multi {
 
 using namespace ygg;
 
-#define TESTSIZE 1000
+constexpr int TESTSIZE = 1000;
 
 class TAG_A {
 };
 class TAG_B {
 };
-
-namespace multitest {
 
 class Node
     : public RBTreeNodeBase<Node, TreeOptions<TreeFlags::MULTIPLE>, TAG_A>,
@@ -176,8 +179,8 @@ TEST(MultiRBTreeTest, RandomInsertionTest)
     ta.insert(nodes[i]);
     tb.insert(nodes[i]);
 
-    // std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i) +
-    // std::string(".dot"); tree.dump_to_dot(fname);
+    // std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i)
+    // + std::string(".dot"); tree.dump_to_dot(fname);
 
     ASSERT_TRUE(ta.verify_integrity());
     ASSERT_TRUE(tb.verify_integrity());
@@ -209,8 +212,8 @@ TEST(MultiRBTreeTest, LinearInsertionTest)
     ta.insert(nodes[i]);
     tb.insert(nodes[i]);
 
-    // std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i) +
-    // std::string(".dot"); tree.dump_to_dot(fname);
+    // std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i)
+    // + std::string(".dot"); tree.dump_to_dot(fname);
 
     ASSERT_TRUE(ta.verify_integrity());
     ASSERT_TRUE(ta.verify_integrity());
@@ -230,7 +233,8 @@ TEST(MultiRBTreeTest, LinearIterationTest)
     indices.push_back(i);
   }
 
-  std::shuffle(indices.begin(), indices.end(), std::random_device());
+  std::shuffle(indices.begin(), indices.end(),
+               ygg::testing::utilities::Randomizer(4));
 
   for (auto index : indices) {
     ta.insert(nodes[index]);
@@ -253,6 +257,8 @@ TEST(MultiRBTreeTest, LinearIterationTest)
   }
 }
 
-} // namespace multitest
+} // namespace rbtree_multi
+} // namespace testing
+} // namespace ygg
 
-#endif // TEST_RBTREE_HPP
+#endif // TEST_MULTI_RBTREE
