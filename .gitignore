@@ -3,3 +3,7 @@ docs/output
 
 *~
 \#*
+
+# Stuff generated for emacs
+.cquery_cached_index/**
+compile_commands.json
