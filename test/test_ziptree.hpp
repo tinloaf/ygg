@@ -120,6 +120,28 @@ struct hash<ygg::testing::ziptree::HashRankNode>
 
 } // namespace std
 
+// Make comparable to int
+bool
+operator<(const ygg::testing::ziptree::Node & lhs, const int rhs)
+{
+  return lhs.data < rhs;
+}
+bool
+operator<(const int lhs, const ygg::testing::ziptree::Node & rhs)
+{
+  return lhs < rhs.data;
+}
+bool
+operator<(const ygg::testing::ziptree::HashRankNode & lhs, const int rhs)
+{
+  return lhs.data < rhs;
+}
+bool
+operator<(const int lhs, const ygg::testing::ziptree::HashRankNode & rhs)
+{
+  return lhs < rhs.data;
+}
+
 namespace ygg {
 namespace testing {
 namespace ziptree {
@@ -143,6 +165,41 @@ TEST(ZipTreeTest, TrivialInsertionTest)
   HashRankNode in(0);
   itree.insert(in);
   itree.dbg_verify();
+}
+
+TEST(ZipTreeTest, TrivialFindTest)
+{
+  ExplicitRankTree tree;
+
+  Node n0(0, 0);
+  tree.insert(n0);
+  Node n1(1, 5);
+  tree.insert(n1);
+  Node n2(2, 3);
+  tree.insert(n2);
+  tree.dbg_verify();
+
+  ASSERT_EQ(tree.find(n0), tree.begin());
+  ASSERT_EQ(tree.find(0), tree.begin());
+  ASSERT_TRUE(tree.find(2) != tree.end());
+  ASSERT_TRUE(tree.find(n1) != tree.end());
+  ASSERT_TRUE(tree.find(5) == tree.end());
+
+  ImplicitRankTree itree;
+
+  HashRankNode in0(0);
+  itree.insert(in0);
+  HashRankNode in1(1);
+  itree.insert(in1);
+  HashRankNode in2(2);
+  itree.insert(in2);
+  itree.dbg_verify();
+
+  ASSERT_EQ(itree.find(in0), itree.begin());
+  ASSERT_EQ(itree.find(0), itree.begin());
+  ASSERT_TRUE(itree.find(2) != itree.end());
+  ASSERT_TRUE(itree.find(in1) != itree.end());
+  ASSERT_TRUE(itree.find(5) == itree.end());  
 }
 
 TEST(ZipTreeTest, TrivialUnzippingTest)
@@ -405,15 +462,12 @@ TEST(ZipTreeTest, ComprehensiveTest)
   }
 
   // Query elements
-  /*
   for (int i = 0; i < ZIPTREE_TESTSIZE; ++i) {
     auto it = tree.find(persistent_nodes[i]);
     assert(&(*it) == &(persistent_nodes[i]));
     ASSERT_EQ(&(*it), &(persistent_nodes[i]));
   }
-  */
 }
-
 
 /*****************************************
  * Test for individual bugs
@@ -423,9 +477,8 @@ TEST(ZipTreeTest, Bug1Test)
 
   ImplicitRankTree itree;
 
-  HashRankNode nodes[] = {
-    {40}, {0}, {10}, {30}, {20}, {47}, {26}, {4}, {19}, {13}
-  };
+  HashRankNode nodes[] = {{40}, {0},  {10}, {30}, {20},
+                          {47}, {26}, {4},  {19}, {13}};
 
   for (auto & node : nodes) {
     itree.insert(node);
@@ -445,7 +498,6 @@ TEST(ZipTreeTest, Bug1Test)
   itree.dump_to_dot("/tmp/dots/bug1-after.dot");
   itree.dbg_verify();
 }
-
 
 } // namespace ziptree
 } // namespace testing
