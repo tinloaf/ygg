@@ -453,7 +453,7 @@ TEST(ZipTreeTest, ComprehensiveTest)
   tree.dbg_verify();
   itree.dbg_verify();
 
-  for (int i = 0; i < ZIPTREE_TESTSIZE; ++i) {
+  for (int i = 0; i < (int)ZIPTREE_TESTSIZE; ++i) {
     tree.remove(transient_nodes[i]);
     itree.remove(itransient_nodes[i]);
 
@@ -462,7 +462,7 @@ TEST(ZipTreeTest, ComprehensiveTest)
   }
 
   // Query elements
-  for (int i = 0; i < ZIPTREE_TESTSIZE; ++i) {
+  for (int i = 0; i < (int)ZIPTREE_TESTSIZE; ++i) {
     auto it = tree.find(persistent_nodes[i]);
     assert(&(*it) == &(persistent_nodes[i]));
     ASSERT_EQ(&(*it), &(persistent_nodes[i]));

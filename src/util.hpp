@@ -28,10 +28,63 @@ struct is_specialization<Template<Args...>, Template> : std::true_type
 {
 };
 
+template <class T, template <std::size_t> class Template>
+struct is_numeric_specialization : std::false_type
+{
+};
+
+template <template <std::size_t> class Template, std::size_t N>
+struct is_numeric_specialization<Template<N>, Template> : std::true_type
+{
+};
+
 template <class... Ts>
 void
 throw_away(Ts...)
 {}
+
+  class NotFoundMarker{
+  public:
+    static constexpr std::size_t value = 0;
+  };
+  
+template <template <std::size_t> class TMPL>
+constexpr auto
+get_value_if_present_func()
+{
+  return TypeHolder<NotFoundMarker>{};
+}
+
+template <template <std::size_t> class TMPL, class T,
+          class... Rest>
+constexpr auto get_value_if_present_func(
+    typename std::enable_if<is_numeric_specialization<T, TMPL>{}, bool>::type
+        dummy = true)
+{
+  (void)dummy;
+  return TypeHolder<T>{};
+}
+
+template <template <std::size_t> class TMPL, class T,
+          class... Rest>
+constexpr auto get_value_if_present_func(
+    typename std::enable_if<!is_numeric_specialization<T, TMPL>{}, bool>::type
+        dummy = true)
+{
+  (void)dummy;
+  return get_value_if_present_func<TMPL, Rest...>();
+}
+
+template <template <std::size_t> class TMPL, class... Ts>
+class get_value_if_present {
+private:
+  using type =
+      typename decltype(get_value_if_present_func<TMPL, Ts...>())::type;
+
+public:
+  constexpr static bool found = std::is_same<type, NotFoundMarker>::value;
+  constexpr static std::size_t value = type::value;
+};
 
 template <template <class> class TMPL, class Default>
 constexpr auto
