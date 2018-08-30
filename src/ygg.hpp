@@ -4,3 +4,4 @@
 #include "list.hpp"
 #include "options.hpp"
 #include "rbtree.hpp"
+#include "ziptree.hpp"

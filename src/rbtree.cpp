@@ -1,3 +1,6 @@
+#ifndef YGG_RBTREE_CPP
+#define YGG_RBTREE_CPP
+
 #include "rbtree.hpp"
 
 namespace ygg {
@@ -1419,3 +1422,5 @@ Compare>::lower_bound(const Comparable & query) const
 */
 
 } // namespace ygg
+
+#endif // YGG_RBTREE_CPP

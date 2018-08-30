@@ -189,7 +189,7 @@ public:
  * details.
  * @tparam Tag					An class tag that identifies
  * this tree. Can be used to insert the same nodes into multiple trees. See
- * DOCTODO for details. Can be any class, the class can be empty
+ * DOCTODO for details. Can be any class, the class can be empty.
  * @tparam Compare      A compare class. The Red-Black Tree follows STL
  * semantics for 'Compare'. Defaults to ygg::utilities::flexible_less. Implement
  * operator<(const Node & lhs, const Node & rhs) if you want to use it.
@@ -203,6 +203,9 @@ public:
                                           Options::compress_color>; // TODO
   // rename
 
+  /**
+   * @brief Create a new empty red-black tree.
+   */
   RBTree();
 
   // Node Base
