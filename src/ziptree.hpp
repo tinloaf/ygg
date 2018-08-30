@@ -1,9 +1,9 @@
-#pragma once
 #ifndef YGG_ZIPTREE_H
 #define YGG_ZIPTREE_H
 
 #include "options.hpp"
 #include "size_holder.hpp"
+#include "tree_iterator.hpp"
 
 #include <functional>
 
@@ -40,45 +40,125 @@ struct dbg_verify_size_helper<Tree, false>
 {
   void
   operator()(const Tree & t, size_t node_count)
-  {}
+  {
+    (void)t;
+    (void)node_count;
+  }
 };
 
-template <class Node, class RankType, bool use_hash>
+template <class Node, class Options, bool use_hash, bool store>
 class ZTreeRankFromHash;
 
-template <class Node, class RankType>
-class ZTreeRankFromHash<Node, RankType, true> {
+template <class Node, class Options>
+class ZTreeRankFromHash<Node, Options, true, false> {
 public:
   ZTreeRankFromHash(){};
+
+  static void
+  update_rank(Node & node) noexcept
+  {
+    (void)node;
+  }
 
   static int
   get_rank(const Node & node) noexcept
   {
     // TODO ffsl? ffs?
-    return __builtin_ffsl((long int)std::hash<Node>{}(node));
+    // TODO if constrexpr when switching to C++17
+    if (Options::ztree_universalize) {
+      // TODO this is not strictly a universal family
+      size_t universalized =
+          (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
+          Options::ztree_universalize_modul;
+      return __builtin_ffsl((long int)universalized);
+    } else {
+      return __builtin_ffsl((long int)std::hash<Node>{}(node));
+    }
   }
 };
 
-template <class Node, class RankType>
-class ZTreeRankFromHash<Node, RankType, false> {
+template <class Node, class Options>
+class ZTreeRankFromHash<Node, Options, true, true> {
 public:
-  ZTreeRankFromHash(){}; // TODO FIXME randomize!
+  ZTreeRankFromHash(){};
 
-  // TODO is int the right type here?
-  static int
+  static void
+  update_rank(Node & node) noexcept
+  {
+    // TODO ffsl? ffs?
+    // TODO if constrexpr when switching to C++17
+    if (Options::ztree_universalize) {
+      // TODO this is not strictly a universal family
+      size_t universalized =
+          (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
+          Options::ztree_universalize_modul;
+      node._zt_rank.rank = __builtin_ffsl((long int)universalized);
+    } else {
+      node._zt_rank.rank = __builtin_ffsl((long int)std::hash<Node>{}(node));
+    }
+  }
+
+  static size_t
   get_rank(const Node & node) noexcept
   {
-    return (int)node._zt_rank.rank;
+    return (size_t)node._zt_rank.rank;
   }
 
 private:
   template <class, class, class>
   friend class ZTreeNodeBase;
-  RankType rank;
+  typename Options::ztree_rank_type::type rank;
+};
+
+template <class Node, class Options>
+class ZTreeRankFromHash<Node, Options, false, true> {
+public:
+  ZTreeRankFromHash(){}; // TODO FIXME randomize!
+
+  static void
+  update_rank(Node & node) noexcept
+  {
+    (void)node;
+  }
+
+  static size_t
+  get_rank(const Node & node) noexcept
+  {
+    return (size_t)node._zt_rank.rank;
+  }
+
+private:
+  template <class, class, class>
+  friend class ZTreeNodeBase;
+  typename Options::ztree_rank_type::type rank;
+};
+
+template <class Node, class Options>
+class ZTreeRankFromHash<Node, Options, false, false> {
+  // Build a static assertion that always fails, but
+  // only if this specialization is ever used. Thus, it must depend on
+  // the template parameters.
+  static_assert(!std::is_class<Node>::value || std::is_class<Node>::value,
+                "If rank-by-hash is not used, ranks must be stored.");
 };
 
 } // namespace ztree_internal
 
+/**
+ * @brief Base class (template) to supply your node class with metainformation
+ *
+ * The class you use as nodes for the Zip Tree *must* derive from this
+ * class (template). It supplies your class with the necessary members to
+ * contain the linking between the tree nodes.
+ *
+ * @tparam Node    The node class itself. Yes, that's the class derived from
+ * this template. This sounds weird, but is correct. See the examples if you're
+ * confused.
+ * @tparam options  The options class (a version of TreeOptions) that you
+ * parameterize the tree with. (See the options parameter of ZTree.)
+ * @tparam Tag 		The tag used to identify the tree that this node should
+ * be inserted into. See ZTree for details.
+ */
 template <class Node, class Options, class Tag>
 class ZTreeNodeBase {
 public:
@@ -86,26 +166,80 @@ public:
   Node * _zt_left = nullptr;
   Node * _zt_right = nullptr;
 
-private:
-  friend class ztree_internal::ZTreeRankFromHash<
-      Node, typename Options::ztree_rank_type, Options::ztree_use_hash>;
+protected:
+  /**
+   * @brief Update the stored rank in this node
+   *
+   * If you configure your ZTree to generate the nodes' ranks from hashes (i.e.,
+   * set TreeFlags::ZTREE_USE_HASH) *and* to store the nodes' ranks (i.e., set
+   * TreeFlags::ZTREE_RANK_TYPE), you **must** call this method *before* adding
+   * the node to your tree, but *after* the node's hash has become valid.
+   *
+   * @warning Inserting a node into the tree in the aforementioned case before
+   * calling calling this method leads to undefined behavior.
+   */
+  void
+  update_rank() noexcept
+  {
+    ztree_internal::ZTreeRankFromHash<
+        Node, Options, Options::ztree_use_hash,
+        Options::ztree_store_rank>::update_rank(*static_cast<Node *>(this));
+  }
 
-  ztree_internal::ZTreeRankFromHash<Node, typename Options::ztree_rank_type,
-                                    Options::ztree_use_hash>
+private:
+  template <class, class, bool, bool>
+  friend class ztree_internal::ZTreeRankFromHash;
+
+  ztree_internal::ZTreeRankFromHash<Node, Options, Options::ztree_use_hash,
+                                    Options::ztree_store_rank>
       _zt_rank;
 };
 
+template <class Node>
+class ZTreeDefaultNodeTraits {
+};
+
 // TODO NodeTraits
-template <class Node, class NodeTraits, class Options = DefaultOptions,
-          class Tag = int, class Compare = ygg::rbtree_internal::flexible_less,
-          class RankGetter = ztree_internal::ZTreeRankFromHash<
-              Node, typename Options::ztree_rank_type, Options::ztree_use_hash>>
+/**
+ * @brief The Zip Tree
+ *
+ * This is the main Zip Tree class.
+ *
+ * @tparam Node         The node class for this tree. It must be derived from
+ * ZTreeNodeBase.
+ * @tparam NodeTraits   A class implementing various hooks and functions on your
+ * node class. See DOCTODO for details.
+ * @tparam Options			The TreeOptions class specifying the
+ * parameters of this ZTree. See the TreeOptions and TreeFlags classes for
+ * details.
+ * @tparam Tag					An class tag that identifies
+ * this tree. Can be used to insert the same nodes into multiple trees. See
+ * DOCTODO for details. Can be any class, the class can be empty.
+ * @tparam Compare      A compare class. The Zip Tree follows STL
+ * semantics for 'Compare'. Defaults to ygg::utilities::flexible_less. Implement
+ * operator<(const Node & lhs, const Node & rhs) if you want to use it.
+ * @tparam RankGetter   A class that must implement a static size_t
+ * get_rank(const Node &) function that returns the rank of a node. If you
+ * implement this yourself (instead of using the provided default), you are
+ * responsible of making sure that the ranks uphold the assumptions that zip
+ * trees make regarding the ranks.
+ */
+
+template <
+    class Node, class NodeTraits, class Options = DefaultOptions,
+    class Tag = int, class Compare = ygg::rbtree_internal::flexible_less,
+    class RankGetter = ztree_internal::ZTreeRankFromHash<
+        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank>>
 class ZTree {
 public:
   using NB = ZTreeNodeBase<Node, Options, Tag>;
   using my_type = ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>;
 
+  /**
+   * @brief Construct a new empty Zip Tree.
+   */
   ZTree() noexcept;
+
   static_assert(std::is_base_of<NB, Node>::value,
                 "Node class not properly derived from node base!");
 
@@ -187,13 +321,52 @@ public:
                                  NodeInterface, reverse>(){};
   };
 
+  /**
+   * @brief Inserts <node> into the tree
+   *
+   * Inserts <node> into the tree.
+   *
+   * *Warning*: Please note that after calling insert() on a node (and before
+   * removing that node again), that node *may not move in memory*. A common
+   * pitfall is to store nodes in a std::vector (or other STL container), which
+   * reallocates (and thereby moves objecs around).
+   *
+   * For zip trees, the hinted version is equivalent to the unhinted insertion.
+   *
+   * @param   Node  The node to be inserted.
+   */
   void insert(Node & node) noexcept;
   void insert(Node & node, Node & hint) noexcept;
 
+  /**
+   * @brief Removes <node> from the tree
+   *
+   * Removes <node> from the tree.
+   *
+   * @param   Node  The node to be removed.
+   */
   void remove(Node & node) noexcept;
 
   // TODO add rank-shortened search
 
+  /**
+   * @brief Finds an element in the tree
+   *
+   * Returns an iterator to the first element that compares equally to <query>.
+   * Note that <query> does not have to be a Node, but can be anything that can
+   * be compared to a Node, i.e., for which
+   *    Compare()(const Node &, const Comparable &)
+   * and
+   *    Compare()(const Comparable &, const Node &)
+   * are defined and implemented. In the case of using the default
+   * ygg::utilities::flexible_less as Compare, that means you have to implement
+   * operator<() for both types.
+   *
+   * @param query An object comparing equally to the element that should be
+   * found.
+   * @returns An iterator to the first element comparing equally to <query>, or
+   * end() if no such element exists
+   */
   template <class Comparable>
   const_iterator<false> find(const Comparable & query) const;
   template <class Comparable>
@@ -252,6 +425,7 @@ public:
 
   // Debugging methods
   void dbg_verify() const;
+  void dbg_print_rank_stats() const;
 
   /**
    * @brief Debugging Method: Draw the Tree as a .dot file
@@ -284,12 +458,19 @@ public:
    */
   bool empty() const;
 
+  /**
+   * @brief Removes all elements from the tree.
+   *
+   * Removes all elements from the tree.
+   */
+  void clear();
+
 private:
   Node * root;
   Compare cmp;
 
   void unzip(Node & oldn, Node & newn) noexcept;
-  Node * zip(Node & old_root) noexcept;
+  void zip(Node & old_root) noexcept;
 
   Node * get_smallest() const;
   Node * get_largest() const;

@@ -11,7 +11,16 @@ associated with some key. Inside the red-black tree, the elements will be held s
 to their key. This makes two operations very efficient: Iterating all keys in sorted order, and 
 finding a certain element by key.
 
-For an example on how to use the red-black tree, see @ref rbtreexample .
+For an example on how to use the red-black tree, see @ref rbtreeexample .
+
+Zip Tree
+========
+
+A zip tree is a search tree, just as the red-black tree. It is a randomized data structure
+that has some nice expected guarantees. For details, refer to
+[the article by Tarjan et al.](https://arxiv.org/abs/1806.06726).
+
+For an example on how to use the zip tree, see @ref ziptreeexample .
 
 Interval Tree
 =============

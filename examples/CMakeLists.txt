@@ -5,6 +5,13 @@ set_target_properties(example_rbtree
                       PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
                       )
 
+add_executable (example_ziptree example_ziptree.cpp)
+set_target_properties(example_ziptree
+        PROPERTIES CXX_STANDARD 14)
+set_target_properties(example_ziptree
+                      PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
+                      )
+
 add_executable (example_intervaltree example_intervaltree.cpp)
 set_target_properties(example_intervaltree
         PROPERTIES CXX_STANDARD 14)

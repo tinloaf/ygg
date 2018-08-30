@@ -1,4 +1,11 @@
+#ifndef YGG_ZIPTREE_CPP
+#define YGG_ZIPTREE_CPP
+
 #include "ziptree.hpp"
+
+#include <vector>
+#include <fstream>
+#include <iostream>
 
 namespace ygg {
 
@@ -59,6 +66,27 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
 
   if (current != nullptr) {
     this->unzip(*current, node);
+  }
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
+void
+ZTree<Node, NodeTraits, Options, Tag, Compare,
+      RankGetter>::dbg_print_rank_stats() const
+{
+  std::vector<size_t> rank_count;
+
+  for (auto & node : *this) {
+    size_t rank = RankGetter::get_rank(node);
+    if (rank_count.size() <= rank) {
+      rank_count.resize(rank + 1, 0);
+    }
+    rank_count[rank]++;
+  }
+
+  for (unsigned int rank = 1 ; rank < rank_count.size() ; ++rank) {
+    std::cout << "Rank " << rank << "\t: " << rank_count[rank] << std::endl;
   }
 }
 
@@ -128,14 +156,13 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::remove(
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
-Node *
+void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     Node & old_root) noexcept
 {
   Node * left_head = old_root._zt_left;
   Node * right_head = old_root._zt_right;
 
-  Node * new_root = nullptr;
   Node * cur = old_root._zt_parent;
 
   bool last_from_left;
@@ -231,7 +258,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 	cur->_zt_right = nullptr;
       }
     }
-    return nullptr;
+    return;
   }
 
   // Now, walk down left and right
@@ -242,9 +269,6 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
         ((left_head != nullptr) && (RankGetter::get_rank(*left_head) >
                                     RankGetter::get_rank(*right_head)))) {
       // Use left
-      if (new_root == nullptr) { // TODO we don't need to check this every time
-	new_root = left_head;
-      }
 
       if (last_from_left) {
 	// just pass on
@@ -263,10 +287,6 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
       last_from_left = true;
     } else {
       // use right
-      if (new_root == nullptr) { // TODO we don't need to check this every time
-	new_root = right_head;
-      }
-
       if (!last_from_left) {
 	// just pass on
       } else {
@@ -283,8 +303,6 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
       last_from_left = false;
     }
   }
-
-  return new_root;
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
@@ -652,4 +670,15 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::empty() const
   return (this->root == nullptr);
 }
 
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
+void
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::clear()
+{
+  this->root = nullptr;
+  this->s.set(0);
+}
+
 } // namespace ygg
+
+#endif // YGG_ZIPTREE_CPP

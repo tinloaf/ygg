@@ -66,25 +66,90 @@ public:
   class COMPRESS_COLOR {
   };
 
+  /**
+   * @brief Zip Tree Option: Indicates that nodes' ranks should be derived from
+   * a std::hash hash of the node.
+   */
   class ZTREE_USE_HASH {
   };
 
+  /**
+   * @brief Zip Tree Option: Causes ranks to be stored in nodes and sets their
+   * type.
+   *
+   * The ranks of the nodes need not necessarily be stored at the nodes. If you
+   * e.g. generate ranks from hashes, they can be recomputed whenever needed.
+   * This saves some space in the nodes.
+   *
+   * @warning If you do not enable ZTREE_USE_HASH, you *must* set
+   * ZTREE_RANK_TYPE.
+   *
+   * @tparam T The type that you want to use to store the rank. Usually, uint8_t
+   * is sufficient.
+   */
   template <class T>
   class ZTREE_RANK_TYPE {
   public:
     using type = T;
   };
+
+  /**
+   * @brief Zip Tree Option: Apply universal hashing to compute node ranks. This
+   * sets the coefficient.
+   *
+   * The default way of computing ranks (from hashes) can apply universal
+   * hashing to (to some extents) guarantee a geometric distribution of the
+   * nodes' ranks. The universal hashing of a std::hash-value x is done via:
+   *
+   *   h = (x * <coefficient>) % <modul>
+   *
+   * This parameter sets the coefficeint.
+   *
+   * @warning Universal hashing is only activated if you also set
+   * ZTREE_RANK_HASH_UNIVERSALIZE_MODUL.
+   *
+   * @tparam coefficient_in The desired coefficient. Randomize this!
+   */
+  template <size_t coefficient_in>
+  class ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT {
+  public:
+    constexpr static size_t value = coefficient_in;
+  };
+
+  /**
+   * @brief Zip Tree Option: Apply universal hashing to compute node ranks. This
+   * sets the modul.
+   *
+   * The default way of computing ranks (from hashes) can apply universal
+   * hashing to (to some extents) guarantee a geometric distribution of the
+   * nodes' ranks. The universal hashing of a std::hash-value x is done via:
+   *
+   *   h = (x * <coefficient>) % <modul>
+   *
+   * This parameter sets the modul.
+   *
+   * @warning Universal hashing is only activated if you also set
+   * ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT.
+   *
+   * @tparam coefficient_in The desired modul. Randomize this! You might want to
+   * chose a prime.
+   */
+  template <size_t modul_in>
+  class ZTREE_RANK_HASH_UNIVERSALIZE_MODUL {
+  public:
+    constexpr static size_t value = modul_in;
+  };
 };
 
 /**
- * @brief Class holding the options for an RBTree
+ * @brief Class holding the options for the data structures in this library.
  *
- * This class acts as a container for the options of an RBTree. Note that this
- * class should never (and in fact, cannot be) instantiated. All options are
- * passed as template parameters, and the class itself is in turn passed as
- * template parameter to RBTree and RBTreeNodeBase.
+ * This class acts as a container for the options of all the data structures in
+ * this library. Note that this class should never (and in fact, cannot be)
+ * instantiated. All options are passed as template parameters, and the class
+ * itself is in turn passed as template parameter to the data structures.
  *
- * Example, setting both the MULTIPLE and ORDER_QUERIES options:
+ * Example, setting both the MULTIPLE and ORDER_QUERIES options for a red-black tree:
  *
  * @code{.c++}
  * using MyTreeOptions = TreeOptions<TreeFlags::MULTIPLE,
@@ -112,8 +177,24 @@ public:
       rbtree_internal::pack_contains<TreeFlags::ZTREE_USE_HASH, Opts...>();
 
   using ztree_rank_type =
-      typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE,
-                                              size_t, Opts...>::type;
+      typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE, bool,
+                                              Opts...>::type;
+
+  static constexpr bool ztree_universalize =
+      (utilities::get_value_if_present<
+           TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL, Opts...>::found &&
+       utilities::get_value_if_present<
+           TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT>::found);
+
+  static constexpr bool ztree_store_rank =
+      !std::is_same<ztree_rank_type, bool>::value;
+
+  static constexpr size_t ztree_universalize_modul =
+      utilities::get_value_if_present<
+          TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL>::value;
+  static constexpr size_t ztree_universalize_coefficient =
+      utilities::get_value_if_present<
+          TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT>::value;
 
   /// @endcond
 private:
