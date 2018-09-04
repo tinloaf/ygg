@@ -6,6 +6,7 @@
 #include "tree_iterator.hpp"
 
 #include <functional>
+#include <cmath>
 
 namespace ygg {
 
@@ -113,8 +114,30 @@ private:
 template <class Node, class Options>
 class ZTreeRankFromHash<Node, Options, false, true> {
 public:
-  ZTreeRankFromHash(){}; // TODO FIXME randomize!
+  ZTreeRankFromHash()
+  {
+    auto rand_val = std::rand();
+    this->rank = 0;
+    while (rand_val == RAND_MAX) {
+      this->rank += (size_t)std::log2(RAND_MAX);
+      rand_val = std::rand();
+    }
+    this->rank = __builtin_ffsl((long int)rand_val);
+  };
 
+  template<class URBG>
+  ZTreeRankFromHash(URBG && g)
+  {
+    auto rand_val = g();
+    this->rank = 0;
+    while (rand_val == g.max()) {
+      this->rank += (size_t)std::log2(g.max());
+      rand_val = g();
+    }
+    this->rank = __builtin_ffsl((long int)rand_val);
+  };
+
+  
   static void
   update_rank(Node & node) noexcept
   {

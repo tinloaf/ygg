@@ -3,9 +3,9 @@
 
 #include "ziptree.hpp"
 
-#include <vector>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 namespace ygg {
 
@@ -31,41 +31,59 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
     return;
   }
 
-  Node * current = this->root;
-  Node * last = nullptr;
-  bool last_left = false;
-
-  while ((current != nullptr) &&
-         ((node_rank < RankGetter::get_rank(*current)) ||
-          ((node_rank == RankGetter::get_rank(*current)) &&
-           (!this->cmp(*current, node))))) {
-    last = current;
-    // On equality, go left
-    if (this->cmp(*current, node)) {
-      last_left = false;
-      current = current->_zt_right;
-    } else {
-      last_left = true;
-      current = current->_zt_left;
-    }
-  }
-
-  // Place new node in place of old
-  if (last != nullptr) {
-    node._zt_parent = last;
-    if (last_left) {
-      last->_zt_left = &node;
-    } else {
-      last->_zt_right = &node;
-    }
-  } else {
-    // We replace the root
-    node._zt_parent = nullptr;
+  if (RankGetter::get_rank(node) >= RankGetter::get_rank(*this->root)) {
+    // Replacing the root!
+    Node * old_root = this->root;
     this->root = &node;
-  }
+    node._zt_parent = nullptr;
 
-  if (current != nullptr) {
-    this->unzip(*current, node);
+    this->unzip(*old_root, node);
+  } else {
+    Node * current = this->root;
+
+    // Find the *parent* of the node to be replaced
+    // TODO this assumes that comparison is cheaper than rank-getting. Should we
+    // implement both?
+    // TODO this assumes to insert the nodes as far to the bottom as possible in
+    // the case of rank ties. Is that a good idea?
+    while (true) {
+      // Check if we must descend left
+
+      bool goes_after = this->cmp(*current, node);
+      if (!goes_after && __builtin_expect((current->_zt_left != nullptr), 1) &&
+          (RankGetter::get_rank(*current->_zt_left) >= node_rank)) {
+	current = current->_zt_left;
+      } else if ((goes_after &&
+                  __builtin_expect((current->_zt_right != nullptr), 1) &&
+                  (RankGetter::get_rank(*current->_zt_right) >= node_rank))) {
+	current = current->_zt_right;
+      } else {
+	// we're done!
+	break;
+      }
+    }
+
+    // Place node below parent
+    Node * old_node = nullptr;
+
+    node._zt_parent = current;
+    if (!this->cmp(*current, node)) {
+      // Place left
+      if (current->_zt_left != nullptr) {
+	old_node = current->_zt_left;
+      }
+      current->_zt_left = &node;
+    } else {
+      // Place right
+      if (current->_zt_right != nullptr) {
+	old_node = current->_zt_right;
+      }
+      current->_zt_right = &node;
+    }
+
+    if (old_node != nullptr) {
+      this->unzip(*old_node, node);
+    }
   }
 }
 
@@ -85,7 +103,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare,
     rank_count[rank]++;
   }
 
-  for (unsigned int rank = 1 ; rank < rank_count.size() ; ++rank) {
+  for (unsigned int rank = 1; rank < rank_count.size(); ++rank) {
     std::cout << "Rank " << rank << "\t: " << rank_count[rank] << std::endl;
   }
 }
@@ -100,14 +118,18 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
   Node * right_head = &newn;
 
   Node * cur = &oldn;
+
+  /*
+   * The following code has been micro-optimized in the big loop below:
+   *
   while (cur != nullptr) {
     if (this->cmp(newn, *cur)) {
       // Add to the right spine
 
-      if (right_head != &newn) {
-	right_head->_zt_left = cur;
+      if (__builtin_expect((right_head != &newn), 1)) {
+        right_head->_zt_left = cur;
       } else {
-	right_head->_zt_right = cur;
+        right_head->_zt_right = cur;
       }
 
       cur->_zt_parent = right_head;
@@ -117,16 +139,149 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
     } else {
       // Add to the left spine
 
-      if (left_head != &newn) {
-	left_head->_zt_right = cur;
+      if (__builtin_expect((left_head != &newn), 1)) {
+        left_head->_zt_right = cur;
       } else {
-	left_head->_zt_left = cur;
+        left_head->_zt_left = cur;
       }
 
       cur->_zt_parent = left_head;
       left_head = cur;
 
       cur = cur->_zt_right;
+    }
+  }
+  */
+
+  //
+  // State: Neither left nor right spine have been started
+  //
+  if (this->cmp(newn, *cur)) {
+    // Add to the right spine
+
+    // Start the right spine
+    right_head->_zt_right = cur;
+
+    cur->_zt_parent = right_head;
+    right_head = cur;
+
+    cur = cur->_zt_left;
+
+    while (cur != nullptr) {
+      //
+      // State : Right spine has been started, left has not been started
+      //
+
+      if (this->cmp(newn, *cur)) {
+	// Add to the right spine
+
+	// Right spine has been started, add to the left
+	right_head->_zt_left = cur;
+
+	cur->_zt_parent = right_head;
+	right_head = cur;
+
+	cur = cur->_zt_left;
+      } else {
+
+	// Start the left spine
+	left_head->_zt_left = cur;
+
+	cur->_zt_parent = left_head;
+	left_head = cur;
+
+	cur = cur->_zt_right;
+
+	while (cur != nullptr) {
+	  //
+	  // State: both spines have been started
+	  //
+	  if (this->cmp(newn, *cur)) {
+	    // Add to the right spine
+
+	    right_head->_zt_left = cur;
+
+	    cur->_zt_parent = right_head;
+	    right_head = cur;
+
+	    cur = cur->_zt_left;
+	  } else {
+	    // Add to the left spine
+
+	    left_head->_zt_right = cur;
+
+	    cur->_zt_parent = left_head;
+	    left_head = cur;
+
+	    cur = cur->_zt_right;
+	  }
+	}
+	break;
+      }
+    }
+
+  } else {
+    // Add to the left spine
+
+    // Start the left spine
+    left_head->_zt_left = cur;
+
+    cur->_zt_parent = left_head;
+    left_head = cur;
+
+    cur = cur->_zt_right;
+
+    while (cur != nullptr) {
+      //
+      // State : Left spine has been started, right not
+      //
+      if (this->cmp(newn, *cur)) {
+	// Add to the right spine
+
+	// Start the right spine
+	right_head->_zt_right = cur;
+
+	cur->_zt_parent = right_head;
+	right_head = cur;
+
+	cur = cur->_zt_left;
+
+	while (cur != nullptr) {
+	  //
+	  // State: both spines have been started
+	  //
+	  if (this->cmp(newn, *cur)) {
+	    // Add to the right spine
+
+	    right_head->_zt_left = cur;
+
+	    cur->_zt_parent = right_head;
+	    right_head = cur;
+
+	    cur = cur->_zt_left;
+	  } else {
+	    // Add to the left spine
+
+	    left_head->_zt_right = cur;
+
+	    cur->_zt_parent = left_head;
+	    left_head = cur;
+
+	    cur = cur->_zt_right;
+	  }
+	}
+	break;
+
+      } else {
+	// Add to the left spine
+
+	left_head->_zt_right = cur;
+
+	cur->_zt_parent = left_head;
+	left_head = cur;
+
+	cur = cur->_zt_right;
+      }
     }
   }
 
@@ -142,7 +297,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
   } else {
     right_head->_zt_right = nullptr;
   }
-}
+} // namespace ygg
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
@@ -168,47 +323,31 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
   bool last_from_left;
 
   // First one is special.
-  // TODO simplify this code!
-  if ((left_head != nullptr) && (right_head != nullptr)) {
-    // Both are there, use the one with the larger rank
-    if (RankGetter::get_rank(*left_head) > RankGetter::get_rank(*right_head)) {
-      last_from_left = true;
 
+  // Left child is used if
+  //  - right is empty *or*
+  //  - left is nonempty *and* has higher rank
+  // TODO this leads to a left-leaning behavior. Correct this?
+  if ((right_head == nullptr) ||
+      ((left_head != nullptr) && (RankGetter::get_rank(*left_head) >
+                                  RankGetter::get_rank(*right_head)))) {
+    if (left_head == nullptr) {
+      // Both child-trees are empty. This is a special case: Just remove the
+      // node and return, no zipping necessary.
       if (cur == nullptr) {
-	this->root = left_head;
-	left_head->_zt_parent = nullptr;
+	this->root = nullptr;
       } else {
 	if (cur->_zt_left == &old_root) {
-	  cur->_zt_left = left_head;
+	  cur->_zt_left = nullptr;
 	} else {
 	  assert(cur->_zt_right == &old_root);
-	  cur->_zt_right = left_head;
+	  cur->_zt_right = nullptr;
 	}
-	left_head->_zt_parent = cur;
       }
-      cur = left_head;
-      left_head = left_head->_zt_right;
-    } else {
-      last_from_left = false;
-
-      if (cur == nullptr) {
-	this->root = right_head;
-	right_head->_zt_parent = nullptr;
-      } else {
-	if (cur->_zt_left == &old_root) {
-	  cur->_zt_left = right_head;
-	} else {
-	  assert(cur->_zt_right == &old_root);
-	  cur->_zt_right = right_head;
-	}
-
-	right_head->_zt_parent = cur;
-      }
-      cur = right_head;
-      right_head = right_head->_zt_left;
+      return;
     }
-  } else if (left_head != nullptr) {
-    // Only left is there, use it!
+
+    // use left
     last_from_left = true;
 
     if (cur == nullptr) {
@@ -226,7 +365,6 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     cur = left_head;
     left_head = left_head->_zt_right;
   } else if (right_head != nullptr) {
-    // Only right is there, use it.
     last_from_left = false;
 
     if (cur == nullptr) {
@@ -242,32 +380,14 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 
       right_head->_zt_parent = cur;
     }
-
     cur = right_head;
     right_head = right_head->_zt_left;
-  } else {
-    // Both child-trees are empty. This is a special case: Just remove the node
-    // and return, no zipping necessary.
-    if (cur == nullptr) {
-      this->root = nullptr;
-    } else {
-      if (cur->_zt_left == &old_root) {
-	cur->_zt_left = nullptr;
-      } else {
-	assert(cur->_zt_right == &old_root);
-	cur->_zt_right = nullptr;
-      }
-    }
-    return;
   }
 
-  // Now, walk down left and right
-  // TODO as soon as one becomes nullptr, we can just rehang the whole subtree,
-  // no need for iteration!
-  while ((left_head != nullptr) || (right_head != nullptr)) {
-    if ((right_head == nullptr) ||
-        ((left_head != nullptr) && (RankGetter::get_rank(*left_head) >
-                                    RankGetter::get_rank(*right_head)))) {
+  // TODO this leads to a left-leaning behavior. Correct this?
+  while ((left_head != nullptr) && (right_head != nullptr)) {
+    if ((RankGetter::get_rank(*left_head) >
+         RankGetter::get_rank(*right_head))) {
       // Use left
 
       if (last_from_left) {
@@ -279,10 +399,6 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
       }
 
       cur = left_head;
-      /*
-      left_head = (left_head->_zt_right != nullptr) ? left_head->_zt_right
-                                                    : left_head->_zt_left;
-      */
       left_head = left_head->_zt_right;
       last_from_left = true;
     } else {
@@ -295,12 +411,22 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 	right_head->_zt_parent = cur;
       }
       cur = right_head;
-      /*
-      right_head = (right_head->_zt_left != nullptr) ? right_head->_zt_left
-                                                     : right_head->_zt_right;
-      */
       right_head = right_head->_zt_left;
       last_from_left = false;
+    }
+  }
+
+  // If one of both heads has become nullptr, the other tree might still be
+  // non-empty. We must re-hang this one completely.
+  if (left_head != nullptr) {
+    if (!last_from_left) {
+      cur->_zt_left = left_head;
+      left_head->_zt_parent = cur;
+    }
+  } else if (right_head != nullptr) {
+    if (last_from_left) {
+      cur->_zt_right = right_head;
+      right_head->_zt_parent = cur;
     }
   }
 }
@@ -358,7 +484,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare,
   }
 
   if (sub_root->_zt_right != nullptr) {
-    assert(RankGetter::get_rank(*sub_root->_zt_right) <
+    assert(RankGetter::get_rank(*sub_root->_zt_right) <=
            RankGetter::get_rank(*sub_root));
     assert(this->cmp(*sub_root, *sub_root->_zt_right));
     assert(sub_root->_zt_right->_zt_parent == sub_root);
@@ -414,8 +540,13 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::output_node_base(
     return;
   }
 
+  std::string node_label = name_getter(node);
+  node_label += " (";
+  node_label += std::to_string(RankGetter::get_rank(*node));
+  node_label += ")";
+
   out << "  " << std::to_string((long unsigned int)node) << "[ label=\""
-      << name_getter(node) << "\"]\n";
+      << node_label << "\"]\n";
 
   if (node->NB::_zt_parent != nullptr) {
     std::string label;

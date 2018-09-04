@@ -15,7 +15,7 @@ namespace ziptree {
 
 using namespace ygg;
 
-constexpr size_t ZIPTREE_TESTSIZE = 2000;
+constexpr size_t ZIPTREE_TESTSIZE = 5000;
 constexpr size_t ZIPTREE_SEED = 4;
 
 using ExplicitRankOptions =
@@ -173,8 +173,10 @@ TEST(ZipTreeTest, TrivialFindTest)
 
   Node n0(0, 0);
   tree.insert(n0);
+  tree.dbg_verify();
   Node n1(1, 5);
   tree.insert(n1);
+  tree.dbg_verify();
   Node n2(2, 3);
   tree.insert(n2);
   tree.dbg_verify();
@@ -199,7 +201,7 @@ TEST(ZipTreeTest, TrivialFindTest)
   ASSERT_EQ(itree.find(0), itree.begin());
   ASSERT_TRUE(itree.find(2) != itree.end());
   ASSERT_TRUE(itree.find(in1) != itree.end());
-  ASSERT_TRUE(itree.find(5) == itree.end());  
+  ASSERT_TRUE(itree.find(5) == itree.end());
 }
 
 TEST(ZipTreeTest, TrivialUnzippingTest)
@@ -218,28 +220,24 @@ TEST(ZipTreeTest, TrivialUnzippingTest)
   HashRankNode in3(3);
 
   tree.insert(n0);
-  tree.dump_to_dot("/tmp/dots/after-0.dot");
   tree.dbg_verify();
 
   itree.insert(in0);
   itree.dbg_verify();
 
   tree.insert(n1);
-  tree.dump_to_dot("/tmp/dots/after-1.dot");
   tree.dbg_verify();
 
   itree.insert(in1);
   itree.dbg_verify();
 
   tree.insert(n2);
-  tree.dump_to_dot("/tmp/dots/after-2.dot");
   tree.dbg_verify();
 
   itree.insert(in2);
   itree.dbg_verify();
 
   tree.insert(n3);
-  tree.dump_to_dot("/tmp/dots/after-3.dot");
   tree.dbg_verify();
 
   itree.insert(in3);
@@ -270,28 +268,22 @@ TEST(ZipTreeTest, TrivialZippingTest)
   itree.insert(in2);
   itree.insert(in3);
 
-  tree.dump_to_dot("/tmp/dots/before-delete-1.dot");
-
   tree.remove(n1);
-  tree.dump_to_dot("/tmp/dots/after-delete-1.dot");
   tree.dbg_verify();
   itree.remove(in1);
   itree.dbg_verify();
 
   tree.remove(n3);
-  tree.dump_to_dot("/tmp/dots/after-delete-3.dot");
   tree.dbg_verify();
   itree.remove(in3);
   itree.dbg_verify();
 
   tree.remove(n2);
-  tree.dump_to_dot("/tmp/dots/after-delete-2.dot");
   tree.dbg_verify();
   itree.remove(in2);
   itree.dbg_verify();
 
   tree.remove(n0);
-  tree.dump_to_dot("/tmp/dots/after-delete-0.dot");
   tree.dbg_verify();
   itree.remove(in0);
   itree.dbg_verify();
@@ -485,17 +477,13 @@ TEST(ZipTreeTest, Bug1Test)
     itree.dbg_verify();
   }
 
-  itree.dump_to_dot("/tmp/dots/bug1-before-first-remove.dot");
   itree.remove(nodes[7]); // 4
-  itree.dump_to_dot("/tmp/dots/bug1-after-first-remove.dot");
   itree.dbg_verify();
   itree.remove(nodes[9]); // 13
   itree.dbg_verify();
   itree.remove(nodes[5]); // 47
   itree.dbg_verify();
-  itree.dump_to_dot("/tmp/dots/bug1-before.dot");
   itree.remove(nodes[8]); // 19
-  itree.dump_to_dot("/tmp/dots/bug1-after.dot");
   itree.dbg_verify();
 }
 

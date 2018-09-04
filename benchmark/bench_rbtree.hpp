@@ -519,12 +519,23 @@ public:
  */
 
 /*
- * Various Parameters for the RBTree
+ * Various Parameters for the RBTree / Zip Tree
  */
-using BasicTreeOptions =
-    TreeOptions<TreeFlags::ZTREE_USE_HASH, TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
-                TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<1234567>,
-                TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<23345689>>;
+using BasicTreeOptions = TreeOptions<
+    TreeFlags::ZTREE_USE_HASH, TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
+    TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<9859957398433823229ul>,
+    TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
+        std::numeric_limits<size_t>::max()>>;
+using ZTreeNoStoreOptions = TreeOptions<
+    TreeFlags::ZTREE_USE_HASH,
+    TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<9859957398433823229ul>,
+    TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
+        std::numeric_limits<size_t>::max()>>;
+using ZTreeRandomOptions = TreeOptions<
+    TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
+    TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<9859957398433823229ul>,
+    TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
+        std::numeric_limits<size_t>::max()>>;
 using MultiTreeOptions = TreeOptions<TreeFlags::MULTIPLE>;
 using CompressedTreeOptions = TreeOptions<TreeFlags::COMPRESS_COLOR>;
 
@@ -550,8 +561,31 @@ BENCHMARK_F(Insert, Zip, YggZipTreeInsertFixture<BasicTreeOptions>, 1000, 1)
     this->t.insert(n);
   }
   celero::DoNotOptimizeAway(this->t);
+  // this->t.dbg_print_rank_stats();
+}
 
-  //  this->t.dbg_print_rank_stats();
+BENCHMARK_F(Insert, NoStoreZip, YggZipTreeInsertFixture<ZTreeNoStoreOptions>,
+            1000, 1)
+{
+  this->t.clear();
+
+  for (auto & n : this->nodes) {
+    this->t.insert(n);
+  }
+  celero::DoNotOptimizeAway(this->t);
+  // this->t.dbg_print_rank_stats();
+}
+
+BENCHMARK_F(Insert, RandomZip, YggZipTreeInsertFixture<ZTreeRandomOptions>,
+            1000, 1)
+{
+  this->t.clear();
+
+  for (auto & n : this->nodes) {
+    this->t.insert(n);
+  }
+  celero::DoNotOptimizeAway(this->t);
+  // this->t.dbg_print_rank_stats();
 }
 
 BENCHMARK_F(Insert, StdSet, StdSetInsertFixture, 1000, 1)
@@ -640,6 +674,18 @@ BENCHMARK_F(Search, Zip, YggZipTreeSearchFixture<BasicTreeOptions>, 30, 50)
   celero::DoNotOptimizeAway(sum);
 }
 
+BENCHMARK_F(Search, NoStoreZip, YggZipTreeSearchFixture<ZTreeNoStoreOptions>,
+            30, 50)
+{
+  int sum = 0;
+  for (auto & v : this->search_values) {
+    auto it = this->t.find(*v);
+    sum += it->get_value();
+  }
+
+  celero::DoNotOptimizeAway(sum);
+}
+
 BENCHMARK_F(Search, StdSet, StdSetSearchFixture, 30, 50)
 {
   int sum = 0;
@@ -716,6 +762,15 @@ BENCHMARK_F(Iteration, Zip, YggZipTreeSearchFixture<BasicTreeOptions>, 50, 200)
   }
 }
 
+BENCHMARK_F(Iteration, NoStoreZip, YggZipTreeSearchFixture<ZTreeNoStoreOptions>,
+            50, 200)
+{
+  for (const auto & n : this->t) {
+    // sum += n.value;
+    celero::DoNotOptimizeAway(n);
+  }
+}
+
 BENCHMARK_F(Iteration, StdSet, StdSetSearchFixture, 50, 200)
 {
   for (const auto & n : this->s) {
@@ -772,6 +827,16 @@ BASELINE_F(Delete, RBTree, YggRBTreeSearchFixture<BasicTreeOptions>, 1000, 1)
 }
 
 BENCHMARK_F(Delete, Zip, YggZipTreeSearchFixture<BasicTreeOptions>, 1000, 1)
+{
+  for (auto & v : this->search_values) {
+    this->t.remove(*v);
+  }
+
+  celero::DoNotOptimizeAway(this->t);
+}
+
+BENCHMARK_F(Delete, NoStoreZip, YggZipTreeSearchFixture<ZTreeNoStoreOptions>,
+            1000, 1)
 {
   for (auto & v : this->search_values) {
     this->t.remove(*v);
