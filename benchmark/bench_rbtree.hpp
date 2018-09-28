@@ -23,21 +23,21 @@ public:
   {
     this->instance_sizes.clear();
     for (size_t i = 0; i < TEST_SIZES; i++) {
-      this->instance_sizes.emplace_back(
-          static_cast<int32_t>(std::pow(2, (i + TEST_SIZE_BASE_EXPONENT))), 0u);
+      this->instance_sizes.push_back(
+          {static_cast<int32_t>(std::pow(2, (i + TEST_SIZE_BASE_EXPONENT)))});
     }
   }
 
-  virtual std::vector<std::pair<int64_t, uint64_t>>
+  virtual std::vector<celero::TestFixture::ExperimentValue>
   getExperimentValues() const override
   {
     return this->instance_sizes;
   };
 
   virtual void
-  setUp(const int64_t value_count_in) override
+  setUp(const celero::TestFixture::ExperimentValue & value_count_in) override
   {
-    this->value_count = value_count_in;
+    this->value_count = value_count_in.Value;
     this->values.resize((size_t)this->value_count);
 
     if (distinct) {
@@ -67,7 +67,7 @@ public:
     this->values.clear();
   }
 
-  std::vector<std::pair<int64_t, uint64_t>> instance_sizes;
+  std::vector<celero::TestFixture::ExperimentValue> instance_sizes;
 
   std::vector<int> values;
   int64_t value_count;
@@ -79,11 +79,11 @@ public:
 class StdSetBaseFixture : public RBTreeBaseFixture<true> {
 public:
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->RBTreeBaseFixture<true>::setUp(number_of_nodes);
+    this->RBTreeBaseFixture<true>::setUp(number_of_nodes.Value);
 
-    for (int i = 0; i < number_of_nodes; ++i) {
+    for (int i = 0; i < number_of_nodes.Value; ++i) {
       std::set<int> donor;
       donor.insert(this->values[i]);
       this->nodes.push_back(donor.extract(donor.begin()));
@@ -108,9 +108,9 @@ class StdSetInsertFixture : public StdSetBaseFixture {
 class StdSetSearchFixture : public StdSetBaseFixture {
 public:
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->StdSetBaseFixture::setUp(number_of_nodes);
+    this->StdSetBaseFixture::setUp(number_of_nodes.Value);
 
     for (auto & n : this->nodes) {
       this->s.insert(std::move(n));
@@ -169,12 +169,12 @@ public:
   using Tree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
 
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(number_of_nodes);
+    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes);
-    for (size_t i = 0; i < (size_t)number_of_nodes; ++i) {
+    this->nodes.resize((size_t)number_of_nodes.Value);
+    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
       this->nodes[i].set_value(this->values[i]);
     }
   }
@@ -209,12 +209,12 @@ public:
       RBTree<Node, RBDefaultNodeTraits<Node>, TreeOptions<TreeFlags::MULTIPLE>>;
 
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(number_of_nodes);
+    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes);
-    for (size_t i = 0; i < (size_t)number_of_nodes; ++i) {
+    this->nodes.resize((size_t)number_of_nodes.Value);
+    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
       this->nodes[i].set_value(this->values[i]);
     }
   }
@@ -239,9 +239,9 @@ template <class MyTreeOptions>
 class YggRBTreeSearchFixture : public YggRBTreeBaseFixture<MyTreeOptions> {
 public:
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->YggRBTreeBaseFixture<MyTreeOptions>::setUp(number_of_nodes);
+    this->YggRBTreeBaseFixture<MyTreeOptions>::setUp(number_of_nodes.Value);
 
     for (auto & n : this->nodes) {
       this->t.insert(n);
@@ -300,12 +300,12 @@ public:
   using Tree = ZTree<Node, ZTreeDefaultNodeTraits<Node>, MyTreeOptions>;
 
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->RBTreeBaseFixture<false>::setUp(number_of_nodes);
+    this->RBTreeBaseFixture<false>::setUp(number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes);
-    for (size_t i = 0; i < (size_t)number_of_nodes; ++i) {
+    this->nodes.resize((size_t)number_of_nodes.Value);
+    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
       this->nodes[i].set_value(this->values[i]);
     }
   }
@@ -344,9 +344,9 @@ template <class MyTreeOptions>
 class YggZipTreeSearchFixture : public YggZipTreeBaseFixture<MyTreeOptions> {
 public:
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->YggZipTreeBaseFixture<MyTreeOptions>::setUp(number_of_nodes);
+    this->YggZipTreeBaseFixture<MyTreeOptions>::setUp(number_of_nodes.Value);
 
     for (auto & n : this->nodes) {
       this->t.insert(n);
@@ -391,12 +391,12 @@ public:
   using Tree = boost::intrusive::set<Node>;
 
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->RBTreeBaseFixture<true>::setUp(number_of_nodes);
+    this->RBTreeBaseFixture<true>::setUp(number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes);
-    for (size_t i = 0; i < (size_t)number_of_nodes; ++i) {
+    this->nodes.resize((size_t)number_of_nodes.Value);
+    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
       this->nodes[i].value = this->values[i];
     }
   }
@@ -431,12 +431,12 @@ public:
   using Tree = boost::intrusive::multiset<Node>;
 
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->RBTreeBaseFixture<false>::setUp(number_of_nodes);
+    this->RBTreeBaseFixture<false>::setUp(number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes);
-    for (size_t i = 0; i < (size_t)number_of_nodes; ++i) {
+    this->nodes.resize((size_t)number_of_nodes.Value);
+    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
       this->nodes[i].value = this->values[i];
     }
   }
@@ -459,9 +459,9 @@ class BoostSetInsertFixture : public BoostSetBaseFixture {
 class BoostSetSearchFixture : public BoostSetBaseFixture {
 public:
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->BoostSetBaseFixture::setUp(number_of_nodes);
+    this->BoostSetBaseFixture::setUp(number_of_nodes.Value);
 
     for (auto & n : this->nodes) {
       this->t.insert(n);
@@ -489,9 +489,9 @@ class BoostMultiSetInsertFixture : public BoostMultiSetBaseFixture {
 class BoostMultiSetSearchFixture : public BoostMultiSetBaseFixture {
 public:
   virtual void
-  setUp(const int64_t number_of_nodes) override
+  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->BoostMultiSetBaseFixture::setUp(number_of_nodes);
+    this->BoostMultiSetBaseFixture::setUp(number_of_nodes.Value);
 
     for (auto & n : this->nodes) {
       this->t.insert(n);
