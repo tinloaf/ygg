@@ -1,5 +1,5 @@
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
+add_subdirectory(gtest)
+
 find_package( Threads )
 
 # Find Boost
@@ -7,7 +7,10 @@ find_package(Boost REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
+include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+
 add_executable (run_tests main.cpp)
+add_dependencies(run_tests googletest)
 
 set(CMAKE_C_FLAGS_DEBUG "-fno-omit-frame-pointer -Wall -Wextra -pedantic -Wfloat-equal \
 -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual \
@@ -25,15 +28,8 @@ set_target_properties(run_tests
                       PROPERTIES CXX_STANDARD 14
                       )
 
-target_link_libraries (run_tests LINK_PUBLIC ${LIBS} ${GTEST_BOTH_LIBRARIES}
+target_link_libraries (run_tests ${LIBS} ${GTEST_LIBS_DIR}/libgtest.a ${GTEST_LIBS_DIR}/libgtest_main.a
         ${CMAKE_THREAD_LIBS_INIT} gcov)
-
-# make CLion analyze all files
-add_custom_target(clion_test_dummy SOURCES test_intervaltree.hpp
-    test_rbtree.hpp test_list.hpp test_multi_rbtree.hpp test_intervalmap.hpp test_dynamic_segment_tree.hpp)
-
-enable_testing()
-add_test(NAME gtest COMMAND run_tests)
 
 # copy gdb pretty printers to build dir
 add_custom_command(TARGET run_tests PRE_BUILD
