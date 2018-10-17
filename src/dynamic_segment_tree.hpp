@@ -16,19 +16,39 @@ namespace ygg {
 // Forwards
 template <class Node, class NodeTraits, class Combiners, class Options,
           class Tag>
-class DynamicSegmentTree;
+class DynamicSegmentTreeBase;
 
 namespace dyn_segtree_internal {
 
 // Forwards
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
-class InnerNodeTraits;
+class InnerRBNodeTraits;
+template <class InnerNode>
+class Compare;
 
 /// @cond INTERNAL
 template <class Tag>
 class InnerRBTTag {
 };
 /// @endcond
+
+/********************************************
+ * Base Class Definitions for RBTree
+ ********************************************/
+template <class Tag>
+struct InnerNodeRBBaseBuilder
+{
+  template <class InnerNodeCRTP>
+  using Base =
+      RBTreeNodeBase<InnerNodeCRTP, TreeOptions<TreeFlags::MULTIPLE>, Tag>;
+};
+
+template <class CRTP, class Node, class NodeTraits, class InnerNode, class Tag>
+using RBBaseTree = RBTree<
+    InnerNode,
+    dyn_segtree_internal::InnerRBNodeTraits<CRTP, InnerNode, Node, NodeTraits>,
+    TreeOptions<TreeFlags::MULTIPLE>, dyn_segtree_internal::InnerRBTTag<Tag>,
+    Compare<InnerNode>>;
 
 /**
  * @brief Representation of either a start or an end of an interval
@@ -37,12 +57,11 @@ class InnerRBTTag {
  * you inserted into a DynamicSegmentTree. You can use get_interval() to
  * retrieve a pointer to the node that you inserted into the DynamicSegmentTree.
  */
-template <class OuterNode, class KeyT_in, class ValueT_in, class AggValueT_in,
-          class Combiners, class Tag>
-class InnerNode : public RBTreeNodeBase<InnerNode<OuterNode, KeyT_in, ValueT_in,
-                                                  AggValueT_in, Combiners, Tag>,
-                                        TreeOptions<TreeFlags::MULTIPLE>,
-                                        InnerRBTTag<Tag>> {
+template <template <class InnerNodeCRTP> class Base, class OuterNode,
+          class KeyT_in, class ValueT_in, class AggValueT_in, class Combiners,
+          class Tag>
+class InnerNode : public Base<InnerNode<Base, OuterNode, KeyT_in, ValueT_in,
+                                        AggValueT_in, Combiners, Tag>> {
 public:
   /**
    * @brief The type of the key (i.e., the interval bounds)
@@ -116,9 +135,9 @@ private:
   // The tree and the node traits have full access to the nodes
   template <class FNode, class FNodeTraits, class FCombiners, class FOptions,
             class FTag>
-  friend class ::ygg::DynamicSegmentTree;
+  friend class ::ygg::DynamicSegmentTreeBase;
   template <class FInnerTree, class FInnerNode, class FNode, class FNodeTraits>
-  friend class InnerNodeTraits;
+  friend class InnerRBNodeTraits;
   // Also, debugging classes are friends
   template <class FInnerNode, class... FCombiners>
   friend class ASCIIInnerNodeNameGetter;
@@ -128,7 +147,7 @@ private:
 
 /// @cond INTERNAL
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
-class InnerNodeTraits : public RBDefaultNodeTraits<InnerNode> {
+class InnerRBNodeTraits : public RBDefaultNodeTraits<InnerNode> {
 public:
   static void leaf_inserted(InnerNode & node);
   static void rotated_left(InnerNode & node);
@@ -394,12 +413,12 @@ public:
    * this combiner belongs to. edge_val will then be the agg_left value of the
    * node this combiner belongs to.
    *
-   * @param my_point 					  The point of the inner node that this
-   * MaxCombiner is associated with
+   * @param my_point 					  The point of the inner
+   * node that this MaxCombiner is associated with
    * @param left_child_combiner The MaxCombiner belonging to the left child of
    * this node
-   * @param edge_val 				    The aggregate value of the left edge going
-   * out of this node
+   * @param edge_val 				    The aggregate value of the
+   * left edge going out of this node
    * @return FIXME ignored for now
    */
   bool collect_left(KeyT my_point, const MyType * left_child_combiner,
@@ -415,12 +434,12 @@ public:
    * this combiner belongs to. edge_val will then be the agg_right value of the
    * node this combiner belongs to.
    *
-   * @param my_point 					   The point of the inner node that this
-   * MaxCombiner is associated with
+   * @param my_point 					   The point of the
+   * inner node that this MaxCombiner is associated with
    * @param right_child_combiner The MaxCombiner belonging to the right child of
    * this node
-   * @param edge_val 				     The aggregate value of the right edge
-   * going out of this node
+   * @param edge_val 				     The aggregate value of the
+   * right edge going out of this node
    * @return FIXME ignored for now
    */
   bool collect_right(KeyT my_point, const MyType * right_child_combiner,
@@ -433,8 +452,8 @@ public:
    * This adds edge_val to the maximum currently stored in this combiner. This
    * is used when traversing up a left edge in the tree.
    *
-   * @param new_point 				The point of the node we traversed
-   * into
+   * @param new_point 				The point of the node we
+   * traversed into
    * @param edge_val 					The value of the edge we
    * traversed
    * @return FIXME ignored for now
@@ -446,8 +465,8 @@ public:
    * This adds edge_val to the maximum currently stored in this combiner. This
    * is used when traversing up a right edge in the tree.
    *
-   * @param new_point 				The point of the node we traversed
-   * into
+   * @param new_point 				The point of the node we
+   * traversed into
    * @param edge_val 					The value of the edge we
    * traversed
    * @return FIXME ignored for now
@@ -464,16 +483,16 @@ public:
    * the left_child_combiner's value plus left_edge_val and
    * right_child_combiner's value plus right_edge_val.
    *
-   * @param my_point				       The point of the node this combiner
-   * belongs to
-   * @param left_child_combiner		 The MaxCombiner of the left child of this
-   * node
-   * @param left_edge_val					 The agg_left value of this
-   * node
-   * @param right_child_combiner	 The MaxCombiner of the right child of this
-   * node
-   * @param left_edge_val					 The agg_right value of this
-   * node
+   * @param my_point				       The point of the node
+   * this combiner belongs to
+   * @param left_child_combiner		 The MaxCombiner of the left child of
+   * this node
+   * @param left_edge_val					 The agg_left
+   * value of this node
+   * @param right_child_combiner	 The MaxCombiner of the right child of
+   * this node
+   * @param left_edge_val					 The agg_right
+   * value of this node
    * @return FIXME ignored for now
    */
   bool rebuild(KeyT my_point, const MyType * left_child_combiner,
@@ -540,12 +559,12 @@ public:
    * node that this combiner belongs to. edge_val will then be the agg_left
    * value of the node this combiner belongs to.
    *
-   * @param my_point 					  The point of the inner node that this
-   * RangedMaxCombiner is associated with
+   * @param my_point 					  The point of the inner
+   * node that this RangedMaxCombiner is associated with
    * @param left_child_combiner The RangedMaxCombiner belonging to the left
    * child of this node
-   * @param edge_val 				    The aggregate value of the left edge going
-   * out of this node
+   * @param edge_val 				    The aggregate value of the
+   * left edge going out of this node
    * @return FIXME ignored for now
    */
   bool collect_left(KeyT my_point, const MyType * left_child_combiner,
@@ -562,12 +581,12 @@ public:
    * node that this combiner belongs to. edge_val will then be the agg_right
    * value of the node this combiner belongs to.
    *
-   * @param my_point 					   The point of the inner node that this
-   * RangedMaxCombiner is associated with
+   * @param my_point 					   The point of the
+   * inner node that this RangedMaxCombiner is associated with
    * @param right_child_combiner The RangedMaxCombiner belonging to the right
    * child of this node
-   * @param edge_val 				     The aggregate value of the right edge
-   * going out of this node
+   * @param edge_val 				     The aggregate value of the
+   * right edge going out of this node
    * @return FIXME ignored for now
    */
   bool collect_right(KeyT my_point, const MyType * right_child_combiner,
@@ -580,8 +599,8 @@ public:
    * This adds edge_val to the maximum currently stored in this combiner. This
    * is used when traversing up a left edge in the tree.
    *
-   * @param new_point 				The point of the node we traversed
-   * into
+   * @param new_point 				The point of the node we
+   * traversed into
    * @param edge_val 					The value of the edge we
    * traversed
    * @return FIXME ignored for now
@@ -593,8 +612,8 @@ public:
    * This adds edge_val to the maximum currently stored in this combiner. This
    * is used when traversing up a right edge in the tree.
    *
-   * @param new_point 				The point of the node we traversed
-   * into
+   * @param new_point 				The point of the node we
+   * traversed into
    * @param edge_val 					The value of the edge we
    * traversed
    * @return FIXME ignored for now
@@ -611,16 +630,16 @@ public:
    * the left_child_combiner's value plus left_edge_val and
    * right_child_combiner's value plus right_edge_val.
    *
-   * @param my_point				       The point of the node this combiner
-   * belongs to
-   * @param left_child_combiner		 The RangedMaxCombiner of the left child of
-   * this node
-   * @param left_edge_val					 The agg_left value of this
-   * node
-   * @param right_child_combiner	 The RangedMaxCombiner of the right child of
-   * this node
-   * @param left_edge_val					 The agg_right value of this
-   * node
+   * @param my_point				       The point of the node
+   * this combiner belongs to
+   * @param left_child_combiner		 The RangedMaxCombiner of the left child
+   * of this node
+   * @param left_edge_val					 The agg_left
+   * value of this node
+   * @param right_child_combiner	 The RangedMaxCombiner of the right
+   * child of this node
+   * @param left_edge_val					 The agg_right
+   * value of this node
    * @return FIXME ignored for now
    */
   bool rebuild(KeyT my_point, const MyType * left_child_combiner,
@@ -751,8 +770,8 @@ public:
    * This method calls the rebuild() method on all combiners attached to this
    * node with the respective combined values from the left / right child.
    *
-   * @param my_point				The point of the node this CombinerPack belongs
-   * to
+   * @param my_point				The point of the node this
+   * CombinerPack belongs to
    * @param left_child 			The CombinerPack of the left child (or
    * nullptr)
    * @param left_edge_val   The agg_left value of this node
@@ -815,14 +834,14 @@ using EmptyCombinerPack = CombinerPack<KeyT, AggValueT>;
  * this class (template). It supplies your class with the necessary members to
  * contain the linking between the tree nodes.
  *
- * @tparam KeyType				The type of the key, i.e., the interval
- * borders
- * @tparam ValueType 			The type of the values that every interval
- * is associated with
+ * @tparam KeyType				The type of the key, i.e., the
+ * interval borders
+ * @tparam ValueType 			The type of the values that every
+ * interval is associated with
  * @tparam AggValueType		The typo of an aggregate of multiple
  * ValueT_in's. See DOCTODO for details.
- * @tparam Tag 						The tag used to identify the tree
- * that this node should be inserted into. See RBTree for details.
+ * @tparam Tag 						The tag used to identify
+ * the tree that this node should be inserted into. See RBTree for details.
  */
 template <class KeyType, class ValueType, class AggValueType, class Combiners,
           class Tag = int>
@@ -836,8 +855,10 @@ public:
   using my_type =
       DynSegTreeNodeBase<KeyType, ValueType, AggValueType, Combiners, Tag>;
 
-  using InnerNode = dyn_segtree_internal::InnerNode<my_type, KeyT, ValueT,
-                                                    AggValueT, Combiners, Tag>;
+  using InnerNode = dyn_segtree_internal::InnerNode<
+      dyn_segtree_internal::InnerNodeRBBaseBuilder<
+          dyn_segtree_internal::InnerRBTTag<Tag>>::template Base,
+      my_type, KeyT, ValueT, AggValueT, Combiners, Tag>;
 
   // TODO make these private
   /**
@@ -951,21 +972,22 @@ public:
  *
  * DOCTODO combiners
  *
- * @tparam Node					The node class in your tree, must be
- * derived from DynSegTreeNodeBase
+ * @tparam Node					The node class in your tree,
+ * must be derived from DynSegTreeNodeBase
  * @tparam NodeTraits		The node traits for your node class, must be
  * derived from DynSegTreeNodeTraits
  * @tparam Options			Options for this tree. See DOCTODO for
  * details.
- * @tparam Tag					The tag of this tree. Allows to insert
- * the same node in multiple dynamic segment trees. See DOCTODO for details.
+ * @tparam Tag					The tag of this tree. Allows to
+ * insert the same node in multiple dynamic segment trees. See DOCTODO for
+ * details.
  */
 // TODO DOC right-open intervals
 
 // TODO constant-time size
 template <class Node, class NodeTraits, class Combiners,
           class Options = DefaultOptions, class Tag = int>
-class DynamicSegmentTree {
+class DynamicSegmentTreeBase {
   // TODO add a static assert that checks that the types in all combiners are
   // right
 private:
@@ -986,20 +1008,13 @@ public:
   using AggValueT = typename Node::AggValueT;
 
 private:
-  class InnerTree : public RBTree<InnerNode,
-                                  dyn_segtree_internal::InnerNodeTraits<
-                                      InnerTree, InnerNode, Node, NodeTraits>,
-                                  TreeOptions<TreeFlags::MULTIPLE>,
-                                  dyn_segtree_internal::InnerRBTTag<Tag>,
-                                  dyn_segtree_internal::Compare<InnerNode>> {
+  class InnerTree
+      : public dyn_segtree_internal::RBBaseTree<InnerTree, Node, NodeTraits,
+                                                InnerNode, Tag> {
   public:
     using BaseTree =
-        RBTree<InnerNode,
-               dyn_segtree_internal::InnerNodeTraits<InnerTree, InnerNode, Node,
-                                                     NodeTraits>,
-               TreeOptions<TreeFlags::MULTIPLE>,
-               dyn_segtree_internal::InnerRBTTag<Tag>,
-               dyn_segtree_internal::Compare<InnerNode>>;
+        dyn_segtree_internal::RBBaseTree<InnerTree, Node, NodeTraits, InnerNode,
+                                         Tag>;
 
     using BaseTree::BaseTree;
 
@@ -1203,5 +1218,13 @@ private:
 } // namespace ygg
 
 #include "dynamic_segment_tree.cpp"
+
+namespace ygg {
+
+template <class Node, class NodeTraits, class Combiners,
+          class Options = DefaultOptions, class Tag = int>
+using DynamicSegmentTree =
+    DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>;
+} // namespace ygg
 
 #endif // YGG_DYNAMIC_SEGMENT_TREE_HPP

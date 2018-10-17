@@ -148,6 +148,21 @@ RBTreeNodeBaseImpl<Node, Tag, compress_color>::get_parent() const
   return this->_color_and_parent.get_parent();
 }
 
+  template <class Node, class Tag, bool compress_color>
+Node *
+RBTreeNodeBaseImpl<Node, Tag, compress_color>::get_left() const
+{
+  return this->_rbt_left;
+}
+
+  template <class Node, class Tag, bool compress_color>
+Node *
+RBTreeNodeBaseImpl<Node, Tag, compress_color>::get_right() const
+{
+  return this->_rbt_right;
+}
+
+  
 template <class Node, class Tag, bool compress_color>
 void
 RBTreeNodeBaseImpl<Node, Tag, compress_color>::set_parent(Node * new_parent)

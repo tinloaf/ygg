@@ -75,6 +75,9 @@ public:
   void swap_parent_with(Node * other);
   void swap_color_with(Node * other);
 
+  Node * get_left() const;
+  Node * get_right() const;
+
   // Debugging methods
   size_t get_depth() const noexcept;
 };
