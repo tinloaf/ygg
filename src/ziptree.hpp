@@ -226,9 +226,27 @@ private:
 
 template <class Node>
 class ZTreeDefaultNodeTraits {
+public:
+  /*
+   * Callbacks for Zipping
+   */
+  void init_zipping(Node * to_be_deleted) const noexcept {(void)to_be_deleted;};
+  void before_zip_from_left(Node * left_head) const noexcept {(void)left_head;};
+  void before_zip_from_right(Node * right_head) const noexcept {(void)right_head;};
+  void before_zip_tree_from_left(Node * left_head) const noexcept {(void)left_head;};
+  void before_zip_tree_from_right(Node * right_head) const noexcept {(void)right_head;};
+
+  /*
+   * Callbacks for Unzipping
+   */
+  void init_unzipping(Node * to_be_inserted) const noexcept {(void) to_be_inserted;};
+  void unzip_to_left(Node * n) const noexcept {(void)n;}
+  void unzip_to_right(Node * n) const noexcept {(void)n;}
 };
 
 // TODO NodeTraits
+
+
 /**
  * @brief The Zip Tree
  *

@@ -20,7 +20,7 @@ ZTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
     depth++;
     n = n->get_parent();
   }
-  
+
   return depth;
 }
 
@@ -134,6 +134,9 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 
   Node * cur = &oldn;
 
+  NodeTraits traits;
+  traits.init_unzipping(&newn);
+
   /*
    * The following code has been micro-optimized in the big loop below:
    *
@@ -175,6 +178,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
     // Add to the right spine
 
     // Start the right spine
+    traits.unzip_to_right(cur);
     right_head->_zt_right = cur;
 
     cur->_zt_parent = right_head;
@@ -191,6 +195,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 	// Add to the right spine
 
 	// Right spine has been started, add to the left
+	traits.unzip_to_right(cur);
 	right_head->_zt_left = cur;
 
 	cur->_zt_parent = right_head;
@@ -200,6 +205,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
       } else {
 
 	// Start the left spine
+	traits.unzip_to_left(cur);
 	left_head->_zt_left = cur;
 
 	cur->_zt_parent = left_head;
@@ -214,6 +220,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 	  if (this->cmp(newn, *cur)) {
 	    // Add to the right spine
 
+	    traits.unzip_to_right(cur);
 	    right_head->_zt_left = cur;
 
 	    cur->_zt_parent = right_head;
@@ -223,6 +230,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 	  } else {
 	    // Add to the left spine
 
+	    traits.unzip_to_left(cur);
 	    left_head->_zt_right = cur;
 
 	    cur->_zt_parent = left_head;
@@ -239,6 +247,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
     // Add to the left spine
 
     // Start the left spine
+    traits.unzip_to_left(cur);
     left_head->_zt_left = cur;
 
     cur->_zt_parent = left_head;
@@ -254,6 +263,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 	// Add to the right spine
 
 	// Start the right spine
+	traits.unzip_to_right(cur);
 	right_head->_zt_right = cur;
 
 	cur->_zt_parent = right_head;
@@ -268,6 +278,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 	  if (this->cmp(newn, *cur)) {
 	    // Add to the right spine
 
+	    traits.unzip_to_right(cur);
 	    right_head->_zt_left = cur;
 
 	    cur->_zt_parent = right_head;
@@ -276,7 +287,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 	    cur = cur->_zt_left;
 	  } else {
 	    // Add to the left spine
-
+	    traits.unzip_to_left(cur);
 	    left_head->_zt_right = cur;
 
 	    cur->_zt_parent = left_head;
@@ -289,7 +300,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 
       } else {
 	// Add to the left spine
-
+	traits.unzip_to_left(cur);
 	left_head->_zt_right = cur;
 
 	cur->_zt_parent = left_head;
@@ -330,6 +341,9 @@ void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     Node & old_root) noexcept
 {
+  NodeTraits traits;
+  traits.init_zipping(&old_root);
+
   Node * left_head = old_root._zt_left;
   Node * right_head = old_root._zt_right;
 
@@ -363,6 +377,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     }
 
     // use left
+    traits.before_zip_from_left(left_head);
     last_from_left = true;
 
     if (cur == nullptr) {
@@ -381,6 +396,9 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     left_head = left_head->_zt_right;
   } else if (right_head != nullptr) {
     last_from_left = false;
+
+    // use right
+    traits.before_zip_from_right(right_head);
 
     if (cur == nullptr) {
       this->root = right_head;
@@ -404,6 +422,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     if ((RankGetter::get_rank(*left_head) >
          RankGetter::get_rank(*right_head))) {
       // Use left
+      traits.before_zip_from_left(left_head);
 
       if (last_from_left) {
 	// just pass on
@@ -418,6 +437,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
       last_from_left = true;
     } else {
       // use right
+      traits.before_zip_from_right(right_head);
+
       if (!last_from_left) {
 	// just pass on
       } else {
@@ -434,12 +455,15 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
   // If one of both heads has become nullptr, the other tree might still be
   // non-empty. We must re-hang this one completely.
   if (left_head != nullptr) {
+    // Right head is nullptr, re-hang left tree
     if (!last_from_left) {
+      traits.before_zip_tree_from_left(left_head);
       cur->_zt_left = left_head;
       left_head->_zt_parent = cur;
     }
   } else if (right_head != nullptr) {
     if (last_from_left) {
+      traits.before_zip_tree_from_right(right_head);
       cur->_zt_right = right_head;
       right_head->_zt_parent = cur;
     }

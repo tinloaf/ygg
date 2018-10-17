@@ -54,7 +54,7 @@ public:
   }
 };
 
-class NodeTraits {
+class NodeTraits : public ZTreeDefaultNodeTraits<Node> {
 public:
   static std::string
   get_id(const Node * node)
@@ -72,7 +72,7 @@ public:
     return (size_t)n.get_rank();
   }
 };
-  
+
 class HashRankNode : public ZTreeNodeBase<HashRankNode, ImplicitRankOptions> {
 public:
   int data;
@@ -94,7 +94,7 @@ public:
   }
 };
 
-class HashRankNodeTraits {
+class HashRankNodeTraits : public ZTreeDefaultNodeTraits<HashRankNode> {
 public:
   static std::string
   get_id(const HashRankNode * node)
@@ -125,7 +125,6 @@ operator<(const int lhs, const ygg::testing::ziptree::HashRankNode & rhs)
   return lhs < rhs.data;
 }
 
-  
 } // namespace ziptree
 } // namespace testing
 } // namespace ygg
