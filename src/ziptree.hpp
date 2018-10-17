@@ -47,6 +47,7 @@ struct dbg_verify_size_helper<Tree, false>
   }
 };
 
+  // TODO rename this - if use_hash is false, no hashing takes place!
 template <class Node, class Options, bool use_hash, bool store>
 class ZTreeRankFromHash;
 
@@ -190,6 +191,14 @@ public:
 
   Node * get_parent() const noexcept {
     return this->_zt_parent;
+  }
+
+  Node * get_left() const noexcept {
+    return this->_zt_left;
+  }
+
+  Node * get_right() const noexcept {
+    return this->_zt_right;
   }
   
   // Debugging methods
@@ -386,6 +395,56 @@ public:
   void insert(Node & node, Node & hint) noexcept;
 
   /**
+   * @brief Upper-bounds an element
+   *
+   * Returns an iterator to the smallest element to which <query> compares as
+   * "less", i.e. the smallest element that is considered go strictly after
+   * <query>.
+   *
+   * Note that <query> does not have to be a Node, but can be anything that can
+   * be compared to a Node, i.e., for which
+   *    Compare()(const Node &, const Comparable &)
+   * and
+   *    Compare()(const Comparable &, const Node &)
+   * are defined and implemented. In the case of using the default
+   * ygg::utilities::flexible_less as Compare, that means you have to implement
+   * operator<() for both types.
+   *
+   * @param query An object comparable to Node that should be upper-bounded
+   * @returns An iterator to the first element comparing "greater" to <query>,
+   * or end() if no such element exists
+   */
+  template <class Comparable>
+  const_iterator<false> upper_bound(const Comparable & query) const;
+  template <class Comparable>
+  iterator<false> upper_bound(const Comparable & query);
+
+  /**
+   * @brief Lower-bounds an element
+   *
+   * Returns an iterator to the first element that is not less that <query>,
+   * i.e., that does not have to go before <query>.
+   *
+   * Note that <query> does not have to be a Node, but can be anything that can
+   * be compared to a Node, i.e., for which
+   *    Compare()(const Node &, const Comparable &)
+   * and
+   *    Compare()(const Comparable &, const Node &)
+   * are defined and implemented. In the case of using the default
+   * ygg::utilities::flexible_less as Compare, that means you have to implement
+   * operator<() for both types.
+   *
+   * @param query An object comparable to Node that should be lower-bounded
+   * @returns An iterator to the first element comparing greater-or-equally to
+   * <query>, or end() if no such element exists
+   */
+  template <class Comparable>
+  const_iterator<false> lower_bound(const Comparable & query) const;
+  template <class Comparable>
+  iterator<false> lower_bound(const Comparable & query);
+
+  
+  /**
    * @brief Removes <node> from the tree
    *
    * Removes <node> from the tree.
@@ -505,6 +564,8 @@ public:
    */
   bool empty() const;
 
+  Node * get_root() const;
+  
   /**
    * @brief Removes all elements from the tree.
    *

@@ -10,6 +10,7 @@
 #include "rbtree.hpp"
 #include "size_holder.hpp"
 #include "util.hpp"
+#include "ziptree.hpp"
 
 namespace ygg {
 
@@ -25,10 +26,16 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 class InnerRBNodeTraits;
 template <class InnerNode>
 class Compare;
+template <class InnerNode, class AggValueT>
+class InnerZNodeTraits;
 
 /// @cond INTERNAL
 template <class Tag>
 class InnerRBTTag {
+};
+
+template <class Tag>
+class InnerZTTag {
 };
 /// @endcond
 
@@ -49,6 +56,24 @@ using RBBaseTree = RBTree<
     dyn_segtree_internal::InnerRBNodeTraits<CRTP, InnerNode, Node, NodeTraits>,
     TreeOptions<TreeFlags::MULTIPLE>, dyn_segtree_internal::InnerRBTTag<Tag>,
     Compare<InnerNode>>;
+
+/********************************************
+ * Base Class Definitions for Zip Tree
+ ********************************************/
+template <class Tag>
+struct InnerNodeZTBaseBuilder
+{
+  template <class InnerNodeCRTP>
+  using Base =
+      ZTreeNodeBase<InnerNodeCRTP, TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, Tag>;
+};
+
+template <class CRTP, class Node, class NodeTraits, class InnerNode, class Tag>
+using ZBaseTree =
+    ZTree<InnerNode,
+          dyn_segtree_internal::InnerZNodeTraits<InnerNode, typename InnerNode::AggValueT>,
+          TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, // TODO make this configurable?
+          dyn_segtree_internal::InnerZTTag<Tag>, Compare<InnerNode>>;
 
 /**
  * @brief Representation of either a start or an end of an interval
@@ -138,11 +163,109 @@ private:
   friend class ::ygg::DynamicSegmentTreeBase;
   template <class FInnerTree, class FInnerNode, class FNode, class FNodeTraits>
   friend class InnerRBNodeTraits;
+  template<class InnerNode, class AggValueT>
+  friend class InnerZNodeTraits;
+  
   // Also, debugging classes are friends
   template <class FInnerNode, class... FCombiners>
   friend class ASCIIInnerNodeNameGetter;
   template <class FInnerNode, class... FCombiners>
   friend class DOTInnerNodeNameGette;
+};
+
+template <class InnerNode, class AggValueT>
+class InnerZNodeTraits { // TODO inherit from default traits?
+public:
+  /*
+   * Data for Zipping
+   */
+  AggValueT left_accumulated;
+  AggValueT right_accumulated;
+
+  /*
+   * Callbacks for Zipping
+   */
+  void
+  init_zipping(InnerNode * to_be_deleted) noexcept
+  {
+    left_accumulated = to_be_deleted->agg_left;
+    right_accumulated = to_be_deleted->agg_right;
+  };
+
+  void
+  before_zip_from_left(InnerNode * left_head) noexcept
+  {
+    left_head->agg_left += left_accumulated;
+    left_accumulated += left_head->agg_right;
+    left_head->agg_right = AggValueT();
+  };
+
+  void
+  before_zip_from_right(InnerNode * right_head) noexcept
+  {
+    right_head->agg_right += right_accumulated;
+    right_accumulated += right_head->agg_left;
+    right_head->agg_left = AggValueT();
+  };
+
+  void
+  before_zip_tree_from_left(InnerNode * left_head) noexcept
+  {
+    left_head->agg_left += left_accumulated;
+    left_head->agg_right += left_accumulated;
+  };
+
+  void
+  before_zip_tree_from_right(InnerNode * right_head) noexcept
+  {
+    right_head->agg_left += right_accumulated;
+    right_head->agg_right += right_accumulated;
+  };
+
+  /*
+   * Data for Unzipping
+   */
+  InnerNode * unzip_left_last;
+  InnerNode * unzip_right_last;
+  bool unzip_left_first;
+  bool unzip_right_first;
+
+  void
+  init_unzipping(InnerNode * to_be_inserted) noexcept
+  {
+    unzip_left_last = to_be_inserted;
+    unzip_right_last = to_be_inserted;
+    unzip_left_first = true;
+    unzip_right_first = true;
+    left_accumulated = AggValueT();
+    right_accumulated = AggValueT();
+  };
+
+  void
+  unzip_to_left(InnerNode * n) noexcept
+  {
+    if (unzip_left_first) {
+      unzip_left_last->agg_left = left_accumulated;
+      unzip_left_first = false;
+    } else {
+      unzip_left_last->agg_right = left_accumulated;
+    }
+    left_accumulated = n->agg_right;
+    right_accumulated += n->agg_right;
+  }
+
+  void
+  unzip_to_right(InnerNode * n) noexcept
+  {
+    if (unzip_right_first) {
+      unzip_right_last->agg_right = right_accumulated;
+      unzip_right_first = false;
+    } else {
+      unzip_right_last->agg_left = right_accumulated;
+    }
+    right_accumulated = n->agg_left;
+    left_accumulated += n->agg_left;
+  }
 };
 
 /// @cond INTERNAL
@@ -855,11 +978,17 @@ public:
   using my_type =
       DynSegTreeNodeBase<KeyType, ValueType, AggValueType, Combiners, Tag>;
 
+  /*
   using InnerNode = dyn_segtree_internal::InnerNode<
       dyn_segtree_internal::InnerNodeRBBaseBuilder<
           dyn_segtree_internal::InnerRBTTag<Tag>>::template Base,
       my_type, KeyT, ValueT, AggValueT, Combiners, Tag>;
-
+  */
+  using InnerNode = dyn_segtree_internal::InnerNode<
+      dyn_segtree_internal::InnerNodeZTBaseBuilder<
+          dyn_segtree_internal::InnerZTTag<Tag>>::template Base,
+      my_type, KeyT, ValueT, AggValueT, Combiners, Tag>;
+  
   // TODO make these private
   /**
    * @brief RBTree node that represents the start of the interval represented by
@@ -1009,11 +1138,11 @@ public:
 
 private:
   class InnerTree
-      : public dyn_segtree_internal::RBBaseTree<InnerTree, Node, NodeTraits,
+      : public dyn_segtree_internal::ZBaseTree<InnerTree, Node, NodeTraits,
                                                 InnerNode, Tag> {
   public:
     using BaseTree =
-        dyn_segtree_internal::RBBaseTree<InnerTree, Node, NodeTraits, InnerNode,
+        dyn_segtree_internal::ZBaseTree<InnerTree, Node, NodeTraits, InnerNode,
                                          Tag>;
 
     using BaseTree::BaseTree;

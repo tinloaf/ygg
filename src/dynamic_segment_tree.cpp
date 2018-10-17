@@ -74,9 +74,9 @@ void
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::delete_leaf(
     InnerNode & node)
 {
-  InnerNode * parent = InnerTree::get_parent(&node);
+  InnerNode * parent = node.get_parent();
   if (parent != nullptr) {
-    if (InnerTree::get_left_child(parent) == &node) {
+    if (parent->get_left() == &node) {
       parent->agg_left += node.agg_left;
     } else {
       parent->agg_right += node.agg_left;
@@ -89,7 +89,7 @@ void
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_left(
     InnerNode & node)
 {
-  InnerNode * old_right = InnerTree::get_parent(&node);
+  InnerNode * old_right = node.get_parent();
 
   typename InnerNode::AggValueT old_right_agg = node.agg_right;
   node.agg_right += old_right->agg_left;
@@ -106,7 +106,7 @@ void
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_right(
     InnerNode & node)
 {
-  InnerNode * old_left = InnerTree::get_parent(&node);
+  InnerNode * old_left = node.get_parent();
 
   typename InnerNode::AggValueT old_left_agg = node.agg_left;
   node.agg_left += old_left->agg_right;
@@ -274,7 +274,7 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
   bool progress_left = true;
   while (true) {
     if (progress_left) {
-      left = InnerTree::get_parent(left);
+      left = left->get_parent();
 
       if (left != nullptr) {
 	left_path.push_back(left);
@@ -287,7 +287,7 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
 	left_set.insert(left);
       }
     } else {
-      right = InnerTree::get_parent(right);
+      right = right->get_parent();
 
       if (right != nullptr) {
 	right_path.push_back(right);
@@ -355,7 +355,7 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
   bool last_changed_left = false;
   for (size_t i = 0; i < left_contour.size() - 1; ++i) {
     InnerNode * cur = left_contour[i];
-    if ((i == 0) || (InnerTree::get_right_child(cur) != left_contour[i - 1])) {
+    if ((i == 0) || (cur->get_right() != left_contour[i - 1])) {
       cur->InnerNode::agg_right += val;
     }
     last_changed_left = rebuild_combiners_at(cur);
@@ -365,7 +365,7 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
   bool last_changed_right = false;
   for (size_t i = 0; i < right_contour.size() - 1; ++i) {
     InnerNode * cur = right_contour[i];
-    if ((i == 0) || (InnerTree::get_left_child(cur) != right_contour[i - 1])) {
+    if ((i == 0) || (cur->get_left() != right_contour[i - 1])) {
       cur->InnerNode::agg_left += val;
     }
     last_changed_right = rebuild_combiners_at(cur);
@@ -401,10 +401,10 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::query(
   while (cur != nullptr) {
     if (cmp(x, *cur)) {
       agg += cur->agg_left;
-      cur = InnerTree::get_left_child(cur);
+      cur = cur->get_left();
     } else {
       agg += cur->agg_right;
-      cur = InnerTree::get_right_child(cur);
+      cur = cur->get_right();
     }
   }
 
@@ -473,7 +473,7 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(
   if (left_contour.size() > 1) {
     for (size_t i = 0; i < left_contour.size(); ++i) {
       InnerNode * cur = left_contour[i];
-      InnerNode * right_child = InnerTree::get_right_child(cur);
+      InnerNode * right_child = cur->get_right();
 
       // Factor in the edge we just traversed up
       if (i > 0) {
@@ -510,7 +510,7 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(
   if (right_contour.size() > 1) {
     for (size_t i = 0; i < right_contour.size(); ++i) {
       InnerNode * cur = right_contour[i];
-      InnerNode * left_child = InnerTree::get_left_child(cur);
+      InnerNode * left_child = cur->get_left();
 
       // Factor in the edge we just traversed up
       if (i > 0) {

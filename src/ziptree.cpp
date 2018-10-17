@@ -125,6 +125,14 @@ ZTree<Node, NodeTraits, Options, Tag, Compare,
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
+Node *
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::get_root() const
+{
+  return this->root;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
 void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
     Node & oldn, Node & newn) noexcept
@@ -602,6 +610,88 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::output_node_base(
 
   this->output_node_base(node->NB::_zt_left, out, name_getter);
   this->output_node_base(node->NB::_zt_right, out, name_getter);
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
+template <class Comparable>
+typename ZTree<Node, NodeTraits, Options, Tag, Compare,
+               RankGetter>::template iterator<false>
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::lower_bound(
+    const Comparable & query)
+{
+  Node * cur = this->root;
+  Node * last_left = nullptr;
+
+  while (cur != nullptr) {
+    if (this->cmp(*cur, query)) {
+      cur = cur->NB::_zt_right;
+    } else {
+      last_left = cur;
+      cur = cur->NB::_zt_left;
+    }
+  }
+
+  if (last_left != nullptr) {
+    return iterator<false>(last_left);
+  } else {
+    return this->end();
+  }
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
+template <class Comparable>
+typename ZTree<Node, NodeTraits, Options, Tag, Compare,
+               RankGetter>::template iterator<false>
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::upper_bound(
+    const Comparable & query)
+{
+  Node * cur = this->root;
+  Node * last_left = nullptr;
+
+  while (cur != nullptr) {
+    if (this->cmp(query, *cur)) {
+      last_left = cur;
+      cur = cur->_zt_left;
+    } else {
+      cur = cur->_zt_right;
+    }
+  }
+
+  if (last_left != nullptr) {
+    return iterator<false>(last_left);
+  } else {
+    return this->end();
+  }
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
+template <class Comparable>
+typename ZTree<Node, NodeTraits, Options, Tag, Compare,
+               RankGetter>::template const_iterator<false>
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::upper_bound(
+    const Comparable & query) const
+{
+  return const_iterator<false>(
+      const_cast<ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter> *>(
+          this)
+          ->upper_bound(query));
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
+template <class Comparable>
+typename ZTree<Node, NodeTraits, Options, Tag, Compare,
+               RankGetter>::template const_iterator<false>
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::lower_bound(
+    const Comparable & query) const
+{
+  return const_iterator<false>(
+      const_cast<ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter> *>(
+          this)
+          ->lower_bound(query));
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
