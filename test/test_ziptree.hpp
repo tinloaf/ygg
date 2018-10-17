@@ -72,7 +72,7 @@ public:
     return (size_t)n.get_rank();
   }
 };
-
+  
 class HashRankNode : public ZTreeNodeBase<HashRankNode, ImplicitRankOptions> {
 public:
   int data;
@@ -103,23 +103,6 @@ public:
   }
 };
 
-} // namespace ziptree
-} // namespace testing
-} // namespace ygg
-
-namespace std {
-template <>
-struct hash<ygg::testing::ziptree::HashRankNode>
-{
-  size_t
-  operator()(const ygg::testing::ziptree::HashRankNode & n) const noexcept
-  {
-    return hash<int>{}(n.get_data());
-  }
-};
-
-} // namespace std
-
 // Make comparable to int
 bool
 operator<(const ygg::testing::ziptree::Node & lhs, const int rhs)
@@ -141,6 +124,24 @@ operator<(const int lhs, const ygg::testing::ziptree::HashRankNode & rhs)
 {
   return lhs < rhs.data;
 }
+
+  
+} // namespace ziptree
+} // namespace testing
+} // namespace ygg
+
+namespace std {
+template <>
+struct hash<ygg::testing::ziptree::HashRankNode>
+{
+  size_t
+  operator()(const ygg::testing::ziptree::HashRankNode & n) const noexcept
+  {
+    return hash<int>{}(n.get_data());
+  }
+};
+
+} // namespace std
 
 namespace ygg {
 namespace testing {
