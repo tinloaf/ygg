@@ -188,6 +188,13 @@ public:
   Node * _zt_left = nullptr;
   Node * _zt_right = nullptr;
 
+  Node * get_parent() const noexcept {
+    return this->_zt_parent;
+  }
+  
+  // Debugging methods
+  size_t get_depth() const noexcept;
+  
 protected:
   /**
    * @brief Update the stored rank in this node

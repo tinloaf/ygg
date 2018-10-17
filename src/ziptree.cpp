@@ -9,6 +9,21 @@
 
 namespace ygg {
 
+template <class Node, class Options, class Tag>
+size_t
+ZTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
+{
+  size_t depth = 0;
+  Node * n = (Node *)this;
+
+  while (n->get_parent() != nullptr) {
+    depth++;
+    n = n->get_parent();
+  }
+  
+  return depth;
+}
+
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::ZTree() noexcept

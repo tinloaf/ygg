@@ -11,3 +11,6 @@ set_target_properties(benchmark
                       PROPERTIES COMPILE_FLAGS "-O3 -march=native")
 set_target_properties(benchmark
                       PROPERTIES CXX_STANDARD 17)
+
+		    add_executable(pathlengths pathlengths.cpp)
+		    set_target_properties(pathlengths PROPERTIES CXX_STANDARD 17)

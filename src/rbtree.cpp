@@ -112,6 +112,22 @@ ColorParentStorage<Node, false>::swap_parent_with(
 }
 
 template <class Node, class Tag, bool compress_color>
+size_t
+RBTreeNodeBaseImpl<Node, Tag, compress_color>::get_depth() const
+    noexcept
+{
+  size_t depth = 0;
+  Node * n = (Node *)this;
+
+  while (n->get_parent() != nullptr) {
+    depth++;
+    n = n->get_parent();
+  }
+
+  return depth;
+}
+
+template <class Node, class Tag, bool compress_color>
 void
 RBTreeNodeBaseImpl<Node, Tag, compress_color>::set_color(Color new_color)
 {
