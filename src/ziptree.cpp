@@ -14,7 +14,7 @@ size_t
 ZTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
 {
   size_t depth = 0;
-  Node * n = (Node *)this;
+  const Node * n = (const Node *)this;
 
   while (n->get_parent() != nullptr) {
     depth++;
@@ -145,8 +145,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
   NodeTraits traits;
   traits.init_unzipping(&newn);
 
-  //std::cout << "========================\n";
-  //std::cout << "Start unzipping with root " << (size_t)&newn << "\n";
+  // std::cout << "========================\n";
+  // std::cout << "Start unzipping with root " << (size_t)&newn << "\n";
 
   /*
    * The following code has been micro-optimized in the big loop below:
@@ -359,7 +359,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
   Node * left_head = old_root._zt_left;
   Node * right_head = old_root._zt_right;
   Node * new_head = nullptr;
-  
+
   Node * cur = old_root._zt_parent;
 
   bool last_from_left;
@@ -377,7 +377,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
       // Both child-trees are empty. This is a special case: Just remove the
       // node and return, no zipping necessary.
       traits.delete_without_zipping(&old_root);
-      
+
       if (cur == nullptr) {
 	this->root = nullptr;
       } else {
@@ -392,12 +392,12 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     }
 
     traits.init_zipping(&old_root);
-    
+
     // use left
     traits.before_zip_from_left(left_head);
     last_from_left = true;
     new_head = left_head;
-    
+
     if (cur == nullptr) {
       this->root = left_head;
       left_head->_zt_parent = nullptr;
@@ -414,13 +414,13 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     left_head = left_head->_zt_right;
   } else {
     traits.init_zipping(&old_root);
-    
+
     last_from_left = false;
 
     // use right
     traits.before_zip_from_right(right_head);
     new_head = right_head;
-    
+
     if (cur == nullptr) {
       this->root = right_head;
       right_head->_zt_parent = nullptr;

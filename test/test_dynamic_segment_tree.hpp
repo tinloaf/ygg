@@ -330,7 +330,7 @@ TEST(DynSegTreeTest, NestingInsertionOverlappingDeletionTest)
   }
 
   for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-    val = agg.query((int)10 * i);
+    val = agg.query((int)(10 * i));
     ASSERT_EQ(val, i + 1);
   }
 }
@@ -741,17 +741,20 @@ TEST(RangedMaxCombinerTest, NestingTest)
   ASSERT_EQ(combiner.get_right_border(),
             2 * DYNSEGTREE_TESTSIZE - (DYNSEGTREE_TESTSIZE - 1) + 1);
 
-  for (int i = 0; i < DYNSEGTREE_TESTSIZE - 1; ++i) {
-    combiner = agg.get_combiner<RMCombiner>(i, i + 1, true, false);
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wstrict-overflow"
+  for (unsigned int i = 0; i < (unsigned int)DYNSEGTREE_TESTSIZE - 1u; ++i) {
+    combiner = agg.get_combiner<RMCombiner>((int)i, (int)(i + 1), true, false);
     ASSERT_EQ(combiner.get(), i + 1);
     ASSERT_EQ(combiner.get_left_border(), i);
     ASSERT_EQ(combiner.get_right_border(), i + 1);
 
-    combiner = agg.get_combiner<RMCombiner>(0, i + 1, true, true);
+    combiner = agg.get_combiner<RMCombiner>(0, (int)(i + 1), true, true);
     ASSERT_EQ(combiner.get(), i + 2);
     ASSERT_EQ(combiner.get_left_border(), i + 1);
-    ASSERT_TRUE(combiner.get_right_border() >= i + 1);
+    ASSERT_TRUE(combiner.get_right_border() >= (int)(i + 1));
   }
+  #pragma GCC diagnostic pop
 }
 
 } // namespace testing

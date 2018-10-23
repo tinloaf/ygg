@@ -120,10 +120,11 @@ public:
     auto rand_val = std::rand();
     this->rank = 0;
     while (rand_val == RAND_MAX) {
-      this->rank += (decltype(this->rank))std::log2(RAND_MAX);
+      this->rank = (decltype(this->rank))(
+          this->rank + (decltype(this->rank))std::log2(RAND_MAX));
       rand_val = std::rand();
     }
-    this->rank = __builtin_ffsl((long int)rand_val);
+    this->rank = (decltype(this->rank))__builtin_ffsl((long int)rand_val);
   };
 
   template <class URBG>

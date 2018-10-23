@@ -126,9 +126,6 @@ TEST(MultiRBTreeTest, MinimalInteractionTest)
   class TestNode : public Node {
   public:
     using Node::Node;
-
-  private:
-    FRIEND_TEST(MultiRBTreeTest, MinimalInteractionTest);
   };
 
   TestNode n1(0, 0);

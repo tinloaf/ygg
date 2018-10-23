@@ -116,7 +116,7 @@ size_t
 RBTreeNodeBaseImpl<Node, Tag, compress_color>::get_depth() const noexcept
 {
   size_t depth = 0;
-  Node * n = (Node *)this;
+  const Node * n = (const Node *)this;
 
   while (n->get_parent() != nullptr) {
     depth++;
