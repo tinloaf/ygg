@@ -68,9 +68,9 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
       if (!goes_after && __builtin_expect((current->_zt_left != nullptr), 1) &&
           (RankGetter::get_rank(*current->_zt_left) >= node_rank)) {
 	current = current->_zt_left;
-      } else if ((goes_after &&
-                  __builtin_expect((current->_zt_right != nullptr), 1) &&
-                  (RankGetter::get_rank(*current->_zt_right) >= node_rank))) {
+      } else if (goes_after &&
+                 __builtin_expect((current->_zt_right != nullptr), 1) &&
+                 (RankGetter::get_rank(*current->_zt_right) >= node_rank)) {
 	current = current->_zt_right;
       } else {
 	// we're done!
@@ -144,6 +144,9 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 
   NodeTraits traits;
   traits.init_unzipping(&newn);
+
+  //std::cout << "========================\n";
+  //std::cout << "Start unzipping with root " << (size_t)&newn << "\n";
 
   /*
    * The following code has been micro-optimized in the big loop below:
@@ -331,6 +334,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
   } else {
     right_head->_zt_right = nullptr;
   }
+
+  traits.unzip_done(&newn, left_head, right_head);
 } // namespace ygg
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
@@ -350,11 +355,11 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     Node & old_root) noexcept
 {
   NodeTraits traits;
-  traits.init_zipping(&old_root);
 
   Node * left_head = old_root._zt_left;
   Node * right_head = old_root._zt_right;
-
+  Node * new_head = nullptr;
+  
   Node * cur = old_root._zt_parent;
 
   bool last_from_left;
@@ -371,6 +376,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     if (left_head == nullptr) {
       // Both child-trees are empty. This is a special case: Just remove the
       // node and return, no zipping necessary.
+      traits.delete_without_zipping(&old_root);
+      
       if (cur == nullptr) {
 	this->root = nullptr;
       } else {
@@ -384,10 +391,13 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
       return;
     }
 
+    traits.init_zipping(&old_root);
+    
     // use left
     traits.before_zip_from_left(left_head);
     last_from_left = true;
-
+    new_head = left_head;
+    
     if (cur == nullptr) {
       this->root = left_head;
       left_head->_zt_parent = nullptr;
@@ -402,12 +412,15 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     }
     cur = left_head;
     left_head = left_head->_zt_right;
-  } else if (right_head != nullptr) {
+  } else {
+    traits.init_zipping(&old_root);
+    
     last_from_left = false;
 
     // use right
     traits.before_zip_from_right(right_head);
-
+    new_head = right_head;
+    
     if (cur == nullptr) {
       this->root = right_head;
       right_head->_zt_parent = nullptr;
@@ -468,14 +481,28 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
       traits.before_zip_tree_from_left(left_head);
       cur->_zt_left = left_head;
       left_head->_zt_parent = cur;
+      cur = left_head;
+    } else {
+      traits.zipping_ended_left_without_tree(cur);
     }
   } else if (right_head != nullptr) {
     if (last_from_left) {
       traits.before_zip_tree_from_right(right_head);
       cur->_zt_right = right_head;
       right_head->_zt_parent = cur;
+      cur = right_head;
+    } else {
+      traits.zipping_ended_right_without_tree(cur);
+    }
+  } else {
+    if (last_from_left) {
+      traits.zipping_ended_left_without_tree(cur);
+    } else {
+      traits.zipping_ended_right_without_tree(cur);
     }
   }
+
+  traits.zipping_done(new_head, cur);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,

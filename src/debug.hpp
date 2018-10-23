@@ -77,8 +77,8 @@ private:
       std::cout << " " << nng.get_name(node);
       std::cout << "\n";
 
-      this->print_node(node->_rbt_left, prefix, -1);
-      this->print_node(node->_rbt_right, prefix, 1);
+      this->print_node(node->get_left(), prefix, -1);
+      this->print_node(node->get_right(), prefix, 1);
     }
     if (direction != 0) {
       prefix.pop_back();
@@ -127,10 +127,10 @@ private:
 
       this->buf << "\n  " << nid << " [label=\"" << this->nng.get_name(node)
                 << "\"];\n";
-      if (node->_rbt_left == nullptr) {
+      if (node->get_left() == nullptr) {
 	this->buf << "  leftdummy" << nid << " [];\n";
       }
-      if (node->_rbt_right == nullptr) {
+      if (node->get_right() == nullptr) {
 	this->buf << "  rightdummy" << nid << " [];\n";
       }
       this->buf << "\n";
@@ -143,21 +143,21 @@ private:
   {
     unsigned int nid = this->get_node_id(node);
 
-    if (node->_rbt_left != nullptr) {
-      unsigned int left_child_id = this->get_node_id(node->_rbt_left);
+    if (node->get_left() != nullptr) {
+      unsigned int left_child_id = this->get_node_id(node->get_left());
       this->buf << "  " << nid << " -> " << left_child_id << " [label=\""
                 << this->eng.get_name(node, true) << "\"];\n";
-      this->handle_node(node->_rbt_left);
+      this->handle_node(node->get_left());
     } else {
       this->buf << "  " << nid << " -> leftdummy" << nid << " [label=\""
                 << this->eng.get_name(node, true) << "\"];\n";
     }
 
-    if (node->_rbt_right != nullptr) {
-      unsigned int right_child_id = this->get_node_id(node->_rbt_right);
+    if (node->get_right() != nullptr) {
+      unsigned int right_child_id = this->get_node_id(node->get_right());
       this->buf << "  " << nid << " -> " << right_child_id << " [label=\""
                 << this->eng.get_name(node, false) << "\"];\n";
-      this->handle_node(node->_rbt_right);
+      this->handle_node(node->get_right());
     } else {
       this->buf << "  " << nid << " -> rightdummy" << nid << " [label=\""
                 << this->eng.get_name(node, false) << "\"];\n";

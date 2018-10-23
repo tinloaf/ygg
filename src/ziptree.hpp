@@ -47,7 +47,7 @@ struct dbg_verify_size_helper<Tree, false>
   }
 };
 
-  // TODO rename this - if use_hash is false, no hashing takes place!
+// TODO rename this - if use_hash is false, no hashing takes place!
 template <class Node, class Options, bool use_hash, bool store>
 class ZTreeRankFromHash;
 
@@ -189,21 +189,27 @@ public:
   Node * _zt_left = nullptr;
   Node * _zt_right = nullptr;
 
-  Node * get_parent() const noexcept {
+  Node *
+  get_parent() const noexcept
+  {
     return this->_zt_parent;
   }
 
-  Node * get_left() const noexcept {
+  Node *
+  get_left() const noexcept
+  {
     return this->_zt_left;
   }
 
-  Node * get_right() const noexcept {
+  Node *
+  get_right() const noexcept
+  {
     return this->_zt_right;
   }
-  
+
   // Debugging methods
   size_t get_depth() const noexcept;
-  
+
 protected:
   /**
    * @brief Update the stored rank in this node
@@ -236,25 +242,36 @@ private:
 template <class Node>
 class ZTreeDefaultNodeTraits {
 public:
+  // clang-format off
   /*
    * Callbacks for Zipping
    */
   void init_zipping(Node * to_be_deleted) const noexcept {(void)to_be_deleted;};
+  void delete_without_zipping(Node * to_be_deleted) const noexcept {(void)to_be_deleted;};
   void before_zip_from_left(Node * left_head) const noexcept {(void)left_head;};
   void before_zip_from_right(Node * right_head) const noexcept {(void)right_head;};
+  void zipping_ended_left_without_tree(Node * prev_left_head) const noexcept {(void)prev_left_head;};
+  void zipping_ended_right_without_tree(Node * prev_right_head) const noexcept {(void)prev_right_head;};  
   void before_zip_tree_from_left(Node * left_head) const noexcept {(void)left_head;};
   void before_zip_tree_from_right(Node * right_head) const noexcept {(void)right_head;};
-
+  void zipping_done(Node * head, Node * tail) const noexcept {(void)head; (void)tail;}
+  
   /*
    * Callbacks for Unzipping
    */
   void init_unzipping(Node * to_be_inserted) const noexcept {(void) to_be_inserted;};
   void unzip_to_left(Node * n) const noexcept {(void)n;}
   void unzip_to_right(Node * n) const noexcept {(void)n;}
+  void unzip_done(Node * unzip_root, Node * left_spine_end, Node * right_spine_end) const noexcept
+  {
+    (void) unzip_root;
+    (void) left_spine_end;
+    (void) right_spine_end;
+  }
+  // clang-format on
 };
 
 // TODO NodeTraits
-
 
 /**
  * @brief The Zip Tree
@@ -443,7 +460,6 @@ public:
   template <class Comparable>
   iterator<false> lower_bound(const Comparable & query);
 
-  
   /**
    * @brief Removes <node> from the tree
    *
@@ -565,7 +581,7 @@ public:
   bool empty() const;
 
   Node * get_root() const;
-  
+
   /**
    * @brief Removes all elements from the tree.
    *

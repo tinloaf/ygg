@@ -26,7 +26,7 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 class InnerRBNodeTraits;
 template <class InnerNode>
 class Compare;
-template <class InnerNode, class AggValueT>
+template <class InnerTree, class InnerNode, class AggValueT>
 class InnerZNodeTraits;
 
 /// @cond INTERNAL
@@ -65,14 +65,17 @@ struct InnerNodeZTBaseBuilder
 {
   template <class InnerNodeCRTP>
   using Base =
-      ZTreeNodeBase<InnerNodeCRTP, TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, Tag>;
+      ZTreeNodeBase<InnerNodeCRTP,
+                    TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, Tag>;
 };
 
 template <class CRTP, class Node, class NodeTraits, class InnerNode, class Tag>
 using ZBaseTree =
     ZTree<InnerNode,
-          dyn_segtree_internal::InnerZNodeTraits<InnerNode, typename InnerNode::AggValueT>,
-          TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, // TODO make this configurable?
+          dyn_segtree_internal::InnerZNodeTraits<CRTP, InnerNode,
+                                                 typename InnerNode::AggValueT>,
+          TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, // TODO make this
+                                                            // configurable?
           dyn_segtree_internal::InnerZTTag<Tag>, Compare<InnerNode>>;
 
 /**
@@ -163,9 +166,9 @@ private:
   friend class ::ygg::DynamicSegmentTreeBase;
   template <class FInnerTree, class FInnerNode, class FNode, class FNodeTraits>
   friend class InnerRBNodeTraits;
-  template<class InnerNode, class AggValueT>
+  template <class FInnerTree, class FInnerNode, class FAggValueT>
   friend class InnerZNodeTraits;
-  
+
   // Also, debugging classes are friends
   template <class FInnerNode, class... FCombiners>
   friend class ASCIIInnerNodeNameGetter;
@@ -173,7 +176,7 @@ private:
   friend class DOTInnerNodeNameGette;
 };
 
-template <class InnerNode, class AggValueT>
+template <class InnerTree, class InnerNode, class AggValueT>
 class InnerZNodeTraits { // TODO inherit from default traits?
 public:
   /*
@@ -185,42 +188,15 @@ public:
   /*
    * Callbacks for Zipping
    */
-  void
-  init_zipping(InnerNode * to_be_deleted) noexcept
-  {
-    left_accumulated = to_be_deleted->agg_left;
-    right_accumulated = to_be_deleted->agg_right;
-  };
-
-  void
-  before_zip_from_left(InnerNode * left_head) noexcept
-  {
-    left_head->agg_left += left_accumulated;
-    left_accumulated += left_head->agg_right;
-    left_head->agg_right = AggValueT();
-  };
-
-  void
-  before_zip_from_right(InnerNode * right_head) noexcept
-  {
-    right_head->agg_right += right_accumulated;
-    right_accumulated += right_head->agg_left;
-    right_head->agg_left = AggValueT();
-  };
-
-  void
-  before_zip_tree_from_left(InnerNode * left_head) noexcept
-  {
-    left_head->agg_left += left_accumulated;
-    left_head->agg_right += left_accumulated;
-  };
-
-  void
-  before_zip_tree_from_right(InnerNode * right_head) noexcept
-  {
-    right_head->agg_left += right_accumulated;
-    right_head->agg_right += right_accumulated;
-  };
+  void init_zipping(InnerNode * to_be_deleted) noexcept;
+  void before_zip_from_left(InnerNode * left_head) noexcept;
+  void before_zip_from_right(InnerNode * right_head) noexcept;
+  void before_zip_tree_from_left(InnerNode * left_head) noexcept;
+  void zipping_ended_left_without_tree(InnerNode * prev_left_head) noexcept;
+  void zipping_ended_right_without_tree(InnerNode * prev_right_head) noexcept;
+  void before_zip_tree_from_right(InnerNode * right_head) noexcept;
+  void zipping_done(InnerNode * head, InnerNode * tail) noexcept;
+  void delete_without_zipping(InnerNode * to_be_deleted) noexcept;
 
   /*
    * Data for Unzipping
@@ -230,42 +206,11 @@ public:
   bool unzip_left_first;
   bool unzip_right_first;
 
-  void
-  init_unzipping(InnerNode * to_be_inserted) noexcept
-  {
-    unzip_left_last = to_be_inserted;
-    unzip_right_last = to_be_inserted;
-    unzip_left_first = true;
-    unzip_right_first = true;
-    left_accumulated = AggValueT();
-    right_accumulated = AggValueT();
-  };
-
-  void
-  unzip_to_left(InnerNode * n) noexcept
-  {
-    if (unzip_left_first) {
-      unzip_left_last->agg_left = left_accumulated;
-      unzip_left_first = false;
-    } else {
-      unzip_left_last->agg_right = left_accumulated;
-    }
-    left_accumulated = n->agg_right;
-    right_accumulated += n->agg_right;
-  }
-
-  void
-  unzip_to_right(InnerNode * n) noexcept
-  {
-    if (unzip_right_first) {
-      unzip_right_last->agg_right = right_accumulated;
-      unzip_right_first = false;
-    } else {
-      unzip_right_last->agg_left = right_accumulated;
-    }
-    right_accumulated = n->agg_left;
-    left_accumulated += n->agg_left;
-  }
+  void init_unzipping(InnerNode * to_be_inserted) noexcept;
+  void unzip_to_left(InnerNode * n) noexcept;
+  void unzip_to_right(InnerNode * n) noexcept;
+  void unzip_done(InnerNode * unzip_root, InnerNode * left_spine_end,
+                  InnerNode * right_spine_end) noexcept;
 };
 
 /// @cond INTERNAL
@@ -291,6 +236,8 @@ public:
   bool
   operator()(const InnerNode & lhs, const InnerNode & rhs) const
   {
+    //    std::cout << "Comparing points: " << lhs.get_point() << " vs " <<
+    //    rhs.get_point() << "\n";
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
     if (lhs.get_point() != rhs.get_point()) {
@@ -338,6 +285,8 @@ public:
   bool
   operator()(const typename InnerNode::KeyT & lhs, const InnerNode & rhs) const
   {
+    //    std::cout << "A Comparing points: " << lhs << " vs " <<
+    //    rhs.get_point() << "\n";
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
     if (lhs != rhs.get_point()) {
@@ -352,6 +301,8 @@ public:
   bool
   operator()(const InnerNode & lhs, const typename InnerNode::KeyT & rhs) const
   {
+    //    std::cout << "B Comparing points: " << lhs.get_point() << " vs " <<
+    //    rhs << "\n";
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
     if (lhs.get_point() != rhs) {
@@ -425,8 +376,12 @@ public:
         node->combiners.template get_combiner<Combiners>().get_dbg_value() +
         std::string(" ")...};
 
-    std::string res = std::string("[") + std::to_string(node->get_point()) +
-                      std::string("]") + std::string("@") +
+    std::string res = std::string("{") + std::to_string(node->get_point()) +
+                      std::string("}") + std::string("[") +
+                      std::to_string(node->get_interval()->start.get_point()) +
+                      std::string(", ") +
+                      std::to_string(node->get_interval()->end.get_point()) +
+                      std::string(") ") + std::string("@") +
                       std::to_string((unsigned long)node) +
                       std::string("  ╭:") + std::to_string(node->agg_left) +
                       std::string("  ╮:") + std::to_string(node->agg_right) +
@@ -988,7 +943,7 @@ public:
       dyn_segtree_internal::InnerNodeZTBaseBuilder<
           dyn_segtree_internal::InnerZTTag<Tag>>::template Base,
       my_type, KeyT, ValueT, AggValueT, Combiners, Tag>;
-  
+
   // TODO make these private
   /**
    * @brief RBTree node that represents the start of the interval represented by
@@ -1139,11 +1094,11 @@ public:
 private:
   class InnerTree
       : public dyn_segtree_internal::ZBaseTree<InnerTree, Node, NodeTraits,
-                                                InnerNode, Tag> {
+                                               InnerNode, Tag> {
   public:
     using BaseTree =
         dyn_segtree_internal::ZBaseTree<InnerTree, Node, NodeTraits, InnerNode,
-                                         Tag>;
+                                        Tag>;
 
     using BaseTree::BaseTree;
 
@@ -1195,7 +1150,7 @@ public:
    * @param 		x The point to query for
    * @return 		The aggregated value for all intervals containing x
    */
-  AggValueT query(const typename Node::KeyT & x);
+  AggValueT query(const typename Node::KeyT & x) const noexcept;
 
   template <class Combiner>
   Combiner get_combiner() const;
@@ -1309,6 +1264,8 @@ public:
   /*
    * DEBUGGING
    */
+  void dbg_verify() const;
+
   template <class Combiner>
   void dbg_verify_max_combiner() const;
 
@@ -1342,6 +1299,8 @@ private:
   void unapply_interval(Node & n);
 
   InnerTree t;
+
+  void dbg_verify_all_points() const;
 };
 
 } // namespace ygg

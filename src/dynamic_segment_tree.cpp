@@ -61,6 +61,9 @@ InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners,
   return this->container;
 }
 
+/***************************************************
+ * Node traits (i.e., callbacks) for the RBTree case
+ ***************************************************/
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 void
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::leaf_inserted(
@@ -176,6 +179,235 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(
   InnerTree::rebuild_combiners_at(old_descendant_partner);
 }
 
+/***************************************************
+ * Node traits (i.e., callbacks) for the Zip Tree case
+ ***************************************************/
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::init_zipping(
+    InnerNode * to_be_deleted) noexcept
+{
+  left_accumulated = to_be_deleted->agg_left;
+  right_accumulated = to_be_deleted->agg_right;
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::delete_without_zipping(
+    InnerNode * to_be_deleted) noexcept
+{
+  if (to_be_deleted->get_parent() != nullptr) {
+    InnerNode * parent = to_be_deleted->get_parent();
+    if (parent->get_left() == to_be_deleted) {
+      parent->agg_left += to_be_deleted->agg_left;
+    } else {
+      // TODO remove assert
+      assert(parent->get_right() == to_be_deleted);
+      parent->agg_right += to_be_deleted->agg_left;
+    }
+  }
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::before_zip_from_left(
+    InnerNode * left_head) noexcept
+{
+  left_head->agg_left += left_accumulated;
+  left_accumulated += left_head->agg_right;
+  left_head->agg_right = AggValueT();
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::before_zip_from_right(
+    InnerNode * right_head) noexcept
+{
+  right_head->agg_right += right_accumulated;
+  right_accumulated += right_head->agg_left;
+  right_head->agg_left = AggValueT();
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::
+    zipping_ended_left_without_tree(InnerNode * prev_left_head) noexcept
+{
+  prev_left_head->agg_right = left_accumulated;
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::
+    zipping_ended_right_without_tree(InnerNode * prev_right_head) noexcept
+{
+  prev_right_head->agg_left = right_accumulated;
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::before_zip_tree_from_left(
+    InnerNode * left_head) noexcept
+{
+  left_head->agg_left += left_accumulated;
+  left_head->agg_right += left_accumulated;
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::before_zip_tree_from_right(
+    InnerNode * right_head) noexcept
+{
+  right_head->agg_left += right_accumulated;
+  right_head->agg_right += right_accumulated;
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::zipping_done(
+    InnerNode * head, InnerNode * tail) noexcept
+{
+  while (tail != head) {
+    // TODO only iterate up if there are any combiners that must be rebuilt!
+    InnerTree::rebuild_combiners_at(tail);
+    tail = tail->get_parent();
+  }
+
+  // Head also needs to be rebuilt.
+  InnerTree::rebuild_combiners_at(head);
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::init_unzipping(
+    InnerNode * to_be_inserted) noexcept
+{
+  unzip_left_last = to_be_inserted;
+  unzip_right_last = to_be_inserted;
+  unzip_left_first = true;
+  unzip_right_first = true;
+  left_accumulated = AggValueT();
+  right_accumulated = AggValueT();
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::unzip_to_left(
+    InnerNode * n) noexcept
+{
+  if (unzip_left_first) {
+    unzip_left_last->agg_left = left_accumulated;
+    unzip_left_first = false;
+  } else {
+    unzip_left_last->agg_right = left_accumulated;
+  }
+  left_accumulated = n->agg_right;
+  right_accumulated += n->agg_right;
+  unzip_left_last = n;
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::unzip_to_right(
+    InnerNode * n) noexcept
+{
+  if (unzip_right_first) {
+    unzip_right_last->agg_right = right_accumulated;
+    unzip_right_first = false;
+  } else {
+    unzip_right_last->agg_left = right_accumulated;
+  }
+  right_accumulated = n->agg_left;
+  left_accumulated += n->agg_left;
+  unzip_right_last = n;
+}
+
+template <class InnerTree, class InnerNode, class AggValueT>
+void
+InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::unzip_done(
+    InnerNode * unzip_root, InnerNode * left_spine_end,
+    InnerNode * right_spine_end) noexcept
+{
+  /* Add final accumulated things */
+  /* Both the end of the left and right spines agg_right / agg_left
+   * have been added up in left_accumulated / right_accumulated,
+   * we can set instead of add. */
+  if (left_spine_end == unzip_root) {
+    left_spine_end->agg_left = left_accumulated;
+  } else {
+    left_spine_end->agg_right = left_accumulated;
+  }
+  if (right_spine_end == unzip_root) {
+    right_spine_end->agg_right = right_accumulated;
+  } else {
+    right_spine_end->agg_left = right_accumulated;
+  }
+
+  /* Rebuild left spine */
+  InnerNode * n = left_spine_end;
+
+  decltype(n->combiners) * cmb_left = nullptr;
+  if (n->get_left() != nullptr) {
+    cmb_left = &n->get_left()->combiners;
+  }
+  decltype(n->combiners) * cmb_right = nullptr;
+  if (n->get_right() != nullptr) {
+    cmb_right = &n->get_right()->combiners;
+  }
+
+  while (n != unzip_root) {
+    n->InnerNode::combiners.rebuild(n->get_point(), cmb_left, n->agg_left,
+                                    cmb_right, n->agg_right);
+
+    n = n->get_parent();
+    if (n->get_left() != nullptr) {
+      cmb_left = &n->get_left()->combiners;
+    } else {
+      cmb_left = nullptr;
+    }
+    if (n->get_right() != nullptr) {
+      cmb_right = &n->get_right()->combiners;
+    } else {
+      cmb_right = nullptr;
+    }
+  }
+
+  /* Rebuild right spine */
+  n = right_spine_end;
+  cmb_left = nullptr;
+  if (n->get_left() != nullptr) {
+    cmb_left = &n->get_left()->combiners;
+  }
+  cmb_right = nullptr;
+  if (n->get_right() != nullptr) {
+    cmb_right = &n->get_right()->combiners;
+  }
+
+  while (n != unzip_root) {
+    n->InnerNode::combiners.rebuild(n->get_point(), cmb_left, n->agg_left,
+                                    cmb_right, n->agg_right);
+
+    n = n->get_parent();
+    if (n->get_left() != nullptr) {
+      cmb_left = &n->get_left()->combiners;
+    } else {
+      cmb_left = nullptr;
+    }
+    if (n->get_right() != nullptr) {
+      cmb_right = &n->get_right()->combiners;
+    } else {
+      cmb_right = nullptr;
+    }
+  }
+
+  /* Rebuild recursively from the root up */
+  InnerTree::rebuild_combiners_recursively(unzip_root);
+}
+
+/***************************************************
+ * End of node traits
+ ***************************************************/
+
 } // namespace dyn_segtree_internal
 
 template <class Node, class NodeTraits, class Combiners, class Options,
@@ -238,7 +470,6 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::remove(
     Node & n)
 {
   this->unapply_interval(n);
-
   this->t.remove(n.NB::start);
   this->t.remove(n.NB::end);
 }
@@ -389,9 +620,90 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::empty() const
 
 template <class Node, class NodeTraits, class Combiners, class Options,
           class Tag>
+void
+DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
+                       Tag>::dbg_verify_all_points() const
+{
+  using Point = std::pair<typename Node::KeyT, typename Node::AggValueT>;
+
+  std::set<const Node *> nodes;
+  std::vector<const Node *> starts;
+  std::vector<const Node *> ends;
+  std::vector<Point> points;
+
+  for (auto & n : this->t) {
+    const Node * node = static_cast<const Node *>(n.get_interval());
+    if (nodes.find(node) == nodes.end()) {
+      nodes.insert(node);
+      starts.push_back(node);
+      ends.push_back(node);
+    }
+  }
+
+  std::sort(starts.begin(), starts.end(),
+            [](const Node * lhs, const Node * rhs) {
+              return lhs->start.get_point() > rhs->start.get_point();
+            });
+  std::sort(ends.begin(), ends.end(), [](const Node * lhs, const Node * rhs) {
+    return lhs->end.get_point() > rhs->end.get_point();
+  });
+
+  KeyT last_point = starts.back()->start.get_point();
+  AggValueT last_val = AggValueT();
+  while ((!starts.empty()) || (!ends.empty())) {
+    KeyT new_point;
+    AggValueT delta;
+    if ((!ends.empty()) &&
+        ((starts.empty()) ||
+         (ends.back()->end.get_point() <= starts.back()->start.get_point()))) {
+      new_point = ends.back()->end.get_point();
+      delta = -1 * NodeTraits::get_value(*ends.back());
+      ends.pop_back();
+    } else {
+      new_point = starts.back()->start.get_point();
+      delta = NodeTraits::get_value(*starts.back());
+      starts.pop_back();
+    }
+
+    if (new_point > last_point) {
+      points.emplace_back(last_point, last_val);
+      KeyT point_between = (last_point + new_point) / 2;
+      if ((point_between != last_point) && (point_between != new_point)) {
+	points.emplace_back(point_between, last_val);
+      }
+    }
+
+    last_val += delta;
+    last_point = new_point;
+  }
+
+  AggValueT epsilon = 0;
+  if (!std::numeric_limits<AggValueT>::is_integer) { // TODO should be if
+                                                     // constexpr
+    epsilon = 0.0001;
+  }
+
+  for (const auto & point : points) {
+    auto result = this->query(point.first);
+    assert(result <= point.second + epsilon);
+    assert(result >= point.second - epsilon);
+  }
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options,
+          class Tag>
+void
+DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::dbg_verify()
+    const
+{
+  this->dbg_verify_all_points();
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options,
+          class Tag>
 typename Node::AggValueT
 DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::query(
-    const typename Node::KeyT & x)
+    const typename Node::KeyT & x) const noexcept
 {
   InnerNode * cur = this->t.get_root();
   AggValueT agg = AggValueT();
@@ -810,20 +1122,41 @@ void
 DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
                        Tag>::dbg_verify_max_combiner() const
 {
+  typename Node::AggValueT max_val{};
+  typename Node::AggValueT delta{};
+  // TODO FIXME this breaks for non-numeric types
+  if (!std::numeric_limits<typename Node::AggValueT>::is_integer) {
+    delta = 0.000001;
+  }
+
   for (auto & node : this->t) {
     if (node.get_left() != nullptr) {
       auto left_child = node.get_left();
-      assert(node.combiners.template get<Combiner>() >=
+      max_val =
+          std::max(max_val, left_child->combiners.template get<Combiner>() +
+                                node.agg_left);
+      assert(node.combiners.template get<Combiner>() + delta >=
              left_child->combiners.template get<Combiner>() + node.agg_left);
       (void)left_child; // GCC complains about the variable not being used
+    } else {
+      max_val = std::max(max_val, node.agg_left);
+      assert(node.combiners.template get<Combiner>() + delta >= node.agg_left);
     }
 
     if (node.get_right() != nullptr) {
       auto right_child = node.get_right();
-      assert(node.combiners.template get<Combiner>() >=
+      max_val =
+          std::max(max_val, right_child->combiners.template get<Combiner>() +
+                                node.agg_right);
+      assert(node.combiners.template get<Combiner>() + delta >=
              right_child->combiners.template get<Combiner>() + node.agg_right);
       (void)right_child;
+    } else {
+      assert(node.combiners.template get<Combiner>() + delta >= node.agg_right);
+      max_val = std::max(max_val, node.agg_right);
     }
+
+    assert(node.combiners.template get<Combiner>() - delta <= max_val);
   }
 }
 

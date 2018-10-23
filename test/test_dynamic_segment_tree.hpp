@@ -22,13 +22,13 @@ namespace dynamic_segment_tree {
 using namespace boost::icl;
 using namespace ygg;
 
-constexpr int DYNSEGTREE_TESTSIZE = 3000;
+constexpr int DYNSEGTREE_TESTSIZE = 5000;
 constexpr int DYNSEGTREE_COMPREHENSIVE_TESTSIZE = 500;
-constexpr int DYNSEGTREE_DELETION_TESTSIZE = 500;
-constexpr int DYNSEGTREE_DELETION_ITERATIONS = 100;
+constexpr int DYNSEGTREE_DELETION_TESTSIZE = 100;
+constexpr int DYNSEGTREE_DELETION_ITERATIONS = 10;
 
 // chosen by fair xkcd
-constexpr int DYNSEGTREE_SEED = 4;
+constexpr int DYNSEGTREE_SEED = 9;
 
 using MCombiner = MaxCombiner<int, int>;
 using RMCombiner = RangedMaxCombiner<int, int>;
@@ -263,6 +263,7 @@ TEST(DynSegTreeTest, DeletionTest)
 
     for (unsigned int i = 0; i < DYNSEGTREE_DELETION_TESTSIZE; ++i) {
       auto val = agg.query((int)i);
+
       if ((i >= lower) && (i < upper)) {
 	ASSERT_EQ(val, i + 1 + 42);
       } else {
@@ -296,19 +297,19 @@ TEST(DynSegTreeTest, DeletionTest)
   }
 }
 
-TEST(DynSegTreeTest, NestingTestInsertionOverlappingDeletionTest)
+TEST(DynSegTreeTest, NestingInsertionOverlappingDeletionTest)
 {
   Node n[DYNSEGTREE_TESTSIZE];
   for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-    n[i].lower = (int)i;
-    n[i].upper = (int)(2 * DYNSEGTREE_TESTSIZE - i + 1);
+    n[i].lower = 10 * (int)i;
+    n[i].upper = 10 * (int)(2 * DYNSEGTREE_TESTSIZE - i + 1);
     n[i].value = 1;
   }
 
   Node transient[DYNSEGTREE_TESTSIZE];
   for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-    transient[i].lower = (int)i;
-    transient[i].upper = (int)(DYNSEGTREE_TESTSIZE + i);
+    transient[i].lower = 10 * (int)i;
+    transient[i].upper = 10 * (int)(DYNSEGTREE_TESTSIZE + i);
     transient[i].value = 10;
   }
 
@@ -317,24 +318,19 @@ TEST(DynSegTreeTest, NestingTestInsertionOverlappingDeletionTest)
   for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
     agg.insert(n[i]);
     agg.insert(transient[DYNSEGTREE_TESTSIZE - i - 1]);
+    agg.dbg_verify();
   }
 
-  auto val = agg.query((int)1);
-  ASSERT_EQ(val, 22);
+  auto val = agg.query((int)0);
+  ASSERT_EQ(val, 11);
 
-  agg.remove(transient[0]);
-  val = agg.query(1);
-  ASSERT_EQ(val, 12);
-  agg.remove(transient[1]);
-  val = agg.query(1);
-  ASSERT_EQ(val, 2);
-
-  for (unsigned int i = 2; i < DYNSEGTREE_TESTSIZE; ++i) {
+  for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
     agg.remove(transient[i]);
+    agg.dbg_verify();
   }
 
   for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-    val = agg.query((int)i);
+    val = agg.query((int)10 * i);
     ASSERT_EQ(val, i + 1);
   }
 }
@@ -394,7 +390,7 @@ TEST(DynSegTreeTest, ComprehensiveTest)
 {
   Node persistent_nodes[DYNSEGTREE_TESTSIZE];
   std::vector<unsigned int> indices;
-  std::mt19937 rng(DYNSEGTREE_SEED);
+  std::mt19937 rng(DYNSEGTREE_SEED + repetition);
 
   DynSegTree agg;
 
@@ -424,6 +420,7 @@ TEST(DynSegTreeTest, ComprehensiveTest)
 
   for (auto index : indices) {
     agg.insert(transient_nodes[index]);
+    agg.dbg_verify_max_combiner<MCombiner>();
   }
 
   std::shuffle(indices.begin(), indices.end(),
@@ -431,8 +428,8 @@ TEST(DynSegTreeTest, ComprehensiveTest)
 
   for (auto index : indices) {
     agg.insert(persistent_nodes[index]);
+    agg.dbg_verify_max_combiner<MCombiner>();
   }
-  agg.dbg_verify_max_combiner<MCombiner>();
 
   std::shuffle(indices.begin(), indices.end(),
                ygg::testing::utilities::Randomizer(4));
@@ -440,6 +437,8 @@ TEST(DynSegTreeTest, ComprehensiveTest)
   for (auto index : indices) {
     agg.remove(transient_nodes[index]);
   }
+
+  agg.dbg_verify();
   agg.dbg_verify_max_combiner<MCombiner>();
 
   // Reference data structure
@@ -470,6 +469,7 @@ TEST(DynSegTreeTest, ComprehensiveTest)
   int combined = agg.get_combined<MCombiner>();
   ASSERT_EQ(combined, maxval);
 }
+} // namespace dynamic_segment_tree
 
 TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 {
@@ -755,8 +755,8 @@ TEST(RangedMaxCombinerTest, NestingTest)
   }
 }
 
-} // namespace dynamic_segment_tree
 } // namespace testing
+} // namespace ygg
 } // namespace ygg
 
 #endif // YGG_TEST_INTERVAL_AGGREGATOR_HPP

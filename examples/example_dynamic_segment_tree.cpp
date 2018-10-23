@@ -109,7 +109,7 @@ main(int argc, char ** argv)
     t.insert(interval);
   }
 
-  /* Let's see what the aggregate value at the points 0, 0.5, 5, 10 and 15 is:
+  /* Let's see what the aggregate value at the points 0, 0.5, 5, 10, 14 and 15 is:
    */
   for (auto point : std::vector<double>{0, 0.5, 5, 10, 14, 15}) {
     std::cout << "Point: " << point << "\t| Aggregate Value: " << t.query(point)
@@ -117,11 +117,12 @@ main(int argc, char ** argv)
   }
 
   /* Should output:
-   * Point: 0	  | Aggregate Value: 1
-   * Point: 0.5	| Aggregate Value: 3
-   * Point: 5	  | Aggregate Value: 3
-   * Point: 10	| Aggregate Value: 3
-   * Point: 15	| Aggregate Value: 8
+   * Point: 0     | Aggregate Value: 1
+   * Point: 0.5	  | Aggregate Value: 3
+   * Point: 5     | Aggregate Value: 3
+   * Point: 10    | Aggregate Value: 3
+   * Point: 14	  | Aggregate Value: 11
+   * Point: 15	  | Aggregate Value: 8
    * */
 
   std::cout << "\n==============================\n\n";
