@@ -390,7 +390,7 @@ TEST(DynSegTreeTest, ComprehensiveTest)
 {
   Node persistent_nodes[DYNSEGTREE_TESTSIZE];
   std::vector<unsigned int> indices;
-  std::mt19937 rng(DYNSEGTREE_SEED + repetition);
+  std::mt19937 rng(DYNSEGTREE_SEED);
 
   DynSegTree agg;
 
@@ -469,7 +469,6 @@ TEST(DynSegTreeTest, ComprehensiveTest)
   int combined = agg.get_combined<MCombiner>();
   ASSERT_EQ(combined, maxval);
 }
-} // namespace dynamic_segment_tree
 
 TEST(DynSegTreeTest, ComprehensiveCombinerTest)
 {
