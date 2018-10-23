@@ -728,8 +728,6 @@ TEST(__DST_BASENAME(RangedMaxCombinerTest), NestingTest)
   ASSERT_EQ(combiner.get_right_border(),
             2 * DYNSEGTREE_TESTSIZE - (DYNSEGTREE_TESTSIZE - 1) + 1);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
   for (unsigned int i = 0; i < (unsigned int)DYNSEGTREE_TESTSIZE - 1u; ++i) {
     combiner = agg.get_combiner<RMCombiner>((int)i, (int)(i + 1), true, false);
     ASSERT_EQ(combiner.get(), i + 1);
@@ -741,7 +739,6 @@ TEST(__DST_BASENAME(RangedMaxCombinerTest), NestingTest)
     ASSERT_EQ(combiner.get_left_border(), i + 1);
     ASSERT_TRUE(combiner.get_right_border() >= (int)(i + 1));
   }
-#pragma GCC diagnostic pop
 }
 
 } // namespace dynamic_segment_tree
