@@ -411,20 +411,20 @@ InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::unzip_done(
 } // namespace dyn_segtree_internal
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::dbg_print_inner_tree() const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::dbg_print_inner_tree() const
 {
   TreePrinter tp(this->t.get_root(), NodeNameGetter());
   tp.print();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 std::stringstream &
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::dbg_get_dot()
-    const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::dbg_get_dot() const
 {
   TreeDotExporter tdot(
       this->t.get_root(), DotNameGetter(),
@@ -433,10 +433,10 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::dbg_get_dot()
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::insert(
-    Node & n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::insert(Node & n)
 {
   // TODO why are we doing this every time? Should be done once in the
   // constructor!
@@ -464,10 +464,10 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::insert(
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::remove(
-    Node & n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::remove(Node & n)
 {
   this->unapply_interval(n);
   this->t.remove(n.NB::start);
@@ -475,12 +475,12 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::remove(
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::InnerTree::Contour
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::InnerTree::find_lca(InnerNode * left,
-                                                 InnerNode * right)
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::InnerTree::Contour
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::InnerTree::find_lca(InnerNode * left,
+                                             InnerNode * right)
 {
   // TODO speed this up when nodes can be mapped to integers
   // TODO nonsense! Put a flag into the nodes!
@@ -552,31 +552,31 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::apply_interval(Node & n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::apply_interval(Node & n)
 {
   InnerTree::modify_contour(&n.NB::start, &n.NB::end, NodeTraits::get_value(n));
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::unapply_interval(Node & n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::unapply_interval(Node & n)
 {
   InnerTree::modify_contour(&n.NB::start, &n.NB::end,
                             -1 * NodeTraits::get_value(n));
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::InnerTree::modify_contour(InnerNode * left,
-                                                       InnerNode * right,
-                                                       ValueT val)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::InnerTree::modify_contour(InnerNode * left,
+                                                   InnerNode * right,
+                                                   ValueT val)
 {
   std::vector<InnerNode *> left_contour;
   std::vector<InnerNode *> right_contour;
@@ -611,18 +611,19 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 bool
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::empty() const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::empty() const
 {
   return this->t.empty();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::dbg_verify_all_points() const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::dbg_verify_all_points() const
 {
   using Point = std::pair<typename Node::KeyT, typename Node::AggValueT>;
 
@@ -691,19 +692,19 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::dbg_verify()
-    const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::dbg_verify() const
 {
   this->dbg_verify_all_points();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 typename Node::AggValueT
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::query(
-    const typename Node::KeyT & x) const noexcept
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::query(const typename Node::KeyT & x) const noexcept
 {
   InnerNode * cur = this->t.get_root();
   AggValueT agg = AggValueT();
@@ -724,12 +725,14 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::query(
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 template <class Combiner>
 Combiner
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(
-    const typename Node::KeyT & lower, const typename Node::KeyT & upper,
-    bool lower_closed, bool upper_closed) const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::get_combiner(const typename Node::KeyT & lower,
+                                      const typename Node::KeyT & upper,
+                                      bool lower_closed,
+                                      bool upper_closed) const
 {
   dyn_segtree_internal::Compare<InnerNode> cmp;
 
@@ -874,22 +877,24 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::get_combiner(
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 template <class Combiner>
 typename Combiner::ValueT
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::get_combined(
-    const typename Node::KeyT & lower, const typename Node::KeyT & upper,
-    bool lower_closed, bool upper_closed) const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::get_combined(const typename Node::KeyT & lower,
+                                      const typename Node::KeyT & upper,
+                                      bool lower_closed,
+                                      bool upper_closed) const
 {
   return this->get_combiner<Combiner>(lower, upper, lower_closed, upper_closed)
       .get();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 bool
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::InnerTree::rebuild_combiners_at(InnerNode * n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::InnerTree::rebuild_combiners_at(InnerNode * n)
 {
   Combiners * cmb_left = nullptr;
   if (n->get_left() != nullptr) {
@@ -905,10 +910,10 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
-    rebuild_combiners_recursively(InnerNode * n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::InnerTree::rebuild_combiners_recursively(InnerNode * n)
 {
   Combiners * cmb_left = nullptr;
   if (n->get_left() != nullptr) {
@@ -941,162 +946,171 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::InnerTree::
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::cbegin()
-    const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::cbegin() const
 {
   return this->t.cbegin();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::cend() const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::cend() const
 {
   return this->t.cend();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::begin() const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::begin() const
 {
   return this->t.begin();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::begin()
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::begin()
 {
   return this->t.begin();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::end()
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::end()
 {
   return this->t.end();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::end() const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::end() const
 {
   return this->t.end();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<true>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::crbegin()
-    const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::crbegin() const
 {
   return this->t.crbegin();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<true>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::crend() const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::crend() const
 {
   return this->t.crend();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<true>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::rbegin()
-    const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::rbegin() const
 {
   return this->t.rbegin();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template iterator<true>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::rbegin()
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::rbegin()
 {
   return this->t.rbegin();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template iterator<true>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::rend()
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::rend()
 {
   return this->t.rend();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<true>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>::rend() const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<true>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::rend() const
 {
   return this->t.rend();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::lower_bound_event(const KeyT & key) const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::lower_bound_event(const KeyT & key) const
 {
   return this->t.lower_bound(key);
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::lower_bound_event(const KeyT & key)
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::lower_bound_event(const KeyT & key)
 {
   return this->t.lower_bound(key);
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template const_iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::upper_bound_event(const KeyT & key) const
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template const_iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::upper_bound_event(const KeyT & key) const
 {
   return this->t.upper_bound(key);
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-typename DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                                Tag>::template iterator<false>
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::upper_bound_event(const KeyT & key)
+          class TreeSelector, class Tag>
+typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                            Tag>::template iterator<false>
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::upper_bound_event(const KeyT & key)
 {
   return this->t.upper_bound(key);
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 template <class Combiner>
 Combiner
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::get_combiner() const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::get_combiner() const
 {
   if (this->t.get_root() == nullptr) {
     return Combiner();
@@ -1106,21 +1120,21 @@ DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 template <class Combiner>
 typename Combiner::ValueT
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::get_combined() const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::get_combined() const
 {
   return this->get_combiner<Combiner>().get();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
+          class TreeSelector, class Tag>
 template <class Combiner>
 void
-DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options,
-                       Tag>::dbg_verify_max_combiner() const
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::dbg_verify_max_combiner() const
 {
   typename Node::AggValueT max_val{};
   typename Node::AggValueT delta{};

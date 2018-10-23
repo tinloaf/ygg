@@ -16,8 +16,8 @@ namespace ygg {
 
 // Forwards
 template <class Node, class NodeTraits, class Combiners, class Options,
-          class Tag>
-class DynamicSegmentTreeBase;
+          class TreeSelector, class Tag>
+class DynamicSegmentTree;
 
 namespace dyn_segtree_internal {
 
@@ -42,42 +42,56 @@ class InnerZTTag {
 /********************************************
  * Base Class Definitions for RBTree
  ********************************************/
-template <class Tag>
-struct InnerNodeRBBaseBuilder
+struct UseRBTree
 {
-  template <class InnerNodeCRTP>
-  using Base =
-      RBTreeNodeBase<InnerNodeCRTP, TreeOptions<TreeFlags::MULTIPLE>, Tag>;
-};
+  template <class Tag>
+  struct InnerNodeBaseBuilder
+  {
+    template <class InnerNodeCRTP>
+    using Base =
+        RBTreeNodeBase<InnerNodeCRTP, TreeOptions<TreeFlags::MULTIPLE>, Tag>;
+  };
 
-template <class CRTP, class Node, class NodeTraits, class InnerNode, class Tag>
-using RBBaseTree = RBTree<
-    InnerNode,
-    dyn_segtree_internal::InnerRBNodeTraits<CRTP, InnerNode, Node, NodeTraits>,
-    TreeOptions<TreeFlags::MULTIPLE>, dyn_segtree_internal::InnerRBTTag<Tag>,
-    Compare<InnerNode>>;
+  template <class CRTP, class Node, class NodeTraits, class InnerNode,
+            class Tag>
+  using BaseTree =
+      RBTree<InnerNode,
+             dyn_segtree_internal::InnerRBNodeTraits<CRTP, InnerNode, Node,
+                                                     NodeTraits>,
+             TreeOptions<TreeFlags::MULTIPLE>,
+             dyn_segtree_internal::InnerRBTTag<Tag>, Compare<InnerNode>>;
+
+  template <class TagType>
+  using Tag = InnerRBTTag<TagType>;
+};
 
 /********************************************
  * Base Class Definitions for Zip Tree
  ********************************************/
-template <class Tag>
-struct InnerNodeZTBaseBuilder
+struct UseZipTree
 {
-  template <class InnerNodeCRTP>
-  using Base =
-      ZTreeNodeBase<InnerNodeCRTP,
-                    TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, Tag>;
+  template <class Tag>
+  struct InnerNodeBaseBuilder
+  {
+    template <class InnerNodeCRTP>
+    using Base =
+        ZTreeNodeBase<InnerNodeCRTP,
+                      TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, Tag>;
+  };
+
+  template <class CRTP, class Node, class NodeTraits, class InnerNode,
+            class Tag>
+  using BaseTree =
+      ZTree<InnerNode,
+            dyn_segtree_internal::InnerZNodeTraits<
+                CRTP, InnerNode, typename InnerNode::AggValueT>,
+            TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, // TODO make this
+                                                              // configurable?
+            dyn_segtree_internal::InnerZTTag<Tag>, Compare<InnerNode>>;
+
+  template <class TagType>
+  using Tag = InnerZTTag<TagType>;
 };
-
-template <class CRTP, class Node, class NodeTraits, class InnerNode, class Tag>
-using ZBaseTree =
-    ZTree<InnerNode,
-          dyn_segtree_internal::InnerZNodeTraits<CRTP, InnerNode,
-                                                 typename InnerNode::AggValueT>,
-          TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, // TODO make this
-                                                            // configurable?
-          dyn_segtree_internal::InnerZTTag<Tag>, Compare<InnerNode>>;
-
 /**
  * @brief Representation of either a start or an end of an interval
  *
@@ -162,8 +176,8 @@ private:
 
   // The tree and the node traits have full access to the nodes
   template <class FNode, class FNodeTraits, class FCombiners, class FOptions,
-            class FTag>
-  friend class ::ygg::DynamicSegmentTreeBase;
+            class TreeSelector, class FTag>
+  friend class ::ygg::DynamicSegmentTree;
   template <class FInnerTree, class FInnerNode, class FNode, class FNodeTraits>
   friend class InnerRBNodeTraits;
   template <class FInnerTree, class FInnerNode, class FAggValueT>
@@ -459,6 +473,9 @@ public:
 
 /// @endcond
 } // namespace dyn_segtree_internal
+
+using UseRBTree = dyn_segtree_internal::UseRBTree;
+using UseZipTree = dyn_segtree_internal::UseZipTree;
 
 /**
  * @brief A combiner that allows to retrieve the maximum value over any range
@@ -918,11 +935,15 @@ using EmptyCombinerPack = CombinerPack<KeyT, AggValueT>;
  * interval is associated with
  * @tparam AggValueType		The typo of an aggregate of multiple
  * ValueT_in's. See DOCTODO for details.
+ * @tparam TreeSelector               Specifies which balanced binary tree
+ * implementation to use for the underlying tree. Must be one of UseRBTree (to
+ * use the red-black tree) or UseZipTree (to use the zip tree). You need to
+ * specify the same selector at the DynamicSegmentTree!
  * @tparam Tag 						The tag used to identify
  * the tree that this node should be inserted into. See RBTree for details.
  */
 template <class KeyType, class ValueType, class AggValueType, class Combiners,
-          class Tag = int>
+          class TreeSelector = UseRBTree, class Tag = int>
 class DynSegTreeNodeBase {
   // TODO why is all of this public?
 public:
@@ -930,8 +951,8 @@ public:
   using KeyT = KeyType;
   using ValueT = ValueType;
   using AggValueT = AggValueType;
-  using my_type =
-      DynSegTreeNodeBase<KeyType, ValueType, AggValueType, Combiners, Tag>;
+  using my_type = DynSegTreeNodeBase<KeyType, ValueType, AggValueType,
+                                     Combiners, TreeSelector, Tag>;
 
   /*
   using InnerNode = dyn_segtree_internal::InnerNode<
@@ -939,9 +960,16 @@ public:
           dyn_segtree_internal::InnerRBTTag<Tag>>::template Base,
       my_type, KeyT, ValueT, AggValueT, Combiners, Tag>;
   */
+  /*
   using InnerNode = dyn_segtree_internal::InnerNode<
       dyn_segtree_internal::InnerNodeZTBaseBuilder<
           dyn_segtree_internal::InnerZTTag<Tag>>::template Base,
+      my_type, KeyT, ValueT, AggValueT, Combiners, Tag>;
+
+  */
+  using InnerNode = dyn_segtree_internal::InnerNode<
+      TreeSelector::template InnerNodeBaseBuilder<
+          typename TreeSelector::template Tag<Tag>>::template Base,
       my_type, KeyT, ValueT, AggValueT, Combiners, Tag>;
 
   // TODO make these private
@@ -1062,6 +1090,10 @@ public:
  * derived from DynSegTreeNodeTraits
  * @tparam Options			Options for this tree. See DOCTODO for
  * details.
+ * @tparam TreeSelector               Specifies which balanced binary tree
+ * implementation to use for the underlying tree. Must be one of UseRBTree (to
+ * use the red-black tree) or UseZipTree (to use the zip tree). You need to
+ * specify the same selector at the DynSegTreeNodeBase!
  * @tparam Tag					The tag of this tree. Allows to
  * insert the same node in multiple dynamic segment trees. See DOCTODO for
  * details.
@@ -1070,13 +1102,15 @@ public:
 
 // TODO constant-time size
 template <class Node, class NodeTraits, class Combiners,
-          class Options = DefaultOptions, class Tag = int>
-class DynamicSegmentTreeBase {
+          class Options = DefaultOptions, class TreeSelector = UseRBTree,
+          class Tag = int>
+class DynamicSegmentTree {
   // TODO add a static assert that checks that the types in all combiners are
   // right
 private:
   using NB = DynSegTreeNodeBase<typename Node::KeyT, typename Node::ValueT,
-                                typename Node::AggValueT, Combiners, Tag>;
+                                typename Node::AggValueT, Combiners,
+                                TreeSelector, Tag>;
   using InnerNode = typename NB::InnerNode;
 
   static_assert(std::is_base_of<DynSegTreeNodeTraits<Node>, NodeTraits>::value,
@@ -1093,12 +1127,12 @@ public:
 
 private:
   class InnerTree
-      : public dyn_segtree_internal::ZBaseTree<InnerTree, Node, NodeTraits,
+      : public TreeSelector::template BaseTree<InnerTree, Node, NodeTraits,
                                                InnerNode, Tag> {
   public:
     using BaseTree =
-        dyn_segtree_internal::ZBaseTree<InnerTree, Node, NodeTraits, InnerNode,
-                                        Tag>;
+        typename TreeSelector::template BaseTree<InnerTree, Node, NodeTraits,
+                                                 InnerNode, Tag>;
 
     using BaseTree::BaseTree;
 
@@ -1308,11 +1342,12 @@ private:
 #include "dynamic_segment_tree.cpp"
 
 namespace ygg {
-
+/*
 template <class Node, class NodeTraits, class Combiners,
-          class Options = DefaultOptions, class Tag = int>
+        class Options = DefaultOptions, class Tag = int>
 using DynamicSegmentTree =
-    DynamicSegmentTreeBase<Node, NodeTraits, Combiners, Options, Tag>;
+  DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>;
+*/
 } // namespace ygg
 
 #endif // YGG_DYNAMIC_SEGMENT_TREE_HPP
