@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['upper_5fbound',['upper_bound',['../classygg_1_1RBTree.html#ae68e9b9f51f8f703afb863f46bf89675',1,'ygg::RBTree']]]
+  ['ztree',['ZTree',['../classygg_1_1ZTree.html#a25fefa2b8b8e1571686760de65acdc2c',1,'ygg::ZTree']]]
 ];

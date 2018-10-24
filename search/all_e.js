@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['startpage',['Startpage',['../md_pages_Startpage.html',1,'']]],
-  ['size',['size',['../classygg_1_1RBTree.html#aedcdfba7b385f7c1e9f665d1807a31a5',1,'ygg::RBTree::size()'],['../classygg_1_1List.html#a39da3aa6be68e1db0a412b0ff959b068',1,'ygg::List::size()']]]
+  ['size',['size',['../classygg_1_1RBTree.html#a4a6da8985ca8b0e3846f9d73a2d38315',1,'ygg::RBTree::size()'],['../classygg_1_1List.html#ac7c43af07f924a7b8e985e0fce77b940',1,'ygg::List::size()'],['../classygg_1_1ZTree.html#a843c94db6110457283c9a8b35e6d365a',1,'ygg::ZTree::size()']]]
 ];
