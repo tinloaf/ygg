@@ -15,6 +15,7 @@ template <class Node, class Options = DefaultOptions, class Tag = int>
 class ZTreeNodeBase;
 
 namespace ztree_internal {
+/// @cond INTERNAL
 
 template <class Tree, bool enable>
 struct dbg_verify_size_helper
@@ -165,7 +166,7 @@ class ZTreeRankFromHash<Node, Options, false, false> {
   static_assert(!std::is_class<Node>::value || std::is_class<Node>::value,
                 "If rank-by-hash is not used, ranks must be stored.");
 };
-
+/// @endcond
 } // namespace ztree_internal
 
 /**

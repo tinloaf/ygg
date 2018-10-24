@@ -12,6 +12,12 @@ using namespace ygg;
 using MCombiner = RangedMaxCombiner<double, int>;
 using Combiners = CombinerPack<double, int, MCombiner>;
 
+/* You can select whether to use a red-black tree or a zip tree as basis for
+ * the dynamic segment tree. By default, a red-black tree is used. However, in
+ * some situations, a zip tree is faster. Let's use the zip tree!
+ */
+using TreeSelector = UseZipTree;
+
 /* The class representing our intervals and associated values.
  *
  * Our key space (i.e., the borders of the intervals) will be double.
@@ -22,7 +28,8 @@ using Combiners = CombinerPack<double, int, MCombiner>;
  *
  *
  */
-class Interval : public DynSegTreeNodeBase<double, int, int, Combiners> {
+class Interval
+    : public DynSegTreeNodeBase<double, int, int, Combiners, TreeSelector> {
 public:
   double lower; // lower interval border
   double upper; // upper interval border
@@ -80,7 +87,8 @@ public:
 
 /* This is our DynamicSegmentTree
  */
-using MyTree = DynamicSegmentTree<Interval, IntervalTraits, Combiners>;
+using MyTree = DynamicSegmentTree<Interval, IntervalTraits, Combiners,
+                                  DefaultOptions, TreeSelector>;
 
 int
 main(int argc, char ** argv)
@@ -109,7 +117,8 @@ main(int argc, char ** argv)
     t.insert(interval);
   }
 
-  /* Let's see what the aggregate value at the points 0, 0.5, 5, 10, 14 and 15 is:
+  /* Let's see what the aggregate value at the points 0, 0.5, 5, 10, 14 and 15
+   * is:
    */
   for (auto point : std::vector<double>{0, 0.5, 5, 10, 14, 15}) {
     std::cout << "Point: " << point << "\t| Aggregate Value: " << t.query(point)

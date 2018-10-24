@@ -21,6 +21,8 @@ class DynamicSegmentTree;
 
 namespace dyn_segtree_internal {
 
+/// @cond INTERNAL
+
 // Forwards
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 class InnerRBNodeTraits;
@@ -29,7 +31,6 @@ class Compare;
 template <class InnerTree, class InnerNode, class AggValueT>
 class InnerZNodeTraits;
 
-/// @cond INTERNAL
 template <class Tag>
 class InnerRBTTag {
 };
@@ -37,7 +38,6 @@ class InnerRBTTag {
 template <class Tag>
 class InnerZTTag {
 };
-/// @endcond
 
 /********************************************
  * Base Class Definitions for RBTree
@@ -92,6 +92,9 @@ struct UseZipTree
   template <class TagType>
   using Tag = InnerZTTag<TagType>;
 };
+
+/// @endcond
+
 /**
  * @brief Representation of either a start or an end of an interval
  *
@@ -190,6 +193,8 @@ private:
   friend class DOTInnerNodeNameGette;
 };
 
+/// @cond INTERNAL
+  
 template <class InnerTree, class InnerNode, class AggValueT>
 class InnerZNodeTraits { // TODO inherit from default traits?
 public:
@@ -227,7 +232,6 @@ public:
                   InnerNode * right_spine_end) noexcept;
 };
 
-/// @cond INTERNAL
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 class InnerRBNodeTraits : public RBDefaultNodeTraits<InnerNode> {
 public:
@@ -474,8 +478,26 @@ public:
 /// @endcond
 } // namespace dyn_segtree_internal
 
-using UseRBTree = dyn_segtree_internal::UseRBTree;
-using UseZipTree = dyn_segtree_internal::UseZipTree;
+/**
+ * @brief Class used to select the red-black tree as underlying tree for the
+ * DynamicSegmentTree
+ *
+ * Use this class as the TreeSelector template parameter of the
+ * DynamicSegmentTree to chose a red-black tree (an RBTree) as underlying tree
+ * for the DynamicSegmentTree.
+ */
+class UseRBTree : public dyn_segtree_internal::UseRBTree {
+};
+
+/**
+ * @brief Class used to select the Zip Tree tree as underlying tree for the
+ * DynamicSegmentTree
+ *
+ * Use this class as the TreeSelector template parameter of the
+ * DynamicSegmentTree to chose a ZipTree (an ZTree) as underlying tree for the
+ * DynamicSegmentTree.
+ */
+class UseZipTree : public dyn_segtree_internal::UseZipTree {};
 
 /**
  * @brief A combiner that allows to retrieve the maximum value over any range
@@ -1081,6 +1103,12 @@ public:
  * where n is the number of intervals in the dynamic segment tree and A is the
  * time it takes to aggregate a value, i.e., compute operator+(AggValueT,
  * ValueT).
+ *
+ * The DynamicSegmentTree can be based either on a red-black tree (the RBTree),
+ * or on a Zip Tree (the ZTree). By default, the red-black tree is used.
+ * However, especially for applications where segments are moved frequently, the
+ * Zip Tree has proven to be more efficient. You select the underlying tree via
+ * the TreeSelector template parameter.
  *
  * DOCTODO combiners
  *

@@ -9,7 +9,8 @@ implementation of several intrusive data structures:
 * an Interval Map
 * a Doubly-Linked List
 * a Dynamic Segment Tree (which is something between a segment tree and an interval map)
-
+  * ... based on a Red-Black Tree
+  * ... based on a Zip Tree
 
 If you need a Red-Black-Tree, a Zip Tree, an Interval Tree or an Interval Map in your C++ application, and for 
 some reason the existing implementations (like std::set or boost::instrusive::rbtree) are not 

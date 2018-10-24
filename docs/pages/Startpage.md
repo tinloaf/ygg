@@ -8,6 +8,8 @@ implementation of intrusive search tree and interval data structures. It current
 * an interval tree
 * an interval map
 * a dynamic segment tree
+  * based on a red-black tree
+  * based on a zip tree
 * a doubly-linked list
 
 

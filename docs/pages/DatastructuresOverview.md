@@ -55,6 +55,6 @@ Dynamic Segment Tree
 ====================
 
 The dynamic segment tree is something between a classic segment tree and Boost ICL's 
-[interval_map](http://www.boost.org/doc/libs/1_66_0/libs/icl/doc/html/index.html#boost_icl.introduction.definition_and_basic_example). 
+[interval_map](http://www.boost.org/doc/libs/1_66_0/libs/icl/doc/html/index.html#boost_icl.introduction.definition_and_basic_example). It needs an underlying balanced binary search tree, for which you can either use the supplied red-black tree or the supplied Zip Tree.
 You can find a more detailed description at @ref dynamicsegmenttreedoc and an example of its usage 
 at @ref dynamicsegmenttreeexample.

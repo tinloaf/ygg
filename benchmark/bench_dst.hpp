@@ -11,7 +11,7 @@
 
 using namespace ygg;
 
-constexpr size_t TEST_SIZES = 10;
+constexpr size_t TEST_SIZES = 13;
 constexpr size_t TEST_SIZE_BASE_EXPONENT = 2;
 
 template <class Selector, class CombinerPack>
