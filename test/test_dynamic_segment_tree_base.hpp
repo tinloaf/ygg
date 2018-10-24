@@ -98,6 +98,21 @@ TEST(__DST_BASENAME(DynSegTreeTest), TrivialTest)
   ASSERT_EQ(it, agg.cend());
 }
 
+TEST(__DST_BASENAME(DynSegTreeTest), OneDeletionOneInsertionTest)
+{
+  __DST_BASENAME(Node) n(721276795, 1814953098, 10);
+
+  __DST_BASENAME(DynSegTree) agg;
+  ASSERT_TRUE(agg.empty());
+  agg.insert(n);
+
+  agg.remove(n);
+
+  agg.insert(n);
+  ASSERT_TRUE(!agg.empty());
+}
+
+  
 TEST(__DST_BASENAME(DynSegTreeTest), TestDeletionBug)
 {
   __DST_BASENAME(Node) n1(2, 5, 10);

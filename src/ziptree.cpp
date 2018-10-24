@@ -36,6 +36,11 @@ void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
     Node & node) noexcept
 {
+  // TODO set these only where necessary
+  node._zt_parent = nullptr;
+  node._zt_left = nullptr;
+  node._zt_right = nullptr;
+
   // First, search for insertion position.
   auto node_rank = RankGetter::get_rank(node);
   this->s.add(1);
@@ -50,7 +55,6 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
     // Replacing the root!
     Node * old_root = this->root;
     this->root = &node;
-    node._zt_parent = nullptr;
 
     this->unzip(*old_root, node);
   } else {
@@ -502,6 +506,9 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     }
   }
 
+  if (cur == nullptr) {
+    cur = new_head;
+  }
   traits.zipping_done(new_head, cur);
 }
 
@@ -510,6 +517,10 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::dbg_verify() const
 {
+  if (this->root != nullptr) {
+    assert(this->root->get_parent() == nullptr);
+  }
+
   this->dbg_verify_consistency(this->root, nullptr, nullptr);
   if (Options::constant_time_size) {
     this->dbg_verify_size();
@@ -549,6 +560,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare,
   } else {
     assert(this->root != sub_root);
   }
+
+  assert(sub_root->_zt_parent != sub_root);
 
   if (lower_bound != nullptr) {
     assert(this->cmp(*lower_bound, *sub_root));

@@ -449,7 +449,6 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
   n.NB::start.container = static_cast<NB *>(&n);
 
   this->t.insert(n.NB::start);
-
   n.NB::end.point = NodeTraits::get_upper(n);
   n.NB::end.closed = NodeTraits::is_upper_closed(n);
   n.NB::end.agg_left = AggValueT();
@@ -481,7 +480,7 @@ typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::InnerTree::find_lca(InnerNode * left,
                                              InnerNode * right)
-{
+{  
   // TODO speed this up when nodes can be mapped to integers
   // TODO nonsense! Put a flag into the nodes!
   std::set<InnerNode *> left_set;
@@ -641,6 +640,10 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
     }
   }
 
+  if (nodes.empty()) {
+    return;
+  }
+  
   std::sort(starts.begin(), starts.end(),
             [](const Node * lhs, const Node * rhs) {
               return lhs->start.get_point() > rhs->start.get_point();
@@ -648,9 +651,9 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
   std::sort(ends.begin(), ends.end(), [](const Node * lhs, const Node * rhs) {
     return lhs->end.get_point() > rhs->end.get_point();
   });
-
+  
   KeyT last_point = starts.back()->start.get_point();
-  AggValueT last_val = AggValueT();
+  AggValueT last_val = 0; // TODO only works for numeric types!
   while ((!starts.empty()) || (!ends.empty())) {
     KeyT new_point;
     AggValueT delta;
@@ -666,7 +669,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
       starts.pop_back();
     }
 
-    if (new_point > last_point) {
+    if ((new_point > last_point) && (new_point < std::numeric_limits<KeyT>::max() / 2)) {
       points.emplace_back(last_point, last_val);
       KeyT point_between = (last_point + new_point) / 2;
       if ((point_between != last_point) && (point_between != new_point)) {
@@ -681,7 +684,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
   AggValueT epsilon = 0;
   if (!std::numeric_limits<AggValueT>::is_integer) { // TODO should be if
                                                      // constexpr
-    epsilon = 0.0001;
+    epsilon = 0.000001;
   }
 
   for (const auto & point : points) {
@@ -698,6 +701,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::dbg_verify() const
 {
   this->dbg_verify_all_points();
+  this->t.dbg_verify();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,

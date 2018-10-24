@@ -511,6 +511,9 @@ public:
   static Node * get_left_child(Node * n);
   static Node * get_right_child(Node * n);
 
+  /* Debugging methods */
+  // TODO only here for compatibility with the Zip Tree
+  void dbg_verify() const noexcept {}; 
 protected:
   Node * root;
 
