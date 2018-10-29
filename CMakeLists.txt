@@ -3,6 +3,8 @@ project (YGG)
 
 #set (CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
 # Set a default build type if none was specified
 set(default_build_type "Debug")
 
@@ -15,17 +17,31 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
           "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-add_subdirectory(test)
 add_subdirectory(examples)
 
+find_package(Boost)
+#
+# Tests
+#
+if (Boost_FOUND)
+	add_subdirectory(test)
+else()
+	message(WARNING "Tests require Boost.") 
+endif()
+
+#
+# Benchmarks
+#
 if(NOT "${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_LESS "3.8")
-  find_library(CELERO_LIB_DIR libcelero.so)
+	find_package(Celero)
+	find_package(PAPI)
+
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-std=c++17 HASCPP17)
-  if (CELERO_LIB_DIR AND HASCPP17)
+  if (Boost_FOUND AND CELERO_FOUND AND HASCPP17)
     add_subdirectory (benchmark)
   else()
-    message(WARNING "Celero and a C++17 capable compiler are necessary to build benchmarks.")
+    message(WARNING "Celero, Boost and a C++17 capable compiler are necessary to build benchmarks.")
   endif()
 else()
   message(WARNING "CMake >= 3.8.0 required to build benchmarks.")
