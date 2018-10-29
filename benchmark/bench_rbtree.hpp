@@ -10,8 +10,8 @@
 #include <cmath>
 #include <string>
 
-#include "../benchmark/config.hpp"
 #include "../src/ygg.hpp"
+#include "config.hpp"
 
 #include <boost/intrusive/set.hpp>
 
@@ -90,16 +90,26 @@ public:
   RBTreeBaseFixture()
   {
     this->instance_sizes.clear();
-    for (size_t i = 0; i < TEST_SIZES; i++) {
-      this->instance_sizes.push_back(
-          {static_cast<int32_t>(std::pow(2, (i + TEST_SIZE_BASE_EXPONENT)))});
+
+    const auto & configured_sizes = Cmdline::get().get_sizes();
+    if (configured_sizes.empty()) {
+      for (size_t i = 0; i < TEST_SIZES; i++) {
+	this->instance_sizes.push_back(
+	    {static_cast<int32_t>(std::pow(2, (i + TEST_SIZE_BASE_EXPONENT)))});
+      }
+    } else {
+      for (auto & value_pair : configured_sizes) {
+	this->instance_sizes.push_back(
+	    {static_cast<int32_t>(value_pair.first),
+	     static_cast<int32_t>(value_pair.second)});
+      }
     }
 
 #ifdef PAPI_FOUND
-		if (PAPI_is_initialized() == PAPI_NOT_INITED) {
-			PAPI_library_init(PAPI_VER_CURRENT);
-		}
-		
+    if (PAPI_is_initialized() == PAPI_NOT_INITED) {
+      PAPI_library_init(PAPI_VER_CURRENT);
+    }
+
     const std::vector<std::string> papi_requested =
         Cmdline::get().get_papi_types();
     this->selected_events.clear();
@@ -108,8 +118,9 @@ public:
 
     for (const std::string & event_str : papi_requested) {
       auto ret = PAPI_event_name_to_code(event_str.c_str(), &event_code);
-			if (ret != PAPI_OK) {
-				std::cerr << "PAPI event " << event_str << " not found! Error Code: "<< ret << "\n";
+      if (ret != PAPI_OK) {
+	std::cerr << "PAPI event " << event_str
+	          << " not found! Error Code: " << ret << "\n";
 	exit(-1);
       }
 
