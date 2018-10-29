@@ -2,6 +2,14 @@ include_directories(SYSTEM ${CELERO_INCLUDE_DIRS})
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES} ${CELERO_LIBRARIES})
 
+if (PAPI_FOUND)
+	include_directories(SYSTEM ${PAPI_INCLUDE_DIRS})
+	set(LIBS ${LIBS} ${PAPI_LIBRARIES})
+endif()
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/config.hpp" @ONLY)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable (benchmark_rbtree main_rbtree.cpp)
 
@@ -23,3 +31,5 @@ set_target_properties(benchmark_dst
                       PROPERTIES COMPILE_FLAGS "-O3 -march=native")
 set_target_properties(benchmark_dst
                       PROPERTIES CXX_STANDARD 17)
+
+										

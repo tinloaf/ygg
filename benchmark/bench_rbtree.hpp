@@ -5,16 +5,84 @@
 #ifndef YGG_BENCH_RBTREE_HPP
 #define YGG_BENCH_RBTREE_HPP
 
+#include "cmdline.hpp"
 #include <celero/Celero.h>
 #include <cmath>
+#include <string>
 
+#include "../benchmark/config.hpp"
 #include "../src/ygg.hpp"
+
 #include <boost/intrusive/set.hpp>
+
+#ifdef PAPI_FOUND
+#include <papi.h>
+#endif
 
 using namespace ygg;
 
 constexpr size_t TEST_SIZES = 9;
 constexpr size_t TEST_SIZE_BASE_EXPONENT = 7;
+
+class PAPIMeasurement : public celero::UserDefinedMeasurementTemplate<size_t> {
+public:
+  PAPIMeasurement(std::string name_in) : name(name_in) {}
+
+  virtual std::string
+  getName() const override
+  {
+    return std::string(this->name);
+  }
+
+  virtual bool
+  reportSize() const override
+  {
+    return false;
+  };
+  virtual bool
+  reportMean() const override
+  {
+    return true;
+  };
+  virtual bool
+  reportVariance() const override
+  {
+    return false;
+  };
+  virtual bool
+  reportStandardDeviation() const override
+  {
+    return true;
+  };
+  virtual bool
+  reportSkewness() const override
+  {
+    return false;
+  };
+  virtual bool
+  reportKurtosis() const override
+  {
+    return false;
+  };
+  virtual bool
+  reportZScore() const override
+  {
+    return false;
+  };
+  virtual bool
+  reportMin() const override
+  {
+    return false;
+  };
+  virtual bool
+  reportMax() const override
+  {
+    return false;
+  };
+
+private:
+  std::string name;
+};
 
 template <bool distinct>
 class RBTreeBaseFixture : public celero::TestFixture {
@@ -26,6 +94,55 @@ public:
       this->instance_sizes.push_back(
           {static_cast<int32_t>(std::pow(2, (i + TEST_SIZE_BASE_EXPONENT)))});
     }
+
+#ifdef PAPI_FOUND
+		if (PAPI_is_initialized() == PAPI_NOT_INITED) {
+			PAPI_library_init(PAPI_VER_CURRENT);
+		}
+		
+    const std::vector<std::string> papi_requested =
+        Cmdline::get().get_papi_types();
+    this->selected_events.clear();
+    int event_code;
+    event_code = 0 | PAPI_NATIVE_MASK;
+
+    for (const std::string & event_str : papi_requested) {
+      auto ret = PAPI_event_name_to_code(event_str.c_str(), &event_code);
+			if (ret != PAPI_OK) {
+				std::cerr << "PAPI event " << event_str << " not found! Error Code: "<< ret << "\n";
+	exit(-1);
+      }
+
+      this->papi_names.push_back(event_str);
+      this->selected_events.push_back(event_code);
+      this->papi_measurements.emplace_back(new PAPIMeasurement(event_str));
+    }
+
+    int num_counters = PAPI_num_counters();
+    if (num_counters < this->selected_events.size()) {
+      std::cerr << "Too few PAPI counters available.\n";
+      exit(-1);
+    }
+
+    this->event_counts.resize(this->selected_events.size(), 0);
+
+    // Test PAPI
+    if (!this->selected_events.empty()) {
+      auto ret = PAPI_start_counters(this->selected_events.data(),
+                                     (int)this->selected_events.size());
+      if (ret != PAPI_OK) {
+	std::cerr << "Could not start PAPI measurements. Error code: " << ret
+	          << "\n";
+	exit(-1);
+      }
+      if (PAPI_stop_counters(this->event_counts.data(),
+                             (int)this->event_counts.size()) != PAPI_OK) {
+	std::cerr << "Could not stop PAPI measurements. Error code: " << ret
+	          << "\n";
+	exit(-1);
+      }
+    }
+#endif
   }
 
   virtual std::vector<celero::TestFixture::ExperimentValue>
@@ -59,18 +176,55 @@ public:
 	this->values[i] = val;
       }
     }
+
+#ifdef PAPI_FOUND
+    if (!this->selected_events.empty()) {
+      PAPI_start_counters(this->selected_events.data(),
+                          (int)this->selected_events.size());
+    }
+#endif
   }
 
   virtual void
   tearDown() override
   {
+#ifdef PAPI_FOUND
+    if (!this->selected_events.empty()) {
+      PAPI_stop_counters(this->event_counts.data(),
+                         (int)this->event_counts.size());
+      for (size_t i = 0; i < this->selected_events.size(); ++i) {
+	this->papi_measurements[i]->addValue(this->event_counts[i]);
+      }
+    }
+#endif
+
     this->values.clear();
+  }
+
+  virtual std::vector<std::shared_ptr<celero::UserDefinedMeasurement>>
+  getUserDefinedMeasurements() const override
+  {
+#ifdef PAPI_FOUND
+    std::vector<std::shared_ptr<celero::UserDefinedMeasurement>> ret;
+    for (auto & ptr : this->papi_measurements) {
+      ret.push_back(ptr);
+    }
+    return ret;
+#else
+    return {};
+#endif
   }
 
   std::vector<celero::TestFixture::ExperimentValue> instance_sizes;
 
   std::vector<int> values;
   int64_t value_count;
+
+  /* PAPI measurement */
+  std::vector<std::shared_ptr<PAPIMeasurement>> papi_measurements;
+  std::vector<std::string> papi_names;
+  std::vector<int> selected_events;
+  std::vector<long long int> event_counts;
 };
 
 /*
@@ -171,7 +325,8 @@ public:
   virtual void
   setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(number_of_nodes.Value);
+    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(
+        number_of_nodes.Value);
 
     this->nodes.resize((size_t)number_of_nodes.Value);
     for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
@@ -211,7 +366,8 @@ public:
   virtual void
   setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
   {
-    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(number_of_nodes.Value);
+    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(
+        number_of_nodes.Value);
 
     this->nodes.resize((size_t)number_of_nodes.Value);
     for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
