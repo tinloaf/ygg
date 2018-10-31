@@ -26,6 +26,13 @@ set_target_properties(example_ziptree
                       PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
                       )
 
+add_executable (example_avgmintree example_avgmintree.cpp)
+set_target_properties(example_avgmintree
+        PROPERTIES CXX_STANDARD 14)
+set_target_properties(example_avgmintree
+                      PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
+                      )
+
 add_executable (example_intervaltree example_intervaltree.cpp)
 set_target_properties(example_intervaltree
         PROPERTIES CXX_STANDARD 17)
