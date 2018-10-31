@@ -45,6 +45,9 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
           STRING "Choose the type of build." FORCE)
 endif()
 
+# If additional include directories were specified, add them
+include_directories(SYSTEM $ENV{INCLUDE})
+
 add_subdirectory(examples)
 add_subdirectory(test)
 

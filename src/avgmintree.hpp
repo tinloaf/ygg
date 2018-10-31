@@ -5,9 +5,9 @@
 #include "size_holder.hpp"
 #include "tree_iterator.hpp"
 
-#include <stddef.h>
 #include <cmath>
 #include <functional>
+#include <stddef.h>
 
 namespace ygg {
 
@@ -19,6 +19,18 @@ class AvgMinTree;
 
 namespace avgmintree_internal {
 /// @cond INTERNAL
+
+template <class Node, class NodeTraits>
+class NodeNameGetter {
+public:
+	NodeNameGetter() = default;
+	std::string
+	get_name(Node * n) const
+	{
+		return NodeTraits::get_id(n) + " (S: " + std::to_string(n->size) +
+		       " PL: " + std::to_string(n->length_sum) + std::string(")");
+	}
+};
 
 template <class Tree, bool enable>
 struct dbg_verify_size_helper
@@ -100,6 +112,10 @@ private:
 	template <class FNode, class FNodeTraits, class FOptions, class FTag,
 	          class FCompare>
 	friend class AvgMinTree;
+
+	// Debugging
+	template <class FNode, class FNodeTraits>
+	friend class avgmintree_internal::NodeNameGetter;
 
 	// TODO make types configurable?
 	size_t size;
@@ -450,6 +466,8 @@ public:
 	 */
 	void clear();
 
+	void dbg_print() const;
+
 private:
 	Node * root;
 	Compare cmp;
@@ -460,7 +478,12 @@ private:
 	Node * get_smallest() const;
 	Node * get_largest() const;
 
-	// Debugging methods
+	SizeHolder<Options::constant_time_size> s;
+
+	/*
+	 * Debugging stuff
+	 */
+	void dbg_verify_path_lengths(Node * sub_root) const;
 	void dbg_verify_consistency(Node * sub_root, Node * lower_bound,
 	                            Node * upper_bound) const;
 	void dbg_verify_size() const;
@@ -472,8 +495,6 @@ private:
 	template <class NodeNameGetter>
 	void output_node_base(const Node * node, std::ofstream & out,
 	                      NodeNameGetter name_getter) const;
-
-	SizeHolder<Options::constant_time_size> s;
 };
 
 } // namespace ygg

@@ -6,6 +6,7 @@
 #include "test_list.hpp"
 #include "test_multi_rbtree.hpp"
 #include "test_rbtree.hpp"
+#include "test_avgmintree.hpp"
 #include "test_ziptree.hpp"
 #include "test_energy.hpp"
 #include "test_wbtree.hpp"

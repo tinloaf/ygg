@@ -1,11 +1,13 @@
 #ifndef YGG_AVGMINTREE_CPP
 #define YGG_AVGMINTREE_CPP
 
-#include "avgmintree.hpp"
-
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <vector>
+
+#include "avgmintree.hpp"
+#include "debug.hpp"
 
 namespace ygg {
 
@@ -26,7 +28,7 @@ AvgMinTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::AvgMinTree() noexcept
-  : root(nullptr), cmp()
+    : root(nullptr), cmp()
 {}
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -34,10 +36,14 @@ void
 AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
     Node & node) noexcept
 {
+	this->s.add(1);
+
 	// TODO set these only where necessary
 	node._zt_parent = nullptr;
 	node._zt_left = nullptr;
 	node._zt_right = nullptr;
+	node.size = 1;
+	node.length_sum = 0;
 
 	/*
 	 * Search for insertion position. What we do is:
@@ -75,8 +81,6 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 	if (path.empty()) {
 		// Insert a new root
 		this->root = &node;
-		node.size = 1;
-		node.length_sum = 0;
 		return;
 	}
 
@@ -248,49 +252,50 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::unzip(Node & oldn,
 		}
 	}
 
-	/* Reconstruct */
 	if (left_head != &newn) {
-		left_head = left_head->get_parent();
-		while (left_head != &newn) {
-			left_head->size = 1;
-			left_head->length_sum = 0;
-
-			if (left_head->get_left() != nullptr) {
-				left_head->size += left_head->get_left()->size;
-				left_head->length_sum +=
-				    left_head->get_left()->length_sum + (left_head->get_left()->size);
-			}
-
-			if (left_head->get_right() != nullptr) {
-				left_head->size += left_head->get_right()->size;
-				left_head->length_sum +=
-				    left_head->get_right()->length_sum + (left_head->get_right()->size);
-			}
-
-			left_head = left_head->get_parent();
-		}
+		left_head->_zt_right = nullptr;
+	}
+	if (right_head != &newn) {
+		right_head->_zt_left = nullptr;
 	}
 
-	if (right_head != &newn) {
-		right_head = right_head->get_parent();
-		while (right_head != &newn) {
-			right_head->size = 1;
-			right_head->length_sum = 0;
+	/* Reconstruct */
+	while (left_head != &newn) {
+		left_head->size = 1;
+		left_head->length_sum = 0;
 
-			if (right_head->get_left() != nullptr) {
-				right_head->size += right_head->get_left()->size;
-				right_head->length_sum +=
-				    right_head->get_left()->length_sum + (right_head->get_left()->size);
-			}
-
-			if (right_head->get_right() != nullptr) {
-				right_head->size += right_head->get_right()->size;
-				right_head->length_sum += right_head->get_right()->length_sum +
-				                          (right_head->get_right()->size);
-			}
-
-			right_head = right_head->get_parent();
+		if (left_head->get_left() != nullptr) {
+			left_head->size += left_head->get_left()->size;
+			left_head->length_sum +=
+			    left_head->get_left()->length_sum + (left_head->get_left()->size);
 		}
+
+		if (left_head->get_right() != nullptr) {
+			left_head->size += left_head->get_right()->size;
+			left_head->length_sum +=
+			    left_head->get_right()->length_sum + (left_head->get_right()->size);
+		}
+
+		left_head = left_head->get_parent();
+	}
+
+	while (right_head != &newn) {
+		right_head->size = 1;
+		right_head->length_sum = 0;
+
+		if (right_head->get_left() != nullptr) {
+			right_head->size += right_head->get_left()->size;
+			right_head->length_sum +=
+			    right_head->get_left()->length_sum + (right_head->get_left()->size);
+		}
+
+		if (right_head->get_right() != nullptr) {
+			right_head->size += right_head->get_right()->size;
+			right_head->length_sum +=
+			    right_head->get_right()->length_sum + (right_head->get_right()->size);
+		}
+
+		right_head = right_head->get_parent();
 	}
 
 	newn.size = 1;
@@ -312,6 +317,7 @@ void
 AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::remove(Node & n) noexcept
 {
 	this->s.reduce(1);
+	Node * old_parent = n.get_parent();
 	this->zip(n);
 }
 
@@ -408,19 +414,63 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::zip(
 	// non-empty. We must re-hang this one completely.
 	if (left_head != nullptr) {
 		// Right head is nullptr, re-hang left tree
-		if (!last_from_left) {
+		if (first) {
 			traits.before_zip_tree_from_left(left_head);
-			cur->_zt_left = left_head;
-			left_head->_zt_parent = cur;
+			new_head = left_head;
+			if (cur == nullptr) {
+				this->root = left_head;
+				left_head->_zt_parent = nullptr;
+			} else {
+				if (cur->_zt_left == &old_root) {
+					cur->_zt_left = left_head;
+				} else {
+					assert(cur->_zt_right == &old_root);
+					cur->_zt_right = left_head;
+				}
+				left_head->_zt_parent = cur;
+			}
+			cur = left_head;
+		} else if (!last_from_left) {
+			traits.before_zip_tree_from_left(left_head);
+
+			if (cur != nullptr) {
+				cur->_zt_left = left_head;
+				left_head->_zt_parent = cur;
+			} else {
+				this->root = left_head;
+				left_head->_zt_parent = nullptr;
+			}
 			cur = left_head;
 		} else {
 			traits.zipping_ended_left_without_tree(cur);
 		}
 	} else if (right_head != nullptr) {
-		if (last_from_left) {
+		if (first) {
 			traits.before_zip_tree_from_right(right_head);
-			cur->_zt_right = right_head;
-			right_head->_zt_parent = cur;
+			new_head = right_head;
+			if (cur == nullptr) {
+				this->root = right_head;
+				right_head->_zt_parent = nullptr;
+			} else {
+				if (cur->_zt_left == &old_root) {
+					cur->_zt_left = right_head;
+				} else {
+					assert(cur->_zt_right == &old_root);
+					cur->_zt_right = right_head;
+				}
+				right_head->_zt_parent = cur;
+			}
+			cur = right_head;
+		} else if (last_from_left) {
+			traits.before_zip_tree_from_right(right_head);
+
+			if (cur != nullptr) {
+				cur->_zt_right = right_head;
+				right_head->_zt_parent = cur;
+			} else {
+				this->root = right_head;
+				right_head->_zt_parent = nullptr;
+			}
 			cur = right_head;
 		} else {
 			traits.zipping_ended_right_without_tree(cur);
@@ -436,35 +486,34 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::zip(
 	if (cur == nullptr) {
 		cur = new_head;
 	}
-
+	/*
 	if (new_head != nullptr) {
-		/* Reconstruct */
-		Node * reconstruct = cur;
-		while (true) {
-			reconstruct->size = 1;
-			reconstruct->length_sum = 0;
+	  std::cout << "Reconstruction!\n";
+	  */
+	/* Reconstruct */
+	// Reconstruction must go up to the root
+	Node * reconstruct = cur;
+	while (reconstruct != nullptr) {
+		reconstruct->size = 1;
+		reconstruct->length_sum = 0;
 
-			if (reconstruct->get_left() != nullptr) {
-				reconstruct->size += reconstruct->get_left()->size;
-				reconstruct->length_sum += reconstruct->get_left()->length_sum +
-				                           (reconstruct->get_left()->size);
-			}
-
-			if (reconstruct->get_right() != nullptr) {
-				reconstruct->size += reconstruct->get_right()->size;
-				reconstruct->length_sum += reconstruct->get_right()->length_sum +
-				                           (reconstruct->get_right()->size);
-			}
-
-			if (reconstruct == new_head) {
-				break;
-			}
-			reconstruct = reconstruct->get_parent();
+		if (reconstruct->get_left() != nullptr) {
+			reconstruct->size += reconstruct->get_left()->size;
+			reconstruct->length_sum +=
+			    reconstruct->get_left()->length_sum + (reconstruct->get_left()->size);
 		}
+
+		if (reconstruct->get_right() != nullptr) {
+			reconstruct->size += reconstruct->get_right()->size;
+			reconstruct->length_sum += reconstruct->get_right()->length_sum +
+			                           (reconstruct->get_right()->size);
+		}
+
+		reconstruct = reconstruct->get_parent();
 	}
 
 	traits.zipping_done(new_head, cur);
-}
+} // namespace ygg
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
@@ -472,6 +521,8 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::dbg_verify() const
 {
 	if (this->root != nullptr) {
 		assert(this->root->get_parent() == nullptr);
+
+		this->dbg_verify_path_lengths(this->root);
 	}
 
 	this->dbg_verify_consistency(this->root, nullptr, nullptr);
@@ -493,6 +544,42 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::dbg_verify_size() const
 	avgmintree_internal::dbg_verify_size_helper<my_type,
 	                                            Options::constant_time_size>{}(
 	    *this, node_count);
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+void
+AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::dbg_print() const
+{
+	avgmintree_internal::NodeNameGetter<Node, NodeTraits> nng;
+	debug::TreePrinter<Node, decltype(nng)> tp(this->root, nng);
+	tp.print();
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+void
+AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::dbg_verify_path_lengths(
+    Node * sub_root) const
+{
+	size_t size = 1;
+	size_t length_sum = 0;
+
+	if (sub_root->get_left() != nullptr) {
+		size += sub_root->get_left()->size;
+		length_sum += sub_root->get_left()->length_sum + sub_root->get_left()->size;
+
+		this->dbg_verify_path_lengths(sub_root->get_left());
+	}
+
+	if (sub_root->get_right() != nullptr) {
+		size += sub_root->get_right()->size;
+		length_sum +=
+		    sub_root->get_right()->length_sum + sub_root->get_right()->size;
+
+		this->dbg_verify_path_lengths(sub_root->get_right());
+	}
+
+	assert(sub_root->size == size);
+	assert(sub_root->length_sum == length_sum);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
