@@ -56,12 +56,12 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 	 */
 
 	// The bool indicates whether the node goes left of <node>
-	std::vector<std::pair<Node *, bool>> path;
-
+	//	std::vector<std::pair<Node *, bool>> path;
+	/*
 	Node * current = this->root;
 	while (current != nullptr) {
 		// Check if we must descend left
-		bool goes_after = ! this->cmp(node, *current);
+		bool goes_after = !this->cmp(node, *current);
 		path.emplace_back(current, goes_after);
 
 		if (!goes_after) {
@@ -70,91 +70,129 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 			current = current->_zt_right;
 		}
 	}
+	*/
 
+	Node * current = this->root;
+	Node * leaf = nullptr;
+	size_t path_length = 0;
+	while (current != nullptr) {
+		leaf = current;
+		bool goes_after = !this->cmp(node, *current);
+		path_length++;
+
+		if (!goes_after) {
+			current = current->_zt_left;
+		} else {
+			current = current->_zt_right;
+		}		
+	}
+			 
+	/*
 	std::vector<size_t> right_path_sum(path.size() + 1, 0);
 	std::vector<size_t> right_size(path.size() + 1, 0);
 	std::vector<size_t> left_path_sum(path.size() + 1, 0);
 	std::vector<size_t> left_size(path.size() + 1, 0);
 	std::vector<size_t> total_path_sum(path.size() + 1, 0);
 	std::vector<int> path_sum_change(path.size() + 1, 0);
+	*/
 
-	if (path.empty()) {
+	size_t last_right_path_sum;
+	size_t last_right_size;
+	size_t last_left_path_sum;
+	size_t last_left_size;
+	int last_path_sum_change;
+
+	// Best values we've seen
+	Node * best_parent = leaf;
+	Node * best_position = nullptr;
+	int best_path_sum_change;
+
+	if (path_length == 0) {
 		// Insert a new root
 		this->root = &node;
 		return;
 	}
 
-	total_path_sum.back() = path.size();
-	path_sum_change.back() = path.size();
+	// We start with the case that we insert a leaf
+	Node * current_parent = leaf;
+	last_right_path_sum = 0;
+	last_right_size = 0;
+	last_left_path_sum = 0;
+	last_left_size = 0;
+	last_path_sum_change = path_length;
+	best_path_sum_change = path_length;
 
-	int best_change = path.size();
-	size_t best_position = path.size();
+	Node * n = leaf;
 
-	for (int i = path.size() - 1; i >= 0; --i) {
-		Node * n = path[i].first;
-		bool left = path[i].second;
+	size_t depth = path_length - 1;
 
-		right_path_sum[i] = right_path_sum[i + 1];
-		right_size[i] = right_size[i + 1];
-
-		left_path_sum[i] = left_path_sum[i + 1];
-		left_size[i] = left_size[i + 1];
+	while (n != nullptr) {
+		bool left = !this->cmp(node, *n);
+		size_t right_path_sum = last_right_path_sum;
+		size_t right_size = last_right_size;
+		size_t left_path_sum = last_left_path_sum;
+		size_t left_size = last_left_size;
 
 		if (left) {
 			// This vertex goes to the left
-			left_size[i] += 1;
+			left_size += 1;
 			// All previous path lengths on the left are increased by 1
-			left_path_sum[i] += left_size[i];
+			left_path_sum += left_size;
 
 			if (n->_zt_left != nullptr) {
 				// The left subtree of <n> also contributes to the weight of the
 				// left spine
-				left_size[i] += n->_zt_left->size;
+				left_size += n->_zt_left->size;
 				// All the paths from <n->_zt_left> to its successors are part of the
 				// left spine, plus one edge each
-				left_path_sum[i] += (n->_zt_left->length_sum) + 2 * (n->_zt_left->size);
+				left_path_sum += (n->_zt_left->length_sum) + 2 * (n->_zt_left->size);
 			}
 		} else {
-			right_size[i] += 1;
-			right_path_sum[i] += right_size[i];
+			right_size += 1;
+			right_path_sum += right_size;
 
 			if (n->_zt_right != nullptr) {
-				right_size[i] += n->_zt_right->size;
-				right_path_sum[i] +=
-				    (n->_zt_right->length_sum) + 2 * (n->_zt_right->size);
+				right_size += n->_zt_right->size;
+				right_path_sum += (n->_zt_right->length_sum) + 2 * (n->_zt_right->size);
 			}
 		}
 
-		total_path_sum[i] = left_path_sum[i] + (left_size[i] * i) +
-		                    right_path_sum[i] + (right_size[i] * i) + i;
+		size_t total_path_sum = left_path_sum + (left_size * depth) +
+		                        right_path_sum + (right_size * depth) + depth;
 
-		size_t previous_path_sum = (n->size * i) + n->length_sum;
-		path_sum_change[i] = (int)total_path_sum[i] - (int)previous_path_sum;
-		if (path_sum_change[i] < best_change) {
-			best_change = path_sum_change[i];
-			best_position = i;
+		size_t previous_path_sum = (n->size * depth) + n->length_sum;
+		int path_sum_change = (int)total_path_sum - (int)previous_path_sum;
+
+		if (path_sum_change < best_path_sum_change) {
+			best_path_sum_change = path_sum_change;
+			best_parent = n->get_parent();
+			best_position = n;
 		}
+
+		depth--;
+		n = n->get_parent();
 	}
 
 	// Actually insert
-	if (best_position == 0) {
+	if (best_parent == nullptr) {
 		// replacing the root!
+		Node * old_root = this->root;
 		this->root = &node;
-		this->unzip(*(path[0].first), node);
-	} else if (best_position == path.size()) {
+		this->unzip(*old_root, node);
+	} else if (best_parent == leaf) {
 		// Inserting a leaf
-		Node * parent = path[best_position - 1].first;
-		bool parent_left_of_node = path[best_position - 1].second;
+		bool parent_left_of_node = ! this->cmp(node, *best_parent);
 
-		node._zt_parent = parent;
+		node._zt_parent = best_parent;
 		if (parent_left_of_node) {
-			parent->_zt_right = &node;
+			best_parent->_zt_right = &node;
 		} else {
-			parent->_zt_left = &node;
+			best_parent->_zt_left = &node;
 		}
 
 		/* From the leave on up, update sizes and path sums! */
 		size_t i = 1;
+		Node * parent = best_parent;
 		while (parent != nullptr) {
 			parent->size += 1;
 			parent->length_sum += i++;
@@ -162,15 +200,14 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 		}
 	} else {
 		// Hang node under its new parent
-		Node * parent = path[best_position - 1].first;
-		bool parent_left_of_node = path[best_position - 1].second;
-		Node * unzip_at = path[best_position].first;
+		bool parent_left_of_node = ! this->cmp(node, *best_parent);
+		Node * unzip_at = best_position;
 
-		node._zt_parent = parent;
+		node._zt_parent = best_parent;
 		if (parent_left_of_node) {
-			parent->_zt_right = &node;
+			best_parent->_zt_right = &node;
 		} else {
-			parent->_zt_left = &node;
+			best_parent->_zt_left = &node;
 		}
 
 		this->unzip(*unzip_at, node);
@@ -179,6 +216,15 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 		 * Up to and including the inserted node, unzip() should have taken
 		 * care of this. */
 		/* TODO Reconstruction *should* be unnecessary */
+		/*
+		while (parent != nullptr) {
+		  parent->size += 1;
+		  parent->length_sum += path_sum_change[best_position];
+		  parent = parent->get_parent();
+		}
+		*/
+		// TODO What the hell? The above should be a lot faster, but isn't?
+		Node * parent = best_parent;
 		while (parent != nullptr) {
 			parent->size = 1;
 			parent->length_sum = 0;
@@ -197,7 +243,7 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 
 			parent = parent->get_parent();
 		}
-	}	
+	}
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
