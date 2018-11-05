@@ -211,13 +211,40 @@ operator<(const EnergyNode & lhs, const EnergyNode & rhs)
 class ZTreeNode : public ygg::ZTreeNodeBase<ZTreeNode, BasicTreeOptions> {
 public:
 	size_t val;
+
+	void
+	update()
+	{
+		this->update_rank();
+	}
 };
+
+namespace std {
+	template<>
+	struct hash<ZTreeNode> {
+		size_t operator()(const ZTreeNode & node) {
+			return hash<size_t>{}(node.val);
+		}
+	};
+}
 
 class RandZTreeNode
     : public ygg::ZTreeNodeBase<RandZTreeNode, RandomRankTreeOptions> {
 public:
 	size_t val;
 };
+
+class AvgMinTreeNode
+    : public ygg::AvgMinTreeNodeBase<AvgMinTreeNode, ygg::DefaultOptions> {
+public:
+	size_t val;
+};
+
+bool
+operator<(const AvgMinTreeNode & lhs, const AvgMinTreeNode & rhs)
+{
+	return lhs.val < rhs.val;
+}
 
 bool
 operator<(const ZTreeNode & lhs, const ZTreeNode & rhs)
@@ -328,6 +355,19 @@ template <std::size_t I = 0, typename... Tpl>
 	do_analysis<I + 1, Tpl...>(tpl, count, move_count, seed_count, seed_start,
 	                           os);
 }
+
+	template <class Node>
+void
+update_hash(Node & n)
+{}
+
+template <>
+void
+update_hash<ZTreeNode>(ZTreeNode & n)
+{
+	n.update();
+}
+
 
 int
 main(int argc, const char ** argv)
