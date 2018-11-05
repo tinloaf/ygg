@@ -61,7 +61,7 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 	Node * current = this->root;
 	while (current != nullptr) {
 		// Check if we must descend left
-		bool goes_after = this->cmp(*current, node);
+		bool goes_after = ! this->cmp(node, *current);
 		path.emplace_back(current, goes_after);
 
 		if (!goes_after) {
@@ -112,7 +112,7 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 				left_size[i] += n->_zt_left->size;
 				// All the paths from <n->_zt_left> to its successors are part of the
 				// left spine, plus one edge each
-				left_path_sum[i] += (n->_zt_left->length_sum) + (n->_zt_left->size);
+				left_path_sum[i] += (n->_zt_left->length_sum) + 2 * (n->_zt_left->size);
 			}
 		} else {
 			right_size[i] += 1;
@@ -120,7 +120,8 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 
 			if (n->_zt_right != nullptr) {
 				right_size[i] += n->_zt_right->size;
-				right_path_sum[i] += (n->_zt_right->length_sum) + (n->_zt_right->size);
+				right_path_sum[i] +=
+				    (n->_zt_right->length_sum) + 2 * (n->_zt_right->size);
 			}
 		}
 
@@ -196,7 +197,7 @@ AvgMinTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 
 			parent = parent->get_parent();
 		}
-	}
+	}	
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
