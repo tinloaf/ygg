@@ -1369,13 +1369,4 @@ private:
 
 #include "dynamic_segment_tree.cpp"
 
-namespace ygg {
-/*
-template <class Node, class NodeTraits, class Combiners,
-        class Options = DefaultOptions, class Tag = int>
-using DynamicSegmentTree =
-  DynamicSegmentTree<Node, NodeTraits, Combiners, Options, Tag>;
-*/
-} // namespace ygg
-
 #endif // YGG_DYNAMIC_SEGMENT_TREE_HPP
