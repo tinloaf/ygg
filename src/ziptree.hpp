@@ -20,32 +20,32 @@ namespace ztree_internal {
 template <class Tree, bool enable>
 struct dbg_verify_size_helper
 {
-  void operator()(const Tree & t, size_t node_count);
+	void operator()(const Tree & t, size_t node_count);
 };
 
 template <class Tree>
 struct dbg_verify_size_helper<Tree, true>
 {
-  void
-  operator()(const Tree & t, size_t node_count)
-  {
-    assert(t.size() == node_count);
-    // Usage in assertion is not enough for GCC to realize that the variable is
-    // being used.
-    (void)t;
-    (void)node_count;
-  }
+	void
+	operator()(const Tree & t, size_t node_count)
+	{
+		assert(t.size() == node_count);
+		// Usage in assertion is not enough for GCC to realize that the variable is
+		// being used.
+		(void)t;
+		(void)node_count;
+	}
 };
 
 template <class Tree>
 struct dbg_verify_size_helper<Tree, false>
 {
-  void
-  operator()(const Tree & t, size_t node_count)
-  {
-    (void)t;
-    (void)node_count;
-  }
+	void
+	operator()(const Tree & t, size_t node_count)
+	{
+		(void)t;
+		(void)node_count;
+	}
 };
 
 // TODO rename this - if use_hash is false, no hashing takes place!
@@ -55,116 +55,116 @@ class ZTreeRankFromHash;
 template <class Node, class Options>
 class ZTreeRankFromHash<Node, Options, true, false> {
 public:
-  ZTreeRankFromHash(){};
+	ZTreeRankFromHash(){};
 
-  static void
-  update_rank(Node & node) noexcept
-  {
-    (void)node;
-  }
+	static void
+	update_rank(Node & node) noexcept
+	{
+		(void)node;
+	}
 
-  static int
-  get_rank(const Node & node) noexcept
-  {
-    // TODO ffsl? ffs?
-    // TODO if constrexpr when switching to C++17
-    if (Options::ztree_universalize) {
-      // TODO this is not strictly a universal family
-      size_t universalized =
-          (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
-          Options::ztree_universalize_modul;
-      return __builtin_ffsl((long int)universalized);
-    } else {
-      return __builtin_ffsl((long int)std::hash<Node>{}(node));
-    }
-  }
+	static int
+	get_rank(const Node & node) noexcept
+	{
+		// TODO ffsl? ffs?
+		// TODO if constrexpr when switching to C++17
+		if (Options::ztree_universalize) {
+			// TODO this is not strictly a universal family
+			size_t universalized =
+			    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
+			    Options::ztree_universalize_modul;
+			return __builtin_ffsl((long int)universalized);
+		} else {
+			return __builtin_ffsl((long int)std::hash<Node>{}(node));
+		}
+	}
 };
 
 template <class Node, class Options>
 class ZTreeRankFromHash<Node, Options, true, true> {
 public:
-  ZTreeRankFromHash(){};
+	ZTreeRankFromHash(){};
 
-  static void
-  update_rank(Node & node) noexcept
-  {
-    // TODO ffsl? ffs?
-    // TODO if constrexpr when switching to C++17
-    if (Options::ztree_universalize) {
-      // TODO this is not strictly a universal family
-      size_t universalized =
-          (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
-          Options::ztree_universalize_modul;
-      node._zt_rank.rank = __builtin_ffsl((long int)universalized);
-    } else {
-      node._zt_rank.rank = __builtin_ffsl((long int)std::hash<Node>{}(node));
-    }
-  }
+	static void
+	update_rank(Node & node) noexcept
+	{
+		// TODO ffsl? ffs?
+		// TODO if constrexpr when switching to C++17
+		if (Options::ztree_universalize) {
+			// TODO this is not strictly a universal family
+			size_t universalized =
+			    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
+			    Options::ztree_universalize_modul;
+			node._zt_rank.rank = __builtin_ffsl((long int)universalized);
+		} else {
+			node._zt_rank.rank = __builtin_ffsl((long int)std::hash<Node>{}(node));
+		}
+	}
 
-  static size_t
-  get_rank(const Node & node) noexcept
-  {
-    return (size_t)node._zt_rank.rank;
-  }
+	static size_t
+	get_rank(const Node & node) noexcept
+	{
+		return (size_t)node._zt_rank.rank;
+	}
 
 private:
-  template <class, class, class>
-  friend class ZTreeNodeBase;
-  typename Options::ztree_rank_type::type rank;
+	template <class, class, class>
+	friend class ZTreeNodeBase;
+	typename Options::ztree_rank_type::type rank;
 };
 
 template <class Node, class Options>
 class ZTreeRankFromHash<Node, Options, false, true> {
 public:
-  ZTreeRankFromHash()
-  {
-    auto rand_val = std::rand();
-    this->rank = 0;
-    while (rand_val == RAND_MAX) {
-      this->rank = (decltype(this->rank))(
-          this->rank + (decltype(this->rank))std::log2(RAND_MAX));
-      rand_val = std::rand();
-    }
-    this->rank = (decltype(this->rank))__builtin_ffsl((long int)rand_val);
-  };
+	ZTreeRankFromHash()
+	{
+		auto rand_val = std::rand();
+		this->rank = 0;
+		while (rand_val == RAND_MAX) {
+			this->rank = (decltype(this->rank))(
+			    this->rank + (decltype(this->rank))std::log2(RAND_MAX));
+			rand_val = std::rand();
+		}
+		this->rank = (decltype(this->rank))__builtin_ffsl((long int)rand_val);
+	};
 
-  template <class URBG>
-  ZTreeRankFromHash(URBG && g)
-  {
-    auto rand_val = g();
-    this->rank = 0;
-    while (rand_val == g.max()) {
-      this->rank += (size_t)std::log2(g.max());
-      rand_val = g();
-    }
-    this->rank = __builtin_ffsl((long int)rand_val);
-  }
+	template <class URBG>
+	ZTreeRankFromHash(URBG && g)
+	{
+		auto rand_val = g();
+		this->rank = 0;
+		while (rand_val == g.max()) {
+			this->rank += (size_t)std::log2(g.max());
+			rand_val = g();
+		}
+		this->rank = __builtin_ffsl((long int)rand_val);
+	}
 
-  static void
-  update_rank(Node & node) noexcept
-  {
-    (void)node;
-  }
+	static void
+	update_rank(Node & node) noexcept
+	{
+		(void)node;
+	}
 
-  static size_t
-  get_rank(const Node & node) noexcept
-  {
-    return (size_t)node._zt_rank.rank;
-  }
+	static size_t
+	get_rank(const Node & node) noexcept
+	{
+		return (size_t)node._zt_rank.rank;
+	}
 
 private:
-  template <class, class, class>
-  friend class ZTreeNodeBase;
-  typename Options::ztree_rank_type::type rank;
+	template <class, class, class>
+	friend class ZTreeNodeBase;
+	typename Options::ztree_rank_type::type rank;
 };
 
 template <class Node, class Options>
 class ZTreeRankFromHash<Node, Options, false, false> {
-  // Build a static assertion that always fails, but
-  // only if this specialization is ever used. Thus, it must depend on
-  // the template parameters.
-  static_assert(!std::is_class<Node>::value || std::is_class<Node>::value,
-                "If rank-by-hash is not used, ranks must be stored.");
+	// Build a static assertion that always fails, but
+	// only if this specialization is ever used. Thus, it must depend on
+	// the template parameters.
+	static_assert(!std::is_class<Node>::value || std::is_class<Node>::value,
+	              "If rank-by-hash is not used, ranks must be stored.");
 };
 /// @endcond
 } // namespace ztree_internal
@@ -187,64 +187,64 @@ class ZTreeRankFromHash<Node, Options, false, false> {
 template <class Node, class Options, class Tag>
 class ZTreeNodeBase {
 public:
-  Node * _zt_parent = nullptr;
-  Node * _zt_left = nullptr;
-  Node * _zt_right = nullptr;
+	Node * _zt_parent = nullptr;
+	Node * _zt_left = nullptr;
+	Node * _zt_right = nullptr;
 
-  Node *
-  get_parent() const noexcept
-  {
-    return this->_zt_parent;
-  }
+	Node *
+	get_parent() const noexcept
+	{
+		return this->_zt_parent;
+	}
 
-  Node *
-  get_left() const noexcept
-  {
-    return this->_zt_left;
-  }
+	Node *
+	get_left() const noexcept
+	{
+		return this->_zt_left;
+	}
 
-  Node *
-  get_right() const noexcept
-  {
-    return this->_zt_right;
-  }
+	Node *
+	get_right() const noexcept
+	{
+		return this->_zt_right;
+	}
 
-  // Debugging methods
-  size_t get_depth() const noexcept;
+	// Debugging methods
+	size_t get_depth() const noexcept;
 
 protected:
-  /**
-   * @brief Update the stored rank in this node
-   *
-   * If you configure your ZTree to generate the nodes' ranks from hashes (i.e.,
-   * set TreeFlags::ZTREE_USE_HASH) *and* to store the nodes' ranks (i.e., set
-   * TreeFlags::ZTREE_RANK_TYPE), you **must** call this method *before* adding
-   * the node to your tree, but *after* the node's hash has become valid.
-   *
-   * @warning Inserting a node into the tree in the aforementioned case before
-   * calling calling this method leads to undefined behavior.
-   */
-  void
-  update_rank() noexcept
-  {
-    ztree_internal::ZTreeRankFromHash<
-        Node, Options, Options::ztree_use_hash,
-        Options::ztree_store_rank>::update_rank(*static_cast<Node *>(this));
-  }
+	/**
+	 * @brief Update the stored rank in this node
+	 *
+	 * If you configure your ZTree to generate the nodes' ranks from hashes (i.e.,
+	 * set TreeFlags::ZTREE_USE_HASH) *and* to store the nodes' ranks (i.e., set
+	 * TreeFlags::ZTREE_RANK_TYPE), you **must** call this method *before* adding
+	 * the node to your tree, but *after* the node's hash has become valid.
+	 *
+	 * @warning Inserting a node into the tree in the aforementioned case before
+	 * calling calling this method leads to undefined behavior.
+	 */
+	void
+	update_rank() noexcept
+	{
+		ztree_internal::ZTreeRankFromHash<
+		    Node, Options, Options::ztree_use_hash,
+		    Options::ztree_store_rank>::update_rank(*static_cast<Node *>(this));
+	}
 
 private:
-  template <class, class, bool, bool>
-  friend class ztree_internal::ZTreeRankFromHash;
+	template <class, class, bool, bool>
+	friend class ztree_internal::ZTreeRankFromHash;
 
-  ztree_internal::ZTreeRankFromHash<Node, Options, Options::ztree_use_hash,
-                                    Options::ztree_store_rank>
-      _zt_rank;
+	ztree_internal::ZTreeRankFromHash<Node, Options, Options::ztree_use_hash,
+	                                  Options::ztree_store_rank>
+	    _zt_rank;
 };
 
 template <class Node>
 class ZTreeDefaultNodeTraits {
 public:
-  // clang-format off
+	// clang-format off
   /*
    * Callbacks for Zipping
    */
@@ -270,7 +270,7 @@ public:
     (void) left_spine_end;
     (void) right_spine_end;
   }
-  // clang-format on
+	// clang-format on
 };
 
 // TODO NodeTraits
@@ -307,314 +307,352 @@ template <
         Node, Options, Options::ztree_use_hash, Options::ztree_store_rank>>
 class ZTree {
 public:
-  using NB = ZTreeNodeBase<Node, Options, Tag>;
-  using my_type = ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>;
+	using NB = ZTreeNodeBase<Node, Options, Tag>;
+	using MyClass = ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>;
 
-  /**
-   * @brief Construct a new empty Zip Tree.
-   */
-  ZTree() noexcept;
+	/**
+	 * @brief Construct a new empty Zip Tree.
+	 */
+	ZTree() noexcept;
 
-  static_assert(std::is_base_of<NB, Node>::value,
-                "Node class not properly derived from node base!");
+	static_assert(std::is_base_of<NB, Node>::value,
+	              "Node class not properly derived from node base!");
+
+	/**
+	 * @brief Create a new Zip Tree from a different Zip Tree.
+	 *
+	 * The other Zip Tree is moved into this one, i.e., using it
+	 * afterwards is undefined behavior.
+	 *
+	 * @param other  The Zip Tree that this one is constructed from
+	 */
+	ZTree(MyClass && other);
+
+	/**
+	 * @brief Move-assign an other Zip Tree to this one
+	 *
+	 * The other Zip Tree is moved into this one, i.e., using it
+	 * afterwards is undefined behavior.
+	 *
+	 * @param other  The Zip Tree that this one is constructed from
+	 */
+	MyClass & operator=(MyClass && other);
+
+	// Copying
+	/**
+	 * @brief Copy an other tree into this one
+	 *
+	 * @warning Both trees must have the same size! The nodes in this tree
+	 * will be overwritten.
+	 *
+	 * @warning Your node class must implement an operator=(). However,
+	 * the operator=() must not change the assigned rank of a node!
+	 *
+	 * @warning This method is only available for trees which:
+	 *    * use hash-based ranking and
+	 *    * store the rank, i.e., for which TreeFlags::ZTREE_RANK_TYPE is set.
+	 *
+	 * @param other  The Zip Tree that this one is copied from
+	 */
+	MyClass & operator=(const MyClass & other);
 
 private:
-  // Class to tell the abstract search tree iterator how to handle
-  // our nodes
-  class NodeInterface {
-  public:
-    static Node *
-    get_parent(Node * n)
-    {
-      return n->NB::_zt_parent;
-    }
-    static Node *
-    get_left(Node * n)
-    {
-      return n->NB::_zt_left;
-    }
-    static Node *
-    get_right(Node * n)
-    {
-      return n->NB::_zt_right;
-    }
+	// Class to tell the abstract search tree iterator how to handle
+	// our nodes
+	class NodeInterface {
+	public:
+		static Node *
+		get_parent(Node * n)
+		{
+			return n->NB::_zt_parent;
+		}
+		static Node *
+		get_left(Node * n)
+		{
+			return n->NB::_zt_left;
+		}
+		static Node *
+		get_right(Node * n)
+		{
+			return n->NB::_zt_right;
+		}
 
-    static const Node *
-    get_parent(const Node * n)
-    {
-      return n->NB::_zt_parent;
-    }
-    static const Node *
-    get_left(const Node * n)
-    {
-      return n->NB::_zt_left;
-    }
-    static const Node *
-    get_right(const Node * n)
-    {
-      return n->NB::_zt_right;
-    }
-  };
+		static const Node *
+		get_parent(const Node * n)
+		{
+			return n->NB::_zt_parent;
+		}
+		static const Node *
+		get_left(const Node * n)
+		{
+			return n->NB::_zt_left;
+		}
+		static const Node *
+		get_right(const Node * n)
+		{
+			return n->NB::_zt_right;
+		}
+	};
 
 public:
-  // forward, for friendship
-  template <bool reverse>
-  class const_iterator;
+	// forward, for friendship
+	template <bool reverse>
+	class const_iterator;
 
-  template <bool reverse>
-  class iterator : public internal::IteratorBase<iterator<reverse>, Node,
-                                                 NodeInterface, reverse> {
-  public:
-    using internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
-                                 reverse>::IteratorBase;
-    iterator(const iterator<reverse> & orig)
-        : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
-                                 reverse>(orig.n){};
-    iterator()
-        : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
-                                 reverse>(){};
+	template <bool reverse>
+	class iterator : public internal::IteratorBase<iterator<reverse>, Node,
+	                                               NodeInterface, reverse> {
+	public:
+		using internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
+		                             reverse>::IteratorBase;
+		iterator(const iterator<reverse> & orig)
+		    : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
+		                             reverse>(orig.n){};
+		iterator()
+		    : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
+		                             reverse>(){};
 
-  private:
-    friend class const_iterator<reverse>;
-  };
+	private:
+		friend class const_iterator<reverse>;
+	};
 
-  template <bool reverse>
-  class const_iterator
-      : public internal::IteratorBase<const_iterator<reverse>, const Node,
-                                      NodeInterface, reverse> {
-  public:
-    using internal::IteratorBase<const_iterator<reverse>, const Node,
-                                 NodeInterface, reverse>::IteratorBase;
-    const_iterator(const const_iterator<reverse> & orig)
-        : internal::IteratorBase<const_iterator<reverse>, const Node,
-                                 NodeInterface, reverse>(orig.n){};
-    const_iterator(const iterator<reverse> & orig)
-        : internal::IteratorBase<const_iterator<reverse>, const Node,
-                                 NodeInterface, reverse>(orig.n){};
-    const_iterator()
-        : internal::IteratorBase<const_iterator<reverse>, const Node,
-                                 NodeInterface, reverse>(){};
-  };
+	template <bool reverse>
+	class const_iterator
+	    : public internal::IteratorBase<const_iterator<reverse>, const Node,
+	                                    NodeInterface, reverse> {
+	public:
+		using internal::IteratorBase<const_iterator<reverse>, const Node,
+		                             NodeInterface, reverse>::IteratorBase;
+		const_iterator(const const_iterator<reverse> & orig)
+		    : internal::IteratorBase<const_iterator<reverse>, const Node,
+		                             NodeInterface, reverse>(orig.n){};
+		const_iterator(const iterator<reverse> & orig)
+		    : internal::IteratorBase<const_iterator<reverse>, const Node,
+		                             NodeInterface, reverse>(orig.n){};
+		const_iterator()
+		    : internal::IteratorBase<const_iterator<reverse>, const Node,
+		                             NodeInterface, reverse>(){};
+	};
 
-  /**
-   * @brief Inserts <node> into the tree
-   *
-   * Inserts <node> into the tree.
-   *
-   * *Warning*: Please note that after calling insert() on a node (and before
-   * removing that node again), that node *may not move in memory*. A common
-   * pitfall is to store nodes in a std::vector (or other STL container), which
-   * reallocates (and thereby moves objecs around).
-   *
-   * For zip trees, the hinted version is equivalent to the unhinted insertion.
-   *
-   * @param   Node  The node to be inserted.
-   */
-  void insert(Node & node) noexcept;
-  void insert(Node & node, Node & hint) noexcept;
+	/**
+	 * @brief Inserts <node> into the tree
+	 *
+	 * Inserts <node> into the tree.
+	 *
+	 * *Warning*: Please note that after calling insert() on a node (and before
+	 * removing that node again), that node *may not move in memory*. A common
+	 * pitfall is to store nodes in a std::vector (or other STL container), which
+	 * reallocates (and thereby moves objecs around).
+	 *
+	 * For zip trees, the hinted version is equivalent to the unhinted insertion.
+	 *
+	 * @param   Node  The node to be inserted.
+	 */
+	void insert(Node & node) noexcept;
+	void insert(Node & node, Node & hint) noexcept;
 
-  /**
-   * @brief Upper-bounds an element
-   *
-   * Returns an iterator to the smallest element to which <query> compares as
-   * "less", i.e. the smallest element that is considered go strictly after
-   * <query>.
-   *
-   * Note that <query> does not have to be a Node, but can be anything that can
-   * be compared to a Node, i.e., for which
-   *    Compare()(const Node &, const Comparable &)
-   * and
-   *    Compare()(const Comparable &, const Node &)
-   * are defined and implemented. In the case of using the default
-   * ygg::utilities::flexible_less as Compare, that means you have to implement
-   * operator<() for both types.
-   *
-   * @param query An object comparable to Node that should be upper-bounded
-   * @returns An iterator to the first element comparing "greater" to <query>,
-   * or end() if no such element exists
-   */
-  template <class Comparable>
-  const_iterator<false> upper_bound(const Comparable & query) const;
-  template <class Comparable>
-  iterator<false> upper_bound(const Comparable & query);
+	/**
+	 * @brief Upper-bounds an element
+	 *
+	 * Returns an iterator to the smallest element to which <query> compares as
+	 * "less", i.e. the smallest element that is considered go strictly after
+	 * <query>.
+	 *
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default
+	 * ygg::utilities::flexible_less as Compare, that means you have to implement
+	 * operator<() for both types.
+	 *
+	 * @param query An object comparable to Node that should be upper-bounded
+	 * @returns An iterator to the first element comparing "greater" to <query>,
+	 * or end() if no such element exists
+	 */
+	template <class Comparable>
+	const_iterator<false> upper_bound(const Comparable & query) const;
+	template <class Comparable>
+	iterator<false> upper_bound(const Comparable & query);
 
-  /**
-   * @brief Lower-bounds an element
-   *
-   * Returns an iterator to the first element that is not less that <query>,
-   * i.e., that does not have to go before <query>.
-   *
-   * Note that <query> does not have to be a Node, but can be anything that can
-   * be compared to a Node, i.e., for which
-   *    Compare()(const Node &, const Comparable &)
-   * and
-   *    Compare()(const Comparable &, const Node &)
-   * are defined and implemented. In the case of using the default
-   * ygg::utilities::flexible_less as Compare, that means you have to implement
-   * operator<() for both types.
-   *
-   * @param query An object comparable to Node that should be lower-bounded
-   * @returns An iterator to the first element comparing greater-or-equally to
-   * <query>, or end() if no such element exists
-   */
-  template <class Comparable>
-  const_iterator<false> lower_bound(const Comparable & query) const;
-  template <class Comparable>
-  iterator<false> lower_bound(const Comparable & query);
+	/**
+	 * @brief Lower-bounds an element
+	 *
+	 * Returns an iterator to the first element that is not less that <query>,
+	 * i.e., that does not have to go before <query>.
+	 *
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default
+	 * ygg::utilities::flexible_less as Compare, that means you have to implement
+	 * operator<() for both types.
+	 *
+	 * @param query An object comparable to Node that should be lower-bounded
+	 * @returns An iterator to the first element comparing greater-or-equally to
+	 * <query>, or end() if no such element exists
+	 */
+	template <class Comparable>
+	const_iterator<false> lower_bound(const Comparable & query) const;
+	template <class Comparable>
+	iterator<false> lower_bound(const Comparable & query);
 
-  /**
-   * @brief Removes <node> from the tree
-   *
-   * Removes <node> from the tree.
-   *
-   * @param   Node  The node to be removed.
-   */
-  void remove(Node & node) noexcept;
+	/**
+	 * @brief Removes <node> from the tree
+	 *
+	 * Removes <node> from the tree.
+	 *
+	 * @param   Node  The node to be removed.
+	 */
+	void remove(Node & node) noexcept;
 
-  // TODO add rank-shortened search
+	// TODO add rank-shortened search
 
-  /**
-   * @brief Finds an element in the tree
-   *
-   * Returns an iterator to the first element that compares equally to <query>.
-   * Note that <query> does not have to be a Node, but can be anything that can
-   * be compared to a Node, i.e., for which
-   *    Compare()(const Node &, const Comparable &)
-   * and
-   *    Compare()(const Comparable &, const Node &)
-   * are defined and implemented. In the case of using the default
-   * ygg::utilities::flexible_less as Compare, that means you have to implement
-   * operator<() for both types.
-   *
-   * @param query An object comparing equally to the element that should be
-   * found.
-   * @returns An iterator to the first element comparing equally to <query>, or
-   * end() if no such element exists
-   */
-  template <class Comparable>
-  const_iterator<false> find(const Comparable & query) const;
-  template <class Comparable>
-  iterator<false> find(const Comparable & query);
+	/**
+	 * @brief Finds an element in the tree
+	 *
+	 * Returns an iterator to the first element that compares equally to <query>.
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default
+	 * ygg::utilities::flexible_less as Compare, that means you have to implement
+	 * operator<() for both types.
+	 *
+	 * @param query An object comparing equally to the element that should be
+	 * found.
+	 * @returns An iterator to the first element comparing equally to <query>, or
+	 * end() if no such element exists
+	 */
+	template <class Comparable>
+	const_iterator<false> find(const Comparable & query) const;
+	template <class Comparable>
+	iterator<false> find(const Comparable & query);
 
-  // Iteration
-  /**
-   * Returns an iterator pointing to the smallest element in the tree.
-   */
-  const_iterator<false> cbegin() const;
-  /**
-   * Returns an iterator pointing after the largest element in the tree.
-   */
-  const_iterator<false> cend() const;
-  /**
-   * Returns an iterator pointing to the smallest element in the tree.
-   */
-  const_iterator<false> begin() const;
-  iterator<false> begin();
+	// Iteration
+	/**
+	 * Returns an iterator pointing to the smallest element in the tree.
+	 */
+	const_iterator<false> cbegin() const;
+	/**
+	 * Returns an iterator pointing after the largest element in the tree.
+	 */
+	const_iterator<false> cend() const;
+	/**
+	 * Returns an iterator pointing to the smallest element in the tree.
+	 */
+	const_iterator<false> begin() const;
+	iterator<false> begin();
 
-  /**
-   * Returns an iterator pointing after the largest element in the tree.
-   */
-  const_iterator<false> end() const;
-  iterator<false> end();
+	/**
+	 * Returns an iterator pointing after the largest element in the tree.
+	 */
+	const_iterator<false> end() const;
+	iterator<false> end();
 
-  /**
-   * Returns an reverse iterator pointing to the largest element in the tree.
-   */
-  const_iterator<true> crbegin() const;
-  /**
-   * Returns an reverse iterator pointing before the smallest element in the
-   * tree.
-   */
-  const_iterator<true> crend() const;
-  /**
-   * Returns an reverse iterator pointing to the largest element in the tree.
-   */
-  const_iterator<true> rbegin() const;
-  iterator<true> rbegin();
+	/**
+	 * Returns an reverse iterator pointing to the largest element in the tree.
+	 */
+	const_iterator<true> crbegin() const;
+	/**
+	 * Returns an reverse iterator pointing before the smallest element in the
+	 * tree.
+	 */
+	const_iterator<true> crend() const;
+	/**
+	 * Returns an reverse iterator pointing to the largest element in the tree.
+	 */
+	const_iterator<true> rbegin() const;
+	iterator<true> rbegin();
 
-  /**
-   * Returns an reverse iterator pointing before the smallest element in the
-   * tree.
-   */
-  const_iterator<true> rend() const;
-  iterator<true> rend();
+	/**
+	 * Returns an reverse iterator pointing before the smallest element in the
+	 * tree.
+	 */
+	const_iterator<true> rend() const;
+	iterator<true> rend();
 
-  /**
-   * Returns an iterator pointing to the entry held in node.
-   *
-   * @param node  The node the iterator should point to.
-   */
-  const_iterator<false> iterator_to(const Node & node) const;
-  iterator<false> iterator_to(Node & node);
+	/**
+	 * Returns an iterator pointing to the entry held in node.
+	 *
+	 * @param node  The node the iterator should point to.
+	 */
+	const_iterator<false> iterator_to(const Node & node) const;
+	iterator<false> iterator_to(Node & node);
 
-  // Debugging methods
-  void dbg_verify() const;
-  void dbg_print_rank_stats() const;
+	// Debugging methods
+	void dbg_verify() const;
+	void dbg_print_rank_stats() const;
 
-  /**
-   * @brief Debugging Method: Draw the Tree as a .dot file
-   *
-   * Outputs the current tree as a .dot file which can be drawn using
-   * graphviz.
-   *
-   * @param filename  The file path where to write the .dot file.
-   */
-  void dump_to_dot(const std::string & filename) const;
+	/**
+	 * @brief Debugging Method: Draw the Tree as a .dot file
+	 *
+	 * Outputs the current tree as a .dot file which can be drawn using
+	 * graphviz.
+	 *
+	 * @param filename  The file path where to write the .dot file.
+	 */
+	void dump_to_dot(const std::string & filename) const;
 
-  /**
-   * Return the number of elements in the tree.
-   *
-   * This method runs in O(1).
-   *
-   * @warning This method is only available if CONSTANT_TIME_SIZE is set as
-   * option!
-   *
-   * @return The number of elements in the tree.
-   */
-  size_t size() const;
+	/**
+	 * Return the number of elements in the tree.
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @warning This method is only available if CONSTANT_TIME_SIZE is set as
+	 * option!
+	 *
+	 * @return The number of elements in the tree.
+	 */
+	size_t size() const;
 
-  /**
-   * @brief Returns whether the tree is empty
-   *
-   * This method runs in O(1).
-   *
-   * @return true if the tree is empty, false otherwise
-   */
-  bool empty() const;
+	/**
+	 * @brief Returns whether the tree is empty
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @return true if the tree is empty, false otherwise
+	 */
+	bool empty() const;
 
-  Node * get_root() const;
+	Node * get_root() const;
 
-  /**
-   * @brief Removes all elements from the tree.
-   *
-   * Removes all elements from the tree.
-   */
-  void clear();
+	/**
+	 * @brief Removes all elements from the tree.
+	 *
+	 * Removes all elements from the tree.
+	 */
+	void clear();
 
 private:
-  Node * root;
-  Compare cmp;
+	Node * root;
+	Compare cmp;
 
-  void unzip(Node & oldn, Node & newn) noexcept;
-  void zip(Node & old_root) noexcept;
+	void unzip(Node & oldn, Node & newn) noexcept;
+	void zip(Node & old_root) noexcept;
 
-  Node * get_smallest() const;
-  Node * get_largest() const;
+	Node * get_smallest() const;
+	Node * get_largest() const;
 
-  // Debugging methods
-  void dbg_verify_consistency(Node * sub_root, Node * lower_bound,
-                              Node * upper_bound) const;
-  void dbg_verify_size() const;
+	// Debugging methods
+	void dbg_verify_consistency(Node * sub_root, Node * lower_bound,
+	                            Node * upper_bound) const;
+	void dbg_verify_size() const;
 
-  template <class NodeNameGetter>
-  void dump_to_dot_base(const std::string & filename,
-                        NodeNameGetter name_getter) const;
+	template <class NodeNameGetter>
+	void dump_to_dot_base(const std::string & filename,
+	                      NodeNameGetter name_getter) const;
 
-  template <class NodeNameGetter>
-  void output_node_base(const Node * node, std::ofstream & out,
-                        NodeNameGetter name_getter) const;
+	template <class NodeNameGetter>
+	void output_node_base(const Node * node, std::ofstream & out,
+	                      NodeNameGetter name_getter) const;
 
-  SizeHolder<Options::constant_time_size> s;
+	SizeHolder<Options::constant_time_size> s;
 };
 
 } // namespace ygg
