@@ -13,7 +13,7 @@ namespace utilities {
 template <class T>
 class TypeHolder {
 public:
-  using type = T;
+	using type = T;
 };
 
 // From
@@ -43,54 +43,63 @@ void
 throw_away(Ts...)
 {}
 
-  class NotFoundMarker{
-  public:
-    static constexpr std::size_t value = 0;
-  };
-  
+class NotFoundMarker {
+public:
+	static constexpr std::size_t value = 0;
+};
+
 template <template <std::size_t> class TMPL>
 constexpr auto
 get_value_if_present_func()
 {
-  return TypeHolder<NotFoundMarker>{};
+	return TypeHolder<NotFoundMarker>{};
 }
 
-template <template <std::size_t> class TMPL, class T,
-          class... Rest>
+template <template <std::size_t> class TMPL, class T, class... Rest>
 constexpr auto get_value_if_present_func(
     typename std::enable_if<is_numeric_specialization<T, TMPL>{}, bool>::type
         dummy = true)
 {
-  (void)dummy;
-  return TypeHolder<T>{};
+	(void)dummy;
+	return TypeHolder<T>{};
 }
 
-template <template <std::size_t> class TMPL, class T,
-          class... Rest>
+template <template <std::size_t> class TMPL, class T, class... Rest>
 constexpr auto get_value_if_present_func(
     typename std::enable_if<!is_numeric_specialization<T, TMPL>{}, bool>::type
         dummy = true)
 {
-  (void)dummy;
-  return get_value_if_present_func<TMPL, Rest...>();
+	(void)dummy;
+	return get_value_if_present_func<TMPL, Rest...>();
 }
 
 template <template <std::size_t> class TMPL, class... Ts>
 class get_value_if_present {
 private:
-  using type =
-      typename decltype(get_value_if_present_func<TMPL, Ts...>())::type;
+	using type =
+	    typename decltype(get_value_if_present_func<TMPL, Ts...>())::type;
 
 public:
-  constexpr static bool found = std::is_same<type, NotFoundMarker>::value;
-  constexpr static std::size_t value = type::value;
+	constexpr static bool found = !std::is_same<type, NotFoundMarker>::value;
+	constexpr static std::size_t value = type::value;
+};
+
+template <template <std::size_t> class TMPL, std::size_t DEFAULT, class... Ts>
+class get_value_if_present_else_default {
+private:
+	using type =
+	    typename decltype(get_value_if_present_func<TMPL, Ts...>())::type;
+
+public:
+	constexpr static bool found = !std::is_same<type, NotFoundMarker>::value;
+	constexpr static std::size_t value = found ? type::value : DEFAULT;
 };
 
 template <template <class> class TMPL, class Default>
 constexpr auto
 get_type_if_present_func()
 {
-  return TypeHolder<Default>{};
+	return TypeHolder<Default>{};
 }
 
 template <template <class> class TMPL, class Default, class T, class... Rest>
@@ -98,8 +107,8 @@ constexpr auto get_type_if_present_func(
     typename std::enable_if<is_specialization<T, TMPL>{}, bool>::type dummy =
         true)
 {
-  (void)dummy;
-  return TypeHolder<T>{};
+	(void)dummy;
+	return TypeHolder<T>{};
 }
 
 template <template <class> class TMPL, class Default, class T, class... Rest>
@@ -107,15 +116,15 @@ constexpr auto get_type_if_present_func(
     typename std::enable_if<!is_specialization<T, TMPL>{}, bool>::type dummy =
         true)
 {
-  (void)dummy;
-  return get_type_if_present_func<TMPL, Default, Rest...>();
+	(void)dummy;
+	return get_type_if_present_func<TMPL, Default, Rest...>();
 }
 
 template <template <class> class TMPL, class Default, class... Ts>
 class get_type_if_present {
 public:
-  using type =
-      typename decltype(get_type_if_present_func<TMPL, Default, Ts...>())::type;
+	using type =
+	    typename decltype(get_type_if_present_func<TMPL, Default, Ts...>())::type;
 };
 
 } // namespace utilities
@@ -131,12 +140,12 @@ namespace rbtree_internal {
  */
 class flexible_less {
 public:
-  template <class T1, class T2>
-  constexpr bool
-  operator()(const T1 & lhs, const T2 & rhs) const
-  {
-    return lhs < rhs;
-  }
+	template <class T1, class T2>
+	constexpr bool
+	operator()(const T1 & lhs, const T2 & rhs) const
+	{
+		return lhs < rhs;
+	}
 };
 
 /*
@@ -154,7 +163,7 @@ template <typename QueryT>
 constexpr bool
 pack_contains()
 {
-  return false;
+	return false;
 }
 
 // Forward
@@ -165,22 +174,22 @@ template <typename QueryT, bool found, typename... Rest>
 constexpr typename std::enable_if<found, bool>::type
 pack_contains_forward()
 {
-  return true;
+	return true;
 }
 
 template <typename QueryT, bool found, typename... Rest>
 constexpr typename std::enable_if<!found, bool>::type
 pack_contains_forward()
 {
-  return pack_contains<QueryT, Rest...>();
+	return pack_contains<QueryT, Rest...>();
 }
 
 template <typename QueryT, typename First, typename... Rest>
 constexpr bool
 pack_contains()
 {
-  return pack_contains_forward<QueryT, std::is_same<QueryT, First>::value,
-                               Rest...>();
+	return pack_contains_forward<QueryT, std::is_same<QueryT, First>::value,
+	                             Rest...>();
 }
 
 /*
@@ -238,7 +247,7 @@ template <template <class...> class From, template <class...> class To,
           class... Ts>
 struct pass_pack<From<Ts...>, To>
 {
-  using type = To<Ts...>;
+	using type = To<Ts...>;
 };
 
 /*
