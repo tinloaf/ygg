@@ -141,44 +141,58 @@ class RBTreeNodeBase
  * This class serves as an (optional) base class for the NodeTraits you need to
  * implement. See DOCTODO for details on NodeTraits. This class just implements
  * the various hooks as empty functions.
- *
- * @tparam Node   The node class of your Red Black Tree
  */
-template <class Node>
 class RBDefaultNodeTraits {
 public:
 	// TODO document
+	template <class Node, class Tree>
 	static void
-	leaf_inserted(Node & node)
+	leaf_inserted(Node & node, Tree & t)
 	{
 		(void)node;
-	};
+		(void)t;
+	}
+
+	template <class Node, class Tree>
 	static void
-	rotated_left(Node & node)
+	rotated_left(Node & node, Tree & t)
 	{
 		(void)node;
-	};
+		(void)t;
+	}
+
+	template <class Node, class Tree>
 	static void
-	rotated_right(Node & node)
+	rotated_right(Node & node, Tree & t)
 	{
 		(void)node;
-	};
+		(void)t;
+	}
+
+	template <class Node, class Tree>
 	static void
-	delete_leaf(Node & node)
+	delete_leaf(Node & node, Tree & t)
 	{
 		(void)node;
-	};
+		(void)t;
+	}
+
+	template <class Node, class Tree>
 	static void
-	deleted_below(Node & node)
+	deleted_below(Node & node, Tree & t)
 	{
 		(void)node;
-	};
+		(void)t;
+	}
+
+	template <class Node, class Tree>
 	static void
-	swapped(Node & old_ancestor, Node & old_descendant)
+	swapped(Node & old_ancestor, Node & old_descendant, Tree & t)
 	{
 		(void)old_ancestor;
 		(void)old_descendant;
-	};
+		(void)t;
+	}
 };
 
 /**

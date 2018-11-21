@@ -67,7 +67,7 @@ public:
 	}
 };
 
-class NodeTraits : public RBDefaultNodeTraits<Node> {
+class NodeTraits : public RBDefaultNodeTraits {
 public:
 	static std::string
 	get_id(const Node * node)
@@ -76,7 +76,7 @@ public:
 	}
 };
 
-class EqualityNodeTraits : public RBDefaultNodeTraits<EqualityNode> {
+class EqualityNodeTraits : public RBDefaultNodeTraits {
 public:
 	static std::string
 	get_id(const EqualityNode * node)

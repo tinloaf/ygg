@@ -37,7 +37,7 @@ public:
 };
 
 // Configure the RBTree based on Node and the default NodeTraits
-using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
+using MyTree = RBTree<Node, RBDefaultNodeTraits, MyTreeOptions>;
 ~~~~~~~~~~~~~
 
 In fact, we could have skipped defining our own TreeOptions here, since TreeFlags::MULTIPLE is 

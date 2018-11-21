@@ -19,58 +19,58 @@ constexpr size_t TEST_SIZE_BASE_EXPONENT = 7;
 template <bool distinct>
 class RBTreeBaseFixture : public celero::TestFixture {
 public:
-  RBTreeBaseFixture()
-  {
-    this->instance_sizes.clear();
-    for (size_t i = 0; i < TEST_SIZES; i++) {
-      this->instance_sizes.push_back(
-          {static_cast<int32_t>(std::pow(2, (i + TEST_SIZE_BASE_EXPONENT)))});
-    }
-  }
-
-  virtual std::vector<celero::TestFixture::ExperimentValue>
-  getExperimentValues() const override
-  {
-    return this->instance_sizes;
-  };
-
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & value_count_in) override
-  {
-    this->value_count = value_count_in.Value;
-    this->values.resize((size_t)this->value_count);
-
-    if (distinct) {
-      std::set<int> seen;
-
-      for (size_t i = 0; i < (size_t)this->value_count; ++i) {
-	int val = rand();
-
-	while (seen.find(val) != seen.end()) {
-	  val = rand();
+	RBTreeBaseFixture()
+	{
+		this->instance_sizes.clear();
+		for (size_t i = 0; i < TEST_SIZES; i++) {
+			this->instance_sizes.push_back(
+			    {static_cast<int32_t>(std::pow(2, (i + TEST_SIZE_BASE_EXPONENT)))});
+		}
 	}
 
-	this->values[i] = val;
-	seen.insert(val);
-      }
-    } else {
-      for (size_t i = 0; i < (size_t)this->value_count; ++i) {
-	int val = rand();
-	this->values[i] = val;
-      }
-    }
-  }
+	virtual std::vector<celero::TestFixture::ExperimentValue>
+	getExperimentValues() const override
+	{
+		return this->instance_sizes;
+	};
 
-  virtual void
-  tearDown() override
-  {
-    this->values.clear();
-  }
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & value_count_in) override
+	{
+		this->value_count = value_count_in.Value;
+		this->values.resize((size_t)this->value_count);
 
-  std::vector<celero::TestFixture::ExperimentValue> instance_sizes;
+		if (distinct) {
+			std::set<int> seen;
 
-  std::vector<int> values;
-  int64_t value_count;
+			for (size_t i = 0; i < (size_t)this->value_count; ++i) {
+				int val = rand();
+
+				while (seen.find(val) != seen.end()) {
+					val = rand();
+				}
+
+				this->values[i] = val;
+				seen.insert(val);
+			}
+		} else {
+			for (size_t i = 0; i < (size_t)this->value_count; ++i) {
+				int val = rand();
+				this->values[i] = val;
+			}
+		}
+	}
+
+	virtual void
+	tearDown() override
+	{
+		this->values.clear();
+	}
+
+	std::vector<celero::TestFixture::ExperimentValue> instance_sizes;
+
+	std::vector<int> values;
+	int64_t value_count;
 };
 
 /*
@@ -78,28 +78,28 @@ public:
  */
 class StdSetBaseFixture : public RBTreeBaseFixture<true> {
 public:
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->RBTreeBaseFixture<true>::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->RBTreeBaseFixture<true>::setUp(number_of_nodes.Value);
 
-    for (int i = 0; i < number_of_nodes.Value; ++i) {
-      std::set<int> donor;
-      donor.insert(this->values[i]);
-      this->nodes.push_back(donor.extract(donor.begin()));
-    }
-  }
+		for (int i = 0; i < number_of_nodes.Value; ++i) {
+			std::set<int> donor;
+			donor.insert(this->values[i]);
+			this->nodes.push_back(donor.extract(donor.begin()));
+		}
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->RBTreeBaseFixture<true>::tearDown();
+	virtual void
+	tearDown() override
+	{
+		this->RBTreeBaseFixture<true>::tearDown();
 
-    this->s.clear();
-  }
+		this->s.clear();
+	}
 
-  std::vector<decltype(std::set<int>().extract(std::set<int>().begin()))> nodes;
-  std::set<int> s;
+	std::vector<decltype(std::set<int>().extract(std::set<int>().begin()))> nodes;
+	std::set<int> s;
 };
 
 class StdSetInsertFixture : public StdSetBaseFixture {
@@ -107,32 +107,32 @@ class StdSetInsertFixture : public StdSetBaseFixture {
 
 class StdSetSearchFixture : public StdSetBaseFixture {
 public:
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->StdSetBaseFixture::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->StdSetBaseFixture::setUp(number_of_nodes.Value);
 
-    for (auto & n : this->nodes) {
-      this->s.insert(std::move(n));
-    }
+		for (auto & n : this->nodes) {
+			this->s.insert(std::move(n));
+		}
 
-    for (int v : this->values) {
-      this->search_values.push_back(v);
-    }
+		for (int v : this->values) {
+			this->search_values.push_back(v);
+		}
 
-    this->nodes.clear();
-    std::random_shuffle(this->search_values.begin(), this->search_values.end());
-  }
+		this->nodes.clear();
+		std::random_shuffle(this->search_values.begin(), this->search_values.end());
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->search_values.clear();
+	virtual void
+	tearDown() override
+	{
+		this->search_values.clear();
 
-    this->StdSetBaseFixture::tearDown();
-  }
+		this->StdSetBaseFixture::tearDown();
+	}
 
-  std::vector<int> search_values;
+	std::vector<int> search_values;
 };
 
 /*
@@ -142,93 +142,95 @@ template <class MyTreeOptions>
 class YggRBTreeBaseFixture
     : public RBTreeBaseFixture<!MyTreeOptions::multiple> {
 public:
-  class Node : public RBTreeNodeBase<Node, MyTreeOptions> {
-  private:
-    int value;
+	class Node : public RBTreeNodeBase<Node, MyTreeOptions> {
+	private:
+		int value;
 
-  public:
-    void
-    set_value(int new_value)
-    {
-      this->value = new_value;
-    }
+	public:
+		void
+		set_value(int new_value)
+		{
+			this->value = new_value;
+		}
 
-    int
-    get_value() const
-    {
-      return this->value;
-    }
+		int
+		get_value() const
+		{
+			return this->value;
+		}
 
-    bool
-    operator<(const Node & rhs) const
-    {
-      return this->value < rhs.value;
-    }
-  };
+		bool
+		operator<(const Node & rhs) const
+		{
+			return this->value < rhs.value;
+		}
+	};
 
-  using Tree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
+	using Tree = RBTree<Node, RBDefaultNodeTraits, MyTreeOptions>;
 
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(
+		    number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes.Value);
-    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
-      this->nodes[i].set_value(this->values[i]);
-    }
-  }
+		this->nodes.resize((size_t)number_of_nodes.Value);
+		for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
+			this->nodes[i].set_value(this->values[i]);
+		}
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::tearDown();
+	virtual void
+	tearDown() override
+	{
+		this->RBTreeBaseFixture<!MyTreeOptions::multiple>::tearDown();
 
-    this->nodes.clear();
-  }
+		this->nodes.clear();
+	}
 
-  std::vector<Node> nodes;
-  Tree t;
+	std::vector<Node> nodes;
+	Tree t;
 };
 
 template <class MyTreeOptions>
 class YggMultiRBTreeBaseFixture : public RBTreeBaseFixture<false> {
 public:
-  class Node : public RBTreeNodeBase<Node, TreeOptions<TreeFlags::MULTIPLE>> {
-  public:
-    int value;
+	class Node : public RBTreeNodeBase<Node, TreeOptions<TreeFlags::MULTIPLE>> {
+	public:
+		int value;
 
-    bool
-    operator<(const Node & rhs) const
-    {
-      return this->value < rhs.value;
-    }
-  };
+		bool
+		operator<(const Node & rhs) const
+		{
+			return this->value < rhs.value;
+		}
+	};
 
-  using Tree =
-      RBTree<Node, RBDefaultNodeTraits<Node>, TreeOptions<TreeFlags::MULTIPLE>>;
+	using Tree =
+	    RBTree<Node, RBDefaultNodeTraits, TreeOptions<TreeFlags::MULTIPLE>>;
 
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->RBTreeBaseFixture<!MyTreeOptions::multiple>::setUp(
+		    number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes.Value);
-    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
-      this->nodes[i].set_value(this->values[i]);
-    }
-  }
+		this->nodes.resize((size_t)number_of_nodes.Value);
+		for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
+			this->nodes[i].set_value(this->values[i]);
+		}
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->RBTreeBaseFixture<!MyTreeOptions::multiple>::tearDown();
+	virtual void
+	tearDown() override
+	{
+		this->RBTreeBaseFixture<!MyTreeOptions::multiple>::tearDown();
 
-    this->nodes.clear();
-  }
+		this->nodes.clear();
+	}
 
-  std::vector<Node> nodes;
-  Tree t;
+	std::vector<Node> nodes;
+	Tree t;
 };
 
 template <class MyTreeOptions>
@@ -238,30 +240,30 @@ class YggRBTreeInsertFixture : public YggRBTreeBaseFixture<MyTreeOptions> {
 template <class MyTreeOptions>
 class YggRBTreeSearchFixture : public YggRBTreeBaseFixture<MyTreeOptions> {
 public:
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->YggRBTreeBaseFixture<MyTreeOptions>::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->YggRBTreeBaseFixture<MyTreeOptions>::setUp(number_of_nodes.Value);
 
-    for (auto & n : this->nodes) {
-      this->t.insert(n);
-      this->search_values.push_back(&n);
-    }
+		for (auto & n : this->nodes) {
+			this->t.insert(n);
+			this->search_values.push_back(&n);
+		}
 
-    std::random_shuffle(this->search_values.begin(), this->search_values.end());
-  }
+		std::random_shuffle(this->search_values.begin(), this->search_values.end());
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->t.clear();
-    this->search_values.clear();
+	virtual void
+	tearDown() override
+	{
+		this->t.clear();
+		this->search_values.clear();
 
-    this->YggRBTreeBaseFixture<MyTreeOptions>::tearDown();
-  }
+		this->YggRBTreeBaseFixture<MyTreeOptions>::tearDown();
+	}
 
-  std::vector<typename YggRBTreeBaseFixture<MyTreeOptions>::Node *>
-      search_values;
+	std::vector<typename YggRBTreeBaseFixture<MyTreeOptions>::Node *>
+	    search_values;
 };
 
 /*
@@ -270,56 +272,56 @@ public:
 template <class Options>
 class ZipNode : public ZTreeNodeBase<ZipNode<Options>, Options> {
 private:
-  int value;
+	int value;
 
 public:
-  void
-  set_value(int new_value)
-  {
-    this->value = new_value;
-    this->update_rank();
-  }
+	void
+	set_value(int new_value)
+	{
+		this->value = new_value;
+		this->update_rank();
+	}
 
-  int
-  get_value() const
-  {
-    return this->value;
-  }
+	int
+	get_value() const
+	{
+		return this->value;
+	}
 
-  bool
-  operator<(const ZipNode<Options> & rhs) const
-  {
-    return this->value < rhs.value;
-  }
+	bool
+	operator<(const ZipNode<Options> & rhs) const
+	{
+		return this->value < rhs.value;
+	}
 };
 
 template <class MyTreeOptions>
 class YggZipTreeBaseFixture : public RBTreeBaseFixture<false> {
 public:
-  using Node = ZipNode<MyTreeOptions>;
-  using Tree = ZTree<Node, ZTreeDefaultNodeTraits<Node>, MyTreeOptions>;
+	using Node = ZipNode<MyTreeOptions>;
+	using Tree = ZTree<Node, ZTreeDefaultNodeTraits<Node>, MyTreeOptions>;
 
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->RBTreeBaseFixture<false>::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->RBTreeBaseFixture<false>::setUp(number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes.Value);
-    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
-      this->nodes[i].set_value(this->values[i]);
-    }
-  }
+		this->nodes.resize((size_t)number_of_nodes.Value);
+		for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
+			this->nodes[i].set_value(this->values[i]);
+		}
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->RBTreeBaseFixture<false>::tearDown();
+	virtual void
+	tearDown() override
+	{
+		this->RBTreeBaseFixture<false>::tearDown();
 
-    this->nodes.clear();
-  }
+		this->nodes.clear();
+	}
 
-  std::vector<Node> nodes;
-  Tree t;
+	std::vector<Node> nodes;
+	Tree t;
 };
 
 // Necessary for rank-by-hash
@@ -327,11 +329,11 @@ namespace std {
 template <class T>
 struct hash<ZipNode<T>>
 {
-  size_t
-  operator()(const ZipNode<T> & n) const
-  {
-    return n.get_value();
-  }
+	size_t
+	operator()(const ZipNode<T> & n) const
+	{
+		return n.get_value();
+	}
 };
 
 } // namespace std
@@ -343,30 +345,30 @@ class YggZipTreeInsertFixture : public YggZipTreeBaseFixture<MyTreeOptions> {
 template <class MyTreeOptions>
 class YggZipTreeSearchFixture : public YggZipTreeBaseFixture<MyTreeOptions> {
 public:
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->YggZipTreeBaseFixture<MyTreeOptions>::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->YggZipTreeBaseFixture<MyTreeOptions>::setUp(number_of_nodes.Value);
 
-    for (auto & n : this->nodes) {
-      this->t.insert(n);
-      this->search_values.push_back(&n);
-    }
+		for (auto & n : this->nodes) {
+			this->t.insert(n);
+			this->search_values.push_back(&n);
+		}
 
-    std::random_shuffle(this->search_values.begin(), this->search_values.end());
-  }
+		std::random_shuffle(this->search_values.begin(), this->search_values.end());
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->t.clear();
-    this->search_values.clear();
+	virtual void
+	tearDown() override
+	{
+		this->t.clear();
+		this->search_values.clear();
 
-    this->YggZipTreeBaseFixture<MyTreeOptions>::tearDown();
-  }
+		this->YggZipTreeBaseFixture<MyTreeOptions>::tearDown();
+	}
 
-  std::vector<typename YggZipTreeBaseFixture<MyTreeOptions>::Node *>
-      search_values;
+	std::vector<typename YggZipTreeBaseFixture<MyTreeOptions>::Node *>
+	    search_values;
 };
 
 /*
@@ -375,82 +377,82 @@ public:
 
 class BoostSetBaseFixture : public RBTreeBaseFixture<true> {
 public:
-  class Node
-      : public boost::intrusive::set_base_hook<boost::intrusive::link_mode<
-            boost ::intrusive::link_mode_type::normal_link>> {
-  public:
-    int value;
+	class Node
+	    : public boost::intrusive::set_base_hook<boost::intrusive::link_mode<
+	          boost ::intrusive::link_mode_type::normal_link>> {
+	public:
+		int value;
 
-    bool
-    operator<(const Node & rhs) const
-    {
-      return this->value < rhs.value;
-    }
-  };
+		bool
+		operator<(const Node & rhs) const
+		{
+			return this->value < rhs.value;
+		}
+	};
 
-  using Tree = boost::intrusive::set<Node>;
+	using Tree = boost::intrusive::set<Node>;
 
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->RBTreeBaseFixture<true>::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->RBTreeBaseFixture<true>::setUp(number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes.Value);
-    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
-      this->nodes[i].value = this->values[i];
-    }
-  }
+		this->nodes.resize((size_t)number_of_nodes.Value);
+		for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
+			this->nodes[i].value = this->values[i];
+		}
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->RBTreeBaseFixture<true>::tearDown();
+	virtual void
+	tearDown() override
+	{
+		this->RBTreeBaseFixture<true>::tearDown();
 
-    this->nodes.clear();
-  }
+		this->nodes.clear();
+	}
 
-  std::vector<Node> nodes;
-  Tree t;
+	std::vector<Node> nodes;
+	Tree t;
 };
 
 class BoostMultiSetBaseFixture : public RBTreeBaseFixture<false> {
 public:
-  class Node
-      : public boost::intrusive::set_base_hook<boost::intrusive::link_mode<
-            boost ::intrusive::link_mode_type::normal_link>> {
-  public:
-    int value;
+	class Node
+	    : public boost::intrusive::set_base_hook<boost::intrusive::link_mode<
+	          boost ::intrusive::link_mode_type::normal_link>> {
+	public:
+		int value;
 
-    bool
-    operator<(const Node & rhs) const
-    {
-      return this->value < rhs.value;
-    }
-  };
+		bool
+		operator<(const Node & rhs) const
+		{
+			return this->value < rhs.value;
+		}
+	};
 
-  using Tree = boost::intrusive::multiset<Node>;
+	using Tree = boost::intrusive::multiset<Node>;
 
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->RBTreeBaseFixture<false>::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->RBTreeBaseFixture<false>::setUp(number_of_nodes.Value);
 
-    this->nodes.resize((size_t)number_of_nodes.Value);
-    for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
-      this->nodes[i].value = this->values[i];
-    }
-  }
+		this->nodes.resize((size_t)number_of_nodes.Value);
+		for (size_t i = 0; i < (size_t)number_of_nodes.Value; ++i) {
+			this->nodes[i].value = this->values[i];
+		}
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->RBTreeBaseFixture<false>::tearDown();
+	virtual void
+	tearDown() override
+	{
+		this->RBTreeBaseFixture<false>::tearDown();
 
-    this->nodes.clear();
-  }
+		this->nodes.clear();
+	}
 
-  std::vector<Node> nodes;
-  Tree t;
+	std::vector<Node> nodes;
+	Tree t;
 };
 
 class BoostSetInsertFixture : public BoostSetBaseFixture {
@@ -458,29 +460,29 @@ class BoostSetInsertFixture : public BoostSetBaseFixture {
 
 class BoostSetSearchFixture : public BoostSetBaseFixture {
 public:
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->BoostSetBaseFixture::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->BoostSetBaseFixture::setUp(number_of_nodes.Value);
 
-    for (auto & n : this->nodes) {
-      this->t.insert(n);
-      this->search_values.push_back(&n);
-    }
+		for (auto & n : this->nodes) {
+			this->t.insert(n);
+			this->search_values.push_back(&n);
+		}
 
-    std::random_shuffle(this->search_values.begin(), this->search_values.end());
-  }
+		std::random_shuffle(this->search_values.begin(), this->search_values.end());
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->t.clear();
-    this->search_values.clear();
+	virtual void
+	tearDown() override
+	{
+		this->t.clear();
+		this->search_values.clear();
 
-    this->BoostSetBaseFixture::tearDown();
-  }
+		this->BoostSetBaseFixture::tearDown();
+	}
 
-  std::vector<Node *> search_values;
+	std::vector<Node *> search_values;
 };
 
 class BoostMultiSetInsertFixture : public BoostMultiSetBaseFixture {
@@ -488,29 +490,29 @@ class BoostMultiSetInsertFixture : public BoostMultiSetBaseFixture {
 
 class BoostMultiSetSearchFixture : public BoostMultiSetBaseFixture {
 public:
-  virtual void
-  setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
-  {
-    this->BoostMultiSetBaseFixture::setUp(number_of_nodes.Value);
+	virtual void
+	setUp(const celero::TestFixture::ExperimentValue & number_of_nodes) override
+	{
+		this->BoostMultiSetBaseFixture::setUp(number_of_nodes.Value);
 
-    for (auto & n : this->nodes) {
-      this->t.insert(n);
-      this->search_values.push_back(&n);
-    }
+		for (auto & n : this->nodes) {
+			this->t.insert(n);
+			this->search_values.push_back(&n);
+		}
 
-    std::random_shuffle(this->search_values.begin(), this->search_values.end());
-  }
+		std::random_shuffle(this->search_values.begin(), this->search_values.end());
+	}
 
-  virtual void
-  tearDown() override
-  {
-    this->t.clear();
-    this->search_values.clear();
+	virtual void
+	tearDown() override
+	{
+		this->t.clear();
+		this->search_values.clear();
 
-    this->BoostMultiSetBaseFixture::tearDown();
-  }
+		this->BoostMultiSetBaseFixture::tearDown();
+	}
 
-  std::vector<Node *> search_values;
+	std::vector<Node *> search_values;
 };
 
 /* ===================================================
@@ -545,107 +547,107 @@ using CompressedTreeOptions = TreeOptions<TreeFlags::COMPRESS_COLOR>;
 
 BASELINE_F(Insert, RBTree, YggRBTreeInsertFixture<BasicTreeOptions>, 1000, 1)
 {
-  this->t.clear();
+	this->t.clear();
 
-  for (auto & n : this->nodes) {
-    this->t.insert(n);
-  }
-  celero::DoNotOptimizeAway(this->t);
+	for (auto & n : this->nodes) {
+		this->t.insert(n);
+	}
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Insert, Zip, YggZipTreeInsertFixture<BasicTreeOptions>, 1000, 1)
 {
-  this->t.clear();
+	this->t.clear();
 
-  for (auto & n : this->nodes) {
-    this->t.insert(n);
-  }
-  celero::DoNotOptimizeAway(this->t);
-  // this->t.dbg_print_rank_stats();
+	for (auto & n : this->nodes) {
+		this->t.insert(n);
+	}
+	celero::DoNotOptimizeAway(this->t);
+	// this->t.dbg_print_rank_stats();
 }
 
 BENCHMARK_F(Insert, NoStoreZip, YggZipTreeInsertFixture<ZTreeNoStoreOptions>,
             1000, 1)
 {
-  this->t.clear();
+	this->t.clear();
 
-  for (auto & n : this->nodes) {
-    this->t.insert(n);
-  }
-  celero::DoNotOptimizeAway(this->t);
-  // this->t.dbg_print_rank_stats();
+	for (auto & n : this->nodes) {
+		this->t.insert(n);
+	}
+	celero::DoNotOptimizeAway(this->t);
+	// this->t.dbg_print_rank_stats();
 }
 
 BENCHMARK_F(Insert, RandomZip, YggZipTreeInsertFixture<ZTreeRandomOptions>,
             1000, 1)
 {
-  this->t.clear();
+	this->t.clear();
 
-  for (auto & n : this->nodes) {
-    this->t.insert(n);
-  }
-  celero::DoNotOptimizeAway(this->t);
-  // this->t.dbg_print_rank_stats();
+	for (auto & n : this->nodes) {
+		this->t.insert(n);
+	}
+	celero::DoNotOptimizeAway(this->t);
+	// this->t.dbg_print_rank_stats();
 }
 
 BENCHMARK_F(Insert, StdSet, StdSetInsertFixture, 1000, 1)
 {
-  for (auto & n : this->nodes) {
-    this->s.insert(std::move(n));
-  }
-  celero::DoNotOptimizeAway(s);
+	for (auto & n : this->nodes) {
+		this->s.insert(std::move(n));
+	}
+	celero::DoNotOptimizeAway(s);
 }
 
 BENCHMARK_F(Insert, Boostset, BoostSetInsertFixture, 1000, 1)
 {
-  this->t.clear();
+	this->t.clear();
 
-  for (auto & n : this->nodes) {
-    this->t.insert(n);
-  }
-  celero::DoNotOptimizeAway(this->t);
+	for (auto & n : this->nodes) {
+		this->t.insert(n);
+	}
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Insert, MultiYgg, YggRBTreeInsertFixture<MultiTreeOptions>, 1000, 1)
 {
-  this->t.clear();
+	this->t.clear();
 
-  for (auto & n : this->nodes) {
-    this->t.insert(n);
-  }
-  celero::DoNotOptimizeAway(this->t);
+	for (auto & n : this->nodes) {
+		this->t.insert(n);
+	}
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Insert, YggValidation, YggRBTreeInsertFixture<BasicTreeOptions>,
             1000, 1)
 {
-  this->t.clear();
+	this->t.clear();
 
-  for (auto & n : this->nodes) {
-    this->t.insert(n);
-  }
-  celero::DoNotOptimizeAway(this->t);
+	for (auto & n : this->nodes) {
+		this->t.insert(n);
+	}
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Insert, CompressedYgg,
             YggRBTreeInsertFixture<CompressedTreeOptions>, 1000, 1)
 {
-  this->t.clear();
+	this->t.clear();
 
-  for (auto & n : this->nodes) {
-    this->t.insert(n);
-  }
-  celero::DoNotOptimizeAway(this->t);
+	for (auto & n : this->nodes) {
+		this->t.insert(n);
+	}
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Insert, BoostMultiSet, BoostMultiSetInsertFixture, 1000, 1)
 {
-  this->t.clear();
+	this->t.clear();
 
-  for (auto & n : this->nodes) {
-    this->t.insert(n);
-  }
-  celero::DoNotOptimizeAway(this->t);
+	for (auto & n : this->nodes) {
+		this->t.insert(n);
+	}
+	celero::DoNotOptimizeAway(this->t);
 }
 
 /*
@@ -654,92 +656,92 @@ BENCHMARK_F(Insert, BoostMultiSet, BoostMultiSetInsertFixture, 1000, 1)
 
 BASELINE_F(Search, RBTree, YggRBTreeSearchFixture<BasicTreeOptions>, 30, 50)
 {
-  int sum = 0;
-  for (auto & v : this->search_values) {
-    auto it = this->t.find(*v);
-    sum += it->get_value();
-  }
+	int sum = 0;
+	for (auto & v : this->search_values) {
+		auto it = this->t.find(*v);
+		sum += it->get_value();
+	}
 
-  celero::DoNotOptimizeAway(sum);
+	celero::DoNotOptimizeAway(sum);
 }
 
 BENCHMARK_F(Search, Zip, YggZipTreeSearchFixture<BasicTreeOptions>, 30, 50)
 {
-  int sum = 0;
-  for (auto & v : this->search_values) {
-    auto it = this->t.find(*v);
-    sum += it->get_value();
-  }
+	int sum = 0;
+	for (auto & v : this->search_values) {
+		auto it = this->t.find(*v);
+		sum += it->get_value();
+	}
 
-  celero::DoNotOptimizeAway(sum);
+	celero::DoNotOptimizeAway(sum);
 }
 
 BENCHMARK_F(Search, NoStoreZip, YggZipTreeSearchFixture<ZTreeNoStoreOptions>,
             30, 50)
 {
-  int sum = 0;
-  for (auto & v : this->search_values) {
-    auto it = this->t.find(*v);
-    sum += it->get_value();
-  }
+	int sum = 0;
+	for (auto & v : this->search_values) {
+		auto it = this->t.find(*v);
+		sum += it->get_value();
+	}
 
-  celero::DoNotOptimizeAway(sum);
+	celero::DoNotOptimizeAway(sum);
 }
 
 BENCHMARK_F(Search, StdSet, StdSetSearchFixture, 30, 50)
 {
-  int sum = 0;
-  for (int v : this->search_values) {
-    auto it = this->s.find(v);
-    sum += (*it);
-  }
+	int sum = 0;
+	for (int v : this->search_values) {
+		auto it = this->s.find(v);
+		sum += (*it);
+	}
 
-  celero::DoNotOptimizeAway(sum);
+	celero::DoNotOptimizeAway(sum);
 }
 
 BENCHMARK_F(Search, BoostSet, BoostSetSearchFixture, 30, 50)
 {
-  int sum = 0;
-  for (auto & v : this->search_values) {
-    auto it = this->t.find(*v);
-    sum += it->value;
-  }
+	int sum = 0;
+	for (auto & v : this->search_values) {
+		auto it = this->t.find(*v);
+		sum += it->value;
+	}
 
-  celero::DoNotOptimizeAway(sum);
+	celero::DoNotOptimizeAway(sum);
 }
 
 BENCHMARK_F(Search, MultiYgg, YggRBTreeSearchFixture<MultiTreeOptions>, 30, 50)
 {
-  int sum = 0;
-  for (auto & v : this->search_values) {
-    auto it = this->t.find(*v);
-    sum += it->get_value();
-  }
+	int sum = 0;
+	for (auto & v : this->search_values) {
+		auto it = this->t.find(*v);
+		sum += it->get_value();
+	}
 
-  celero::DoNotOptimizeAway(sum);
+	celero::DoNotOptimizeAway(sum);
 }
 
 BENCHMARK_F(Search, CompressedYgg,
             YggRBTreeSearchFixture<CompressedTreeOptions>, 30, 50)
 {
-  int sum = 0;
-  for (auto & v : this->search_values) {
-    auto it = this->t.find(*v);
-    sum += it->get_value();
-  }
+	int sum = 0;
+	for (auto & v : this->search_values) {
+		auto it = this->t.find(*v);
+		sum += it->get_value();
+	}
 
-  celero::DoNotOptimizeAway(sum);
+	celero::DoNotOptimizeAway(sum);
 }
 
 BENCHMARK_F(Search, BoostMultiSet, BoostMultiSetSearchFixture, 30, 50)
 {
-  int sum = 0;
-  for (auto & v : this->search_values) {
-    auto it = this->t.find(*v);
-    sum += it->value;
-  }
+	int sum = 0;
+	for (auto & v : this->search_values) {
+		auto it = this->t.find(*v);
+		sum += it->value;
+	}
 
-  celero::DoNotOptimizeAway(sum);
+	celero::DoNotOptimizeAway(sum);
 }
 
 /*
@@ -748,69 +750,69 @@ BENCHMARK_F(Search, BoostMultiSet, BoostMultiSetSearchFixture, 30, 50)
 
 BASELINE_F(Iteration, RBTree, YggRBTreeSearchFixture<BasicTreeOptions>, 50, 200)
 {
-  for (const auto & n : this->t) {
-    // sum += n.value;
-    celero::DoNotOptimizeAway(n);
-  }
+	for (const auto & n : this->t) {
+		// sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
 }
 
 BENCHMARK_F(Iteration, Zip, YggZipTreeSearchFixture<BasicTreeOptions>, 50, 200)
 {
-  for (const auto & n : this->t) {
-    // sum += n.value;
-    celero::DoNotOptimizeAway(n);
-  }
+	for (const auto & n : this->t) {
+		// sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
 }
 
 BENCHMARK_F(Iteration, NoStoreZip, YggZipTreeSearchFixture<ZTreeNoStoreOptions>,
             50, 200)
 {
-  for (const auto & n : this->t) {
-    // sum += n.value;
-    celero::DoNotOptimizeAway(n);
-  }
+	for (const auto & n : this->t) {
+		// sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
 }
 
 BENCHMARK_F(Iteration, StdSet, StdSetSearchFixture, 50, 200)
 {
-  for (const auto & n : this->s) {
-    // sum += n.value;
-    celero::DoNotOptimizeAway(n);
-  }
+	for (const auto & n : this->s) {
+		// sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
 }
 
 BENCHMARK_F(Iteration, BoostSet, BoostSetSearchFixture, 50, 200)
 {
-  for (const auto & n : this->t) {
-    // sum += n.value;
-    celero::DoNotOptimizeAway(n);
-  }
+	for (const auto & n : this->t) {
+		// sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
 }
 
 BENCHMARK_F(Iteration, MultiYgg, YggRBTreeSearchFixture<MultiTreeOptions>, 50,
             200)
 {
-  for (const auto & n : this->t) {
-    // sum += n.value;
-    celero::DoNotOptimizeAway(n);
-  }
+	for (const auto & n : this->t) {
+		// sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
 }
 
 BENCHMARK_F(Iteration, CompressedYgg,
             YggRBTreeSearchFixture<CompressedTreeOptions>, 50, 200)
 {
-  for (const auto & n : this->t) {
-    // sum += n.value;
-    celero::DoNotOptimizeAway(n);
-  }
+	for (const auto & n : this->t) {
+		// sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
 }
 
 BENCHMARK_F(Iteration, BoostMultiSet, BoostMultiSetSearchFixture, 50, 200)
 {
-  for (const auto & n : this->t) {
-    // sum += n.value;
-    celero::DoNotOptimizeAway(n);
-  }
+	for (const auto & n : this->t) {
+		// sum += n.value;
+		celero::DoNotOptimizeAway(n);
+	}
 }
 
 /*
@@ -819,77 +821,77 @@ BENCHMARK_F(Iteration, BoostMultiSet, BoostMultiSetSearchFixture, 50, 200)
 
 BASELINE_F(Delete, RBTree, YggRBTreeSearchFixture<BasicTreeOptions>, 1000, 1)
 {
-  for (auto & v : this->search_values) {
-    this->t.remove(*v);
-  }
+	for (auto & v : this->search_values) {
+		this->t.remove(*v);
+	}
 
-  celero::DoNotOptimizeAway(this->t);
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Delete, Zip, YggZipTreeSearchFixture<BasicTreeOptions>, 1000, 1)
 {
-  for (auto & v : this->search_values) {
-    this->t.remove(*v);
-  }
+	for (auto & v : this->search_values) {
+		this->t.remove(*v);
+	}
 
-  celero::DoNotOptimizeAway(this->t);
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Delete, NoStoreZip, YggZipTreeSearchFixture<ZTreeNoStoreOptions>,
             1000, 1)
 {
-  for (auto & v : this->search_values) {
-    this->t.remove(*v);
-  }
+	for (auto & v : this->search_values) {
+		this->t.remove(*v);
+	}
 
-  celero::DoNotOptimizeAway(this->t);
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Delete, StdSet, StdSetSearchFixture, 1000, 1)
 {
-  for (auto & v : this->search_values) {
-    this->nodes.push_back(this->s.extract(v));
-  }
+	for (auto & v : this->search_values) {
+		this->nodes.push_back(this->s.extract(v));
+	}
 
-  celero::DoNotOptimizeAway(this->s);
-  celero::DoNotOptimizeAway(this->nodes);
+	celero::DoNotOptimizeAway(this->s);
+	celero::DoNotOptimizeAway(this->nodes);
 }
 
 BENCHMARK_F(Delete, BoostSet, BoostSetSearchFixture, 1000, 1)
 {
-  for (auto & v : this->search_values) {
-    this->t.erase(*v);
-  }
+	for (auto & v : this->search_values) {
+		this->t.erase(*v);
+	}
 
-  celero::DoNotOptimizeAway(this->t);
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Delete, MultiYgg, YggRBTreeSearchFixture<MultiTreeOptions>, 1000, 1)
 {
-  for (auto & v : this->search_values) {
-    this->t.remove(*v);
-  }
+	for (auto & v : this->search_values) {
+		this->t.remove(*v);
+	}
 
-  celero::DoNotOptimizeAway(this->t);
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Delete, CompressedYgg,
             YggRBTreeSearchFixture<CompressedTreeOptions>, 1000, 1)
 {
-  for (auto & v : this->search_values) {
-    this->t.remove(*v);
-  }
+	for (auto & v : this->search_values) {
+		this->t.remove(*v);
+	}
 
-  celero::DoNotOptimizeAway(this->t);
+	celero::DoNotOptimizeAway(this->t);
 }
 
 BENCHMARK_F(Delete, BoostMultiSet, BoostMultiSetSearchFixture, 1000, 1)
 {
-  for (auto & v : this->search_values) {
-    this->t.erase(*v);
-  }
+	for (auto & v : this->search_values) {
+		this->t.erase(*v);
+	}
 
-  celero::DoNotOptimizeAway(this->t);
+	celero::DoNotOptimizeAway(this->t);
 }
 
 #endif // YGG_BENCH_RBTREE_HPP

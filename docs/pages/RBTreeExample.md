@@ -30,7 +30,7 @@ public:
 };
 
 // Configure the RBTree based on Node and the default NodeTraits
-using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
+using MyTree = RBTree<Node, RBDefaultNodeTraits, MyTreeOptions>;
 
 // We need this s.t. we can query by key value (i.e, an int) directly
 bool operator<(const Node & lhs, const int rhs) {

@@ -263,7 +263,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 		node.NB::set_parent(nullptr);
 		node.NB::set_color(rbtree_internal::Color::BLACK);
 		this->root = &node;
-		NodeTraits::leaf_inserted(node);
+		NodeTraits::leaf_inserted(node, *this);
 	} else {
 		node.NB::set_parent(parent);
 		node.NB::set_color(rbtree_internal::Color::RED);
@@ -288,7 +288,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 			}
 		}
 
-		NodeTraits::leaf_inserted(node);
+		NodeTraits::leaf_inserted(node, *this);
 		this->fixup_after_insert(&node);
 	}
 
@@ -322,7 +322,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 
 	parent->NB::set_parent(right_child);
 
-	NodeTraits::rotated_left(*parent);
+	NodeTraits::rotated_left(*parent, *this);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -352,7 +352,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 
 	parent->NB::set_parent(left_child);
 
-	NodeTraits::rotated_right(*parent);
+	NodeTraits::rotated_right(*parent, *this);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -819,7 +819,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
 		n1->swap_color_with(n2);
 	}
 
-	NodeTraits::swapped(*n1, *n2);
+	NodeTraits::swapped(*n1, *n2, *this);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -970,23 +970,26 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 		 * replace the node with its child, not caring to "swap back".
 		 */
 		// TODO C++17 mark this if constexpr
-		if (&NodeTraits::delete_leaf == &RBDefaultNodeTraits<Node>::delete_leaf) {
-			// Not overridden
-			this->replace_node(&node, right_child);
-			right_child->NB::set_color(rbtree_internal::Color::BLACK);
-		} else {
-			// Overridden
-			this->swap_nodes(&node, right_child, true);
+		// TODO fix this check for the new templates
+		/*
+		if (&NodeTraits::delete_leaf == &RBDefaultNodeTraits::delete_leaf<Node,
+		MyClass>) {
+		  // Not overridden
+		  this->replace_node(&node, right_child);
+		  right_child->NB::set_color(rbtree_internal::Color::BLACK);
+		  } else {*/
+		// Overridden
+		this->swap_nodes(&node, right_child, true);
 
-			NodeTraits::delete_leaf(node);
+		NodeTraits::delete_leaf(node, *this);
 
-			right_child->NB::set_color(rbtree_internal::Color::BLACK);
-			right_child->NB::_rbt_right =
-			    nullptr; // this stored the node to be deleted…
-			// TODO null the pointers in node?
-		}
+		right_child->NB::set_color(rbtree_internal::Color::BLACK);
+		right_child->NB::_rbt_right =
+		    nullptr; // this stored the node to be deleted…
+		             // TODO null the pointers in node?
+		             //}
 
-		NodeTraits::deleted_below(*right_child);
+		NodeTraits::deleted_below(*right_child, *this);
 
 		return; // no fixup necessary
 	}
@@ -994,7 +997,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 	// Node has no children, so we have to just delete it, which is no problem if
 	// we are red. Otherwise, we must start a fixup at the parent.
 	bool deleted_left = false;
-	NodeTraits::delete_leaf(node);
+	NodeTraits::delete_leaf(node, *this);
 	if (node.NB::get_parent() != nullptr) {
 		if (node.NB::get_parent()->NB::_rbt_left == &node) {
 			node.NB::get_parent()->NB::_rbt_left = nullptr;
@@ -1003,7 +1006,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 			node.NB::get_parent()->NB::_rbt_right = nullptr;
 		}
 
-		NodeTraits::deleted_below(*node.NB::get_parent());
+		NodeTraits::deleted_below(*node.NB::get_parent(), *this);
 	} else {
 		this->root = nullptr; // Tree is now empty!
 		return;               // No fixup needed!

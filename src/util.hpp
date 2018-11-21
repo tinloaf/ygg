@@ -127,6 +127,24 @@ public:
 	    typename decltype(get_type_if_present_func<TMPL, Default, Ts...>())::type;
 };
 
+/* Return true if any of the arguments returns true */
+template <class... Bools>
+constexpr bool any_of(Bools... arguments);
+
+template <class First, class... Remainder>
+constexpr bool
+any_of(First first, Remainder... remainder)
+{
+	return first || any_of(remainder...);
+}
+
+template <>
+constexpr bool
+any_of()
+{
+	return false;
+}
+
 } // namespace utilities
 
 namespace rbtree_internal {

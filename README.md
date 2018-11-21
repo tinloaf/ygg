@@ -74,7 +74,7 @@ public:
 }
 
 // Configure the RBTree based on Node and the default NodeTraits
-using MyTree = RBTree<Node, RBDefaultNodeTraits<Node>, MyTreeOptions>;
+using MyTree = RBTree<Node, RBDefaultNodeTraits, MyTreeOptions>;
 ```
 
 Now, let's add some elements, iterate and query:
