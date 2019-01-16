@@ -162,6 +162,9 @@ public:
 	 */
 	const OuterNode * get_interval() const noexcept;
 
+	// TODO this must be reset when inserting into the tree!
+	size_t lca_tag = 0;
+
 private:
 	// TODO instead of storing all of these, and use interval traits and container
 	// pointer?
@@ -1149,18 +1152,39 @@ public:
 	                                   TreeSelector, Tag>;
 
 private:
-	class InnerTree
-	    : public TreeSelector::template BaseTree<InnerTree, Node, NodeTraits,
-	                                             InnerNode, Tag> {
-	public:
-		using BaseTree =
-		    typename TreeSelector::template BaseTree<InnerTree, Node, NodeTraits,
-		                                             InnerNode, Tag>;
+  class InnerTree
+      : public TreeSelector::template BaseTree<InnerTree, Node, NodeTraits,
+                                               InnerNode, Tag> {
+  public:
+    using BaseTree =
+        typename TreeSelector::template BaseTree<InnerTree, Node, NodeTraits,
+                                                 InnerNode, Tag>;
 
-		using BaseTree::BaseTree;
+    using BaseTree::BaseTree;
 
-		void modify_contour(InnerNode * left, InnerNode * right, ValueT val);
+    void modify_contour(InnerNode * left, InnerNode * right, ValueT val);
 
+    using Contour =
+        std::pair<std::vector<InnerNode *>, std::vector<InnerNode *>>;
+    void build_lca(InnerNode * left, InnerNode * right) const;
+
+    static bool rebuild_combiners_at(InnerNode * n);
+    static void rebuild_combiners_recursively(InnerNode * n);
+
+  private:
+	  // Generation to be used to tag nodes during LCA search
+	  mutable size_t generation = 0;
+	  // Allocate-once buffers for the contour
+
+	  /**
+		 * @brief Result of a find_lca call.
+		 *
+		 * This vector stores the "left part" of a call to find_lca.
+		 *
+		 * @warning It is only valid after a call to find_lca, and before
+		 * the next call to find_lca!
+		 */
+	  mutable std::vector<InnerNode *> contour_left_path;
 		/**
 		 * @brief Result of a find_lca call.
 		 *
@@ -1169,31 +1193,8 @@ private:
 		 * @warning It is only valid after a call to find_lca, and before
 		 * the next call to find_lca!
 		 */
-		mutable std::vector<InnerNode *> left_contour;
-
-		/**
-		 * @brief Result of a find_lca call.
-		 *
-		 * This vector stores the "left part" of a call to find_lca.
-		 *
-		 * @warning It is only valid after a call to find_lca, and before
-		 * the next call to find_lca!
-		 */
-		mutable std::vector<InnerNode *> right_contour;
-
-		using Contour = std::pair<const std::vector<InnerNode *> &,
-		                          const std::vector<InnerNode *> &>;
-		/**
-		 * @brief Performs a lowest-common-ancestor search
-		 *
-		 * Performs an LCA search for left and right, storing the paths from
-		 * left and right to the LCA in left_contour / right_contour, respectively.
-		 */
-		Contour find_lca(InnerNode * left, InnerNode * right) const;
-
-		static bool rebuild_combiners_at(InnerNode * n);
-		static void rebuild_combiners_recursively(InnerNode * n);
-	};
+	  mutable std::vector<InnerNode *> contour_right_path;
+  };
 
 public:
 	/**
