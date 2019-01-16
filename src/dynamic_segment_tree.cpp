@@ -505,7 +505,7 @@ void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::InnerTree::build_lca(InnerNode * left,
                                               InnerNode * right) const
-{ 
+{
 	this->generation++;
 
 	// TODO buffer these
@@ -529,31 +529,31 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 		if (progress_left) {
 			left = left->get_parent();
 
-			if (left != nullptr) {
+			if (__builtin_expect((left != nullptr), 1)) {
 				this->contour_left_path.push_back(left);
-			}
 
-			if (__builtin_expect((left->lca_tag == this->generation), 0)) {
-				// Already visited by the right search
-				lca = left;
-				break;
-			}
+				if (__builtin_expect((left->lca_tag == this->generation), 0)) {
+					// Already visited by the right search
+					lca = left;
+					break;
+				}
 
-			left->lca_tag = this->generation;
+				left->lca_tag = this->generation;
+			}
 		} else {
 			right = right->get_parent();
 
-			if (right != nullptr) {
+			if (__builtin_expect((right != nullptr), 1)) {
 				this->contour_right_path.push_back(right);
-			}
 
-			if (__builtin_expect((right->lca_tag == this->generation), 0)) {
-				// Already visited by the left search
-				lca = right;
-				break;
-			}
+				if (__builtin_expect((right->lca_tag == this->generation), 0)) {
+					// Already visited by the left search
+					lca = right;
+					break;
+				}
 
-			right->lca_tag = this->generation;
+				right->lca_tag = this->generation;
+			}
 		}
 
 		if ((left != nullptr) && (right != nullptr)) {
@@ -600,7 +600,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                                                    InnerNode * right,
                                                    ValueT val)
 {
-	this->find_lca(left, right);
+	this->build_lca(left, right);
 
 	// left contour
 	bool last_changed_left = false;
@@ -808,15 +808,15 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 
 	decltype(InnerNode().get_point()) topmost_point;
 
-	if (!this->contour_left_path.empty()) {
-		for (size_t i = 0; i < this->contour_left_path.size(); ++i) {
-			InnerNode * cur = this->contour_left_path[i];
+	if (!this->t.contour_left_path.empty()) {
+		for (size_t i = 0; i < this->t.contour_left_path.size(); ++i) {
+			InnerNode * cur = this->t.contour_left_path[i];
 			InnerNode * right_child = cur->get_right();
 
 			// Factor in the edge we just traversed up
 			if (i > 0) {
 				// TODO inefficient!
-				if (right_child == this->contour_left_path[i - 1]) {
+				if (right_child == this->t.contour_left_path[i - 1]) {
 					// we traversed the right edge
 					cp.traverse_right_edge_up(cur->get_point(), cur->agg_right);
 				} else {
@@ -826,8 +826,8 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 			}
 
 			// Combine with descending across the contour, if we traversed a left edge
-			if ((i != this->contour_left_path.size() - 1) &&
-			    ((i == 0) || (right_child != this->contour_left_path[i - 1]))) {
+			if ((i != this->t.contour_left_path.size() - 1) &&
+			    ((i == 0) || (right_child != this->t.contour_left_path[i - 1]))) {
 				if (right_child != nullptr) {
 					cp.collect_right(cur->get_point(), &right_child->combiners,
 					                 cur->agg_right);
@@ -837,7 +837,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 			}
 		}
 
-		topmost_point = this->contour_left_path.back()->get_point();
+		topmost_point = this->t.contour_left_path.back()->get_point();
 	}
 
 	// TODO is this necessary?
@@ -846,14 +846,14 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 
 	// TODO can this ever be empty?
 	// Traverse the last left-edge into the root
-	if (!this->contour_right_path.empty()) {
-		for (size_t i = 0; i < this->contour_right_path.size(); ++i) {
-			InnerNode * cur = this->contour_right_path[i];
+	if (!this->t.contour_right_path.empty()) {
+		for (size_t i = 0; i < this->t.contour_right_path.size(); ++i) {
+			InnerNode * cur = this->t.contour_right_path[i];
 			InnerNode * left_child = cur->get_left();
 
 			// Factor in the edge we just traversed up
 			if (i > 0) {
-				if (left_child == this->contour_right_path[i - 1]) {
+				if (left_child == this->t.contour_right_path[i - 1]) {
 					// we traversed the left edge
 					cp.traverse_left_edge_up(cur->get_point(), cur->agg_left);
 				} else {
@@ -864,8 +864,8 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 
 			// Combine with descending across the contour, if we traversed a right
 			// edge
-			if ((i != this->contour_right_path.size() - 1) &&
-			    ((i == 0) || (left_child != this->contour_right_path[i - 1]))) {
+			if ((i != this->t.contour_right_path.size() - 1) &&
+			    ((i == 0) || (left_child != this->t.contour_right_path[i - 1]))) {
 				if (left_child != nullptr) {
 					cp.collect_left(cur->get_point(), &left_child->combiners,
 					                cur->agg_left);
@@ -875,7 +875,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 			}
 		}
 
-		topmost_point = this->contour_right_path.back()->get_point();
+		topmost_point = this->t.contour_right_path.back()->get_point();
 	}
 
 	// Combine right and left contour
@@ -885,7 +885,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 	 * Step 3: Take the combined value and aggregate into it everything on the way
 	 * up to the root.
 	 */
-	InnerNode * cur = this->contour_right_path.back();
+	InnerNode * cur = this->t.contour_right_path.back();
 	while (cur != this->t.get_root()) {
 		InnerNode * old = cur;
 		cur = cur->get_parent();
@@ -1164,6 +1164,8 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 	// TODO FIXME this breaks for non-numeric types
 	if (!std::numeric_limits<typename Node::AggValueT>::is_integer) {
 		delta = 0.000001;
+	} else {
+		(void)delta;
 	}
 
 	for (auto & node : this->t) {
