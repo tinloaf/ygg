@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.8)
 project (YGG)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 #set (CMAKE_CXX_STANDARD 14)
 
@@ -18,22 +20,16 @@ endif()
 add_subdirectory(test)
 add_subdirectory(examples)
 
-if(NOT "${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_LESS "3.8")
-  find_library(CELERO_LIB_DIR libcelero.so)
+find_package(Celero)
+
+if (${CELERO_FOUND})
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-std=c++17 HASCPP17)
-  if (CELERO_LIB_DIR AND HASCPP17)
+	if (${HASCPP17})
     add_subdirectory (benchmark)
-  else()
-    message(WARNING "Celero and a C++17 capable compiler are necessary to build benchmarks.")
-  endif()
+	else()
+		MESSAGE(WARNING, "Not building benchmarks, your compiler does not support C++17.")
+	endif()
 else()
-  message(WARNING "CMake >= 3.8.0 required to build benchmarks.")
-  message(INFO "You are running CMake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}")
+	MESSAGE(WARNING, "Not building benchmarks, Celero not found.")
 endif()
-
-# make CLion analyze all files
-add_custom_target(clion_dummy SOURCES src/rbtree.hpp src/intervaltree.hpp src/ygg.hpp
-        src/intervaltree.cpp src/rbtree.cpp src/ygg.hpp src/util.hpp src/options.hpp
-        src/intervalmap.hpp src/intervalmap.cpp src/list.hpp src/list.cpp
-        src/dynamic_segment_tree.cpp src/dynamic_segment_tree.hpp src/debug.hpp)
