@@ -1357,6 +1357,15 @@ public:
 	upper_bound_event(const typename Node::KeyT & key) const;
 	iterator<false> upper_bound_event(const typename Node::KeyT & key);
 
+	/**
+	 * @brief Removes all elements from the tree.
+	 *
+	 * TODO write a test for this method
+	 * 
+	 * Removes all elements from the tree.
+	 */
+	void clear();
+	
 	/*
 	 * DEBUGGING
 	 */

@@ -1,7 +1,7 @@
 #ifndef BENCH_BST_INSERT_HPP
 #define BENCH_BST_INSERT_HPP
 
-#include "common.hpp"
+#include "common_bst.hpp"
 
 /*
  * Ygg's Red-Black Tree

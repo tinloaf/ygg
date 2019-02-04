@@ -1,7 +1,7 @@
 #ifndef BENCH_BST_INSERT_HPP
 #define BENCH_BST_INSERT_HPP
 
-#include "common.hpp"
+#include "common_bst.hpp"
 
 // TODO search for values not in the tree?
 

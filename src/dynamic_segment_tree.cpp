@@ -643,6 +643,16 @@ template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::clear()
+{
+	return this->t.clear();
+}
+
+
+template <class Node, class NodeTraits, class Combiners, class Options,
+          class TreeSelector, class Tag>
+void
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::dbg_verify_all_points() const
 {
 	using Point = std::pair<typename Node::KeyT, typename Node::AggValueT>;

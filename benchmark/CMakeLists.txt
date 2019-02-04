@@ -6,7 +6,7 @@ find_package(Boost REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-include_directories("google_benchmark/include/benchmark")
+include_directories(${GBENCHMARK_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_executable(benchmark_bst_insert bench_bst_insert.cpp)
@@ -36,6 +36,16 @@ set_target_properties(benchmark_bst_search
                       PROPERTIES CXX_STANDARD 17)
 
 
+
+add_executable(benchmark_dst_insert bench_dst_insert.cpp)
+add_dependencies(benchmark_dst_insert gbenchmark)
+target_link_libraries(benchmark_dst_insert Threads::Threads  ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+set_target_properties(benchmark_dst_insert
+                      PROPERTIES COMPILE_FLAGS "-O3 -march=native")
+set_target_properties(benchmark_dst_insert
+                      PROPERTIES CXX_STANDARD 17)
+
+										
 										
 add_executable(pathlengths pathlengths.cpp)
 set_target_properties(pathlengths PROPERTIES CXX_STANDARD 17)
