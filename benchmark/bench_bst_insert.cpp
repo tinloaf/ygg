@@ -11,9 +11,11 @@ using YggRBFixture =
 BENCHMARK_DEFINE_F(YggRBFixture, BM_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
+		this->papi_start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
+		this->papi_stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -22,6 +24,8 @@ BENCHMARK_DEFINE_F(YggRBFixture, BM_Insertion)(benchmark::State & state)
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+
+	this->papi_report_and_reset(state);
 }
 BENCHMARK_REGISTER_F(YggRBFixture, BM_Insertion)->Args({1000, 1000});
 
@@ -33,9 +37,11 @@ using YggZFixture =
 BENCHMARK_DEFINE_F(YggZFixture, BM_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
+		this->papi_start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
+		this->papi_stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -44,6 +50,7 @@ BENCHMARK_DEFINE_F(YggZFixture, BM_Insertion)(benchmark::State & state)
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+	this->papi_report_and_reset(state);
 }
 BENCHMARK_REGISTER_F(YggZFixture, BM_Insertion)->Args({1000, 1000});
 
@@ -54,9 +61,11 @@ using BISetFixture = Fixture<BoostSetInterface, true, false, false, false>;
 BENCHMARK_DEFINE_F(BISetFixture, BM_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
+		this->papi_start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
+		this->papi_stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -65,6 +74,7 @@ BENCHMARK_DEFINE_F(BISetFixture, BM_Insertion)(benchmark::State & state)
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+	this->papi_report_and_reset(state);
 }
 BENCHMARK_REGISTER_F(BISetFixture, BM_Insertion)->Args({1000, 1000});
 
@@ -82,10 +92,12 @@ BENCHMARK_DEFINE_F(StdSetFixture, BM_Insertion)(benchmark::State & state)
 	insertion_iterators.reserve(this->experiment_nodes.size());
 
 	for (auto _ : state) {
+		this->papi_start();
 		for (auto & n : this->experiment_nodes) {
 			// TODO emplace_back incurs a minimal overhead. Can we work around this?
 			insertion_iterators.emplace_back(this->t.insert(std::move(n)));
 		}
+		this->papi_stop();
 
 		state.PauseTiming();
 		// Since we moved, we must completely rebuild the experiment nodes
@@ -97,9 +109,9 @@ BENCHMARK_DEFINE_F(StdSetFixture, BM_Insertion)(benchmark::State & state)
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+
+	this->papi_report_and_reset(state);
 }
 BENCHMARK_REGISTER_F(StdSetFixture, BM_Insertion)->Args({1000, 1000});
-
-BENCHMARK_MAIN();
 
 #endif
