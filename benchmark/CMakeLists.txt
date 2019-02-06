@@ -65,12 +65,3 @@ set_target_properties(benchmark_dst_move
 										
 add_executable(pathlengths pathlengths.cpp)
 set_target_properties(pathlengths PROPERTIES CXX_STANDARD 17)
-
-# add_executable (benchmark_dst main_dst.cpp)
-
-# target_link_libraries(benchmark_dst ${GBENCHMARK_LIBS_DIR}/benchmark.so)
-
-# set_target_properties(benchmark_dst
-#                       PROPERTIES COMPILE_FLAGS "-O3 -march=native")
-# set_target_properties(benchmark_dst
-#                       PROPERTIES CXX_STANDARD 17)
