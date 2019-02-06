@@ -25,23 +25,23 @@ public:
 
 		std::uniform_int_distribution<> distr(std::numeric_limits<int>::min(),
 		                                      std::numeric_limits<int>::max());
-		std::vector<int> fixed_values;
 
 		this->fixed_nodes.clear();
 		for (size_t i = 0; i < fixed_count; ++i) {
 			int val = distr(this->rng);
 			this->fixed_nodes.push_back(Interface::create_node(val));
-
-			if (values_from_fixed) {
-				fixed_values.push_back(val);
-			}
+			this->fixed_values.push_back(val);
 		}
 		for (auto & n : this->fixed_nodes) {
 			Interface::insert(this->t, n);
 		}
 
+		std::vector<int> shuffled_values;
 		if (values_from_fixed) {
-			std::shuffle(fixed_values.begin(), fixed_values.end(), this->rng);
+			shuffled_values.insert(shuffled_values.begin(),
+			                       this->fixed_values.begin(),
+			                       this->fixed_values.end());
+			std::shuffle(shuffled_values.begin(), shuffled_values.end(), this->rng);
 		}
 
 		if (need_nodes) {
@@ -64,7 +64,7 @@ public:
 				int val;
 
 				if (values_from_fixed) {
-					val = fixed_values[i % fixed_count];
+					val = shuffled_values[i % fixed_count];
 				} else {
 					val = distr(this->rng);
 				}
@@ -92,6 +92,7 @@ public:
 		Interface::clear(this->t);
 	}
 
+	std::vector<int> fixed_values;
 	std::vector<typename Interface::Node> fixed_nodes;
 
 	std::vector<typename Interface::Node> experiment_nodes;
@@ -134,12 +135,16 @@ public:
 	}
 };
 
-template<class T>
-bool operator<(const RBNode<T> & lhs, int rhs) {
+template <class T>
+bool
+operator<(const RBNode<T> & lhs, int rhs)
+{
 	return lhs.get_value() < rhs;
 }
-template<class T>
-bool operator<(int lhs, const RBNode<T> & rhs) {
+template <class T>
+bool
+operator<(int lhs, const RBNode<T> & rhs)
+{
 	return lhs < rhs.get_value();
 }
 
@@ -199,12 +204,16 @@ public:
 		return this->value < rhs.value;
 	}
 };
-template<class T>
-bool operator<(const ZipNode<T> & lhs, int rhs) {
+template <class T>
+bool
+operator<(const ZipNode<T> & lhs, int rhs)
+{
 	return lhs.get_value() < rhs;
 }
-template<class T>
-bool operator<(int lhs, const ZipNode<T> & rhs) {
+template <class T>
+bool
+operator<(int lhs, const ZipNode<T> & rhs)
+{
 	return lhs < rhs.get_value();
 }
 
@@ -254,7 +263,7 @@ class BoostSetInterface {
 public:
 	class Node
 	    : public boost::intrusive::set_base_hook<boost::intrusive::link_mode<
-	          boost ::intrusive::link_mode_type::normal_link>> {
+	          boost::intrusive::link_mode_type::normal_link>> {
 		int value;
 
 	public:
@@ -267,7 +276,7 @@ public:
 		}
 	};
 
-	using Tree = boost::intrusive::set<Node>;
+	using Tree = boost::intrusive::multiset<Node>;
 
 	static void
 	insert(Tree & t, Node & n)
@@ -279,6 +288,44 @@ public:
 	create_node(int val)
 	{
 		return Node(val);
+	}
+
+	static void
+	clear(Tree & t)
+	{
+		t.clear();
+	}
+};
+
+/*
+ * Std::Set's interface
+ */
+class StdSetInterface {
+public:
+	using Node = decltype(std::set<int>().extract(0));
+	using Tree = std::multiset<int>;
+
+	static void
+	insert(Tree & t, Node & n)
+	{
+		// TODO this is very unclean
+		t.insert(std::move(n));
+	}
+
+	static void
+	insert(Tree & t, Node && n)
+	{
+		// TODO this is very unclean
+		t.insert(std::move(n));
+	}
+
+	static Node
+	create_node(int val)
+	{
+		std::multiset<int> donor;
+		donor.insert(val);
+
+		return donor.extract(donor.begin());
 	}
 
 	static void
