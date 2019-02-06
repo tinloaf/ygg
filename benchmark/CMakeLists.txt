@@ -45,6 +45,22 @@ set_target_properties(benchmark_dst_insert
 set_target_properties(benchmark_dst_insert
                       PROPERTIES CXX_STANDARD 17)
 
+add_executable(benchmark_dst_delete bench_dst_delete.cpp)
+add_dependencies(benchmark_dst_delete gbenchmark)
+target_link_libraries(benchmark_dst_delete Threads::Threads  ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+set_target_properties(benchmark_dst_delete
+                      PROPERTIES COMPILE_FLAGS "-O3 -march=native")
+set_target_properties(benchmark_dst_delete
+                      PROPERTIES CXX_STANDARD 17)
+
+add_executable(benchmark_dst_move bench_dst_move.cpp)
+add_dependencies(benchmark_dst_move gbenchmark)
+target_link_libraries(benchmark_dst_move Threads::Threads  ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+set_target_properties(benchmark_dst_move
+                      PROPERTIES COMPILE_FLAGS "-O3 -march=native")
+set_target_properties(benchmark_dst_move
+                      PROPERTIES CXX_STANDARD 17)
+										
 										
 										
 add_executable(pathlengths pathlengths.cpp)

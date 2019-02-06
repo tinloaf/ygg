@@ -4,6 +4,7 @@
 
 #ifndef YGG_UTIL_HPP
 
+#include <iterator>
 #include <type_traits>
 
 namespace ygg {
@@ -145,8 +146,151 @@ any_of()
 	return false;
 }
 
+/* @brief A class providing an iterator over the integers 1, 2, … <n>
+ */
+// TODO this does not uphold the multipass guarantee (point 1). Check how boost
+// does this.
+template <class T>
+class IntegerRange {
+public:
+	IntegerRange(T start_in, T stop_in) : start(start_in), stop(stop_in) {}
+
+	class iterator {
+	public:
+		typedef T difference_type;
+		typedef T value_type;
+		typedef const T & reference;
+		typedef T * pointer;
+		typedef std::random_access_iterator_tag iterator_category;
+
+		iterator(T start) : val(start) {}
+		iterator(const iterator & other) : val(other.val) {}
+		iterator() : val() {}
+
+		iterator &
+		operator=(const iterator & other)
+		{
+			val = other.val;
+		};
+
+		bool
+		operator==(const iterator & other) const
+		{
+			return this->val == other.val;
+		}
+		bool
+		operator!=(const iterator & other) const
+		{
+			return this->val != other.val;
+		}
+
+		iterator
+		operator++(int)
+		{
+			iterator cpy = *this;
+			this->val++;
+			return cpy;
+		}
+		iterator &
+		operator++()
+		{
+			this->val++;
+			return *this;
+		}
+		iterator &
+		operator+=(size_t steps)
+		{
+			this->val += steps;
+			return *this;
+		}
+		iterator
+		operator+(size_t steps) const
+		{
+			iterator cpy = *this;
+			cpy += steps;
+			return cpy;
+		}
+
+		iterator
+		operator--(int)
+		{
+			iterator cpy = *this;
+			this->val--;
+			return cpy;
+		}
+		iterator &
+		operator--()
+		{
+			this->val--;
+			return *this;
+		}
+		iterator &
+		operator-=(size_t steps)
+		{
+			this->val -= steps;
+			return *this;
+		}
+		iterator
+		operator-(size_t steps) const
+		{
+			iterator cpy = *this;
+			cpy -= steps;
+			return cpy;
+		}
+
+		difference_type
+		operator-(const iterator & other) const
+		{
+			return this->val - other.val;
+		}
+		bool
+		operator<(const iterator & other) const
+		{
+			return this->val < other.val;
+		}
+		bool
+		operator<=(const iterator & other) const
+		{
+			return this->val <= other.val;
+		}
+		bool
+		operator>(const iterator & other) const
+		{
+			return this->val > other.val;
+		}
+		bool
+		operator>=(const iterator & other) const
+		{
+			return this->val >= other.val;
+		}
+
+		reference operator[](size_t n) { return this->val + n; }
+
+		reference operator*() const { return this->val; }
+
+		pointer operator->() const { return &(this->val); }
+
+	private:
+		T val;
+	};
+
+
+	iterator begin() const {
+		return iterator(start);
+	}
+
+	iterator end() const {
+		return iterator(stop);
+	}
+
+private:
+	const T start;
+	const T stop;
+};
+
 } // namespace utilities
 
+// TODO why is it this namespace?
 namespace rbtree_internal {
 
 /**
