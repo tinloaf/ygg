@@ -648,7 +648,6 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 	return this->t.clear();
 }
 
-
 template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
@@ -721,6 +720,10 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 
 	for (const auto & point : points) {
 		auto result = this->query(point.first);
+#ifdef NDEBUG
+		(void)result; // Avoid warnings
+		(void)epsilon;
+#endif
 		assert(result <= point.second + epsilon);
 		assert(result >= point.second - epsilon);
 	}
