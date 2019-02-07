@@ -1,18 +1,18 @@
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.0.2)
 project(gbenchmark_builder C CXX)
 include(ExternalProject)
 
 set(CMAKE_CXX_STANDARD 11)
 
 ExternalProject_Add(gbenchmark
-        GIT_REPOSITORY https://github.com/google/benchmark.git
-        CMAKE_ARGS -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG:PATH=DebugLibs
-        -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE:PATH=ReleaseLibs
-				-DBENCHMARK_ENABLE_GTEST_TESTS=OFF
-        PREFIX "${CMAKE_CURRENT_BINARY_DIR}"
-        # Disable install step
-        INSTALL_COMMAND ""
-        )
+  GIT_REPOSITORY    https://github.com/google/benchmark.git
+	GIT_TAG           b8ca0c42179b7b5d656494e61dda8b861057122f
+  CMAKE_ARGS       -DBENCHMARK_ENABLE_GTEST_TESTS=OFF
+	                 -DCMAKE_BUILD_TYPE=Release
+	PREFIX           "${CMAKE_CURRENT_BINARY_DIR}"
+  # Disable install step
+  INSTALL_COMMAND ""
+  )
 
 # Specify include dir
 ExternalProject_Get_Property(gbenchmark source_dir)
