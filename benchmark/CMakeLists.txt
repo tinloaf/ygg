@@ -9,9 +9,6 @@ find_package(Threads REQUIRED)
 include_directories(${GBENCHMARK_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 
-# Force optimization
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
-
 set(CMAKE_CXX_STANDARD 17)
 set(LIBS "${LIBS} Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a")
 

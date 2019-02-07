@@ -27,7 +27,9 @@ BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)(benchmark::State & s
 
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(InsertYggRBBSTFixture, BM_BST_Insertion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(InsertYggRBBSTFixture, BM_BST_Insertion)
+    ->RangeMultiplier(2)
+    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
 
 /*
  * Ygg's Zip Tree
@@ -52,7 +54,9 @@ BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)(benchmark::State & st
 	}
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(InsertYggZBSTFixture, BM_BST_Insertion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(InsertYggZBSTFixture, BM_BST_Insertion)
+    ->RangeMultiplier(2)
+    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
 
 /*
  * Boost::Intrusive::Set
@@ -76,7 +80,9 @@ BENCHMARK_DEFINE_F(InsertBISetBSTFixture, BM_BST_Insertion)(benchmark::State & s
 	}
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(InsertBISetBSTFixture, BM_BST_Insertion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(InsertBISetBSTFixture, BM_BST_Insertion)
+    ->RangeMultiplier(2)
+    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
 
 /*
  * std::set
@@ -112,6 +118,8 @@ BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)(benchmark::State & 
 
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(InsertStdSetBSTFixture, BM_BST_Insertion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(InsertStdSetBSTFixture, BM_BST_Insertion)
+    ->RangeMultiplier(2)
+    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
 
 #endif

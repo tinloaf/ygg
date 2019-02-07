@@ -5,10 +5,15 @@
 #include <cstring>
 #include <vector>
 #include <string>
+#include <iostream>
 
 #ifdef USEPAPI
 #include <papi.h>
 #endif
+
+#define EXPERIMENT_SIZE 1024
+#define BASE_SIZE 2048
+#define DOUBLINGS 10
 
 std::vector<std::string> PAPI_MEASUREMENTS;
 bool PAPI_STATS_WRITTEN;
@@ -45,6 +50,7 @@ int main(int argc, char ** argv)
 	if (::benchmark::ReportUnrecognizedArguments(remaining_argc, remaining_argv)) {
 		return 1;
 	}
+
 	::benchmark::RunSpecifiedBenchmarks();
 	return 0;
 }
