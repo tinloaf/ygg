@@ -13,20 +13,18 @@ using SearchYggRBBSTFixture =
 BENCHMARK_DEFINE_F(SearchYggRBBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
-		this->papi_stop();
+		this->papi.stop();
 		// TODO shuffling?
 	}
 
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(SearchYggRBBSTFixture, BM_BST_Search)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(SearchYggRBBSTFixture, BM_BST_Search);
 
 /*
  * Ygg's Zip Tree
@@ -36,18 +34,16 @@ using SearchYggZBSTFixture =
 BENCHMARK_DEFINE_F(SearchYggZBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
-		this->papi_stop();
+		this->papi.stop();
 	}
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(SearchYggZBSTFixture, BM_BST_Search)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(SearchYggZBSTFixture, BM_BST_Search);
 
 /*
  * Boost::Intrusive::Set
@@ -57,18 +53,16 @@ using SearchBISetBSTFixture =
 BENCHMARK_DEFINE_F(SearchBISetBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
-		this->papi_stop();
+		this->papi.stop();
 	}
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(SearchBISetBSTFixture, BM_BST_Search)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(SearchBISetBSTFixture, BM_BST_Search);
 
 /*
  * std::set
@@ -78,17 +72,19 @@ using SearchStdSetBSTFixture =
 BENCHMARK_DEFINE_F(SearchStdSetBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
-		this->papi_stop();
+		this->papi.stop();
 	}
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(SearchStdSetBSTFixture, BM_BST_Search)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(SearchStdSetBSTFixture, BM_BST_Search);
+
+#ifndef NOMAIN
+#include "main.hpp"
+#endif
 
 #endif

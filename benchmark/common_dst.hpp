@@ -5,10 +5,11 @@
 #include <algorithm>
 #include <random>
 #include <vector>
+#include <draup.hpp>
 
 #include "../src/ygg.hpp"
 
-#include "main.hpp"
+#include "common.hpp"
 
 // TODO various RBTree / Zip Tree variants!
 // TODO make values optional
@@ -123,6 +124,8 @@ public:
 	std::mt19937 rng;
 
 	typename Interface::Tree t;
+
+	PapiMeasurements papi;
 };
 
 // TODO try with max combiner!

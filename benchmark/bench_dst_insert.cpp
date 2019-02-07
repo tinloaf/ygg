@@ -23,9 +23,7 @@ BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)(benchmark::State & stat
 		state.ResumeTiming();
 	}
 }
-BENCHMARK_REGISTER_F(InsertRBDSTFixture, BM_DST_Insertion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(InsertRBDSTFixture, BM_DST_Insertion);
 
 /*
  * Zip DST
@@ -47,8 +45,10 @@ BENCHMARK_DEFINE_F(InsertZDSTFixture, BM_DST_Insertion)(benchmark::State & state
 		state.ResumeTiming();
 	}
 }
-BENCHMARK_REGISTER_F(InsertZDSTFixture, BM_DST_Insertion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(InsertZDSTFixture, BM_DST_Insertion);
+
+#ifndef NOMAIN
+#include "main.hpp"
+#endif
 
 #endif

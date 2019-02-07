@@ -7,22 +7,17 @@
 #include <string>
 #include <iostream>
 
-#ifdef USEPAPI
-#include <papi.h>
-#endif
+#include "common.hpp"
 
 #define EXPERIMENT_SIZE 1024
 #define BASE_SIZE 2048
 #define DOUBLINGS 10
 
-std::vector<std::string> PAPI_MEASUREMENTS;
-bool PAPI_STATS_WRITTEN;
-
 int main(int argc, char ** argv)
 {
 	int remaining_argc = argc;
 	char ** remaining_argv = (char **)malloc((size_t)argc * sizeof(char *));
-
+	
 	remaining_argv[0] = argv[0];
 	size_t j = 1;
 	for (size_t i = 1 ; i < (size_t)argc; ++i) {
@@ -42,9 +37,19 @@ int main(int argc, char ** argv)
 		}
 	}
 
-	PAPI_STATS_WRITTEN = false;
+
+	/* 
+	 * Register all tests
+	 */
+	auto plugins = DRAUP_GET_REGISTERED();
+	DRAUP_FOR_EACH(plugins, {
+			auto * bench = new plugin();
+			bench->RangeMultiplier(2);
+			bench->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+			::benchmark::internal::RegisterBenchmarkInternal(bench);
+	});
 	
-	std::cout << "Found " << PAPI_MEASUREMENTS.size() << "events.\n" << std::flush;
+	PAPI_STATS_WRITTEN = false;
 	
 	::benchmark::Initialize(&remaining_argc, remaining_argv);
 	if (::benchmark::ReportUnrecognizedArguments(remaining_argc, remaining_argv)) {

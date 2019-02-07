@@ -11,11 +11,11 @@ using DeleteYggRBBSTFixture =
 BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			this->t.remove(*n);
 		}
-		this->papi_stop();
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto n : this->experiment_node_pointers) {
@@ -25,11 +25,9 @@ BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)(benchmark::State & st
 		state.ResumeTiming();
 	}
 
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(DeleteYggRBBSTFixture, BM_BST_Deletion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(DeleteYggRBBSTFixture, BM_BST_Deletion);
 
 /*
  * Ygg's Zip Tree
@@ -39,11 +37,11 @@ using DeleteYggZBSTFixture =
 BENCHMARK_DEFINE_F(DeleteYggZBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			this->t.remove(*n);
 		}
-		this->papi_stop();
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto n : this->experiment_node_pointers) {
@@ -53,11 +51,9 @@ BENCHMARK_DEFINE_F(DeleteYggZBSTFixture, BM_BST_Deletion)(benchmark::State & sta
 		state.ResumeTiming();
 	}
 
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(DeleteYggZBSTFixture, BM_BST_Deletion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(DeleteYggZBSTFixture, BM_BST_Deletion);
 
 /*
  * Boost::Intrusive::Set
@@ -67,11 +63,11 @@ using DeleteBISetBSTFixture =
 BENCHMARK_DEFINE_F(DeleteBISetBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			this->t.erase(*n);
 		}
-		this->papi_stop();
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto n : this->experiment_node_pointers) {
@@ -81,11 +77,9 @@ BENCHMARK_DEFINE_F(DeleteBISetBSTFixture, BM_BST_Deletion)(benchmark::State & st
 		state.ResumeTiming();
 	}
 
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(DeleteBISetBSTFixture, BM_BST_Deletion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(DeleteBISetBSTFixture, BM_BST_Deletion);
 
 /*
  * std::set
@@ -110,11 +104,11 @@ BENCHMARK_DEFINE_F(DeleteStdSetBSTFixture, BM_BST_Deletion)(benchmark::State & s
 	
 
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto it : experiment_iterators) {
 			extracted_nodes.push_back(std::move(this->t.extract(std::move(it))));
 		}
-		this->papi_stop();
+		this->papi.stop();
 
 		state.PauseTiming();
 		experiment_iterators.clear();
@@ -126,11 +120,12 @@ BENCHMARK_DEFINE_F(DeleteStdSetBSTFixture, BM_BST_Deletion)(benchmark::State & s
 		state.ResumeTiming();
 	}
 
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(DeleteStdSetBSTFixture, BM_BST_Deletion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(DeleteStdSetBSTFixture, BM_BST_Deletion);
 
+#ifndef NOMAIN
+#include "main.hpp"
+#endif
 
 #endif

@@ -11,11 +11,11 @@ using InsertYggRBBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
-		this->papi_stop();
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -25,11 +25,11 @@ BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)(benchmark::State & s
 		state.ResumeTiming();
 	}
 
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(InsertYggRBBSTFixture, BM_BST_Insertion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(InsertYggRBBSTFixture, BM_BST_Insertion)
+
+
 
 /*
  * Ygg's Zip Tree
@@ -39,11 +39,11 @@ using InsertYggZBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
-		this->papi_stop();
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -52,11 +52,9 @@ BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)(benchmark::State & st
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(InsertYggZBSTFixture, BM_BST_Insertion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(InsertYggZBSTFixture, BM_BST_Insertion);
 
 /*
  * Boost::Intrusive::Set
@@ -65,11 +63,11 @@ using InsertBISetBSTFixture = BSTFixture<BoostSetInterface, true, false, false, 
 BENCHMARK_DEFINE_F(InsertBISetBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
-		this->papi_stop();
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -78,11 +76,9 @@ BENCHMARK_DEFINE_F(InsertBISetBSTFixture, BM_BST_Insertion)(benchmark::State & s
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(InsertBISetBSTFixture, BM_BST_Insertion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(InsertBISetBSTFixture, BM_BST_Insertion);
 
 /*
  * std::set
@@ -98,12 +94,12 @@ BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)(benchmark::State & 
 	insertion_iterators.reserve(this->experiment_nodes.size());
 
 	for (auto _ : state) {
-		this->papi_start();
+		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			// TODO emplace_back incurs a minimal overhead. Can we work around this?
 			insertion_iterators.emplace_back(this->t.insert(std::move(n)));
 		}
-		this->papi_stop();
+		this->papi.stop();
 
 		state.PauseTiming();
 		// Since we moved, we must completely rebuild the experiment nodes
@@ -116,10 +112,12 @@ BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)(benchmark::State & 
 		state.ResumeTiming();
 	}
 
-	this->papi_report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(InsertStdSetBSTFixture, BM_BST_Insertion)
-    ->RangeMultiplier(2)
-    ->Ranges({{BASE_SIZE, BASE_SIZE * (1 << DOUBLINGS)}, {EXPERIMENT_SIZE, EXPERIMENT_SIZE}});
+REGISTER(InsertStdSetBSTFixture, BM_BST_Insertion);
+
+#ifndef NOMAIN
+#include "main.hpp"
+#endif
 
 #endif
