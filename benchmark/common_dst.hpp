@@ -23,6 +23,8 @@ public:
 	void
 	SetUp(const ::benchmark::State & state)
 	{
+		this->papi.initialize();
+
 		size_t fixed_count = state.range(0);
 		size_t experiment_count = state.range(1);
 

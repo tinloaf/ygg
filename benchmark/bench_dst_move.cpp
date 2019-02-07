@@ -12,6 +12,7 @@ BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		size_t j = 0;
+		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 			auto [upper, lower, value] = this->experiment_values[j++];
@@ -20,6 +21,7 @@ BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->fixed_nodes[i].value = value; // TODO don't do this?
 			this->t.insert(this->fixed_nodes[i]);
 		}
+		this->papi.stop();
 
 		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
@@ -34,6 +36,8 @@ BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+
+	this->papi.report_and_reset(state);
 }
 REGISTER(MoveRBDSTFixture, BM_DST_Move);
 
@@ -46,6 +50,7 @@ BENCHMARK_DEFINE_F(MoveZDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		size_t j = 0;
+		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 			auto [upper, lower, value] = this->experiment_values[j++];
@@ -54,6 +59,7 @@ BENCHMARK_DEFINE_F(MoveZDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->fixed_nodes[i].value = value; // TODO don't do this?
 			this->t.insert(this->fixed_nodes[i]);
 		}
+		this->papi.stop();
 
 		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
@@ -68,6 +74,8 @@ BENCHMARK_DEFINE_F(MoveZDSTFixture, BM_DST_Move)(benchmark::State & state)
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+
+	this->papi.report_and_reset(state);
 }
 REGISTER(MoveZDSTFixture, BM_DST_Move);
 

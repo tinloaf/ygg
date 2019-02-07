@@ -11,9 +11,11 @@ using InsertRBDSTFixture =
 BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
+		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -22,6 +24,8 @@ BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)(benchmark::State & stat
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+
+	this->papi.report_and_reset(state);
 }
 REGISTER(InsertRBDSTFixture, BM_DST_Insertion);
 
@@ -33,9 +37,11 @@ using InsertZDSTFixture =
 BENCHMARK_DEFINE_F(InsertZDSTFixture, BM_DST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
+		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -44,6 +50,8 @@ BENCHMARK_DEFINE_F(InsertZDSTFixture, BM_DST_Insertion)(benchmark::State & state
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+
+	this->papi.report_and_reset(state);
 }
 REGISTER(InsertZDSTFixture, BM_DST_Insertion);
 

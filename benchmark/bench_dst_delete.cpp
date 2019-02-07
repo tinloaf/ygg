@@ -11,9 +11,11 @@ using DeleteRBDSTFixture =
 BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
+		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
@@ -22,6 +24,8 @@ BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)(benchmark::State & state
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+
+	this->papi.report_and_reset(state);
 }
 REGISTER(DeleteRBDSTFixture, BM_DST_Deletion);
 
@@ -35,9 +39,11 @@ using DeleteZDSTFixture =
 BENCHMARK_DEFINE_F(DeleteZDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
+		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
+		this->papi.stop();
 
 		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
@@ -46,6 +52,8 @@ BENCHMARK_DEFINE_F(DeleteZDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
+
+	this->papi.report_and_reset(state);
 }
 REGISTER(DeleteZDSTFixture, BM_DST_Deletion);
 
