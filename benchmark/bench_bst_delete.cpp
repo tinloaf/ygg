@@ -1,14 +1,14 @@
-#ifndef BENCH_BST_INSERT_HPP
-#define BENCH_BST_INSERT_HPP
+#ifndef BENCH_BST_DELETE_HPP
+#define BENCH_BST_DELETE_HPP
 
 #include "common_bst.hpp"
 
 /*
  * Ygg's Red-Black Tree
  */
-using YggRBFixture =
-	Fixture<YggRBTreeInterface<BasicTreeOptions>, false, false, true, false>;
-BENCHMARK_DEFINE_F(YggRBFixture, BM_Deletion)(benchmark::State & state)
+using DeleteYggRBBSTFixture =
+	BSTFixture<YggRBTreeInterface<BasicTreeOptions>, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -27,14 +27,14 @@ BENCHMARK_DEFINE_F(YggRBFixture, BM_Deletion)(benchmark::State & state)
 
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(YggRBFixture, BM_Deletion)->Args({1000, 100});
+BENCHMARK_REGISTER_F(DeleteYggRBBSTFixture, BM_BST_Deletion)->Args({1000, 100});
 
 /*
  * Ygg's Zip Tree
  */
-using YggZFixture =
-	Fixture<YggZTreeInterface<BasicTreeOptions>, false, false, true, false>;
-BENCHMARK_DEFINE_F(YggZFixture, BM_Deletion)(benchmark::State & state)
+using DeleteYggZBSTFixture =
+	BSTFixture<YggZTreeInterface<BasicTreeOptions>, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteYggZBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -53,14 +53,14 @@ BENCHMARK_DEFINE_F(YggZFixture, BM_Deletion)(benchmark::State & state)
 
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(YggZFixture, BM_Deletion)->Args({1000, 100});
+BENCHMARK_REGISTER_F(DeleteYggZBSTFixture, BM_BST_Deletion)->Args({1000, 100});
 
 /*
  * Boost::Intrusive::Set
  */
-using BISetFixture =
-	Fixture<BoostSetInterface, false, false, true, false>;
-BENCHMARK_DEFINE_F(BISetFixture, BM_Deletion)(benchmark::State & state)
+using DeleteBISetBSTFixture =
+	BSTFixture<BoostSetInterface, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteBISetBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -79,14 +79,14 @@ BENCHMARK_DEFINE_F(BISetFixture, BM_Deletion)(benchmark::State & state)
 
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(BISetFixture, BM_Deletion)->Args({1000, 100});
+BENCHMARK_REGISTER_F(DeleteBISetBSTFixture, BM_BST_Deletion)->Args({1000, 100});
 
 /*
  * std::set
  */
-using StdSetFixture =
-	Fixture<StdSetInterface, false, false, false, false>;
-BENCHMARK_DEFINE_F(StdSetFixture, BM_Deletion)(benchmark::State & state)
+using DeleteStdSetBSTFixture =
+	BSTFixture<StdSetInterface, false, false, false, false>;
+BENCHMARK_DEFINE_F(DeleteStdSetBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	std::vector<decltype(this->t)::const_iterator> experiment_iterators;
 	std::vector<decltype(std::multiset<int>().extract(0))> extracted_nodes;
@@ -122,7 +122,7 @@ BENCHMARK_DEFINE_F(StdSetFixture, BM_Deletion)(benchmark::State & state)
 
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(StdSetFixture, BM_Deletion)->Args({1000, 100});
+BENCHMARK_REGISTER_F(DeleteStdSetBSTFixture, BM_BST_Deletion)->Args({1000, 100});
 
 
 #endif

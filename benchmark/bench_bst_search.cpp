@@ -1,5 +1,5 @@
-#ifndef BENCH_BST_INSERT_HPP
-#define BENCH_BST_INSERT_HPP
+#ifndef BENCH_BST_SEARCH_HPP
+#define BENCH_BST_SEARCH_HPP
 
 #include "common_bst.hpp"
 
@@ -8,9 +8,9 @@
 /*
  * Ygg's Red-Black Tree
  */
-using YggRBFixture =
-	Fixture<YggRBTreeInterface<BasicTreeOptions>, false, true, false, true>;
-BENCHMARK_DEFINE_F(YggRBFixture, BM_Search)(benchmark::State & state)
+using SearchYggRBBSTFixture =
+	BSTFixture<YggRBTreeInterface<BasicTreeOptions>, false, true, false, true>;
+BENCHMARK_DEFINE_F(SearchYggRBBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -24,14 +24,14 @@ BENCHMARK_DEFINE_F(YggRBFixture, BM_Search)(benchmark::State & state)
 
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(YggRBFixture, BM_Search)->Args({1000, 100});
+BENCHMARK_REGISTER_F(SearchYggRBBSTFixture, BM_BST_Search)->Args({1000, 100});
 
 /*
  * Ygg's Zip Tree
  */
-using YggZFixture =
-	Fixture<YggZTreeInterface<BasicTreeOptions>, false, true, false, true>;
-BENCHMARK_DEFINE_F(YggZFixture, BM_Search)(benchmark::State & state)
+using SearchYggZBSTFixture =
+	BSTFixture<YggZTreeInterface<BasicTreeOptions>, false, true, false, true>;
+BENCHMARK_DEFINE_F(SearchYggZBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -43,14 +43,14 @@ BENCHMARK_DEFINE_F(YggZFixture, BM_Search)(benchmark::State & state)
 	}
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(YggZFixture, BM_Search)->Args({1000, 100});
+BENCHMARK_REGISTER_F(SearchYggZBSTFixture, BM_BST_Search)->Args({1000, 100});
 
 /*
  * Boost::Intrusive::Set
  */
-using BISetFixture =
-	Fixture<BoostSetInterface, false, true, false, true>;
-BENCHMARK_DEFINE_F(BISetFixture, BM_Search)(benchmark::State & state)
+using SearchBISetBSTFixture =
+	BSTFixture<BoostSetInterface, false, true, false, true>;
+BENCHMARK_DEFINE_F(SearchBISetBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -62,14 +62,14 @@ BENCHMARK_DEFINE_F(BISetFixture, BM_Search)(benchmark::State & state)
 	}
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(BISetFixture, BM_Search)->Args({1000, 100});
+BENCHMARK_REGISTER_F(SearchBISetBSTFixture, BM_BST_Search)->Args({1000, 100});
 
 /*
  * std::set
  */
-using StdSetFixture =
-	Fixture<StdSetInterface, false, true, false, true>;
-BENCHMARK_DEFINE_F(StdSetFixture, BM_Search)(benchmark::State & state)
+using SearchStdSetBSTFixture =
+	BSTFixture<StdSetInterface, false, true, false, true>;
+BENCHMARK_DEFINE_F(SearchStdSetBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -81,6 +81,6 @@ BENCHMARK_DEFINE_F(StdSetFixture, BM_Search)(benchmark::State & state)
 	}
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(StdSetFixture, BM_Search)->Args({1000, 100});
+BENCHMARK_REGISTER_F(SearchStdSetBSTFixture, BM_BST_Search)->Args({1000, 100});
 
 #endif

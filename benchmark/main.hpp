@@ -1,3 +1,6 @@
+#ifndef MAIN_HPP
+#define MAIN_HPP
+
 #include <cstdlib>
 #include <cstring>
 #include <vector>
@@ -45,3 +48,5 @@ int main(int argc, char ** argv)
 	::benchmark::RunSpecifiedBenchmarks();
 	return 0;
 }
+
+#endif

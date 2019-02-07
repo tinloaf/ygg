@@ -15,7 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 set(CMAKE_CXX_STANDARD 17)
 set(LIBS "${LIBS} Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a")
 
-SET(BINARIES "bench_bst_insert;bench_bst_delete;bench_bst_search;bench_dst_insert;bench_dst_delete;bench_dst_move")
+SET(BINARIES "bench_bst_insert;bench_bst_delete;bench_bst_search;bench_dst_insert;bench_dst_delete;bench_dst_move;run_all")
 
 FOREACH(BINARY ${BINARIES})
 	add_executable(${BINARY} ${BINARY}.cpp)

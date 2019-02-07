@@ -8,14 +8,16 @@
 
 #include "../src/ygg.hpp"
 
+#include "main.hpp"
+
 // TODO various RBTree / Zip Tree variants!
 // TODO make values optional
 
 template <class Interface, bool need_nodes, bool need_values,
           bool need_indices, bool values_from_fixed>
-class Fixture : public benchmark::Fixture {
+class DSTFixture : public benchmark::Fixture {
 public:
-	Fixture() : rng(std::random_device{}()) {}
+	DSTFixture() : rng(std::random_device{}()) {}
 
 	void
 	SetUp(const ::benchmark::State & state)
@@ -262,7 +264,7 @@ public:
 };
 
 
-using BasicTreeOptions =
+using BasicDSTTreeOptions =
     ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
                      ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<

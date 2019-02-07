@@ -1,5 +1,5 @@
-#ifndef BENCH_COMMON_HPP
-#define BENCH_COMMON_HPP
+#ifndef BENCH_COMMON_BST_HPP
+#define BENCH_COMMON_BST_HPP
 
 #include "benchmark.h"
 #include <algorithm>
@@ -19,9 +19,9 @@
 
 template <class Interface, bool need_nodes, bool need_values,
           bool need_node_pointers, bool values_from_fixed>
-class Fixture : public benchmark::Fixture {
+class BSTFixture : public benchmark::Fixture {
 public:
-	Fixture() : rng(std::random_device{}())
+	BSTFixture() : rng(std::random_device{}())
 	{
 #ifdef USEPAPI
 		this->papi_initialized = false;

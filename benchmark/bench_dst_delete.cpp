@@ -1,14 +1,14 @@
-#ifndef BENCH_DST_INSERT_HPP
-#define BENCH_DST_INSERT_HPP
+#ifndef BENCH_DST_DELETE_HPP
+#define BENCH_DST_DELETE_HPP
 
 #include "common_dst.hpp"
 
 /*
  * Red-Black DST
  */
-using RBDSTFixture =
-	Fixture<RBDSTInterface<BasicTreeOptions>, false, false, true, false>;
-BENCHMARK_DEFINE_F(RBDSTFixture, BM_Deletion)(benchmark::State & state)
+using DeleteRBDSTFixture =
+	DSTFixture<RBDSTInterface<BasicDSTTreeOptions>, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		for (auto i : this->experiment_indices) {
@@ -23,14 +23,14 @@ BENCHMARK_DEFINE_F(RBDSTFixture, BM_Deletion)(benchmark::State & state)
 		state.ResumeTiming();
 	}
 }
-BENCHMARK_REGISTER_F(RBDSTFixture, BM_Deletion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(DeleteRBDSTFixture, BM_DST_Deletion)->Args({1000, 1000});
 
 /*
  * Zip DST
  */
-using ZDSTFixture =
-	Fixture<ZDSTInterface<BasicTreeOptions>, false, false, true, false>;
-BENCHMARK_DEFINE_F(ZDSTFixture, BM_Deletion)(benchmark::State & state)
+using DeleteZDSTFixture =
+	DSTFixture<ZDSTInterface<BasicDSTTreeOptions>, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteZDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		for (auto i : this->experiment_indices) {
@@ -45,9 +45,6 @@ BENCHMARK_DEFINE_F(ZDSTFixture, BM_Deletion)(benchmark::State & state)
 		state.ResumeTiming();
 	}
 }
-BENCHMARK_REGISTER_F(ZDSTFixture, BM_Deletion)->Args({1000, 1000});
-
-
-BENCHMARK_MAIN();
+BENCHMARK_REGISTER_F(DeleteZDSTFixture, BM_DST_Deletion)->Args({1000, 1000});
 
 #endif

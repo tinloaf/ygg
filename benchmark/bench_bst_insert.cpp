@@ -6,9 +6,9 @@
 /*
  * Ygg's Red-Black Tree
  */
-using YggRBFixture =
-    Fixture<YggRBTreeInterface<BasicTreeOptions>, true, false, false, false>;
-BENCHMARK_DEFINE_F(YggRBFixture, BM_Insertion)(benchmark::State & state)
+using InsertYggRBBSTFixture =
+    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -27,14 +27,14 @@ BENCHMARK_DEFINE_F(YggRBFixture, BM_Insertion)(benchmark::State & state)
 
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(YggRBFixture, BM_Insertion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(InsertYggRBBSTFixture, BM_BST_Insertion)->Args({1000, 1000});
 
 /*
  * Ygg's Zip Tree
  */
-using YggZFixture =
-    Fixture<YggZTreeInterface<BasicTreeOptions>, true, false, false, false>;
-BENCHMARK_DEFINE_F(YggZFixture, BM_Insertion)(benchmark::State & state)
+using InsertYggZBSTFixture =
+    BSTFixture<YggZTreeInterface<BasicTreeOptions>, true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -52,13 +52,13 @@ BENCHMARK_DEFINE_F(YggZFixture, BM_Insertion)(benchmark::State & state)
 	}
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(YggZFixture, BM_Insertion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(InsertYggZBSTFixture, BM_BST_Insertion)->Args({1000, 1000});
 
 /*
  * Boost::Intrusive::Set
  */
-using BISetFixture = Fixture<BoostSetInterface, true, false, false, false>;
-BENCHMARK_DEFINE_F(BISetFixture, BM_Insertion)(benchmark::State & state)
+using InsertBISetBSTFixture = BSTFixture<BoostSetInterface, true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertBISetBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi_start();
@@ -76,13 +76,13 @@ BENCHMARK_DEFINE_F(BISetFixture, BM_Insertion)(benchmark::State & state)
 	}
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(BISetFixture, BM_Insertion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(InsertBISetBSTFixture, BM_BST_Insertion)->Args({1000, 1000});
 
 /*
  * std::set
  */
-using StdSetFixture = Fixture<StdSetInterface, true, false, false, false>;
-BENCHMARK_DEFINE_F(StdSetFixture, BM_Insertion)(benchmark::State & state)
+using InsertStdSetBSTFixture = BSTFixture<StdSetInterface, true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	// Timing is not active outside the for (… : state) loop, thus we don't have
 	// to pause it here.
@@ -112,6 +112,6 @@ BENCHMARK_DEFINE_F(StdSetFixture, BM_Insertion)(benchmark::State & state)
 
 	this->papi_report_and_reset(state);
 }
-BENCHMARK_REGISTER_F(StdSetFixture, BM_Insertion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(InsertStdSetBSTFixture, BM_BST_Insertion)->Args({1000, 1000});
 
 #endif

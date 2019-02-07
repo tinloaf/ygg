@@ -6,9 +6,9 @@
 /*
  * Red-Black DST
  */
-using RBDSTFixture =
-	Fixture<RBDSTInterface<BasicTreeOptions>, true, false, false, false>;
-BENCHMARK_DEFINE_F(RBDSTFixture, BM_Insertion)(benchmark::State & state)
+using InsertRBDSTFixture =
+	DSTFixture<RBDSTInterface<BasicDSTTreeOptions>, true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		for (auto & n : this->experiment_nodes) {
@@ -23,14 +23,14 @@ BENCHMARK_DEFINE_F(RBDSTFixture, BM_Insertion)(benchmark::State & state)
 		state.ResumeTiming();
 	}
 }
-BENCHMARK_REGISTER_F(RBDSTFixture, BM_Insertion)->Args({1000, 1000});
+BENCHMARK_REGISTER_F(InsertRBDSTFixture, BM_DST_Insertion)->Args({1000, 1000});
 
 /*
  * Zip DST
  */
-using ZDSTFixture =
-	Fixture<ZDSTInterface<BasicTreeOptions>, true, false, false, false>;
-BENCHMARK_DEFINE_F(ZDSTFixture, BM_Insertion)(benchmark::State & state)
+using InsertZDSTFixture =
+	DSTFixture<ZDSTInterface<BasicDSTTreeOptions>, true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertZDSTFixture, BM_DST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
 		for (auto & n : this->experiment_nodes) {
@@ -45,9 +45,6 @@ BENCHMARK_DEFINE_F(ZDSTFixture, BM_Insertion)(benchmark::State & state)
 		state.ResumeTiming();
 	}
 }
-BENCHMARK_REGISTER_F(ZDSTFixture, BM_Insertion)->Args({1000, 1000});
-
-
-BENCHMARK_MAIN();
+BENCHMARK_REGISTER_F(InsertZDSTFixture, BM_DST_Insertion)->Args({1000, 1000});
 
 #endif
