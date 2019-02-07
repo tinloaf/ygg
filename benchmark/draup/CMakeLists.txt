@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 ExternalProject_Add(draup
   GIT_REPOSITORY    https://github.com/tinloaf/draup.git
-	GIT_TAG           43c45b5523a49078081ebe68011604192e4543af
+	GIT_TAG           26359dc05f619ad157b493e5f6fee2ca7e21d9d3
 	PREFIX           "${CMAKE_CURRENT_BINARY_DIR}"
   # We just want to download
 	BUILD_COMMAND     ""
