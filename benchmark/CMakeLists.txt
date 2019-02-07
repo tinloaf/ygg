@@ -3,7 +3,6 @@ project(benchmark C CXX)
 add_subdirectory(gbenchmark)
 add_subdirectory(draup)
 
-find_package(Boost REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
