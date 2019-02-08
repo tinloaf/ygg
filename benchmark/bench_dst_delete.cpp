@@ -7,7 +7,7 @@
  * Red-Black DST
  */
 using DeleteRBDSTFixture =
-	DSTFixture<RBDSTInterface<BasicDSTTreeOptions>, false, false, true, false>;
+	DSTFixture<RBDSTInterface<BasicDSTTreeOptions>, DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -35,7 +35,7 @@ REGISTER(DeleteRBDSTFixture, BM_DST_Deletion);
  * Zip DST
  */
 using DeleteZDSTFixture =
-	DSTFixture<ZDSTInterface<BasicDSTTreeOptions>, false, false, true, false>;
+	DSTFixture<ZDSTInterface<BasicDSTTreeOptions>, DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteZDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {

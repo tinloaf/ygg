@@ -7,7 +7,7 @@
  * Ygg's Red-Black Tree
  */
 using DeleteYggRBBSTFixture =
-	BSTFixture<YggRBTreeInterface<BasicTreeOptions>, false, false, true, false>;
+	BSTFixture<YggRBTreeInterface<BasicTreeOptions>, DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -33,7 +33,7 @@ REGISTER(DeleteYggRBBSTFixture, BM_BST_Deletion);
  * Ygg's Zip Tree
  */
 using DeleteYggZBSTFixture =
-	BSTFixture<YggZTreeInterface<BasicTreeOptions>, false, false, true, false>;
+	BSTFixture<YggZTreeInterface<BasicTreeOptions>, DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteYggZBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -59,7 +59,7 @@ REGISTER(DeleteYggZBSTFixture, BM_BST_Deletion);
  * Boost::Intrusive::Set
  */
 using DeleteBISetBSTFixture =
-	BSTFixture<BoostSetInterface, false, false, true, false>;
+	BSTFixture<BoostSetInterface, DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteBISetBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -85,7 +85,7 @@ REGISTER(DeleteBISetBSTFixture, BM_BST_Deletion);
  * std::set
  */
 using DeleteStdSetBSTFixture =
-	BSTFixture<StdSetInterface, false, false, false, false>;
+	BSTFixture<StdSetInterface, DeleteExperiment, false, false, false, false>;
 BENCHMARK_DEFINE_F(DeleteStdSetBSTFixture, BM_BST_Deletion)(benchmark::State & state)
 {
 	std::vector<decltype(this->t)::const_iterator> experiment_iterators;

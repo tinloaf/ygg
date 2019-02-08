@@ -4,9 +4,10 @@
 #include "benchmark.h"
 #include <algorithm>
 #include <boost/intrusive/set.hpp>
+#include <c++/8/bits/stringfwd.h>
+#include <draup.hpp>
 #include <random>
 #include <vector>
-#include <draup.hpp>
 
 #include "../src/ygg.hpp"
 
@@ -18,13 +19,27 @@
 
 // TODO various RBTree / Zip Tree variants!
 
-template <class Interface, bool need_nodes, bool need_values,
-          bool need_node_pointers, bool values_from_fixed>
+template <class Interface, typename Experiment, bool need_nodes,
+          bool need_values, bool need_node_pointers, bool values_from_fixed>
 class BSTFixture : public benchmark::Fixture {
 public:
-	BSTFixture() : rng(std::random_device{}())
+	static std::string
+	get_name()
 	{
+		auto experiment_c = Experiment{};
+		std::string name = std::string("BST :: ") +
+		                   boost::hana::to<char const *>(experiment_c) +
+		                   std::string(" :: ") + Interface::get_name();
+		return name;
 	}
+
+	void
+	set_name(std::string name)
+	{
+		this->SetName(name.c_str());
+	}
+
+	BSTFixture() : rng(std::random_device{}()) {}
 
 	void
 	SetUp(const ::benchmark::State & state)
@@ -173,6 +188,12 @@ public:
 		t.insert(n);
 	}
 
+	static std::string
+	get_name()
+	{
+		return "RBTree";
+	}
+
 	static Node
 	create_node(int val)
 	{
@@ -238,6 +259,12 @@ public:
 	using Tree =
 	    ygg::ZTree<Node, ygg::ZTreeDefaultNodeTraits<Node>, MyTreeOptions>;
 
+	static std::string
+	get_name()
+	{
+		return "ZipTree";
+	}
+
 	static void
 	insert(Tree & t, Node & n)
 	{
@@ -291,6 +318,12 @@ public:
 
 	using Tree = boost::intrusive::multiset<Node>;
 
+	static std::string
+	get_name()
+	{
+		return "boost::intrusive::multiset";
+	}
+
 	static void
 	insert(Tree & t, Node & n)
 	{
@@ -315,8 +348,14 @@ public:
  */
 class StdSetInterface {
 public:
-	using Node = decltype(std::set<int>().extract(0));
+	using Node = decltype(std::multiset<int>().extract(0));
 	using Tree = std::multiset<int>;
+
+	static std::string
+	get_name()
+	{
+		return "std::multiset";
+	}
 
 	static void
 	insert(Tree & t, Node & n)

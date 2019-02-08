@@ -3,9 +3,9 @@
 
 #include "benchmark.h"
 #include <algorithm>
+#include <draup.hpp>
 #include <random>
 #include <vector>
-#include <draup.hpp>
 
 #include "../src/ygg.hpp"
 
@@ -14,11 +14,27 @@
 // TODO various RBTree / Zip Tree variants!
 // TODO make values optional
 
-template <class Interface, bool need_nodes, bool need_values,
-          bool need_indices, bool values_from_fixed>
+template <class Interface, typename Experiment, bool need_nodes,
+          bool need_values, bool need_indices, bool values_from_fixed>
 class DSTFixture : public benchmark::Fixture {
 public:
 	DSTFixture() : rng(std::random_device{}()) {}
+
+	static std::string
+	get_name()
+	{
+		auto experiment_c = Experiment{};
+		std::string name = std::string("DST :: ") +
+		                   boost::hana::to<char const *>(experiment_c) +
+		                   std::string(" :: ") + Interface::get_name();
+		return name;
+	}
+
+	void
+	set_name(std::string name)
+	{
+		this->SetName(name.c_str());
+	}
 
 	void
 	SetUp(const ::benchmark::State & state)
@@ -56,8 +72,7 @@ public:
 
 		std::vector<std::tuple<int, int, double>> fixed_shuffled;
 		if (values_from_fixed) {
-			fixed_shuffled.insert(fixed_shuffled.begin(),
-			                      this->fixed_values.begin(),
+			fixed_shuffled.insert(fixed_shuffled.begin(), this->fixed_values.begin(),
 			                      this->fixed_values.end());
 			std::shuffle(fixed_shuffled.begin(), fixed_shuffled.end(), this->rng);
 		}
@@ -105,8 +120,7 @@ public:
 			this->experiment_indices.clear();
 			std::sample(range.begin(), range.end(),
 			            std::back_inserter(this->experiment_indices),
-			            experiment_count,
-			            this->rng);
+			            experiment_count, this->rng);
 		}
 	}
 
@@ -118,7 +132,7 @@ public:
 
 	std::vector<typename Interface::Node> fixed_nodes;
 	std::vector<std::tuple<int, int, double>> fixed_values;
-	
+
 	std::vector<typename Interface::Node> experiment_nodes;
 	std::vector<std::tuple<int, int, double>> experiment_values;
 	std::vector<size_t> experiment_indices;
@@ -176,6 +190,12 @@ public:
 	    ygg::DynamicSegmentTree<Node, RBDSTNodeTraits<MyTreeOptions>,
 	                            CombinerPack, MyTreeOptions, ygg::UseRBTree>;
 
+	static std::string
+	get_name()
+	{
+		return "RBTree";
+	}
+
 	static void
 	insert(Tree & t, Node & n)
 	{
@@ -200,13 +220,12 @@ public:
 	}
 };
 
-
 /*
  * Zipping DST Interface
  */
 template <class MyTreeOptions>
 class ZDSTNode : public ygg::DynSegTreeNodeBase<int, double, double,
-                                                 CombinerPack, ygg::UseZipTree> {
+                                                CombinerPack, ygg::UseZipTree> {
 public:
 	int lower;
 	int upper;
@@ -241,8 +260,14 @@ class ZDSTInterface {
 public:
 	using Node = ZDSTNode<MyTreeOptions>;
 	using Tree =
-	    ygg::DynamicSegmentTree<Node, ZDSTNodeTraits<MyTreeOptions>,
-	                            CombinerPack, MyTreeOptions, ygg::UseZipTree>;
+	    ygg::DynamicSegmentTree<Node, ZDSTNodeTraits<MyTreeOptions>, CombinerPack,
+	                            MyTreeOptions, ygg::UseZipTree>;
+
+	static std::string
+	get_name()
+	{
+		return "ZipTree";
+	}
 
 	static void
 	insert(Tree & t, Node & n)
@@ -267,7 +292,6 @@ public:
 		t.clear();
 	}
 };
-
 
 using BasicDSTTreeOptions =
     ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,

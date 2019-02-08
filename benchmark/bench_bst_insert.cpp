@@ -7,7 +7,7 @@
  * Ygg's Red-Black Tree
  */
 using InsertYggRBBSTFixture =
-    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, true, false, false, false>;
+    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, InsertExperiment, true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -35,7 +35,7 @@ REGISTER(InsertYggRBBSTFixture, BM_BST_Insertion)
  * Ygg's Zip Tree
  */
 using InsertYggZBSTFixture =
-    BSTFixture<YggZTreeInterface<BasicTreeOptions>, true, false, false, false>;
+    BSTFixture<YggZTreeInterface<BasicTreeOptions>, InsertExperiment, true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -59,7 +59,7 @@ REGISTER(InsertYggZBSTFixture, BM_BST_Insertion);
 /*
  * Boost::Intrusive::Set
  */
-using InsertBISetBSTFixture = BSTFixture<BoostSetInterface, true, false, false, false>;
+using InsertBISetBSTFixture = BSTFixture<BoostSetInterface, InsertExperiment, true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertBISetBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -83,7 +83,7 @@ REGISTER(InsertBISetBSTFixture, BM_BST_Insertion);
 /*
  * std::set
  */
-using InsertStdSetBSTFixture = BSTFixture<StdSetInterface, true, false, false, false>;
+using InsertStdSetBSTFixture = BSTFixture<StdSetInterface, InsertExperiment, true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)(benchmark::State & state)
 {
 	// Timing is not active outside the for (… : state) loop, thus we don't have

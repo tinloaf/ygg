@@ -7,7 +7,7 @@
  * Red-Black DST
  */
 using MoveRBDSTFixture =
-    DSTFixture<RBDSTInterface<BasicDSTTreeOptions>, false, true, true, false>;
+	DSTFixture<RBDSTInterface<BasicDSTTreeOptions>, MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -45,7 +45,7 @@ REGISTER(MoveRBDSTFixture, BM_DST_Move);
  * Zip DST
  */
 using MoveZDSTFixture =
-    DSTFixture<ZDSTInterface<BasicDSTTreeOptions>, false, true, true, false>;
+	DSTFixture<ZDSTInterface<BasicDSTTreeOptions>, MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveZDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	for (auto _ : state) {

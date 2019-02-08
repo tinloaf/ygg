@@ -9,7 +9,7 @@
  * Ygg's Red-Black Tree
  */
 using SearchYggRBBSTFixture =
-	BSTFixture<YggRBTreeInterface<BasicTreeOptions>, false, true, false, true>;
+	BSTFixture<YggRBTreeInterface<BasicTreeOptions>, SearchExperiment, false, true, false, true>;
 BENCHMARK_DEFINE_F(SearchYggRBBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -30,7 +30,7 @@ REGISTER(SearchYggRBBSTFixture, BM_BST_Search);
  * Ygg's Zip Tree
  */
 using SearchYggZBSTFixture =
-	BSTFixture<YggZTreeInterface<BasicTreeOptions>, false, true, false, true>;
+	BSTFixture<YggZTreeInterface<BasicTreeOptions>, SearchExperiment, false, true, false, true>;
 BENCHMARK_DEFINE_F(SearchYggZBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -49,7 +49,7 @@ REGISTER(SearchYggZBSTFixture, BM_BST_Search);
  * Boost::Intrusive::Set
  */
 using SearchBISetBSTFixture =
-	BSTFixture<BoostSetInterface, false, true, false, true>;
+	BSTFixture<BoostSetInterface, SearchExperiment, false, true, false, true>;
 BENCHMARK_DEFINE_F(SearchBISetBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -68,7 +68,7 @@ REGISTER(SearchBISetBSTFixture, BM_BST_Search);
  * std::set
  */
 using SearchStdSetBSTFixture =
-	BSTFixture<StdSetInterface, false, true, false, true>;
+	BSTFixture<StdSetInterface, SearchExperiment, false, true, false, true>;
 BENCHMARK_DEFINE_F(SearchStdSetBSTFixture, BM_BST_Search)(benchmark::State & state)
 {
 	for (auto _ : state) {

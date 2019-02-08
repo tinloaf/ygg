@@ -16,6 +16,17 @@
 #define REGISTER(BaseClass, Method)                                            \
 	DRAUP_REGISTER(BaseClass##_##Method##_Benchmark)
 
+// Experiment Names
+constexpr auto delete_experiment_c = BOOST_HANA_STRING("Delete");
+using DeleteExperiment = decltype(delete_experiment_c);
+constexpr auto move_experiment_c = BOOST_HANA_STRING("Move");
+using MoveExperiment = decltype(move_experiment_c);
+constexpr auto insert_experiment_c = BOOST_HANA_STRING("Insert");
+using InsertExperiment = decltype(insert_experiment_c);
+constexpr auto search_experiment_c = BOOST_HANA_STRING("Search");
+using SearchExperiment = decltype(search_experiment_c);
+
+
 std::vector<std::string> PAPI_MEASUREMENTS;
 bool PAPI_STATS_WRITTEN;
 
