@@ -4,7 +4,6 @@
 #include "benchmark.h"
 #include <algorithm>
 #include <boost/intrusive/set.hpp>
-#include <c++/8/bits/stringfwd.h>
 #include <draup.hpp>
 #include <random>
 #include <vector>

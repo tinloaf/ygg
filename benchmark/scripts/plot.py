@@ -4,6 +4,7 @@ import re
 import sys
 import os
 import pandas as pd
+from matplotlib import pyplot as plt
 
 DEFAULT_STYLE = {
     'secondary': 'style'
@@ -37,6 +38,7 @@ class ExperimentPlotter(object):
                     str(entry[self._secondary_x]) + "]"
 
     def plot(self, filename):
+        plt.clf()
         if self._secondary_x and self._style['secondary'] == 'style':
             style = self._secondary_key
         else:
