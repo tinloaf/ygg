@@ -219,10 +219,12 @@ template <class Node, class NodeTraits, class Options = DefaultOptions,
 class RBTree {
 public:
 	using MyClass = RBTree<Node, NodeTraits, Options, Tag, Compare>;
-	using Base =
-	    rbtree_internal::RBTreeNodeBaseImpl<Node, Tag,
-	                                        Options::compress_color>; // TODO
-	// rename
+	// Node Base
+	using NB = RBTreeNodeBase<Node, Options, Tag>;
+	static_assert(std::is_base_of<NB, Node>::value,
+	              "Node class not properly derived from RBTreeNodeBase");
+
+
 
 	/**
 	 * @brief Create a new empty red-black tree.
@@ -260,13 +262,9 @@ public:
 	 */
 	MyClass & operator=(const MyClass & other);
 
-	// Node Base
-	using NB = RBTreeNodeBase<Node, Options, Tag>;
-	static_assert(std::is_base_of<NB, Node>::value,
-	              "Node class not properly derived from RBTreeNodeBase");
 
-	// Class to tell the abstract search tree iterator how to handle our nodes
 private:
+	// Class to tell the abstract search tree iterator how to handle our nodes
 	class NodeInterface {
 	public:
 		static Node *
