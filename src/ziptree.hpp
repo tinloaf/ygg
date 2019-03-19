@@ -95,9 +95,11 @@ public:
 			size_t universalized =
 			    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
 			    Options::ztree_universalize_modul;
-			node._zt_rank.rank = __builtin_ffsl((long int)universalized);
+			node._zt_rank.rank =
+			    (decltype(node._zt_rank.rank))__builtin_ffsl((long int)universalized);
 		} else {
-			node._zt_rank.rank = __builtin_ffsl((long int)std::hash<Node>{}(node));
+			node._zt_rank.rank = (decltype(node._zt_rank.rank))__builtin_ffsl(
+			    (long int)std::hash<Node>{}(node));
 		}
 	}
 
