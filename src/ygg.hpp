@@ -5,3 +5,4 @@
 #include "options.hpp"
 #include "rbtree.hpp"
 #include "ziptree.hpp"
+#include "energy.hpp"

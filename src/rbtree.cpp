@@ -1193,7 +1193,7 @@ typename RBTree<Node, NodeTraits, Options, Tag,
 RBTree<Node, NodeTraits, Options, Tag, Compare>::cbegin() const
 {
 	Node * smallest = this->get_smallest();
-	if (smallest == nullptr) {
+	if (smallest == nullptr) { // TODO what the hell?
 		return const_iterator<false>(nullptr);
 	}
 

@@ -7,6 +7,7 @@
 #include "test_multi_rbtree.hpp"
 #include "test_rbtree.hpp"
 #include "test_ziptree.hpp"
+#include "test_energy.hpp"
 
 //#include "test_orderlist.hpp"
 
