@@ -304,7 +304,7 @@ public:
 
 template <
     class Node, class NodeTraits, class Options = DefaultOptions,
-    class Tag = int, class Compare = ygg::rbtree_internal::flexible_less,
+    class Tag = int, class Compare = ygg::utilities::flexible_less,
     class RankGetter = ztree_internal::ZTreeRankFromHash<
         Node, Options, Options::ztree_use_hash, Options::ztree_store_rank>>
 class ZTree {

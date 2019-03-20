@@ -162,7 +162,7 @@ namespace ziptree {
 
 using ExplicitRankTree =
     ZTree<Node, NodeTraits, ExplicitRankOptions, int,
-          ygg::rbtree_internal::flexible_less, DataRankGetter>;
+          ygg::utilities::flexible_less, DataRankGetter>;
 using ImplicitRankTree =
     ZTree<HashRankNode, HashRankNodeTraits, ImplicitRankOptions>;
 

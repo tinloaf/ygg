@@ -1,5 +1,5 @@
-#ifndef RBTREE_HPP
-#define RBTREE_HPP
+#ifndef YGG_RBTREE_HPP
+#define YGG_RBTREE_HPP
 
 #include <cassert>
 #include <cstddef>
@@ -215,7 +215,7 @@ public:
  * operator<(const Node & lhs, const Node & rhs) if you want to use it.
  */
 template <class Node, class NodeTraits, class Options = DefaultOptions,
-          class Tag = int, class Compare = ygg::rbtree_internal::flexible_less>
+          class Tag = int, class Compare = ygg::utilities::flexible_less>
 class RBTree {
 public:
 	using MyClass = RBTree<Node, NodeTraits, Options, Tag, Compare>;
@@ -251,6 +251,7 @@ public:
 	 */
 	MyClass & operator=(MyClass && other);
 
+	// TODO this does not behave like expected! Rename this.
 	// Copying
 	/**
 	 * @brief Copy an other tree into this one
@@ -263,6 +264,11 @@ public:
 	MyClass & operator=(const MyClass & other);
 
 
+	/******************************************************
+	 ******************************************************
+	 *          Begin of iterator declaration
+	 ******************************************************
+	 ******************************************************/
 private:
 	// Class to tell the abstract search tree iterator how to handle our nodes
 	class NodeInterface {
@@ -340,6 +346,13 @@ public:
 		                             NodeInterface, reverse>(){};
 	};
 
+	/******************************************************
+	 ******************************************************
+	 *          End of iterator declaration
+	 ******************************************************
+	 ******************************************************/
+
+	
 	/**
 	 * @brief Inserts <node> into the tree
 	 *
@@ -607,4 +620,4 @@ protected:
 
 #include "rbtree.cpp"
 
-#endif // RBTREE_HPP
+#endif // YGG_RBTREE_HPP

@@ -288,11 +288,6 @@ private:
 	const T stop;
 };
 
-} // namespace utilities
-
-// TODO why is it this namespace?
-namespace rbtree_internal {
-
 /**
  * @brief A more flexible version of std::less
  *
@@ -309,6 +304,12 @@ public:
 		return lhs < rhs;
 	}
 };
+
+
+} // namespace utilities
+
+// TODO why is it this namespace?
+namespace rbtree_internal {
 
 /*
  * This is inspired by
