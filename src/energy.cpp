@@ -101,11 +101,17 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 	Node * rebuild_at = nullptr;
 	bool rebuild_set_upwards = false;
 
+	//	std::cout << "<<<<<<<<<<<<<<< Deleting node " << std::hex << &node << " of size "
+	//          << std::dec << node.NB::_et_size << "\n";
+	//std::cout << "Parent is: " << std::hex << node.NB::_et_parent << std::dec << "\n";
+
 	while (cur->NB::_et_parent != nullptr) {
 		cur = cur->NB::_et_parent;
 		cur->NB::_et_size -= 1;
 		cur->NB::_et_energy += 1;
 
+		//std::cout << " <<< Up-Updating energy and size at " << std::hex << cur << std::dec << "\n";
+		
 		// TODO make 0.5 configurable
 		// TODO ceil here?
 		if (cur->NB::_et_energy > 0.5 * cur->NB::_et_size) {
@@ -117,11 +123,6 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 	cur = &node;
 	Node * child = &node;
 
-	/*
-	std::cout << "<<<<<<<<<<<<<<< Deleting node " << std::hex << &node << " of size "
-	          << std::dec << node.NB::_et_size << "\n";
-	std::cout << "Parent is: " << std::hex << node.NB::_et_parent << std::dec << "\n";
-	*/
 	if ((cur->NB::_et_left == nullptr) && (cur->NB::_et_right == nullptr)) {
 		//std::cout << "<<< Deleting Leaf.\n";
 
@@ -148,7 +149,7 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 				child->NB::_et_energy += 1;
 
 				if ((rebuild_at == nullptr) &&
-				    (cur->NB::_et_energy > 0.5 * cur->NB::_et_size)) {
+				    (child->NB::_et_energy > 0.5 * child->NB::_et_size)) {
 					rebuild_at = child;
 				}
 
@@ -163,11 +164,10 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 				// TODO this is only non-true if we did not descend above.
 				// unroll this case?
 
-				/*
-				std::cout << "<<<<< Splicing swappee out between " << std::hex
-				          << child->NB::_et_parent << " and " << child->NB::_et_left
-				          << std::dec << "\n";
-				*/
+			
+				//std::cout << "<<<<< Splicing swappee out between " << std::hex
+				//          << child->NB::_et_parent << " and " << child->NB::_et_left
+				//          << std::dec << "\n";
 				
 				if (__builtin_expect(child->NB::_et_parent->NB::_et_right == child,
 				                     true)) {
@@ -199,7 +199,7 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 				child->NB::_et_energy += 1;
 
 				if ((rebuild_at == nullptr) &&
-				    (cur->NB::_et_energy > 0.5 * cur->NB::_et_size)) {
+				    (child->NB::_et_energy > 0.5 * child->NB::_et_size)) {
 					rebuild_at = child;
 				}
 
@@ -211,11 +211,11 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 
 			// Splice this child out of the tree
 			if (child->NB::_et_right != nullptr) {
-				/*
-				std::cout << "<<<<< Splicing swappee out between " << std::hex
-				          << child->NB::_et_parent << " and " << child->NB::_et_right
-				          << std::dec << "\n";
-				*/
+			
+				//std::cout << "<<<<< Splicing swappee out between " << std::hex
+				//          << child->NB::_et_parent << " and " << child->NB::_et_right
+				//          << std::dec << "\n";
+			
 				
 				// TODO this is only non-true if we did not descend above.
 				// unroll this case?
@@ -286,6 +286,7 @@ EnergyTree<Node, Options, Tag, Compare>::dbg_verify() const
 {
 	this->dbg_verify_tree();
 	this->dbg_verify_size();
+	this->dbg_verify_energy();
 	this->dbg_verify_sizes();
 }
 
@@ -324,6 +325,15 @@ EnergyTree<Node, Options, Tag, Compare>::dbg_verify_size() const
 	}
 
 	debug::yggassert(count == this->size());
+}
+
+template <class Node, class Options, class Tag, class Compare>
+void
+EnergyTree<Node, Options, Tag, Compare>::dbg_verify_energy() const
+{
+	for (const Node & n : *this) {
+		debug::yggassert(n.NB::_et_energy <= 0.5 * n.NB::_et_size);
+	}
 }
 
 template <class Node, class Options, class Tag, class Compare>

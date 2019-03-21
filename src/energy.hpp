@@ -322,6 +322,7 @@ private:
 	std::vector<Node *> rebuild_buffer;
 
 	void dbg_verify_sizes() const;
+	void dbg_verify_energy() const;
 	void dbg_verify_tree(Node * node = nullptr) const;
 	void dbg_verify_size() const;
 };

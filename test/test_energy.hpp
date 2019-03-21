@@ -15,7 +15,7 @@ namespace energy {
 
 using namespace ygg;
 
-constexpr int ETREE_TESTSIZE = 10000;
+constexpr int ETREE_TESTSIZE = 5000;
 
 class Node : public EnergyTreeNodeBase<Node> {
 public:
@@ -50,7 +50,7 @@ operator<(const int lhs, const ygg::testing::energy::Node & rhs)
 {
 	return lhs < rhs.data;
 }
-	
+
 TEST(EnergyTreeTest, TrivialInsertionTest)
 {
 	auto tree = EnergyTree<Node>();
@@ -64,23 +64,24 @@ TEST(EnergyTreeTest, TrivialInsertionTest)
 
 TEST(EnergyTreeTest, TrivialFindTest)
 {
-EnergyTree<Node> tree;
+	EnergyTree<Node> tree;
 
-Node n0(0);
-tree.insert(n0);
-tree.dbg_verify();
-Node n1(1);
-tree.insert(n1);
-tree.dbg_verify();
-Node n2(2);
-tree.insert(n2);
-ASSERT_TRUE(tree.verify_integrity());
+	Node n0(0);
+	tree.insert(n0);
+	ASSERT_TRUE(tree.verify_integrity());
+	Node n1(1);
+	tree.insert(n1);
+	ASSERT_TRUE(tree.verify_integrity());
 
-ASSERT_EQ(tree.find(n0), tree.begin());
-ASSERT_EQ(tree.find(0), tree.begin());
-ASSERT_TRUE(tree.find(2) != tree.end());
-ASSERT_TRUE(tree.find(n1) != tree.end());
-ASSERT_TRUE(tree.find(5) == tree.end());
+	Node n2(2);
+	tree.insert(n2);
+	ASSERT_TRUE(tree.verify_integrity());
+
+	ASSERT_EQ(tree.find(n0), tree.begin());
+	ASSERT_EQ(tree.find(0), tree.begin());
+	ASSERT_TRUE(tree.find(2) != tree.end());
+	ASSERT_TRUE(tree.find(n1) != tree.end());
+	ASSERT_TRUE(tree.find(5) == tree.end());
 }
 
 TEST(EnergyTreeTest, RandomInsertionTest)
@@ -192,6 +193,7 @@ TEST(EnergyTreeTest, LinearInsertionRandomDeletionTest)
 
 	for (unsigned int i = 0; i < ETREE_TESTSIZE; ++i) {
 		tree.remove(nodes[indices[i]]);
+
 		ASSERT_TRUE(tree.verify_integrity());
 	}
 }
