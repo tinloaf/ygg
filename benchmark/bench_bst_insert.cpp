@@ -29,6 +29,31 @@ BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)(benchmark::State & s
 }
 REGISTER(InsertYggRBBSTFixture, BM_BST_Insertion)
 
+/*
+ * Ygg's Energy-Balanced Tree
+ */
+using InsertYggEBSTFixture =
+    BSTFixture<YggEnergyTreeInterface<BasicTreeOptions>, InsertExperiment, true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertYggEBSTFixture, BM_BST_Insertion)(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto & n : this->experiment_nodes) {
+			this->t.insert(n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto & n : this->experiment_nodes) {
+			this->t.remove(n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(InsertYggEBSTFixture, BM_BST_Insertion)
 
 
 /*

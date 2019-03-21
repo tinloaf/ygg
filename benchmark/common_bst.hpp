@@ -207,6 +207,81 @@ public:
 };
 
 /*
+ * Energy-Balanced Tree Interface
+ */
+template <class MyTreeOptions>
+class ENode
+	: public ygg::EnergyTreeNodeBase<ENode<MyTreeOptions>, MyTreeOptions> {
+private:
+	int value;
+
+public:
+	ENode(int value_in) : value(value_in){};
+
+	void
+	set_value(int new_value)
+	{
+		this->value = new_value;
+	}
+
+	int
+	get_value() const
+	{
+		return this->value;
+	}
+
+	bool
+	operator<(const ENode<MyTreeOptions> & rhs) const
+	{
+		return this->value < rhs.value;
+	}
+};
+
+template <class T>
+bool
+operator<(const ENode<T> & lhs, int rhs)
+{
+	return lhs.get_value() < rhs;
+}
+template <class T>
+bool
+operator<(int lhs, const ENode<T> & rhs)
+{
+	return lhs < rhs.get_value();
+}
+
+template <class MyTreeOptions>
+class YggEnergyTreeInterface {
+public:
+	using Node = ENode<MyTreeOptions>;
+	using Tree = ygg::EnergyTree<Node, MyTreeOptions>;
+
+	static void
+	insert(Tree & t, Node & n)
+	{
+		t.insert(n);
+	}
+
+	static std::string
+	get_name()
+	{
+		return "EnergyTree";
+	}
+
+	static Node
+	create_node(int val)
+	{
+		return Node(val);
+	}
+
+	static void
+	clear(Tree & t)
+	{
+		t.clear();
+	}
+};
+
+/*
  * Zip Tree Interface
  */
 template <class MyTreeOptions>

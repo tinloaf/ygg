@@ -30,6 +30,32 @@ BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)(benchmark::State & st
 REGISTER(DeleteYggRBBSTFixture, BM_BST_Deletion);
 
 /*
+ * Ygg's Energy-Balanced Tree
+ */
+using DeleteYggEBSTFixture =
+	BSTFixture<YggEnergyTreeInterface<BasicTreeOptions>, DeleteExperiment, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteYggEBSTFixture, BM_BST_Deletion)(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggEBSTFixture, BM_BST_Deletion);
+
+/*
  * Ygg's Zip Tree
  */
 using DeleteYggZBSTFixture =
