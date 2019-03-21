@@ -4,6 +4,26 @@ project (YGG)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 #set (CMAKE_CXX_STANDARD 14)
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+         "Valgrind")
+
+#===============================================
+#==== Build type: valgrind
+#===============================================
+
+set(CMAKE_C_FLAGS_VALGRIND "-O2 -march=native -ffast-math -g -flto" CACHE STRING
+        "Flags used by the C++ compiler during valgrind builds."
+        FORCE)
+set(CMAKE_CXX_FLAGS_VALGRIND "${CMAKE_C_FLAGS_VALGRIND}" CACHE STRING
+        "Flags used by the C compiler during valgrind builds."
+        FORCE )
+set (CMAKE_SHARED_LINKER_FLAGS_VALGRIND "${CMAKE_SHARED_LINKER_FLAGS}")
+set (CMAKE_EXE_LINKER_FLAGS_VALGRIND "${CMAKE_EXE_LINKER_FLAGS}")
+MARK_AS_ADVANCED(
+        CMAKE_CXX_FLAGS_VALGRIND
+        CMAKE_C_FLAGS_VALGRIND
+        CMAKE_EXE_LINKER_FLAGS_VALGRIND
+        CMAKE_SHARED_LINKER_FLAGS_VALGRIND )
 
 # Set a default build type if none was specified
 set(default_build_type "Debug")
@@ -12,9 +32,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
   set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
           STRING "Choose the type of build." FORCE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
-          "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 add_subdirectory(test)
