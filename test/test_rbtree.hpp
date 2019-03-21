@@ -518,14 +518,7 @@ TEST(RBTreeTest, LinearInsertionRandomDeletionTest)
 	ASSERT_TRUE(tree.verify_integrity());
 
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-		// std::string fname = std::string("/tmp/trees/before-") + std::to_string(i)
-		// + std::string(".dot"); tree.dump_to_dot(fname);
-
 		tree.remove(nodes[indices[i]]);
-
-		// fname = std::string("/tmp/trees/after-") + std::to_string(i) +
-		// std::string(".dot"); tree.dump_to_dot(fname);
-
 		ASSERT_TRUE(tree.verify_integrity());
 	}
 }

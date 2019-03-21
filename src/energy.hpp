@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "options.hpp"
+#include "size_holder.hpp"
 #include "tree_iterator.hpp"
 
 namespace ygg {
@@ -164,6 +165,60 @@ public:
 	template <class Comparable>
 	iterator<false> find(const Comparable & query);
 
+	/**
+	 * @brief Upper-bounds an element
+	 *
+	 * Returns an iterator to the smallest element to which <query> compares as
+	 * "less", i.e. the smallest element that is considered go strictly after
+	 * <query>.
+	 *
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default
+	 * ygg::utilities::flexible_less as Compare, that means you have to implement
+	 * operator<() for both types.
+	 *
+	 * @warning Not available for explicitly ordered trees
+	 *
+	 * @param query An object comparable to Node that should be upper-bounded
+	 * @returns An iterator to the first element comparing "greater" to <query>,
+	 * or end() if no such element exists
+	 */
+	template <class Comparable>
+	const_iterator<false> upper_bound(const Comparable & query) const;
+	template <class Comparable>
+	iterator<false> upper_bound(const Comparable & query);
+
+	/**
+	 * @brief Lower-bounds an element
+	 *
+	 * Returns an iterator to the first element that is not less that <query>,
+	 * i.e., that does not have to go before <query>.
+	 *
+	 * Note that <query> does not have to be a Node, but can be anything that can
+	 * be compared to a Node, i.e., for which
+	 *    Compare()(const Node &, const Comparable &)
+	 * and
+	 *    Compare()(const Comparable &, const Node &)
+	 * are defined and implemented. In the case of using the default
+	 * ygg::utilities::flexible_less as Compare, that means you have to implement
+	 * operator<() for both types.
+	 *
+	 * @warning Not available for explicitly ordered trees
+	 *
+	 * @param query An object comparable to Node that should be lower-bounded
+	 * @returns An iterator to the first element comparing greater-or-equally to
+	 * <query>, or end() if no such element exists
+	 */
+	template <class Comparable>
+	const_iterator<false> lower_bound(const Comparable & query) const;
+	template <class Comparable>
+	iterator<false> lower_bound(const Comparable & query);
+
+	
 	// Iteration
 	/**
 	 * Returns an iterator pointing to the smallest element in the tree.
@@ -232,6 +287,18 @@ public:
 	void clear();
 
 	/**
+	 * Return the number of elements in the tree.
+	 *
+	 * This method runs in O(1).
+	 *
+	 * @warning This method is only available if CONSTANT_TIME_SIZE is set as
+	 * option!
+	 *
+	 * @return The number of elements in the tree.
+	 */
+	size_t size() const;
+	
+	/**
 	 * @brief Returns whether the tree is empty
 	 *
 	 * This method runs in O(1).
@@ -250,11 +317,13 @@ private:
 
 	Node * root;
 	Compare cmp;
+	SizeHolder<Options::constant_time_size> s;
 
-	std::vector<size_t> rebuild_row_sizes; // TODO is this necessary?
 	std::vector<Node *> rebuild_buffer;
 
 	void dbg_verify_sizes() const;
+	void dbg_verify_tree(Node * node = nullptr) const;
+	void dbg_verify_size() const;
 };
 
 } // namespace ygg
