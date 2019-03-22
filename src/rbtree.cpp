@@ -141,7 +141,7 @@ RBTreeNodeBase<Node, Tag, Options>::swap_parent_with(Node * other)
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-RBTree<Node, NodeTraits, Options, Tag, Compare>::RBTree() 
+RBTree<Node, NodeTraits, Options, Tag, Compare>::RBTree()
 {}
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -509,12 +509,10 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::verify_integrity() const
 	    (this->root == nullptr) || this->verify_black_paths(this->root, &dummy);
 	bool children_okay = this->verify_red_black(this->root);
 
-	bool order_okay = this->verify_order();
 	bool root_okay = this->verify_black_root();
-	
+
 	bool bst_okay = this->TB::verify_integrity();
 
-	
 	// TODO adapt to new verification scheme
 	assert(root_okay && paths_okay && children_okay && bst_okay);
 

@@ -6,9 +6,9 @@ add_subdirectory(draup)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-include_directories(${GBENCHMARK_INCLUDE_DIRS})
+include_directories(SYSTEM ${GBENCHMARK_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/draup/src/draup) # TODO why is DRAUP_INCLUDE_DIRS not set?
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 set(CMAKE_CXX_STANDARD 17)
 set(LIBS "${LIBS} Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a")

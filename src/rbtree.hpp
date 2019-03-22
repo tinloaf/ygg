@@ -203,7 +203,7 @@ public:
 	 * @param other  The red-black tree that this one is constructed from
 	 */
 	RBTree(MyClass && other);
-	
+
 	/*
 	 * Pull in classes from base tree
 	 */

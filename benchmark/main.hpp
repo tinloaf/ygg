@@ -39,16 +39,16 @@ main(int argc, char ** argv)
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--doublings", strlen("--doublings")) == 0) {
-			doublings = (size_t)atoi(argv[i + 1]);
+			doublings = (int64_t)atoi(argv[i + 1]);
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--base_size", strlen("--base_size")) == 0) {
-			base_size = (size_t)atoi(argv[i + 1]);
+			base_size = (int64_t)atoi(argv[i + 1]);
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--experiment_size",
 		                   strlen("--experiment_size")) == 0) {
-			experiment_size = (size_t)atoi(argv[i + 1]);
+			experiment_size = (int64_t)atoi(argv[i + 1]);
 			i += 1;
 			remaining_argc -= 2;
 		} else {

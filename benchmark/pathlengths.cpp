@@ -20,8 +20,8 @@ public:
 
 		std::cout << "Median Depth: \t\t"
 		          << this->path_lengths[this->path_lengths.size() / 2] << std::endl;
-		size_t sum = std::accumulate(this->path_lengths.begin(),
-		                             this->path_lengths.end(), 0);
+		size_t sum = (size_t)std::accumulate(this->path_lengths.begin(),
+		                                     this->path_lengths.end(), 0);
 		std::cout << "Average Depth: \t\t" << ((double)sum) / ((double)this->count)
 		          << std::endl;
 		std::cout << "Depth Sum: \t\t" << sum << std::endl;
@@ -128,6 +128,8 @@ operator<(const RandZTreeNode & lhs, const RandZTreeNode & rhs)
 int
 main(int argc, const char ** argv)
 {
+	(void)argc; // TODO print an error message if wrong
+
 	/* RBTree */
 	using RBTree =
 	    ygg::RBTree<RBTreeNode, ygg::RBDefaultNodeTraits, BasicTreeOptions>;
@@ -140,8 +142,8 @@ main(int argc, const char ** argv)
 	    ygg::ZTree<RandZTreeNode, ygg::ZTreeDefaultNodeTraits<RandZTreeNode>,
 	               RandomRankTreeOptions>;
 
-	size_t count = std::atol(argv[1]);
-	size_t seed = std::atol(argv[2]);
+	size_t count = (size_t)std::atol(argv[1]);
+	size_t seed = (size_t)std::atol(argv[2]);
 
 	std::cout << "==== Red-Black Tree ====\n";
 	TreeDepthAnalyzer<RBTree, RBTreeNode> tarb(count, seed);

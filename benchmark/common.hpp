@@ -26,7 +26,6 @@ using InsertExperiment = decltype(insert_experiment_c);
 constexpr auto search_experiment_c = BOOST_HANA_STRING("Search");
 using SearchExperiment = decltype(search_experiment_c);
 
-
 std::vector<std::string> PAPI_MEASUREMENTS;
 bool PAPI_STATS_WRITTEN;
 
@@ -50,8 +49,7 @@ public:
 				    << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 				std::cout
 				    << "!!        Warning: No PAPI counters available!       !!\n";
-				std::cout
-				    << "!! Use the avail and component_avail tools !!\n";
+				std::cout << "!! Use the avail and component_avail tools !!\n";
 				std::cout
 				    << "!! to figure out why. If you are on Linux, you most  !!\n";
 				std::cout
@@ -84,8 +82,7 @@ public:
 
 		this->event_counts.resize(this->selected_events.size());
 		this->event_count_accu.resize(this->selected_events.size());
-		std::fill(this->event_count_accu.begin(),
-		          this->event_count_accu.end(), 0);
+		std::fill(this->event_count_accu.begin(), this->event_count_accu.end(), 0);
 #endif
 	}
 
@@ -106,8 +103,7 @@ public:
 		// TODO error handling
 		PAPI_stop_counters(this->event_counts.data(),
 		                   (int)this->event_counts.size());
-		std::transform(this->event_counts.begin(),
-		               this->event_counts.end(),
+		std::transform(this->event_counts.begin(), this->event_counts.end(),
 		               this->event_count_accu.begin(),
 		               this->event_count_accu.begin(), std::plus<long long>());
 #endif
@@ -120,8 +116,9 @@ public:
 		for (size_t i = 0; i < PAPI_MEASUREMENTS.size(); ++i) {
 			state.counters[PAPI_MEASUREMENTS[i]] = this->event_count_accu[i];
 		}
-		std::fill(this->event_count_accu.begin(),
-		          this->event_count_accu.end(), 0);
+		std::fill(this->event_count_accu.begin(), this->event_count_accu.end(), 0);
+#else
+		(void)state;
 #endif
 	}
 

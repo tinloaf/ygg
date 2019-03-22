@@ -41,8 +41,8 @@ public:
 	{
 		this->papi.initialize();
 
-		size_t fixed_count = state.range(0);
-		size_t experiment_count = state.range(1);
+		size_t fixed_count = (size_t)state.range(0);
+		size_t experiment_count = (size_t)state.range(1);
 
 		std::uniform_int_distribution<> point_distr(
 		    std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
@@ -127,6 +127,7 @@ public:
 	void
 	TearDown(const ::benchmark::State & state)
 	{
+		(void)state;
 		Interface::clear(this->t);
 	}
 

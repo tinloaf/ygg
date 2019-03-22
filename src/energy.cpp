@@ -528,7 +528,7 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 			i += 2;
 		}
 
-		for (size_t j = i / 2; j < (1 << (tree_levels - 2)); j++) {
+		for (size_t j = i / 2; j < (size_t)(1 << (tree_levels - 2)); j++) {
 			// Remaining nodes in the second-to-last level
 			/*
 			std::cout << "## Zero-ing out to below " << std::hex

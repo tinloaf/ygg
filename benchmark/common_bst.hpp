@@ -45,8 +45,8 @@ public:
 	{
 		this->papi.initialize();
 
-		size_t fixed_count = state.range(0);
-		size_t experiment_count = state.range(1);
+		size_t fixed_count = (size_t)state.range(0);
+		size_t experiment_count = (size_t)state.range(1);
 
 		std::uniform_int_distribution<> distr(std::numeric_limits<int>::min(),
 		                                      std::numeric_limits<int>::max());
@@ -107,13 +107,14 @@ public:
 			std::shuffle(ptrs.begin(), ptrs.end(), this->rng);
 			this->experiment_node_pointers.insert(
 			    this->experiment_node_pointers.begin(), ptrs.begin(),
-			    ptrs.begin() + experiment_count);
+			    ptrs.begin() + (long)experiment_count);
 		}
 	}
 
 	void
 	TearDown(const ::benchmark::State & state)
 	{
+		(void)state;
 		Interface::clear(this->t);
 	}
 
@@ -365,7 +366,7 @@ struct hash<ZipNode<T>>
 	size_t
 	operator()(const ZipNode<T> & n) const
 	{
-		return n.get_value();
+		return (size_t)n.get_value();
 	}
 };
 } // namespace std

@@ -130,7 +130,7 @@ BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)(benchmark::State & 
 		// Since we moved, we must completely rebuild the experiment nodes
 		this->experiment_nodes.clear();
 		for (auto & it : insertion_iterators) {
-			this->experiment_nodes.push_back(std::move(this->t.extract(it)));
+			this->experiment_nodes.push_back(this->t.extract(it));
 		}
 		insertion_iterators.clear();
 		// TODO shuffling here?
