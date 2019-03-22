@@ -46,14 +46,14 @@ ExtendedNodeTraits<Node, INB, NodeTraits>::fix_node(Node & node)
 	auto old_val = node.INB::_it_max_upper;
 	node.INB::_it_max_upper = NodeTraits::get_upper(node);
 
-	if (node._rbt_left != nullptr) {
+	if (node.get_left() != nullptr) {
 		node.INB::_it_max_upper =
-		    std::max(node.INB::_it_max_upper, node._rbt_left->INB::_it_max_upper);
+		    std::max(node.INB::_it_max_upper, node.get_left()->INB::_it_max_upper);
 	}
 
-	if (node._rbt_right != nullptr) {
+	if (node.get_right() != nullptr) {
 		node.INB::_it_max_upper =
-		    std::max(node.INB::_it_max_upper, node._rbt_right->INB::_it_max_upper);
+		    std::max(node.INB::_it_max_upper, node.get_right()->INB::_it_max_upper);
 	}
 
 	if (old_val != node.INB::_it_max_upper) {
@@ -167,13 +167,13 @@ IntervalTree<Node, NodeTraits, Options, Tag>::verify_maxima(Node * n) const
 	bool valid = true;
 	auto maximum = NodeTraits::get_upper(*n);
 
-	if (n->_rbt_right != nullptr) {
-		maximum = std::max(maximum, n->_rbt_right->INB::_it_max_upper);
-		valid &= this->verify_maxima(n->_rbt_right);
+	if (n->get_right() != nullptr) {
+		maximum = std::max(maximum, n->get_right()->INB::_it_max_upper);
+		valid &= this->verify_maxima(n->get_right());
 	}
-	if (n->_rbt_left != nullptr) {
-		maximum = std::max(maximum, n->_rbt_left->INB::_it_max_upper);
-		valid &= this->verify_maxima(n->_rbt_left);
+	if (n->get_left() != nullptr) {
+		maximum = std::max(maximum, n->get_left()->INB::_it_max_upper);
+		valid &= this->verify_maxima(n->get_left());
 	}
 
 	valid &= (maximum == n->INB::_it_max_upper);
@@ -199,10 +199,9 @@ IntervalTree<Node, NodeTraits, Options, Tag>::query(const Comparable & q) const
 		return QueryResult<Comparable>(nullptr, q);
 	}
 
-	// Find the smallest node s.t. not everything below it ends too early
-	while ((cur->_rbt_left != nullptr) &&
-	       (cur->_rbt_left->INB::_it_max_upper >= NodeTraits::get_lower(q))) {
-		cur = cur->_rbt_left;
+	while ((cur->get_left() != nullptr) &&
+	       (cur->get_left()->INB::_it_max_upper >= NodeTraits::get_lower(q))) {
+		cur = cur->get_left();
 	}
 
 	Node * hit;
@@ -254,15 +253,15 @@ find_next_overlapping(Node * cur, const Comparable & q)
 		// We make sure that at the start of the loop, the lower of cur is smaller
 		// than the upper of q. Thus, we need to only check the upper to check for
 		// overlap.
-		if (cur->_rbt_right != nullptr) {
+		if (cur->get_right() != nullptr) {
 			// go to smallest larger-or-equal child
-			cur = cur->_rbt_right;
+			cur = cur->get_right();
 			if (cur->INB::_it_max_upper < NodeTraits::get_lower(q)) {
 				// Prune!
 				// Nothing starting from this node can overlap b/c of upper limit.
 				// Backtrack.
 				while ((cur->get_parent() != nullptr) &&
-				       (cur->get_parent()->_rbt_right ==
+				       (cur->get_parent()->get_right() ==
 				        cur)) { // these are the nodes which are smaller and were
 					              // already visited
 					cur = cur->get_parent();
@@ -277,8 +276,8 @@ find_next_overlapping(Node * cur, const Comparable & q)
 					cur = cur->get_parent();
 				}
 			} else {
-				while (cur->_rbt_left != nullptr) {
-					cur = cur->_rbt_left;
+				while (cur->get_left() != nullptr) {
+					cur = cur->get_left();
 					if (cur->INB::_it_max_upper < NodeTraits::get_lower(q)) {
 						// Prune!
 						// Nothing starting from this node can overlap. Backtrack.
@@ -291,7 +290,7 @@ find_next_overlapping(Node * cur, const Comparable & q)
 			// go up
 			// skip over the nodes already visited
 			while ((cur->get_parent() != nullptr) &&
-			       (cur->get_parent()->_rbt_right ==
+			       (cur->get_parent()->get_right() ==
 			        cur)) { // these are the nodes which are smaller and were already
 				              // visited
 				cur = cur->get_parent();

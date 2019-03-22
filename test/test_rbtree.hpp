@@ -172,7 +172,7 @@ TEST(RBTreeTest, CopyAssignmentTest)
 	ASSERT_TRUE(src.verify_integrity());
 	ASSERT_TRUE(dst.verify_integrity());
 
-	dst = src;
+	dst.mimic(src);
 
 	ASSERT_TRUE(src.verify_integrity());
 	ASSERT_TRUE(dst.verify_integrity());
