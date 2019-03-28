@@ -377,15 +377,15 @@ template <template <size_t> class QueryT, bool found, typename... Rest>
 constexpr typename std::enable_if<!found, bool>::type
 pack_contains_forward_tmpl()
 {
-	return pack_contains<QueryT, Rest...>();
+	return pack_contains_tmpl<QueryT, Rest...>();
 }
 
 template <template <size_t> class QueryT, typename First, typename... Rest>
 constexpr bool
 pack_contains_tmpl()
 {
-	return pack_contains_forward<QueryT, is_numeric_specialization<First, QueryT>::value,
-	                             Rest...>();
+	return pack_contains_forward_tmpl<
+	    QueryT, is_numeric_specialization<First, QueryT>::value, Rest...>();
 }
 
 /*

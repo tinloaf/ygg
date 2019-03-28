@@ -6,3 +6,4 @@
 #include "rbtree.hpp"
 #include "ziptree.hpp"
 #include "energy.hpp"
+#include "wbtree.hpp"
