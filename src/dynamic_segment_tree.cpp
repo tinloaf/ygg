@@ -82,6 +82,10 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::delete_leaf(
 {
 	(void)t;
 
+	// If this node is deleted, it may not carry any segment border any more
+	assert(node.agg_left == node.agg_right);
+
+	// TODO is this really necessary everywhere we call delete_leaf?
 	InnerNode * parent = node.get_parent();
 	if (parent != nullptr) {
 		if (parent->get_left() == &node) {

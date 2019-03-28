@@ -140,6 +140,30 @@ public:
 	public:
 		constexpr static size_t value = modul_in;
 	};
+
+	template <size_t delta_numerator>
+	class WBT_DELTA_NUMERATOR {
+	public:
+		constexpr static size_t value = delta_numerator;
+	};
+
+	template <size_t gamma_numerator>
+	class WBT_GAMMA_NUMERATOR {
+	public:
+		constexpr static size_t value = (double)gamma_numerator;
+	};
+
+	template <size_t delta_denominator>
+	class WBT_DELTA_DENOMINATOR {
+	public:
+		constexpr static size_t value = delta_denominator;
+	};
+
+	template <size_t gamma_denominator>
+	class WBT_GAMMA_DENOMINATOR {
+	public:
+		constexpr static size_t value = (double)gamma_denominator;
+	};
 };
 
 /**
@@ -169,19 +193,22 @@ private:
 	    std::numeric_limits<size_t>::max();
 	static constexpr size_t ztree_universalize_coefficient_default = 1103515245;
 
+	static constexpr double wbt_delta_default = 2.41421356237; // 1 + sqrt(2)
+	static constexpr double wbt_gamma_default = 1.41421356237; // sqrt(2)
+
 public:
 	/// @cond INTERNAL
 	static constexpr bool multiple =
-	    rbtree_internal::pack_contains<TreeFlags::MULTIPLE, Opts...>();
+	    utilities::pack_contains<TreeFlags::MULTIPLE, Opts...>();
 	static constexpr bool order_queries =
-	    rbtree_internal::pack_contains<TreeFlags::ORDER_QUERIES, Opts...>();
+	    utilities::pack_contains<TreeFlags::ORDER_QUERIES, Opts...>();
 	static constexpr bool constant_time_size =
-	    rbtree_internal::pack_contains<TreeFlags::CONSTANT_TIME_SIZE, Opts...>();
+	    utilities::pack_contains<TreeFlags::CONSTANT_TIME_SIZE, Opts...>();
 	static constexpr bool compress_color =
-	    rbtree_internal::pack_contains<TreeFlags::COMPRESS_COLOR, Opts...>();
+	    utilities::pack_contains<TreeFlags::COMPRESS_COLOR, Opts...>();
 
 	static constexpr bool ztree_use_hash =
-	    rbtree_internal::pack_contains<TreeFlags::ZTREE_USE_HASH, Opts...>();
+	    utilities::pack_contains<TreeFlags::ZTREE_USE_HASH, Opts...>();
 
 	using ztree_rank_type =
 	    typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE, bool,
@@ -201,10 +228,43 @@ public:
 	    utilities::get_value_if_present_else_default<
 	        TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL,
 	        ztree_universalize_modul_default, Opts...>::value;
+
 	static constexpr size_t ztree_universalize_coefficient =
 	    utilities::get_value_if_present_else_default<
 	        TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT,
 	        ztree_universalize_coefficient_default, Opts...>::value;
+
+	static constexpr double
+	wbt_delta()
+	{
+		if (utilities::pack_contains_tmpl<TreeFlags::WBT_DELTA_NUMERATOR,
+		                                  Opts...>() &&
+		    utilities::pack_contains_tmpl<TreeFlags::WBT_DELTA_DENOMINATOR,
+		                                  Opts...>()) {
+			return (utilities::get_value_if_present<TreeFlags::WBT_DELTA_NUMERATOR,
+			                                        Opts...>::value /
+			        utilities::get_value_if_present<TreeFlags::WBT_DELTA_DENOMINATOR,
+			                                        Opts...>::value);
+		} else {
+			return wbt_delta_default;
+		}
+	}
+
+	static constexpr double
+	wbt_gamma()
+	{
+		if (utilities::pack_contains_tmpl<TreeFlags::WBT_GAMMA_NUMERATOR,
+		                                  Opts...>() &&
+		    utilities::pack_contains_tmpl<TreeFlags::WBT_GAMMA_DENOMINATOR,
+		                                  Opts...>()) {
+			return (utilities::get_value_if_present<TreeFlags::WBT_GAMMA_NUMERATOR,
+			                                        Opts...>::value /
+			        utilities::get_value_if_present<TreeFlags::WBT_GAMMA_DENOMINATOR,
+			                                        Opts...>::value);
+		} else {
+			return wbt_gamma_default;
+		}
+	}
 
 	/// @endcond
 private:

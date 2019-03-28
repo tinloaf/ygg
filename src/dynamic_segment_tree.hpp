@@ -941,7 +941,7 @@ public:
 	template <class Combiner>
 	const Combiner & get_combiner() const;
 
-	using pack = rbtree_internal::pack<Combiners...>;
+	using pack = utilities::pack<Combiners...>;
 
 private:
 	template <class Combiner>
@@ -1380,13 +1380,13 @@ private:
 	using NodeNameGetterCurried =
 	    dyn_segtree_internal::ASCIIInnerNodeNameGetter<InnerNode, Ts...>;
 	using NodeNameGetter =
-	    typename rbtree_internal::pass_pack<typename Combiners::pack,
+	    typename utilities::pass_pack<typename Combiners::pack,
 	                                        NodeNameGetterCurried>::type;
 	template <class... Ts>
 	using DotNameGetterCurried =
 	    dyn_segtree_internal::DOTInnerNodeNameGetter<InnerNode, Ts...>;
 	using DotNameGetter =
-	    typename rbtree_internal::pass_pack<typename Combiners::pack,
+	    typename utilities::pass_pack<typename Combiners::pack,
 	                                        DotNameGetterCurried>::type;
 
 	using TreePrinter = debug::TreePrinter<InnerNode, NodeNameGetter>;

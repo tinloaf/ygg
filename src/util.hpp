@@ -274,12 +274,15 @@ public:
 		T val;
 	};
 
-
-	iterator begin() const {
+	iterator
+	begin() const
+	{
 		return iterator(start);
 	}
 
-	iterator end() const {
+	iterator
+	end() const
+	{
 		return iterator(stop);
 	}
 
@@ -304,12 +307,6 @@ public:
 		return lhs < rhs;
 	}
 };
-
-
-} // namespace utilities
-
-// TODO why is it this namespace?
-namespace rbtree_internal {
 
 /*
  * This is inspired by
@@ -352,6 +349,42 @@ constexpr bool
 pack_contains()
 {
 	return pack_contains_forward<QueryT, std::is_same<QueryT, First>::value,
+	                             Rest...>();
+}
+
+/*
+ * Version to check for the presence of a size_t template
+ */
+template <template <size_t> class QueryT>
+constexpr bool
+pack_contains_tmpl()
+{
+	return false;
+}
+
+// Forward
+template <template <size_t> class QueryT, typename First, typename... Rest>
+constexpr bool pack_contains_tmpl();
+
+template <template <size_t> class QueryT, bool found, typename... Rest>
+constexpr typename std::enable_if<found, bool>::type
+pack_contains_forward_tmpl()
+{
+	return true;
+}
+
+template <template <size_t> class QueryT, bool found, typename... Rest>
+constexpr typename std::enable_if<!found, bool>::type
+pack_contains_forward_tmpl()
+{
+	return pack_contains<QueryT, Rest...>();
+}
+
+template <template <size_t> class QueryT, typename First, typename... Rest>
+constexpr bool
+pack_contains_tmpl()
+{
+	return pack_contains_forward<QueryT, is_numeric_specialization<First, QueryT>::value,
 	                             Rest...>();
 }
 
@@ -428,7 +461,7 @@ struct pass_pack<From<Ts...>, To>
 // To>::type;
 //};
 
-} // namespace rbtree_internal
+} // namespace utilities
 } // namespace ygg
 
 #define YGG_UTIL_HPP
