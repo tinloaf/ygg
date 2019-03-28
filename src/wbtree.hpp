@@ -10,6 +10,7 @@
 #include "options.hpp"
 #include "size_holder.hpp"
 #include "tree_iterator.hpp"
+#include "debug.hpp"
 
 // Only for debugging purposes
 #include <fstream>
@@ -194,7 +195,7 @@ public:
 
 	/* Debugging methods */
 	// TODO only here for compatibility with the Zip Tree
-	void dbg_verify() const noexcept {};
+	void dbg_verify() const;
 
 protected:
 	void remove_to_leaf(Node & node);
@@ -212,9 +213,7 @@ protected:
 	void swap_unrelated_nodes(Node * n1, Node * n2);
 	void swap_neighbors(Node * parent, Node * child);
 
-	bool verify_black_root() const;
-	bool verify_black_paths(const Node * node, unsigned int * path_length) const;
-	bool verify_red_black(const Node * node) const;
+	void verify_sizes() const;
 };
 
 } // namespace weight

@@ -351,10 +351,42 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_right_leaning(
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+void
+WBTree<Node, NodeTraits, Options, Tag, Compare>::verify_sizes() const
+{
+	for (auto & node : *this) {
+		size_t size = 1;
+		if (node.NB::get_left() != nullptr) {
+			size += node.NB::get_left()->NB::_wbt_size;
+		}
+		if (node.NB::get_right() != nullptr) {
+			size += node.NB::get_right()->NB::_wbt_size;
+		}
+
+		debug::yggassert(size == node.NB::_wbt_size);
+	}
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+void
+WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_verify() const
+{
+	this->verify_tree();
+	this->verify_order();
+	this->verify_sizes();
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 bool
 WBTree<Node, NodeTraits, Options, Tag, Compare>::verify_integrity() const
 {
-	return true; // TODO TBD
+	try {
+		this->dbg_verify();
+	} catch (debug::VerifyException & e) {
+		return false;
+	}
+
+	return true;
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
