@@ -3,7 +3,7 @@
 //
 
 #include "../src/ygg.hpp"
-#include "/home/lukas/src/intervaltree/ygg/src/energy.hpp"
+
 
 using namespace ygg;
 
