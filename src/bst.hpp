@@ -75,7 +75,7 @@ public:
 	Node * const & get_left() const; // TODO make these const
 	Node * const & get_right() const;
 
-	// Debugging methods
+	// Debugging methods TODO remove this
 	size_t get_depth() const noexcept;
 };
 

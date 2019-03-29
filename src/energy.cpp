@@ -13,6 +13,21 @@
 
 namespace ygg {
 
+template <class Node, class Options, class Tag>
+size_t
+EnergyTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
+{
+	size_t depth = 0;
+	const Node * n = (const Node *)this;
+
+	while (n->_et_parent != nullptr) {
+		depth++;
+		n = n->_et_parent;
+	}
+
+	return depth;
+}
+
 template <class Node, class Options, class Tag, class Compare>
 EnergyTree<Node, Options, Tag, Compare>::EnergyTree() : root(nullptr)
 {}
@@ -39,7 +54,7 @@ void
 EnergyTree<Node, Options, Tag, Compare>::insert(Node & node)
 {
 	this->s.add(1);
-	
+
 	node._et_size = 1;
 	node._et_energy = 0;
 	node._et_left = nullptr;
@@ -63,7 +78,7 @@ EnergyTree<Node, Options, Tag, Compare>::insert(Node & node)
 		// TODO unroll two stages of the loop
 		// TODO make 0.5 configurable
 		if ((rebuild_at == nullptr) &&
-		    (cur->NB::_et_energy > 0.5 * cur->NB::_et_size)) {
+		    (2 * cur->NB::_et_energy > cur->NB::_et_size)) {
 			rebuild_at = cur;
 		}
 
@@ -96,25 +111,28 @@ void
 EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 {
 	this->s.reduce(1);
-	
+
 	Node * cur = &node;
 	Node * rebuild_at = nullptr;
 	bool rebuild_set_upwards = false;
 
-	//	std::cout << "<<<<<<<<<<<<<<< Deleting node " << std::hex << &node << " of size "
+	//	std::cout << "<<<<<<<<<<<<<<< Deleting node " << std::hex << &node << " of
+	// size "
 	//          << std::dec << node.NB::_et_size << "\n";
-	//std::cout << "Parent is: " << std::hex << node.NB::_et_parent << std::dec << "\n";
+	// std::cout << "Parent is: " << std::hex << node.NB::_et_parent << std::dec
+	// << "\n";
 
 	while (cur->NB::_et_parent != nullptr) {
 		cur = cur->NB::_et_parent;
 		cur->NB::_et_size -= 1;
 		cur->NB::_et_energy += 1;
 
-		//std::cout << " <<< Up-Updating energy and size at " << std::hex << cur << std::dec << "\n";
-		
+		// std::cout << " <<< Up-Updating energy and size at " << std::hex << cur <<
+		// std::dec << "\n";
+
 		// TODO make 0.5 configurable
 		// TODO ceil here?
-		if (cur->NB::_et_energy > 0.5 * cur->NB::_et_size) {
+		if (2 * cur->NB::_et_energy > cur->NB::_et_size) {
 			rebuild_at = cur;
 			rebuild_set_upwards = true;
 		}
@@ -124,7 +142,7 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 	Node * child = &node;
 
 	if ((cur->NB::_et_left == nullptr) && (cur->NB::_et_right == nullptr)) {
-		//std::cout << "<<< Deleting Leaf.\n";
+		// std::cout << "<<< Deleting Leaf.\n";
 
 		// This is a leaf. We can just delete.
 		Node * parent = cur->NB::_et_parent;
@@ -138,7 +156,7 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 		}
 	} else {
 		if (cur->NB::_et_left != nullptr) {
-			//std::cout << "<<< Delete-Swapping from left.\n";
+			// std::cout << "<<< Delete-Swapping from left.\n";
 			// TODO randomly select whether we do left-leaning or right-leaning
 			// deletion? For now, left-leaning is implemented
 			child = cur->NB::_et_left;
@@ -149,14 +167,14 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 				child->NB::_et_energy += 1;
 
 				if ((rebuild_at == nullptr) &&
-				    (child->NB::_et_energy > 0.5 * child->NB::_et_size)) {
+				    (2 * child->NB::_et_energy > child->NB::_et_size)) {
 					rebuild_at = child;
 				}
 
 				child = child->NB::_et_right;
 			}
 
-			//std::cout << "<<<< Selected swappee: " << std::hex << child << std::dec
+			// std::cout << "<<<< Selected swappee: " << std::hex << child << std::dec
 			//          << "\n";
 
 			// Splice this child out of the tree
@@ -164,11 +182,10 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 				// TODO this is only non-true if we did not descend above.
 				// unroll this case?
 
-			
-				//std::cout << "<<<<< Splicing swappee out between " << std::hex
+				// std::cout << "<<<<< Splicing swappee out between " << std::hex
 				//          << child->NB::_et_parent << " and " << child->NB::_et_left
 				//          << std::dec << "\n";
-				
+
 				if (__builtin_expect(child->NB::_et_parent->NB::_et_right == child,
 				                     true)) {
 					child->NB::_et_parent->NB::_et_right = child->NB::_et_left;
@@ -186,11 +203,11 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 					child->NB::_et_parent->NB::_et_left = nullptr;
 				}
 
-				//std::cout << "<<<< Swapped element is empty on the left.\n";
+				// std::cout << "<<<< Swapped element is empty on the left.\n";
 			}
 
 		} else {
-			//std::cout << "<<< Delete-Swapping from right.\n";
+			// std::cout << "<<< Delete-Swapping from right.\n";
 			child = cur->NB::_et_right;
 
 			// Find the smallest among the greater-or-equal children
@@ -199,27 +216,26 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 				child->NB::_et_energy += 1;
 
 				if ((rebuild_at == nullptr) &&
-				    (child->NB::_et_energy > 0.5 * child->NB::_et_size)) {
+				    (2 * child->NB::_et_energy > child->NB::_et_size)) {
 					rebuild_at = child;
 				}
 
 				child = child->NB::_et_left;
 			}
 
-			//std::cout << "<<<< Selected swappee: " << std::hex << child << std::dec
+			// std::cout << "<<<< Selected swappee: " << std::hex << child << std::dec
 			//			          << "\n";
 
 			// Splice this child out of the tree
 			if (child->NB::_et_right != nullptr) {
-			
-				//std::cout << "<<<<< Splicing swappee out between " << std::hex
+
+				// std::cout << "<<<<< Splicing swappee out between " << std::hex
 				//          << child->NB::_et_parent << " and " << child->NB::_et_right
 				//          << std::dec << "\n";
-			
-				
+
 				// TODO this is only non-true if we did not descend above.
 				// unroll this case?
- 				if (__builtin_expect(child->NB::_et_parent->NB::_et_left == child,
+				if (__builtin_expect(child->NB::_et_parent->NB::_et_left == child,
 				                     true)) {
 					child->NB::_et_parent->NB::_et_left = child->NB::_et_right;
 				} else {
@@ -228,7 +244,7 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 				}
 				child->NB::_et_right->NB::_et_parent = child->NB::_et_parent;
 			} else {
- 				if (__builtin_expect(child->NB::_et_parent->NB::_et_left == child,
+				if (__builtin_expect(child->NB::_et_parent->NB::_et_left == child,
 				                     true)) {
 					child->NB::_et_parent->NB::_et_left = nullptr;
 				} else {
@@ -236,7 +252,7 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 					child->NB::_et_parent->NB::_et_right = nullptr;
 				}
 
-				//std::cout << "<<<< Swapped element is empty on the right.\n";
+				// std::cout << "<<<< Swapped element is empty on the right.\n";
 			}
 		}
 
@@ -270,7 +286,7 @@ EnergyTree<Node, Options, Tag, Compare>::remove(Node & node)
 		child->NB::_et_size = node.NB::_et_size - 1;
 
 		if (!rebuild_set_upwards &&
-		    (child->NB::_et_energy > 0.5 * child->NB::_et_size)) {
+		    (2 * child->NB::_et_energy > child->NB::_et_size)) {
 			rebuild_at = child;
 		}
 	}
@@ -332,7 +348,7 @@ void
 EnergyTree<Node, Options, Tag, Compare>::dbg_verify_energy() const
 {
 	for (const Node & n : *this) {
-		debug::yggassert(n.NB::_et_energy <= 0.5 * n.NB::_et_size);
+		debug::yggassert(2 * n.NB::_et_energy <= n.NB::_et_size);
 	}
 }
 
@@ -400,7 +416,7 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 	std::cout << "################# Rebuilding subtree of size " << original_size
 	          << "\n";
 	*/
-	
+
 	// TODO it should be possible to prevent backtracking out of the node
 	smallest = node;
 	while (smallest->NB::_et_left != nullptr) {
@@ -420,7 +436,8 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 
 	size_t max_counter_bottom_level = 1 + (2 * (bottom_level_size - 1));
 	//	std::cout << "Bottom level size: " << bottom_level_size << "\n";
-	// std::cout << "Max bottom level counter: " << max_counter_bottom_level << "\n";
+	// std::cout << "Max bottom level counter: " << max_counter_bottom_level <<
+	// "\n";
 
 	// Handle first element manually
 	this->rebuild_buffer[0] = smallest;
@@ -458,7 +475,7 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 		std::cout << "Level offset " << level_offset << " / index "
 		          << index_in_level << "\n";
 		*/
-		
+
 		this->rebuild_buffer[level_offset + (unsigned long)index_in_level] = &(*it);
 	}
 
@@ -467,9 +484,9 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 	size_t lower_offset = 0;
 	size_t upper_offset = (full_tree_size + 1) / 2;
 
-	//	std::cout << "-- Up-linking bottom level. Level Size: " << bottom_level_size
+	//	std::cout << "-- Up-linking bottom level. Level Size: " <<
+	// bottom_level_size
 	//          << "\n";
-
 
 	if (tree_levels > 1) {
 		// Linking the bottom level up is special, since it is not full
@@ -511,7 +528,7 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 			std::cout << "  L: " << std::hex << this->rebuild_buffer[i] << std::dec
 			          << "\n";
 			*/
-			
+
 			this->rebuild_buffer[upper_offset + (i / 2)]->NB::_et_left =
 			    this->rebuild_buffer[i];
 			this->rebuild_buffer[upper_offset + (i / 2)]->NB::_et_right = nullptr;
@@ -587,7 +604,7 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 	std::cout << "Top node: " << std::hex << this->rebuild_buffer.back()
 	          << " / Parent: " << original_parent << std::dec << "\n";
 	*/
-	
+
 	// Top level connects to the original parent
 	this->rebuild_buffer.back()->NB::_et_parent = original_parent;
 	if (original_parent == nullptr) {
@@ -752,11 +769,9 @@ EnergyTree<Node, Options, Tag, Compare>::rend()
 	return iterator<true>(nullptr);
 }
 
-
 template <class Node, class Options, class Tag, class Compare>
 template <class Comparable>
-typename EnergyTree<Node, Options, Tag,
-                Compare>::template iterator<false>
+typename EnergyTree<Node, Options, Tag, Compare>::template iterator<false>
 EnergyTree<Node, Options, Tag, Compare>::find(const Comparable & query)
 {
 	Node * cur = this->root;
@@ -780,20 +795,16 @@ EnergyTree<Node, Options, Tag, Compare>::find(const Comparable & query)
 
 template <class Node, class Options, class Tag, class Compare>
 template <class Comparable>
-typename EnergyTree<Node, Options, Tag,
-                Compare>::template const_iterator<false>
-EnergyTree<Node, Options, Tag, Compare>::find(
-    const Comparable & query) const
+typename EnergyTree<Node, Options, Tag, Compare>::template const_iterator<false>
+EnergyTree<Node, Options, Tag, Compare>::find(const Comparable & query) const
 {
 	return const_iterator<false>(const_cast<decltype(this)>(this)->find(query));
 }
 
 template <class Node, class Options, class Tag, class Compare>
 template <class Comparable>
-typename EnergyTree<Node, Options, Tag,
-                Compare>::template iterator<false>
-EnergyTree<Node, Options, Tag, Compare>::lower_bound(
-    const Comparable & query)
+typename EnergyTree<Node, Options, Tag, Compare>::template iterator<false>
+EnergyTree<Node, Options, Tag, Compare>::lower_bound(const Comparable & query)
 {
 	Node * cur = this->root;
 	Node * last_left = nullptr;
@@ -816,10 +827,8 @@ EnergyTree<Node, Options, Tag, Compare>::lower_bound(
 
 template <class Node, class Options, class Tag, class Compare>
 template <class Comparable>
-typename EnergyTree<Node, Options, Tag,
-                Compare>::template iterator<false>
-EnergyTree<Node, Options, Tag, Compare>::upper_bound(
-    const Comparable & query)
+typename EnergyTree<Node, Options, Tag, Compare>::template iterator<false>
+EnergyTree<Node, Options, Tag, Compare>::upper_bound(const Comparable & query)
 {
 	Node * cur = this->root;
 	Node * last_left = nullptr;
@@ -842,24 +851,20 @@ EnergyTree<Node, Options, Tag, Compare>::upper_bound(
 
 template <class Node, class Options, class Tag, class Compare>
 template <class Comparable>
-typename EnergyTree<Node, Options, Tag,
-                Compare>::template const_iterator<false>
+typename EnergyTree<Node, Options, Tag, Compare>::template const_iterator<false>
 EnergyTree<Node, Options, Tag, Compare>::upper_bound(
     const Comparable & query) const
 {
-	return const_iterator<false>(
-	    const_cast<MyClass *>(this)->upper_bound(query));
+	return const_iterator<false>(const_cast<MyClass *>(this)->upper_bound(query));
 }
 
 template <class Node, class Options, class Tag, class Compare>
 template <class Comparable>
-typename EnergyTree<Node, Options, Tag,
-                Compare>::template const_iterator<false>
+typename EnergyTree<Node, Options, Tag, Compare>::template const_iterator<false>
 EnergyTree<Node, Options, Tag, Compare>::lower_bound(
     const Comparable & query) const
 {
-	return const_iterator<false>(
-	    const_cast<MyClass *>(this)->lower_bound(query));
+	return const_iterator<false>(const_cast<MyClass *>(this)->lower_bound(query));
 }
 
 template <class Node, class Options, class Tag, class Compare>

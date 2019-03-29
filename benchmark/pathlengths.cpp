@@ -48,7 +48,7 @@ private:
 	std::vector<Node> nodes;
 	std::vector<size_t> path_length_histogram;
 	std::vector<size_t> path_lengths;
-
+	
 	void
 	compute_path_lengths()
 	{
@@ -102,6 +102,30 @@ operator<(const RBTreeNode & lhs, const RBTreeNode & rhs)
 	return lhs.val < rhs.val;
 }
 
+class WBTreeNode
+    : public ygg::weight::WBTreeNodeBase<WBTreeNode, BasicTreeOptions> {
+public:
+	size_t val;
+};
+
+bool
+operator<(const WBTreeNode & lhs, const WBTreeNode & rhs)
+{
+	return lhs.val < rhs.val;
+}
+
+class EnergyNode
+    : public ygg::EnergyTreeNodeBase<EnergyNode, BasicTreeOptions> {
+public:
+	size_t val;
+};
+
+bool
+operator<(const EnergyNode & lhs, const EnergyNode & rhs)
+{
+	return lhs.val < rhs.val;
+}
+
 class ZTreeNode : public ygg::ZTreeNodeBase<ZTreeNode, BasicTreeOptions> {
 public:
 	size_t val;
@@ -133,6 +157,14 @@ main(int argc, const char ** argv)
 	/* RBTree */
 	using RBTree =
 	    ygg::RBTree<RBTreeNode, ygg::RBDefaultNodeTraits, BasicTreeOptions>;
+
+	/* WBTree */
+	using WBTree = ygg::weight::WBTree<WBTreeNode, ygg::RBDefaultNodeTraits,
+	                                   BasicTreeOptions>;
+
+	/* Energy-Balanced Tree */
+	using EnergyTree = ygg::EnergyTree<EnergyNode, BasicTreeOptions>;
+
 	/* ZTree */
 	using ZTree = ygg::ZTree<ZTreeNode, ygg::ZTreeDefaultNodeTraits<ZTreeNode>,
 	                         BasicTreeOptions>;
@@ -148,6 +180,14 @@ main(int argc, const char ** argv)
 	std::cout << "==== Red-Black Tree ====\n";
 	TreeDepthAnalyzer<RBTree, RBTreeNode> tarb(count, seed);
 	tarb.run();
+
+	std::cout << "==== Weight-Balanced Tree ====\n";
+	TreeDepthAnalyzer<WBTree, WBTreeNode> taw(count, seed);
+	taw.run();
+
+	std::cout << "==== Energy-Balanced Tree ====\n";
+	TreeDepthAnalyzer<EnergyTree, EnergyNode> tae(count, seed);
+	tae.run();
 
 	std::cout << "==== Zip Tree ====\n";
 	TreeDepthAnalyzer<ZTree, ZTreeNode> taz(count, seed);

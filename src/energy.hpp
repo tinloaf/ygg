@@ -18,6 +18,9 @@ public:
 
 	size_t _et_size;
 	size_t _et_energy;
+
+	// Debugging
+	size_t get_depth() const noexcept;
 };
 
 template <class Node, class Options = DefaultOptions, class Tag = int,

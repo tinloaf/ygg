@@ -132,6 +132,7 @@ public:
 	PapiMeasurements papi;
 };
 
+
 /*
  * Red-Black Tree Interface
  */
@@ -206,6 +207,83 @@ public:
 		t.clear();
 	}
 };
+
+
+/*
+ * Weight-Balanced Tree Interface
+ */
+template <class MyTreeOptions>
+class WBNode
+	: public ygg::weight::WBTreeNodeBase<WBNode<MyTreeOptions>, MyTreeOptions> {
+private:
+	int value;
+
+public:
+	WBNode(int value_in) : value(value_in){};
+
+	void
+	set_value(int new_value)
+	{
+		this->value = new_value;
+	}
+
+	int
+	get_value() const
+	{
+		return this->value;
+	}
+
+	bool
+	operator<(const WBNode<MyTreeOptions> & rhs) const
+	{
+		return this->value < rhs.value;
+	}
+};
+
+template <class T>
+bool
+operator<(const WBNode<T> & lhs, int rhs)
+{
+	return lhs.get_value() < rhs;
+}
+template <class T>
+bool
+operator<(int lhs, const WBNode<T> & rhs)
+{
+	return lhs < rhs.get_value();
+}
+
+template <class MyTreeOptions>
+class YggWBTreeInterface {
+public:
+	using Node = WBNode<MyTreeOptions>;
+	using Tree = ygg::weight::WBTree<Node, ygg::weight::WBDefaultNodeTraits, MyTreeOptions>;
+
+	static void
+	insert(Tree & t, Node & n)
+	{
+		t.insert(n);
+	}
+
+	static std::string
+	get_name()
+	{
+		return "WBTree";
+	}
+
+	static Node
+	create_node(int val)
+	{
+		return Node(val);
+	}
+
+	static void
+	clear(Tree & t)
+	{
+		t.clear();
+	}
+};
+
 
 /*
  * Energy-Balanced Tree Interface

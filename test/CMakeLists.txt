@@ -25,7 +25,7 @@ set_target_properties(run_tests
                       PROPERTIES LINK_FLAGS "-fprofile-arcs -ftest-coverage"
                       )
 set_target_properties(run_tests
-                      PROPERTIES CXX_STANDARD 14
+                      PROPERTIES CXX_STANDARD 17
                       )
 
 target_link_libraries (run_tests ${LIBS} ${GTEST_LIBS_DIR}/libgtest.a ${GTEST_LIBS_DIR}/libgtest_main.a
