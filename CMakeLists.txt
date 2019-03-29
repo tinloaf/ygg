@@ -3,7 +3,7 @@ project (YGG)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
-#set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
          "Valgrind")
 
@@ -43,13 +43,9 @@ add_subdirectory(test)
 add_subdirectory(examples)
 
 
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag(-std=c++17 HASCPP17)
-
 find_package(Boost 1.61)
 
 if (Boost_FOUND)
-if (${HASCPP17})
 	# Find PAPI
 	find_package(PAPI)
 	if (PAPI_FOUND)
@@ -59,9 +55,6 @@ if (${HASCPP17})
 	endif(PAPI_FOUND)
 
 	add_subdirectory (benchmark)
-else()
-	MESSAGE(WARNING, "Not building benchmarks, your compiler does not support C++17.")
-endif()
 else()
 	MESSAGE(WARNING, "Not building benchmarks, Boost >= 1.61 not found.")
 endif()

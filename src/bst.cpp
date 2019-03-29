@@ -300,11 +300,30 @@ BinarySearchTree<Node, Options, Tag, Compare,
 	debug::yggassert(tree_okay);
 	debug::yggassert(order_okay);
 
+	this->verify_size();
+
 	assert(tree_okay && order_okay);
 
 	(void)dummy;
 
 	return tree_okay && order_okay;
+}
+
+template <class Node, class Options, class Tag, class Compare,
+          class ParentContainer>
+void
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::verify_size()
+    const
+{
+	if constexpr (Options::constant_time_size) {
+		size_t count = 0;
+		for (const Node & n : *this) {
+			(void)n;
+			count++;
+		}
+
+		debug::yggassert(count == this->size());
+	}
 }
 
 template <class Node, class Options, class Tag, class Compare,

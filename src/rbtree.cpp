@@ -167,8 +167,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 	while (cur != nullptr) {
 		parent = cur;
 
-		// TODO constexpr - if
-		if (on_equality_prefer_left) {
+		if constexpr (on_equality_prefer_left) {
 			if (this->cmp(*cur, node)) {
 				cur = cur->NB::get_right();
 			} else {
@@ -201,15 +200,16 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 			// assert(multiple);
 
 			// TODO constexpr - if
-			if (!Options::multiple) {
+			if constexpr (!Options::multiple) {
 				return;
-			}
-
-			// TODO constexpr - if
-			if (on_equality_prefer_left) {
-				parent->NB::set_left(&node);
 			} else {
-				parent->NB::set_right(&node);
+
+				// TODO constexpr - if
+				if constexpr (on_equality_prefer_left) {
+					parent->NB::set_left(&node);
+				} else {
+					parent->NB::set_right(&node);
+				}
 			}
 		}
 

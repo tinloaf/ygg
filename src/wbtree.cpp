@@ -45,8 +45,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 		parent = cur;
 		parent->NB::_wbt_size += 1;
 
-		// TODO constexpr - if
-		if (on_equality_prefer_left) {
+		if constexpr (on_equality_prefer_left) {
 			if (this->cmp(*cur, node)) {
 				cur = cur->NB::get_right();
 			} else {
@@ -75,14 +74,11 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 			parent->NB::set_right(&node);
 		} else {
 			// assert(multiple);
-
-			// TODO constexpr - if
-			if (!Options::multiple) {
+			if constexpr (!Options::multiple) {
 				return;
 			}
 
-			// TODO constexpr - if
-			if (on_equality_prefer_left) {
+			if constexpr (on_equality_prefer_left) {
 				parent->NB::set_left(&node);
 			} else {
 				parent->NB::set_right(&node);
@@ -545,6 +541,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 			this->swap_nodes(&node, cur);
 		}
 
+		// Now, node is where cur should point to
+		cur = &node;
 		parent = cur->NB::get_parent();
 		NodeTraits::delete_leaf(*cur, *this);
 
@@ -582,6 +580,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 			this->swap_nodes(&node, cur);
 		}
 
+		// Now, node is where cur should point to
+		cur = &node;
 		parent = cur->NB::get_parent();
 		NodeTraits::delete_leaf(*cur, *this);
 

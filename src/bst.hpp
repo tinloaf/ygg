@@ -419,6 +419,8 @@ protected:
 	bool verify_tree() const;
 	bool verify_order() const;
 
+	void verify_size() const;
+
 	Compare cmp;
 
 	SizeHolder<Options::constant_time_size> s;
