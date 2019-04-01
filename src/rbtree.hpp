@@ -229,6 +229,8 @@ public:
 	void insert(Node & node);
 	void insert(Node & node, Node & hint);
 	void insert(Node & node, iterator<false> hint);
+	// TODO document hinted inserts
+	// TODO should order be preserved on hints?
 
 	// TODO document
 	void insert_left_leaning(Node & node);

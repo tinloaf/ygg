@@ -167,17 +167,32 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 	while (cur != nullptr) {
 		parent = cur;
 
-		if constexpr (on_equality_prefer_left) {
-			if (this->cmp(*cur, node)) {
-				cur = cur->NB::get_right();
+		if constexpr (Options::multiple) {
+			if constexpr (on_equality_prefer_left) {
+				if (this->cmp(*cur, node)) {
+					cur = cur->NB::get_right();
+				} else {
+					cur = cur->NB::get_left();
+				}
 			} else {
-				cur = cur->NB::get_left();
+				if (this->cmp(node, *cur)) {
+					cur = cur->NB::get_left();
+				} else {
+					cur = cur->NB::get_right();
+				}
 			}
 		} else {
-			if (this->cmp(node, *cur)) {
+			// Multiple are not allowed - we need three-way comparisons!
+			// on_equality_prefer_left has no effect here
+			if (this->cmp(*cur, node)) {
+				cur = cur->NB::get_right();
+			} else if (this->cmp(node, *cur)) {
 				cur = cur->NB::get_left();
 			} else {
-				cur = cur->NB::get_right();
+				// Same as existing. Reduce size (because we increased it earlier)
+				// and exit.
+				this->s.reduce(1);
+				return;
 			}
 		}
 	}
@@ -192,6 +207,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 		node.NB::set_parent(parent);
 		node.NB::set_color(rbtree_internal::Color::RED);
 
+		// TODO if multiple are allowed, we can make this a two-way comparison!
 		if (this->cmp(node, *parent)) {
 			parent->NB::set_left(&node);
 		} else if (this->cmp(*parent, node)) {
@@ -201,6 +217,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 
 			// TODO constexpr - if
 			if constexpr (!Options::multiple) {
+				// We already added to the size, subtract it again!
+				this->s.reduce(1);
 				return;
 			} else {
 
@@ -378,13 +396,21 @@ void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node,
                                                         Node & hint)
 {
+	/* TODO this code does not work. We need to traverse the path up until
+	 * we have seen at least one smaller-than and one larger-than node.
+	 * Is this really faster? For now, fall back to normal insertion.
+	 */
+
+	this->insert(node);
+
 	// find parent
-	Node * parent = &hint;
+	// Node * parent = &hint;
 
 	/* We need to walk up if:
 	 *  - we're larger than the parent and in its left subtree
 	 *  - we're smaller than the parent and in its right subtree
 	 */
+	/*
 	while (
 	    (parent->NB::get_parent() != nullptr) &&
 	    (((parent->NB::get_parent()->NB::get_left() == parent) &&
@@ -393,16 +419,17 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node,
 	     ((parent->NB::get_parent()->NB::get_right() == parent) &&
 	      (this->cmp(node,
 	                 *parent->NB::get_parent()))))) { // right subtree, node
-		                                                // should go before parent
-		parent = parent->NB::get_parent();
+	                                                  // should go before parent
+	  parent = parent->NB::get_parent();
 	}
 
 	if (parent->NB::get_left() != nullptr) {
-		parent = parent->NB::get_left();
-		this->insert_leaf_base<false>(node, parent);
+	  parent = parent->NB::get_left();
+	  this->insert_leaf_base<false>(node, parent);
 	} else {
-		this->insert_leaf_base<true>(node, parent);
+	  this->insert_leaf_base<true>(node, parent);
 	}
+	*/
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -411,21 +438,25 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(
     Node & node,
     RBTree<Node, NodeTraits, Options, Tag, Compare>::iterator<false> hint)
 {
+	this->insert(node);
+	/* TODO see above.*/
+	/*
 	if (hint == this->end()) {
-		// special case: insert at the end
-		Node * parent = this->root;
+	  // special case: insert at the end
+	  Node * parent = this->root;
 
-		if (parent == nullptr) {
-			this->insert_leaf_base<false>(node, parent);
-		} else {
-			while (parent->NB::get_right() != nullptr) {
-				parent = parent->NB::get_right();
-			}
-			this->insert_leaf_base<false>(node, parent);
-		}
+	  if (parent == nullptr) {
+	    this->insert_leaf_base<false>(node, parent);
+	  } else {
+	    while (parent->NB::get_right() != nullptr) {
+	      parent = parent->NB::get_right();
+	    }
+	    this->insert_leaf_base<false>(node, parent);
+	  }
 	} else {
-		this->insert(node, *hint);
+	  this->insert(node, *hint);
 	}
+	*/
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
