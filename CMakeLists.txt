@@ -44,12 +44,12 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 add_subdirectory(examples)
+add_subdirectory(test)
 
 
-find_package(Boost 1.64)
+find_package(Boost 1.61)
 
 if (Boost_FOUND)
-	add_subdirectory(test)
 
 	# Find PAPI
 	find_package(PAPI)

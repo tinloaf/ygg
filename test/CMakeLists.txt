@@ -3,7 +3,7 @@ add_subdirectory(gtest)
 find_package( Threads )
 
 # Find Boost
-#find_package(Boost 1.46.0 REQUIRED)
+find_package(Boost 1.58.0 REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
