@@ -7,16 +7,20 @@ set (CMAKE_CXX_STANDARD 17)
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
          "Valgrind")
 
+# Work around Boost bug: https://github.com/boostorg/icl/issues/21
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-new-ttp-matching")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-new-ttp-matching")
+
 #===============================================
 #==== Build type: Debug
 #===============================================
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -fno-new-ttp-matching")
 			 
 #===============================================
 #==== Build type: valgrind
 #===============================================
 
-set(CMAKE_C_FLAGS_VALGRIND "-O2 -march=native -ffast-math -g -flto" CACHE STRING
+set(CMAKE_C_FLAGS_VALGRIND "-O2 -march=native -ffast-math -g -flto -fno-new-ttp-matching" CACHE STRING
         "Flags used by the C++ compiler during valgrind builds."
         FORCE)
 set(CMAKE_CXX_FLAGS_VALGRIND "${CMAKE_C_FLAGS_VALGRIND}" CACHE STRING
@@ -39,13 +43,14 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
           STRING "Choose the type of build." FORCE)
 endif()
 
-add_subdirectory(test)
 add_subdirectory(examples)
 
 
-find_package(Boost 1.61)
+find_package(Boost 1.64)
 
 if (Boost_FOUND)
+	add_subdirectory(test)
+
 	# Find PAPI
 	find_package(PAPI)
 	if (PAPI_FOUND)
@@ -56,5 +61,5 @@ if (Boost_FOUND)
 
 	add_subdirectory (benchmark)
 else()
-	MESSAGE(WARNING, "Not building benchmarks, Boost >= 1.61 not found.")
+	MESSAGE(WARNING, "Not building benchmarks or tests, Boost >= 1.64 not found.")
 endif()

@@ -3,7 +3,7 @@ add_subdirectory(gtest)
 find_package( Threads )
 
 # Find Boost
-find_package(Boost REQUIRED)
+#find_package(Boost 1.46.0 REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
@@ -14,12 +14,13 @@ add_dependencies(run_tests googletest)
 
 set(CMAKE_C_FLAGS_DEBUG "-fno-omit-frame-pointer -Wall -Wextra -pedantic -Wfloat-equal \
 -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual \
--Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -Wswitch-default")
+-Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -Wswitch-default \
+-fno-new-ttp-matching")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
 
 set_target_properties(run_tests
                       PROPERTIES COMPILE_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage \
-                      -Wall -Wextra -pedantic"
+                      -Wall -Wextra -pedantic -fno-new-ttp-matching"
                       )
 set_target_properties(run_tests
                       PROPERTIES LINK_FLAGS "-fprofile-arcs -ftest-coverage"
