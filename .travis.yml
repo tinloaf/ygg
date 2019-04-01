@@ -1,21 +1,21 @@
 addons:
     apt:
         sources:
-            - llvm-toolchain-precise
+#            - llvm-toolchain-precise
             - ubuntu-toolchain-r-test
         packages:
 #            - clang-3.7
             - g++-7
             - gcc-7
-            - libboost1.54-all-dev
+            - libboost-all-dev
 
 
 # before_install:
 #     - eval "${MATRIX_EVAL}"
 
 sudo: required
-dist: trusty
-group: deprecated-2017Q4
+dist: xenial
+#group: deprecated-2017Q4
 
 before_install:
   - sudo apt-get -qq update
