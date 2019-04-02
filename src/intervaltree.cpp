@@ -199,11 +199,11 @@ IntervalTree<Node, NodeTraits, Options, Tag>::query(const Comparable & q) const
 		return QueryResult<Comparable>(nullptr, q);
 	}
 
+	// Find the smallest node s.t. not everything below it ends too early
 	while ((cur->_rbt_left != nullptr) &&
 	       (cur->_rbt_left->INB::_it_max_upper >= NodeTraits::get_lower(q))) {
 		cur = cur->_rbt_left;
 	}
-	// Everthing left of here ends too early.
 
 	Node * hit;
 	// If this overlaps, this is our first hit. otherwise, find the next one
@@ -377,10 +377,10 @@ template <class Node, class NodeTraits, class Options, class Tag>
 template <class Comparable>
 typename IntervalTree<Node, NodeTraits, Options,
                       Tag>::template QueryResult<Comparable>::const_iterator &
-IntervalTree<Node, NodeTraits, Options,
-             Tag>::QueryResult<Comparable>::const_iterator::
-operator=(const typename IntervalTree<Node, NodeTraits, Options, Tag>::
-              template QueryResult<Comparable>::const_iterator & other)
+IntervalTree<Node, NodeTraits, Options, Tag>::QueryResult<Comparable>::
+    const_iterator::operator=(
+        const typename IntervalTree<Node, NodeTraits, Options, Tag>::
+            template QueryResult<Comparable>::const_iterator & other)
 {
 	this->n = other.n;
 	this->q = other.q;
@@ -390,23 +390,23 @@ operator=(const typename IntervalTree<Node, NodeTraits, Options, Tag>::
 template <class Node, class NodeTraits, class Options, class Tag>
 template <class Comparable>
 bool
-IntervalTree<Node, NodeTraits, Options,
-             Tag>::QueryResult<Comparable>::const_iterator::
-operator==(const typename IntervalTree<Node, NodeTraits, Options, Tag>::
-               template QueryResult<Comparable>::const_iterator & other) const
+IntervalTree<Node, NodeTraits, Options, Tag>::QueryResult<Comparable>::
+    const_iterator::operator==(
+        const typename IntervalTree<Node, NodeTraits, Options, Tag>::
+            template QueryResult<Comparable>::const_iterator & other) const
 {
 	return ((this->n == other.n) &&
 	        (NodeTraits::get_lower(this->q) == NodeTraits::get_lower(other.q)) &&
-	        (NodeTraits::get_upper(this->q) && NodeTraits::get_upper(other.q)));
+	        (NodeTraits::get_upper(this->q) == NodeTraits::get_upper(other.q)));
 }
 
 template <class Node, class NodeTraits, class Options, class Tag>
 template <class Comparable>
 bool
-IntervalTree<Node, NodeTraits, Options,
-             Tag>::QueryResult<Comparable>::const_iterator::
-operator!=(const typename IntervalTree<Node, NodeTraits, Options, Tag>::
-               template QueryResult<Comparable>::const_iterator & other) const
+IntervalTree<Node, NodeTraits, Options, Tag>::QueryResult<Comparable>::
+    const_iterator::operator!=(
+        const typename IntervalTree<Node, NodeTraits, Options, Tag>::
+            template QueryResult<Comparable>::const_iterator & other) const
 {
 	return !(*this == other);
 }
@@ -442,18 +442,16 @@ IntervalTree<Node, NodeTraits, Options,
 
 template <class Node, class NodeTraits, class Options, class Tag>
 template <class Comparable>
-const Node & IntervalTree<Node, NodeTraits, Options,
-                          Tag>::QueryResult<Comparable>::const_iterator::
-operator*() const
+const Node & IntervalTree<Node, NodeTraits, Options, Tag>::QueryResult<
+    Comparable>::const_iterator::operator*() const
 {
 	return *(this->n);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag>
 template <class Comparable>
-const Node * IntervalTree<Node, NodeTraits, Options,
-                          Tag>::QueryResult<Comparable>::const_iterator::
-operator->() const
+const Node * IntervalTree<Node, NodeTraits, Options, Tag>::QueryResult<
+    Comparable>::const_iterator::operator->() const
 {
 	return this->cur;
 }

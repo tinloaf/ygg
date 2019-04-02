@@ -195,6 +195,20 @@ public:
 		Comparable q;
 	};
 
+	/**
+	 * @brief Queries intervals contained in the interval tree
+	 *
+	 * This method queries for intervals overlapping a query interval.
+	 * The query parameter q can be anything that is comparable to an interval.
+	 * A class <Comparable> is comparable to an interval if the NodeTraits implement a 
+	 * get_lower(const Comparable &) and get_upper(const Comparable &) method.
+	 * 
+	 * The return value is a QueryResult that contains all intervals that overlap
+	 * the given query.
+	 *
+	 * @param q Anything that is comparable (i.e., has get_lower() and get_upper() methods in NodeTraits) to an interval
+	 * @result A QueryResult holding all intervals in the tree that overlap q
+	 */
 	template <class Comparable>
 	QueryResult<Comparable> query(const Comparable & q) const;
 
