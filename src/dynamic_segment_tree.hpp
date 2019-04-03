@@ -11,6 +11,7 @@
 #include "size_holder.hpp"
 #include "util.hpp"
 #include "ziptree.hpp"
+#include "wbtree.hpp"
 
 namespace ygg {
 
@@ -24,12 +25,14 @@ namespace dyn_segtree_internal {
 /// @cond INTERNAL
 
 // Forwards
-template <class InnerTree, class InnerNode, class Node, class NodeTraits>
-class InnerRBNodeTraits;
 template <class InnerNode>
 class Compare;
+template <class InnerTree, class InnerNode, class Node, class NodeTraits>
+class InnerRBNodeTraits;
 template <class InnerTree, class InnerNode, class AggValueT>
 class InnerZNodeTraits;
+	template <class InnerTree, class InnerNode, class Node, class AggValueT>
+class InnerWBNodeTraits;
 
 template <class Tag>
 class InnerRBTTag {
@@ -39,6 +42,11 @@ template <class Tag>
 class InnerZTTag {
 };
 
+template <class Tag>
+class InnerWBTTag {
+};
+
+	
 /********************************************
  * Base Class Definitions for RBTree
  ********************************************/
@@ -65,6 +73,33 @@ struct UseRBTree
 	using Tag = InnerRBTTag<TagType>;
 };
 
+/********************************************
+ * Base Class Definitions for WBTree
+ ********************************************/
+struct UseWBTree
+{
+	template <class Tag>
+	struct InnerNodeBaseBuilder
+	{
+		template <class InnerNodeCRTP>
+		using Base =
+			weight::WBTreeNodeBase<InnerNodeCRTP, TreeOptions<TreeFlags::MULTIPLE>, Tag>; // TODO make options passable here
+	};
+
+	template <class CRTP, class Node, class NodeTraits, class InnerNode,
+	          class Tag>
+	using BaseTree =
+		weight::WBTree<InnerNode,
+	           dyn_segtree_internal::InnerWBNodeTraits<CRTP, InnerNode, Node,
+	                                                   NodeTraits>,
+		               TreeOptions<TreeFlags::MULTIPLE>, // TODO make options passable here
+	           dyn_segtree_internal::InnerWBTTag<Tag>, Compare<InnerNode>>;
+
+	template <class TagType>
+	using Tag = InnerWBTTag<TagType>;
+};
+
+	
 /********************************************
  * Base Class Definitions for Zip Tree
  ********************************************/
@@ -186,6 +221,8 @@ private:
 	friend class ::ygg::DynamicSegmentTree;
 	template <class FInnerTree, class FInnerNode, class FNode, class FNodeTraits>
 	friend class InnerRBNodeTraits;
+	template <class FInnerTree, class FInnerNode, class FNode, class FNodeTraits>
+	friend class InnerWBNodeTraits;
 	template <class FInnerTree, class FInnerNode, class FAggValueT>
 	friend class InnerZNodeTraits;
 
@@ -251,6 +288,15 @@ public:
 
 private:
 	static InnerNode * get_partner(const InnerNode & n);
+};
+
+/*
+ * Since weight-balanced trees are based on the very same rotations that
+ * red-black trees are, we can use the exact same traits.
+ */
+template <class InnerTree, class InnerNode, class Node, class NodeTraits>
+class InnerWBNodeTraits
+    : public InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits> {
 };
 
 template <class InnerNode>
@@ -508,6 +554,18 @@ class UseRBTree : public dyn_segtree_internal::UseRBTree {
 class UseZipTree : public dyn_segtree_internal::UseZipTree {
 };
 
+/**
+ * @brief Class used to select the Zip Tree tree as underlying tree for the
+ * DynamicSegmentTree
+ *
+ * Use this class as the TreeSelector template parameter of the
+ * DynamicSegmentTree to chose a ZipTree (an ZTree) as underlying tree for the
+ * DynamicSegmentTree.
+ */
+class UseWBTree : public dyn_segtree_internal::UseWBTree {
+};
+
+	
 /**
  * @brief A combiner that allows to retrieve the maximum value over any range
  *

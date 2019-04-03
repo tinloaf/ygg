@@ -40,10 +40,18 @@ using Combiners = CombinerPack<int, int, RMCombiner, MCombiner>;
 #include "test_dynamic_segment_tree_base.hpp"
 
 #undef __DST_BASENAME
+#define __DST_BASENAME(NAME) WBTree_##NAME
+#undef __DST_BASESELECTOR
+#define __DST_BASESELECTOR UseWBTree
+
+#include "test_dynamic_segment_tree_base.hpp"
+
+#undef __DST_BASENAME
 #define __DST_BASENAME(NAME) ZipTree_##NAME
 #undef __DST_BASESELECTOR
 #define __DST_BASESELECTOR UseZipTree
 
 #include "test_dynamic_segment_tree_base.hpp"
+
 
 #endif
