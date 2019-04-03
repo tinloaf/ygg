@@ -8,6 +8,7 @@ addons:
             - g++-7
             - gcc-7
             - libboost-all-dev
+            - libgtest-dev
 
 
 # before_install:
@@ -18,15 +19,13 @@ dist: xenial
 #group: deprecated-2017Q4
 
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y libgtest-dev
-  - sudo wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz
-  - sudo tar xf release-1.7.0.tar.gz
   - sudo pip install cmake
   - sudo wget https://github.com/google/gtest-parallel/archive/3ca6798e2c2a06708888611bc5147bd1266f97a0.zip -O gtest-parallel.zip
   - sudo mkdir gtest-parallel
   - sudo unzip -j -d gtest-parallel gtest-parallel.zip
   - sudo cp gtest-parallel/gtest_parallel.py /usr/bin/gtest_parallel.py
+  - sudo wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz
+  - sudo tar xf release-1.7.0.tar.gz
   - cd googletest-release-1.7.0
   - sudo cmake -DBUILD_SHARED_LIBS=ON .
   - sudo make
@@ -46,7 +45,8 @@ compiler:
   - gcc
 
 script:
-  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cd test && make -j2 && python /usr/bin/gtest_parallel.py -w 2 ./run_tests
+  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cd test && make -j2
+  - python /usr/bin/gtest_parallel.py -w 2 ./run_tests
 
 after_success:
   - ls -R
