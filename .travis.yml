@@ -46,7 +46,7 @@ compiler:
   - gcc
 
 script:
-  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cd test && make -j2 && travis_wait python /usr/bin/gtest_parallel.py -w 2 ./run_tests
+  - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cd test && make -j2 && python /usr/bin/gtest_parallel.py -w 2 ./run_tests
 
 after_success:
   - ls -R
