@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <random>
+#include <sstream>
 #include <vector>
 
 #include "../src/wbtree.hpp"
@@ -16,7 +17,7 @@ namespace wbtree {
 using namespace ygg;
 using namespace ygg::weight;
 
-constexpr int WBTREE_TESTSIZE = 2000;
+constexpr int WBTREE_TESTSIZE = 10000;
 
 class Node
     : public weight::WBTreeNodeBase<
@@ -73,8 +74,12 @@ public:
 	static std::string
 	get_id(const Node * node)
 	{
-		return std::to_string(node->data) +
-		       " (W: " + std::to_string(node->_wbt_size) + ")";
+		std::ostringstream os;
+		
+		os << std::to_string(node->data) <<
+			" (W: " << std::to_string(node->_wbt_size) << ")" <<
+			"@ " << std::hex << node << std::dec;
+		return os.str();
 	}
 };
 
@@ -99,6 +104,7 @@ TEST(WBTreeTest, TrivialInsertionTest)
 	n.data = 0;
 	tree.insert(n);
 	ASSERT_FALSE(tree.empty());
+	tree.dbg_verify();
 	ASSERT_TRUE(tree.verify_integrity());
 }
 
@@ -143,11 +149,12 @@ TEST(WBTreeTest, RandomInsertionTest)
 		values_seen.insert(val);
 
 		tree.insert(nodes[i]);
-
-		// std::string fname = std::string("/tmp/trees/tree-") +
-		//    std::to_string(i) +
-		// std::string(".dot"); tree.dump_to_dot(fname);
-
+		/*
+		std::string fname = std::string("/tmp/trees/tree-") +
+		    std::to_string(i) + std::string(".dot");
+		tree.dump_to_dot<NodeTraits>(fname);
+		*/
+		tree.dbg_verify();
 		ASSERT_TRUE(tree.verify_integrity());
 	}
 }

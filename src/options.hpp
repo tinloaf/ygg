@@ -164,6 +164,9 @@ public:
 	public:
 		constexpr static size_t value = (double)gamma_denominator;
 	};
+
+	class WBT_SINGLE_PASS {
+	};
 };
 
 /**
@@ -234,6 +237,7 @@ public:
 	        TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT,
 	        ztree_universalize_coefficient_default, Opts...>::value;
 
+	// TODO make the type integral if possible
 	static constexpr double
 	wbt_delta()
 	{
@@ -265,6 +269,11 @@ public:
 			return wbt_gamma_default;
 		}
 	}
+
+
+	static constexpr bool wbt_single_pass =
+	    utilities::pack_contains<TreeFlags::WBT_SINGLE_PASS, Opts...>();
+
 
 	/// @endcond
 private:

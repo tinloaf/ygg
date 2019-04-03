@@ -28,12 +28,353 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::WBTree(MyClass && other)
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool on_equality_prefer_left>
 void
-WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
-                                                                  Node * start)
+WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
+    Node & node)
 {
-	// TODO during fixup, we traverse the path to the root anyways. Update size in
-	// that traverse!
+	//	std::cout << "\n============= Inserting ============\n";
 
+	node.NB::set_right(nullptr);
+	node.NB::set_left(nullptr);
+	node.NB::_wbt_size = 1;
+
+	if (__builtin_expect(this->root == nullptr, false)) {
+		// std::cout << "Root case.\n";
+		this->root = &node;
+		node.NB::set_parent(nullptr);
+		NodeTraits::leaf_inserted(node, *this);
+		return;
+	}
+
+	Node * cur = this->root;
+
+	Node * parent;
+	bool left_of_parent;
+
+	Node * n_r;
+	Node * n_rr;
+	Node * n_rl;
+
+	Node * n_l;
+	Node * n_ll;
+	Node * n_lr;
+
+	Node * single_next;
+	size_t single_cur_delta;
+
+	// TODO pragma unroll n for gcc 8?
+	while (cur != nullptr) {
+		// TODO use knowledge from earlier cases?
+		// std::cout << "We're at node " << std::hex << cur << std::dec << "\n";
+
+		if (this->cmp(*cur, node)) { // Case R*
+			// std::cout << "> Going Right\n";
+			/* We will descend to the right. Check if this breaks our balance and if
+			 * so, rotate. */
+			n_r = cur->NB::get_right();
+			if (__builtin_expect(n_r != nullptr, true)) {
+				size_t r_size = n_r->NB::_wbt_size + 1;
+				size_t l_size = cur->NB::_wbt_size - r_size - 1;
+
+				if ((l_size + 1) * Options::wbt_delta() <
+				    (r_size + 1)) { // TODO incorporate the plus/minus above
+					// Right-overhang - we must rotate
+					// std::cout << ">> Right-Overhang\n";
+					size_t rr_size = 0;
+					n_rr = n_r->NB::get_right();
+					if (__builtin_expect(n_rr != nullptr, true)) {
+						rr_size += n_rr->NB::_wbt_size;
+					}
+					size_t rl_size = 0;
+					n_rl = n_r->NB::get_left();
+					if (__builtin_expect(n_rl != nullptr, true)) {
+						rl_size += n_rl->NB::_wbt_size;
+					}
+
+					// TODO flip this for on_equality_prefer_left
+					bool case_rr = false;        // TODO unroll this?
+					if (this->cmp(*n_r, node)) { // Case RR
+						rr_size += 1;
+
+						single_next = n_rr;
+						single_cur_delta = 0;
+						parent = n_r;
+
+						case_rr = true;
+					} else { // Case RL*
+						rl_size += 1;
+
+						single_next = n_rl;
+						single_cur_delta = 1;
+						parent = cur;
+					}
+
+					if ((rl_size + 1) >= Options::wbt_gamma() * (rr_size + 1)) {
+						// the right-left subtree is heavy enough to just take it
+						// double rotation!
+						// std::cout << ">>> Double rotation.\n";
+
+						// Special case: n_rl does not exist yet, but is the node to be
+						// inserted (that is the only way it can be still empty and heavier
+						// than an empty n_rr subtree) we handle this specially
+						if (n_rl == nullptr) {
+							/*
+							std::cout << ">>>> Super-Special case!\n";
+							std::cout << ">>>>> Node is " << std::hex << &node << " / cur is "
+							          << cur << " / n_r is " << n_r << std::dec << "\n";
+							          std::cout << "Cur size before is: " <<
+							cur->NB::_wbt_size << "\n";*/
+							node.NB::set_parent(cur->NB::get_parent());
+							node.NB::set_right(n_r);
+							node.NB::set_left(cur);
+							node.NB::_wbt_size = cur->NB::_wbt_size + 1;
+
+							if (__builtin_expect(cur->NB::get_parent() != nullptr, true)) {
+								if (cur->NB::get_parent()->NB::get_left() == cur) {
+									cur->NB::get_parent()->NB::set_left(&node);
+								} else {
+									cur->NB::get_parent()->NB::set_right(&node);
+								}
+							} else {
+								this->root = &node;
+							}
+							cur->NB::set_right(nullptr);
+							cur->NB::set_parent(&node);
+							cur->NB::_wbt_size -= (r_size - 1);
+
+							n_r->NB::set_parent(&node);
+
+							NodeTraits::leaf_inserted(node, *this);
+							return;
+						}
+
+						this->rotate_right(n_r);
+						this->rotate_left(cur);
+
+						n_rl->NB::_wbt_size += 1;
+
+						if (case_rr) {
+							// std::cout << ">>>> Case RR\n";
+							n_r->NB::_wbt_size += 1;
+
+							parent = n_r;
+							left_of_parent = false;
+
+							cur = n_rr;
+						} else {
+							// For the rl case, we need to distuinguish between rlr and rll
+							// Note that in the case of a double rotation, n_rl *cannot* be
+							// null
+
+							if (this->cmp(*n_rl, node)) { // case rlr
+								// std::cout << ">>>> Case RLR\n";
+								n_r->NB::_wbt_size += 1;
+								parent = n_r;
+								left_of_parent = true;
+								cur = n_r->NB::get_left(); // that's where rlr lives now
+							} else {                     // case rll
+								// std::cout << ">>>> Case RLL\n";
+								cur->NB::_wbt_size += 1;
+								parent = cur;
+								left_of_parent = false;
+								cur = cur->NB::get_right(); // that's where rll lives now
+							}
+						}
+
+					} else {
+						// Single rotation does the trick
+						// std::cout << ">>> Single Rotation.\n";
+						this->rotate_left(cur);
+
+						n_r->NB::_wbt_size += 1;
+						cur->NB::_wbt_size += single_cur_delta;
+
+						// We determined above where to continue
+						left_of_parent = false;
+						cur = single_next;
+					}
+				} else {
+					// std::cout << ">> No overhang.\n";
+					// no rotation. Continue at r
+					// Only the size of cur must be updated
+					cur->NB::_wbt_size += 1;
+					// In this case, n_r is not null, thus we continue and do not have to
+					// set a parent
+					cur = n_r;
+				}
+			} else {
+				// we should descend right in cur, but there is no node. Adjust size,
+				// set parent and break loop.
+				// TODO can this break balance?
+				// std::cout << "> Finished on the right!\n";
+
+				cur->NB::_wbt_size += 1;
+				parent = cur;
+				left_of_parent = false;
+				break;
+			}
+		} else { // Case L*
+			// std::cout << "< Going Left\n";
+			/* We will descend to the left. Check if this breaks our balance and if
+			 * so, rotate. */
+			n_l = cur->NB::get_left();
+
+			if (__builtin_expect(n_l != nullptr, true)) {
+				size_t l_size = n_l->NB::_wbt_size + 1;
+				size_t r_size = cur->NB::_wbt_size - l_size - 1;
+
+				if ((r_size + 1) * Options::wbt_delta() <
+				    (l_size + 1)) { // TODO incorporate the plus/minus above
+					// Left-overhang - we must rotate
+					// std::cout << "<< Left-Overhang\n";
+
+					size_t lr_size = 0;
+					n_lr = n_l->NB::get_right();
+					if (__builtin_expect(n_lr != nullptr, true)) { // TODO expectations?
+						lr_size += n_lr->NB::_wbt_size;
+					}
+					size_t ll_size = 0;
+					n_ll = n_l->NB::get_left();
+					if (__builtin_expect(n_ll != nullptr, true)) {
+						ll_size += n_ll->NB::_wbt_size;
+					}
+
+					// TODO flip this for on_equality_prefer_left
+					bool case_ll = false;         // TODO unroll this?
+					if (!this->cmp(*n_l, node)) { // Case LL
+						ll_size += 1;
+
+						single_next = n_ll;
+						single_cur_delta = 0;
+						parent = n_l;
+
+						case_ll = true;
+					} else { // Case LR*
+						lr_size += 1;
+
+						single_next = n_lr;
+						single_cur_delta = 1;
+						parent = cur;
+					}
+
+					if ((lr_size + 1) >= Options::wbt_gamma() * (ll_size + 1)) {
+						// the left-right subtree is heavy enough to just take it
+						// double rotation!
+						// std::cout << "<<< Double Rotation!\n";
+						// Special case: n_lr does not exist yet, but is the node to be
+						// inserted (that is the only way it can be still empty and heavier
+						// than an empty n_ll subtree) we handle this specially
+						if (n_lr == nullptr) {
+							// std::cout << "<<<< Super-special case!\n";
+							node.NB::set_parent(cur->NB::get_parent());
+							node.NB::set_left(n_l);
+							node.NB::set_right(cur);
+							node.NB::_wbt_size = cur->NB::_wbt_size + 1;
+
+							if (__builtin_expect(cur->NB::get_parent() != nullptr, true)) {
+								if (cur->NB::get_parent()->NB::get_left() == cur) {
+									cur->NB::get_parent()->NB::set_left(&node);
+								} else {
+									cur->NB::get_parent()->NB::set_right(&node);
+								}
+							} else {
+								this->root = &node;
+							}
+
+							cur->NB::set_left(nullptr);
+							cur->NB::set_parent(&node);
+							cur->NB::_wbt_size -= (l_size - 1);
+
+							n_l->NB::set_parent(&node);
+
+							NodeTraits::leaf_inserted(node, *this);
+							return;
+						}
+
+						this->rotate_left(n_l);
+						this->rotate_right(cur);
+
+						n_lr->NB::_wbt_size += 1;
+
+						if (case_ll) {
+							// std::cout << "<<<< Case LL\n";
+							n_l->NB::_wbt_size += 1;
+
+							cur = n_ll;
+							parent = n_l;
+							left_of_parent = true;
+
+						} else {
+							// For the lr case, we need to distuinguish between lrl and lrr
+							// Note that in the case of a double rotation, n_lr *cannot* be
+							// null
+
+							if (!this->cmp(*n_lr, node)) { // case lrl
+								// std::cout << "<<<< Case LRL\n";
+								n_l->NB::_wbt_size += 1;
+								parent = n_l;
+								left_of_parent = false;
+								cur = n_l->NB::get_right(); // that's where lrl lives now
+							} else {                      // case lrr
+								// std::cout << "<<<< Case LRR\n";
+
+								cur->NB::_wbt_size += 1;
+								parent = cur;
+								left_of_parent = true;
+								cur = cur->NB::get_left(); // that's where lrr lives now
+							}
+						}
+
+					} else {
+						// std::cout << "<<< Single Rotation\n";
+						// Single rotation does the trick
+						this->rotate_right(cur);
+
+						n_l->NB::_wbt_size += 1;
+						cur->NB::_wbt_size += single_cur_delta;
+
+						// We determined above where to continue
+						left_of_parent = true;
+						cur = single_next;
+					}
+				} else {
+					// std::cout << "<< No overhang.\n";
+					// no rotation. Continue at l
+					// Only the size of cur must be updated
+					cur->NB::_wbt_size += 1;
+					// in this case, n_l is not null, thus we continue and do not need to
+					// set a parent
+					cur = n_l;
+				}
+			} else {
+				// std::cout << "< Finished on the left!\n";
+				// we should descend left, but there is no n_l. Adjust size, set parent
+				// and break loop.
+				// TODO can this break balance?
+				cur->NB::_wbt_size += 1;
+				parent = cur;
+				left_of_parent = true;
+				break;
+			}
+		}
+	}
+
+	// After the loop, we are able to just insert below parent
+	// std::cout << "Inserting " << std::hex << &node << " below " << parent <<
+	// std::dec << "\n";
+	node.NB::set_parent(parent);
+	if (left_of_parent) {
+		parent->NB::set_left(&node);
+	} else {
+		parent->NB::set_right(&node);
+	}
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+template <bool on_equality_prefer_left>
+void
+WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
+    Node & node, Node * start)
+{
 	node.NB::set_right(nullptr);
 	node.NB::set_left(nullptr);
 	node.NB::_wbt_size = 1;
@@ -86,7 +427,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 		}
 
 		NodeTraits::leaf_inserted(node, *this);
-		this->fixup_after_insert(&node);
+		this->fixup_after_insert_twopass(&node);
 	}
 
 	return;
@@ -97,9 +438,16 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 {
 	Node * right_child = parent->NB::get_right();
+
+	size_t right_child_old_size = right_child->NB::_wbt_size;
+	right_child->NB::_wbt_size = parent->NB::_wbt_size;
+	parent->NB::_wbt_size -= right_child_old_size;
+
 	parent->NB::set_right(right_child->NB::get_left());
 	if (right_child->NB::get_left() != nullptr) {
 		right_child->NB::get_left()->NB::set_parent(parent);
+
+		parent->NB::_wbt_size += right_child->NB::get_left()->NB::_wbt_size;
 	}
 
 	Node * parents_parent = parent->NB::get_parent();
@@ -127,9 +475,16 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 {
 	Node * left_child = parent->NB::get_left();
+
+	size_t left_child_old_size = left_child->NB::_wbt_size;
+	left_child->NB::_wbt_size = parent->NB::_wbt_size;
+	parent->NB::_wbt_size -= left_child_old_size;
+
 	parent->NB::set_left(left_child->NB::get_right());
 	if (left_child->NB::get_right() != nullptr) {
 		left_child->NB::get_right()->NB::set_parent(parent);
+
+		parent->NB::_wbt_size += left_child->NB::get_right()->NB::_wbt_size;
 	}
 
 	Node * parents_parent = parent->NB::get_parent();
@@ -152,9 +507,11 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 	NodeTraits::rotated_right(*parent, *this);
 }
 
+// TODO do the fixup already when running down!
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(Node * node)
+WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
+    Node * node)
 {
 	if (node->NB::get_parent() == nullptr) {
 		return;
@@ -183,51 +540,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(Node * node)
 					this->rotate_right(node->NB::get_right());
 					this->rotate_left(node);
 
-					// Rebuild the size of the rotated-down node
-					node->NB::_wbt_size = 1;
-					if (__builtin_expect(node->NB::get_right() != nullptr, true)) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
-					if (node->NB::get_left() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
-
-					Node * sibling = node->NB::get_parent()->NB::get_right();
-					sibling->NB::_wbt_size = 1;
-					if (__builtin_expect(sibling->NB::get_left() != nullptr, true)) {
-						sibling->NB::_wbt_size += sibling->NB::get_left()->NB::_wbt_size;
-					}
-					if (sibling->NB::get_right() != nullptr) {
-						sibling->NB::_wbt_size += sibling->NB::get_right()->NB::_wbt_size;
-					}
-
 					// switch to new parent
 					node = node->NB::get_parent();
-					// rebuilt its size
-					node->NB::_wbt_size =
-					    1 + sibling->NB::_wbt_size + node->NB::get_left()->NB::_wbt_size;
-
 				} else {
 					// Take the whole right subtree - single rotation
-
 					this->rotate_left(node);
-
-					// Rebuild the size of the rotated-down node
-					node->NB::_wbt_size = 1;
-					if (__builtin_expect(node->NB::get_right() != nullptr, true)) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
-					if (node->NB::get_left() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
 
 					// switch to new parent
 					node = node->NB::get_parent();
-					// rebuilt its size
-					node->NB::_wbt_size = 1 + node->NB::get_left()->NB::_wbt_size;
-					if (node->NB::get_right() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
 				}
 			}
 
@@ -248,50 +568,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(Node * node)
 					this->rotate_left(node->NB::get_left());
 					this->rotate_right(node);
 
-					// Rebuild the size of the rotated-down node
-					node->NB::_wbt_size = 1;
-					if (__builtin_expect(node->NB::get_left() != nullptr, true)) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
-					if (node->NB::get_right() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
-
-					Node * sibling = node->NB::get_parent()->NB::get_left();
-					sibling->NB::_wbt_size = 1;
-					if (__builtin_expect(sibling->NB::get_right() != nullptr, true)) {
-						sibling->NB::_wbt_size += sibling->NB::get_right()->NB::_wbt_size;
-					}
-					if (sibling->NB::get_left() != nullptr) {
-						sibling->NB::_wbt_size += sibling->NB::get_left()->NB::_wbt_size;
-					}
-
 					// switch to new parent
 					node = node->NB::get_parent();
-					// rebuilt its size
-					node->NB::_wbt_size =
-					    1 + sibling->NB::_wbt_size + node->NB::get_right()->NB::_wbt_size;
-
 				} else {
 					// Take the whole left subtree
 					this->rotate_right(node);
 
-					// Rebuild the size of the rotated-down node
-					node->NB::_wbt_size = 1;
-					if (__builtin_expect(node->NB::get_left() != nullptr, true)) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
-					if (node->NB::get_right() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
-
 					// switch to new parent
 					node = node->NB::get_parent();
-					// rebuilt its size
-					node->NB::_wbt_size = 1 + node->NB::get_right()->NB::_wbt_size;
-					if (node->NB::get_left() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
 				}
 			}
 		} // end of "ascended left"
@@ -325,7 +609,11 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node)
 {
 	this->s.add(1);
-	this->insert_leaf_base<true>(node, this->root);
+	if constexpr (Options::wbt_single_pass) {
+		this->insert_leaf_onepass<true>(node);
+	} else {
+		this->insert_leaf_base_twopass<true>(node, this->root);
+	}
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -334,7 +622,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_left_leaning(
     Node & node)
 {
 	this->s.add(1);
-	this->insert_leaf_base<true>(node, this->root);
+	this->insert_leaf_base_twopass<true>(node, this->root);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -343,7 +631,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_right_leaning(
     Node & node)
 {
 	this->s.add(1);
-	this->insert_leaf_base<false>(node, this->root);
+	this->insert_leaf_base_twopass<false>(node, this->root);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -686,51 +974,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					this->rotate_right(node->NB::get_right());
 					this->rotate_left(node);
 
-					// Rebuild the size of the rotated-down node
-					node->NB::_wbt_size = 1;
-					if (__builtin_expect(node->NB::get_right() != nullptr, true)) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
-					if (node->NB::get_left() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
-
-					Node * sibling = node->NB::get_parent()->NB::get_right();
-					sibling->NB::_wbt_size = 1;
-					if (__builtin_expect(sibling->NB::get_left() != nullptr, true)) {
-						sibling->NB::_wbt_size += sibling->NB::get_left()->NB::_wbt_size;
-					}
-					if (sibling->NB::get_right() != nullptr) {
-						sibling->NB::_wbt_size += sibling->NB::get_right()->NB::_wbt_size;
-					}
-
 					// switch to new parent
 					node = node->NB::get_parent();
-					// rebuilt its size
-					node->NB::_wbt_size =
-					    1 + sibling->NB::_wbt_size + node->NB::get_left()->NB::_wbt_size;
-
 				} else {
 					// Take the whole right subtree - single rotation
-
 					this->rotate_left(node);
-
-					// Rebuild the size of the rotated-down node
-					node->NB::_wbt_size = 1;
-					if (__builtin_expect(node->NB::get_right() != nullptr, true)) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
-					if (node->NB::get_left() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
 
 					// switch to new parent
 					node = node->NB::get_parent();
-					// rebuilt its size
-					node->NB::_wbt_size = 1 + node->NB::get_left()->NB::_wbt_size;
-					if (node->NB::get_right() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
 				}
 			}
 
@@ -762,50 +1013,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					this->rotate_left(node->NB::get_left());
 					this->rotate_right(node);
 
-					// Rebuild the size of the rotated-down node
-					node->NB::_wbt_size = 1;
-					if (__builtin_expect(node->NB::get_left() != nullptr, true)) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
-					if (node->NB::get_right() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
-
-					Node * sibling = node->NB::get_parent()->NB::get_left();
-					sibling->NB::_wbt_size = 1;
-					if (__builtin_expect(sibling->NB::get_right() != nullptr, true)) {
-						sibling->NB::_wbt_size += sibling->NB::get_right()->NB::_wbt_size;
-					}
-					if (sibling->NB::get_left() != nullptr) {
-						sibling->NB::_wbt_size += sibling->NB::get_left()->NB::_wbt_size;
-					}
-
 					// switch to new parent
 					node = node->NB::get_parent();
-					// rebuilt its size
-					node->NB::_wbt_size =
-					    1 + sibling->NB::_wbt_size + node->NB::get_right()->NB::_wbt_size;
-
 				} else {
 					// Take the whole left subtree
 					this->rotate_right(node);
 
-					// Rebuild the size of the rotated-down node
-					node->NB::_wbt_size = 1;
-					if (__builtin_expect(node->NB::get_left() != nullptr, true)) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
-					if (node->NB::get_right() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_right()->NB::_wbt_size;
-					}
-
 					// switch to new parent
 					node = node->NB::get_parent();
-					// rebuilt its size
-					node->NB::_wbt_size = 1 + node->NB::get_right()->NB::_wbt_size;
-					if (node->NB::get_left() != nullptr) {
-						node->NB::_wbt_size += node->NB::get_left()->NB::_wbt_size;
-					}
 				}
 			}
 

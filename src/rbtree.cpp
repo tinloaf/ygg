@@ -400,7 +400,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node,
 	 * we have seen at least one smaller-than and one larger-than node.
 	 * Is this really faster? For now, fall back to normal insertion.
 	 */
-
+	(void)hint;
 	this->insert(node);
 
 	// find parent

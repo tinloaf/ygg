@@ -31,6 +31,131 @@ BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)
 }
 REGISTER(DeleteYggRBBSTFixture, BM_BST_Deletion);
 
+
+
+
+
+
+
+/*
+ * Ygg's Weight-Balanced Trees
+ */
+// Default gamma, delta / twopass
+using DeleteYggWBDefGDefDTPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
+               DeleteExperiment, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
+
+// Default gamma, delta / single pass
+using DeleteYggWBDefGDefDSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
+               DeleteExperiment, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
+
+// integral gamma, delta / single pass
+using DeleteYggWB3G2DSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>,
+               DeleteExperiment, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
+
+
+// integral gamma, delta / twopass
+using DeleteYggWB3G2DTPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions, WBBSTNamer3G2DTP>,
+               DeleteExperiment, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
+
+
+
+
+
+
+
+
+
+
+
+
 /*
  * Ygg's Energy-Balanced Tree
  */

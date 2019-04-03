@@ -202,9 +202,12 @@ protected:
 	void fixup_after_delete(Node * parent, bool deleted_left);
 
 	template <bool on_equality_prefer_left>
-	void insert_leaf_base(Node & node, Node * start);
+	void insert_leaf_base_twopass(Node & node, Node * start);
+	void fixup_after_insert_twopass(Node * node);
 
-	void fixup_after_insert(Node * node);
+	template <bool on_equality_prefer_left>
+	void insert_leaf_onepass(Node & node);
+
 	void rotate_left(Node * parent);
 	void rotate_right(Node * parent);
 

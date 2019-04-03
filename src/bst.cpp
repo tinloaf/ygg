@@ -208,42 +208,36 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::verify_tree()
 
 	Node * cur = this->root;
 	while (cur->NB::get_left() != nullptr) {
+		debug::yggassert(cur->NB::get_left() != cur->NB::get_right());
 		cur = cur->NB::get_left();
-		if (cur->NB::get_left() == cur) {
-			assert(false);
-			return (false);
-		}
+		debug::yggassert(cur->NB::get_left() != cur);
+		debug::yggassert(cur->NB::get_right() != cur);
 	}
 
 	std::set<Node *> seen;
 
 	while (cur != nullptr) {
-		if (seen.find(cur) != seen.end()) {
-			assert(false);
-			return false;
+		debug::yggassert(cur->NB::get_left() != cur);
+		debug::yggassert(cur->NB::get_right() != cur);
+		if (cur->NB::get_left() != nullptr) {
+			debug::yggassert(cur->NB::get_left() != cur->NB::get_right());
 		}
+		
+		debug::yggassert(seen.find(cur) == seen.end());
 		seen.insert(cur);
 
 		if (cur->NB::get_left() != nullptr) {
-			if (cur->NB::get_left()->NB::get_parent() != cur) {
-				assert(false);
-				return false;
-			}
-			if (cur->NB::get_right() == cur) {
-				assert(false);
-				return false;
-			}
+			debug::yggassert(cur->NB::get_left()->NB::get_parent() == cur);
+			debug::yggassert(cur->NB::get_left()->NB::get_left() != cur);
+			debug::yggassert(cur->NB::get_left()->NB::get_right() != cur);
+			debug::yggassert(cur->NB::get_left() != cur);
 		}
 
 		if (cur->NB::get_right() != nullptr) {
-			if (cur->NB::get_right()->NB::get_parent() != cur) {
-				assert(false);
-				return false;
-			}
-			if (cur->NB::get_right() == cur) {
-				assert(false);
-				return false;
-			}
+			debug::yggassert(cur->NB::get_right()->NB::get_parent() == cur);
+			debug::yggassert(cur->NB::get_right()->NB::get_left() != cur);
+			debug::yggassert(cur->NB::get_right()->NB::get_right() != cur);
+			debug::yggassert(cur->NB::get_right() != cur);
 		}
 
 		/*

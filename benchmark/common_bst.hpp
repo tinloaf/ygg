@@ -132,7 +132,6 @@ public:
 	PapiMeasurements papi;
 };
 
-
 /*
  * Red-Black Tree Interface
  */
@@ -192,7 +191,7 @@ public:
 	static std::string
 	get_name()
 	{
-		return "RBTree";
+		return "RBTree ";
 	}
 
 	static Node
@@ -208,13 +207,12 @@ public:
 	}
 };
 
-
 /*
  * Weight-Balanced Tree Interface
  */
 template <class MyTreeOptions>
 class WBNode
-	: public ygg::weight::WBTreeNodeBase<WBNode<MyTreeOptions>, MyTreeOptions> {
+    : public ygg::weight::WBTreeNodeBase<WBNode<MyTreeOptions>, MyTreeOptions> {
 private:
 	int value;
 
@@ -253,11 +251,12 @@ operator<(int lhs, const WBNode<T> & rhs)
 	return lhs < rhs.get_value();
 }
 
-template <class MyTreeOptions>
+template <class MyTreeOptions, class BenchmarkNamer>
 class YggWBTreeInterface {
 public:
 	using Node = WBNode<MyTreeOptions>;
-	using Tree = ygg::weight::WBTree<Node, ygg::weight::WBDefaultNodeTraits, MyTreeOptions>;
+	using Tree = ygg::weight::WBTree<Node, ygg::weight::WBDefaultNodeTraits,
+	                                 MyTreeOptions>;
 
 	static void
 	insert(Tree & t, Node & n)
@@ -268,7 +267,9 @@ public:
 	static std::string
 	get_name()
 	{
-		return "WBTree";
+		std::ostringstream name;
+		name << "WBTree[" << BenchmarkNamer::name << "] ";
+		return name.str();
 	}
 
 	static Node
@@ -284,13 +285,12 @@ public:
 	}
 };
 
-
 /*
  * Energy-Balanced Tree Interface
  */
 template <class MyTreeOptions>
 class ENode
-	: public ygg::EnergyTreeNodeBase<ENode<MyTreeOptions>, MyTreeOptions> {
+    : public ygg::EnergyTreeNodeBase<ENode<MyTreeOptions>, MyTreeOptions> {
 private:
 	int value;
 
@@ -541,11 +541,45 @@ public:
 };
 
 using BasicTreeOptions =
-    ygg::TreeOptions<ygg::TreeFlags::ZTREE_USE_HASH,
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
                      ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
                          9859957398433823229ul>,
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
                          std::numeric_limits<size_t>::max()>>;
+
+/* Variants of the weight-balanced tree */
+using WBTTwopassTreeOptions = ygg::TreeOptions<ygg::TreeFlags::MULTIPLE>;
+using WBTSinglepassTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS>;
+
+using WBTTwopass32TreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
+                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<2>,
+                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
+using WBTSinglepass32TreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
+                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<2>,
+                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
+struct WBBSTNamerDefGDefDTP
+{
+	constexpr static const char * name = "1+sqrt(2),sqrt(2),TP";
+};
+struct WBBSTNamerDefGDefDSP
+{
+	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP";
+};
+struct WBBSTNamer3G2DSP
+{
+	constexpr static const char * name = "3,2,SP";
+};
+struct WBBSTNamer3G2DTP
+{
+	constexpr static const char * name = "3,2,TP";
+};
 
 #endif
