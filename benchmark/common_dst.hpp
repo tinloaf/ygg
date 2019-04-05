@@ -221,6 +221,83 @@ public:
 	}
 };
 
+
+/*
+ * Weight-Balanced DST Interface
+ */
+template <class MyTreeOptions>
+class WBDSTNode : public ygg::DynSegTreeNodeBase<int, double, double,
+                                                 CombinerPack, ygg::UseWBTree> {
+public:
+	int lower;
+	int upper;
+	double value;
+};
+
+template <class MyTreeOptions>
+class WBDSTNodeTraits
+    : public ygg::DynSegTreeNodeTraits<WBDSTNode<MyTreeOptions>> {
+public:
+	using Node = WBDSTNode<MyTreeOptions>;
+
+	static int
+	get_lower(const Node & n)
+	{
+		return n.lower;
+	}
+	static int
+	get_upper(const Node & n)
+	{
+		return n.upper;
+	}
+	static double
+	get_value(const Node & n)
+	{
+		return n.value;
+	}
+};
+
+template <class MyTreeOptions>
+class WBDSTInterface {
+public:
+	using Node = WBDSTNode<MyTreeOptions>;
+	using Tree =
+	    ygg::DynamicSegmentTree<Node, WBDSTNodeTraits<MyTreeOptions>,
+	                            CombinerPack, MyTreeOptions, ygg::UseWBTree>;
+
+	static std::string
+	get_name()
+	{
+		return "WBTree";
+	}
+
+	static void
+	insert(Tree & t, Node & n)
+	{
+		t.insert(n);
+	}
+
+	static Node
+	create_node(int lower, int upper, double val)
+	{
+		Node n;
+		n.lower = lower;
+		n.upper = upper;
+		n.value = val;
+
+		return n;
+	}
+
+	static void
+	clear(Tree & t)
+	{
+		t.clear();
+	}
+};
+
+
+
+
 /*
  * Zipping DST Interface
  */

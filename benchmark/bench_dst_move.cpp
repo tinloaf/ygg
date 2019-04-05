@@ -42,6 +42,45 @@ BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 REGISTER(MoveRBDSTFixture, BM_DST_Move);
 
 /*
+ * Weight-Balanced DST
+ */
+using MoveWBDSTFixture =
+	DSTFixture<WBDSTInterface<BasicDSTTreeOptions>, MoveExperiment, false, true, true, false>;
+BENCHMARK_DEFINE_F(MoveWBDSTFixture, BM_DST_Move)(benchmark::State & state)
+{
+	for (auto _ : state) {
+		size_t j = 0;
+		this->papi.start();
+		for (auto i : this->experiment_indices) {
+			this->t.remove(this->fixed_nodes[i]);
+			auto [upper, lower, value] = this->experiment_values[j++];
+			this->fixed_nodes[i].upper = upper;
+			this->fixed_nodes[i].lower = lower;
+			this->fixed_nodes[i].value = value; // TODO don't do this?
+			this->t.insert(this->fixed_nodes[i]);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		// TODO actually, this is the same as above - also time it?
+		for (auto i : this->experiment_indices) {
+			this->t.remove(this->fixed_nodes[i]);
+			auto [upper, lower, value] = this->fixed_values[i];
+			this->fixed_nodes[i].upper = upper;
+			this->fixed_nodes[i].lower = lower;
+			this->fixed_nodes[i].value = value; // TODO don't do this?
+			this->t.insert(this->fixed_nodes[i]);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(MoveWBDSTFixture, BM_DST_Move);
+
+
+/*
  * Zip DST
  */
 using MoveZDSTFixture =
