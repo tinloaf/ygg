@@ -30,7 +30,7 @@ public:
 };
 
 // Configure the RBTree based on Node and the default NodeTraits
-using MyTree = weight::WBTree<Node, RBDefaultNodeTraits, MyTreeOptions>;
+using MyTree = weight::WBTree<Node, weight::WBDefaultNodeTraits, MyTreeOptions>;
 
 // We need this s.t. we can query by key value (i.e, an int) directly
 bool
