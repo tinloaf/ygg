@@ -385,15 +385,15 @@ TEST(__DST_BASENAME(DynSegTreeTest), ManyEqualTest)
 
 TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 {
-	__DST_BASENAME(Node) persistent_nodes[DYNSEGTREE_TESTSIZE];
+	__DST_BASENAME(Node) persistent_nodes[DYNSEGTREE_COMPREHENSIVE_TESTSIZE];
 	std::vector<unsigned int> indices;
 	std::mt19937 rng(DYNSEGTREE_SEED);
 
 	__DST_BASENAME(DynSegTree) agg;
 
-	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
+	for (unsigned int i = 0; i < DYNSEGTREE_COMPREHENSIVE_TESTSIZE; ++i) {
 		std::uniform_int_distribution<unsigned int> bounds_distr(
-		    0, 10 * DYNSEGTREE_TESTSIZE / 2);
+		    0, 10 * DYNSEGTREE_COMPREHENSIVE_TESTSIZE / 2);
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
@@ -404,15 +404,15 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 				<< "\n";*/
 	}
 
-	__DST_BASENAME(Node) transient_nodes[DYNSEGTREE_TESTSIZE];
-	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
+	__DST_BASENAME(Node) transient_nodes[DYNSEGTREE_COMPREHENSIVE_TESTSIZE];
+	for (unsigned int i = 0; i < DYNSEGTREE_COMPREHENSIVE_TESTSIZE; ++i) {
 		std::uniform_int_distribution<unsigned int> bounds_distr(
-		    0, 10 * DYNSEGTREE_TESTSIZE / 2);
+		    0, 10 * DYNSEGTREE_COMPREHENSIVE_TESTSIZE / 2);
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
 		transient_nodes[i] = __DST_BASENAME(Node)((int)lower, (int)upper,
-		                                          (int)(DYNSEGTREE_TESTSIZE + i));
+		                                          (int)(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
 	}
 
 	std::shuffle(indices.begin(), indices.end(),
@@ -449,7 +449,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 			    interval<int>::right_open(node.lower, node.upper), node.value);
 		}
 
-		for (size_t i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
+		for (size_t i = 0; i < DYNSEGTREE_COMPREHENSIVE_TESTSIZE; ++i) {
 			if (deleted_indices.find(i) != deleted_indices.end()) {
 				continue;
 			}
