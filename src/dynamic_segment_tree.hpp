@@ -10,8 +10,8 @@
 #include "rbtree.hpp"
 #include "size_holder.hpp"
 #include "util.hpp"
-#include "ziptree.hpp"
 #include "wbtree.hpp"
+#include "ziptree.hpp"
 
 namespace ygg {
 
@@ -31,7 +31,7 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 class InnerRBNodeTraits;
 template <class InnerTree, class InnerNode, class AggValueT>
 class InnerZNodeTraits;
-	template <class InnerTree, class InnerNode, class Node, class AggValueT>
+template <class InnerTree, class InnerNode, class Node, class AggValueT>
 class InnerWBNodeTraits;
 
 template <class Tag>
@@ -46,7 +46,6 @@ template <class Tag>
 class InnerWBTTag {
 };
 
-	
 /********************************************
  * Base Class Definitions for RBTree
  ********************************************/
@@ -83,23 +82,23 @@ struct UseWBTree
 	{
 		template <class InnerNodeCRTP>
 		using Base =
-			weight::WBTreeNodeBase<InnerNodeCRTP, TreeOptions<TreeFlags::MULTIPLE>, Tag>; // TODO make options passable here
+		    weight::WBTreeNodeBase<InnerNodeCRTP, TreeOptions<TreeFlags::MULTIPLE>,
+		                           Tag>; // TODO make options passable here
 	};
 
 	template <class CRTP, class Node, class NodeTraits, class InnerNode,
 	          class Tag>
-	using BaseTree =
-		weight::WBTree<InnerNode,
-	           dyn_segtree_internal::InnerWBNodeTraits<CRTP, InnerNode, Node,
-	                                                   NodeTraits>,
-		               TreeOptions<TreeFlags::MULTIPLE>, // TODO make options passable here
-	           dyn_segtree_internal::InnerWBTTag<Tag>, Compare<InnerNode>>;
+	using BaseTree = weight::WBTree<
+	    InnerNode,
+	    dyn_segtree_internal::InnerWBNodeTraits<CRTP, InnerNode, Node,
+	                                            NodeTraits>,
+	    TreeOptions<TreeFlags::MULTIPLE>, // TODO make options passable here
+	    dyn_segtree_internal::InnerWBTTag<Tag>, Compare<InnerNode>>;
 
 	template <class TagType>
 	using Tag = InnerWBTTag<TagType>;
 };
 
-	
 /********************************************
  * Base Class Definitions for Zip Tree
  ********************************************/
@@ -297,6 +296,11 @@ private:
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 class InnerWBNodeTraits
     : public InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits> {
+public:
+	template <class WBTreeBase>
+	static void splice_out_left_knee(InnerNode & node, WBTreeBase & t);
+	template <class WBTreeBase>
+	static void splice_out_right_knee(InnerNode & node, WBTreeBase & t);
 };
 
 template <class InnerNode>
@@ -448,29 +452,44 @@ public:
 		    node->combiners.template get_combiner<Combiners>().get_dbg_value() +
 		    std::string(" ")...};
 
-		std::string res = std::string("{") + std::to_string(node->get_point()) +
-		                  std::string("}") + std::string("[") +
-		                  std::to_string(node->get_interval()->start.get_point()) +
-		                  std::string(", ") +
-		                  std::to_string(node->get_interval()->end.get_point()) +
-		                  std::string(") ") + std::string("@") +
-		                  std::to_string((unsigned long)node) +
-		                  std::string("  ╭:") + std::to_string(node->agg_left) +
-		                  std::string("  ╮:") + std::to_string(node->agg_right) +
-		                  std::string("  {");
+		std::ostringstream res;
+		res << std::string("{") << std::to_string(node->get_point())
+		    << std::string("}") << std::string("[");
+
+		if (node->is_start()) {
+			res << "_";
+		}
+		res << std::to_string(node->get_interval()->start.get_point());
+		if (node->is_start()) {
+			res << "_";
+		}
+
+		res << std::string(", ");
+		if (node->is_end()) {
+			res << "_";
+		}
+		res << std::to_string(node->get_interval()->end.get_point());
+		if (node->is_end()) {
+			res << "_";
+		}
+
+		res << std::string(") ") << std::string("@") << std::hex << node << std::dec
+		    << std::string("  ╭:") << std::to_string(node->agg_left)
+		    << std::string("  ╮:") << std::to_string(node->agg_right)
+		    << std::string("  {");
 
 		bool first = true;
 		for (auto & cmb_str : combiner_txts) {
 			if (!first) {
-				res += ", ";
+				res << ", ";
 			}
 			first = false;
-			res += cmb_str;
+			res << cmb_str;
 		}
 
-		res += std::string("}");
+		res << std::string("}");
 
-		return res;
+		return res.str();
 	}
 };
 
@@ -565,7 +584,6 @@ class UseZipTree : public dyn_segtree_internal::UseZipTree {
 class UseWBTree : public dyn_segtree_internal::UseWBTree {
 };
 
-	
 /**
  * @brief A combiner that allows to retrieve the maximum value over any range
  *
@@ -1419,11 +1437,11 @@ public:
 	 * @brief Removes all elements from the tree.
 	 *
 	 * TODO write a test for this method
-	 * 
+	 *
 	 * Removes all elements from the tree.
 	 */
 	void clear();
-	
+
 	/*
 	 * DEBUGGING
 	 */
@@ -1439,13 +1457,13 @@ private:
 	    dyn_segtree_internal::ASCIIInnerNodeNameGetter<InnerNode, Ts...>;
 	using NodeNameGetter =
 	    typename utilities::pass_pack<typename Combiners::pack,
-	                                        NodeNameGetterCurried>::type;
+	                                  NodeNameGetterCurried>::type;
 	template <class... Ts>
 	using DotNameGetterCurried =
 	    dyn_segtree_internal::DOTInnerNodeNameGetter<InnerNode, Ts...>;
 	using DotNameGetter =
 	    typename utilities::pass_pack<typename Combiners::pack,
-	                                        DotNameGetterCurried>::type;
+	                                  DotNameGetterCurried>::type;
 
 	using TreePrinter = debug::TreePrinter<InnerNode, NodeNameGetter>;
 	using TreeDotExporter = debug::TreeDotExport<
@@ -1464,6 +1482,7 @@ private:
 	InnerTree t;
 
 	void dbg_verify_all_points() const;
+	void dbg_verify_start_end() const;
 };
 
 } // namespace ygg

@@ -115,35 +115,19 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 
 						// Special case: n_rl does not exist yet, but is the node to be
 						// inserted (that is the only way it can be still empty and heavier
-						// than an empty n_rr subtree) we handle this specially
+						// than an empty n_rr subtree) we handle this specially.
+						// We insert the node first, then do the double rotation, and are done.
 						if (n_rl == nullptr) {
-							/*
-							std::cout << ">>>> Super-Special case!\n";
-							std::cout << ">>>>> Node is " << std::hex << &node << " / cur is "
-							          << cur << " / n_r is " << n_r << std::dec << "\n";
-							          std::cout << "Cur size before is: " <<
-							cur->NB::_wbt_size << "\n";*/
-							node.NB::set_parent(cur->NB::get_parent());
-							node.NB::set_right(n_r);
-							node.NB::set_left(cur);
-							node.NB::_wbt_size = cur->NB::_wbt_size + 1;
-
-							if (__builtin_expect(cur->NB::get_parent() != nullptr, true)) {
-								if (cur->NB::get_parent()->NB::get_left() == cur) {
-									cur->NB::get_parent()->NB::set_left(&node);
-								} else {
-									cur->NB::get_parent()->NB::set_right(&node);
-								}
-							} else {
-								this->root = &node;
-							}
-							cur->NB::set_right(nullptr);
-							cur->NB::set_parent(&node);
-							cur->NB::_wbt_size -= (r_size - 1);
-
-							n_r->NB::set_parent(&node);
-
+							node.NB::set_parent(n_r);
+							n_r->NB::set_left(&node);
+							n_r->NB::_wbt_size += 1;
+							cur->NB::_wbt_size += 1;
+							
 							NodeTraits::leaf_inserted(node, *this);
+
+							this->rotate_right(n_r);
+							this->rotate_left(cur);
+
 							return;
 						}
 
@@ -260,33 +244,23 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						// the left-right subtree is heavy enough to just take it
 						// double rotation!
 						// std::cout << "<<< Double Rotation!\n";
+						
 						// Special case: n_lr does not exist yet, but is the node to be
 						// inserted (that is the only way it can be still empty and heavier
-						// than an empty n_ll subtree) we handle this specially
+						// than an empty n_ll subtree) we handle this specially.
+						// We insert the node first, then do the double rotation, and are done.
 						if (n_lr == nullptr) {
 							// std::cout << "<<<< Super-special case!\n";
-							node.NB::set_parent(cur->NB::get_parent());
-							node.NB::set_left(n_l);
-							node.NB::set_right(cur);
-							node.NB::_wbt_size = cur->NB::_wbt_size + 1;
-
-							if (__builtin_expect(cur->NB::get_parent() != nullptr, true)) {
-								if (cur->NB::get_parent()->NB::get_left() == cur) {
-									cur->NB::get_parent()->NB::set_left(&node);
-								} else {
-									cur->NB::get_parent()->NB::set_right(&node);
-								}
-							} else {
-								this->root = &node;
-							}
-
-							cur->NB::set_left(nullptr);
-							cur->NB::set_parent(&node);
-							cur->NB::_wbt_size -= (l_size - 1);
-
-							n_l->NB::set_parent(&node);
-
+							node.NB::set_parent(n_l);
+							n_l->NB::set_right(&node);
+							n_l->NB::_wbt_size += 1;
+							cur->NB::_wbt_size += 1;
+							
 							NodeTraits::leaf_inserted(node, *this);
+
+							this->rotate_left(n_l);
+							this->rotate_right(cur);
+
 							return;
 						}
 
@@ -367,6 +341,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 	} else {
 		parent->NB::set_right(&node);
 	}
+	NodeTraits::leaf_inserted(node, *this);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -678,7 +653,7 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
                                                             Node * n2)
 {
-	if (n1->NB::get_parent() == n2) {
+	if (n1->NB::get_parent() == n2) { // TODO this should never happen, since n2 is always the descendant
 		this->swap_neighbors(n2, n1);
 	} else if (n2->NB::get_parent() == n1) {
 		this->swap_neighbors(n1, n2);
@@ -717,6 +692,7 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_neighbors(Node * parent,
                                                                 Node * child)
 {
+	// std::cout << "Swap neighbors!\n";
 	child->NB::set_parent(parent->NB::get_parent());
 	parent->NB::set_parent(child);
 	if (child->NB::get_parent() != nullptr) {
@@ -765,6 +741,8 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(Node * n1,
                                                                       Node * n2)
 {
+	// std::cout << "Swap unrelated!\n";
+
 	std::swap(n1->NB::get_left(), n2->NB::get_left());
 	if (n1->NB::get_left() != nullptr) {
 		n1->NB::get_left()->NB::set_parent(n1);
@@ -813,11 +791,12 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 
 	// Size reduction is done during up-traversal!
 
+	// TODO follow both paths and see where less fixups are necessary?
 	// TODO make configurable whether right-leaning or left-leaning?
 	// or use size? (currently implemented)
 	if ((cur->NB::get_left() != nullptr) &&
 	    ((cur->NB::get_right() == nullptr) ||
-	     (cur->NB::get_left()->NB::_wbt_size <=
+	     (cur->NB::get_left()->NB::_wbt_size >
 	      cur->NB::get_right()->NB::_wbt_size))) {
 		// Use the largest node on the left
 		cur = cur->NB::get_left();
@@ -832,11 +811,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 		// Now, node is where cur should point to
 		cur = &node;
 		parent = cur->NB::get_parent();
-		NodeTraits::delete_leaf(*cur, *this);
 
 		if (cur->NB::get_left() != nullptr) {
+			NodeTraits::splice_out_right_knee(*cur, *this);
+
 			// Update child's parent if there is such a child
 			cur->NB::get_left()->NB::set_parent(parent);
+		} else {
+			NodeTraits::delete_leaf(*cur, *this);
 		}
 
 		if (__builtin_expect(parent == nullptr, false)) {
@@ -871,11 +853,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 		// Now, node is where cur should point to
 		cur = &node;
 		parent = cur->NB::get_parent();
-		NodeTraits::delete_leaf(*cur, *this);
 
 		if (cur->NB::get_right() != nullptr) {
+			NodeTraits::splice_out_left_knee(*cur, *this);
 			// Update child's parent if there is such a child
 			cur->NB::get_right()->NB::set_parent(parent);
+		} else {
+			NodeTraits::delete_leaf(*cur, *this);
 		}
 
 		if (__builtin_expect(parent == nullptr, false)) {

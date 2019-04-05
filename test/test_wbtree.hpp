@@ -17,7 +17,7 @@ namespace wbtree {
 using namespace ygg;
 using namespace ygg::weight;
 
-constexpr int WBTREE_TESTSIZE = 10000;
+constexpr int WBTREE_TESTSIZE = 2000;
 
 class Node
     : public weight::WBTreeNodeBase<

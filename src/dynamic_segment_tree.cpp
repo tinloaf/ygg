@@ -62,6 +62,67 @@ InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners,
 }
 
 /***************************************************
+ * Node traits (i.e., callbacks) for the WBTree case
+ *
+ * Note that we inherit all the callbacks from the RBTree,
+ * thus we do not need to reimplement them.
+ ***************************************************/
+template <class InnerTree, class InnerNode, class Node, class NodeTraits>
+template<class WBTreeBase>
+void
+InnerWBNodeTraits<InnerTree, InnerNode, Node,
+                  NodeTraits>::splice_out_left_knee(InnerNode & node, WBTreeBase & t)
+{
+	// the path-sum to the right of the left knee should equal to it's
+	// mirror equivalent, i.e., the path-sum to the right of the next-but-one node.
+	// Just push down whatever is right
+	(void)t;
+	node.get_right()->agg_left += node.agg_right;
+	node.get_right()->agg_right += node.agg_right;
+
+	// Combiners may now be wrong at the right child. To fix them, we need to wipe our
+	// agg_right
+	node.agg_left = typename Node::AggValueT();
+	node.agg_right = typename Node::AggValueT();
+	InnerTree::rebuild_combiners_at(node.get_right());
+}
+
+
+	template <class InnerTree, class InnerNode, class Node, class NodeTraits>
+template<class WBTreeBase>
+void
+InnerWBNodeTraits<InnerTree, InnerNode, Node,
+                  NodeTraits>::splice_out_right_knee(InnerNode & node, WBTreeBase & t)
+{
+	// the path-sum to the left of the right knee should equal to it's
+	// mirror equivalent, i.e., the path-sum to the right of the previous-but-one node.
+	// Just push down whatever is left
+	(void)t;
+	node.get_left()->agg_left += node.agg_left;
+	node.get_left()->agg_right += node.agg_left;
+
+	// Combiners may now be wrong at the right child. To fix them, we need to wipe our
+	// agg_right
+	node.agg_right = typename Node::AggValueT();
+	node.agg_left = typename Node::AggValueT();
+	InnerTree::rebuild_combiners_at(node.get_left());
+}
+
+	
+/*template <class InnerTree, class InnerNode, class Node, class NodeTraits>
+template <class WBTreeBase>
+void
+InnerWBNodeTraits<InnerTree, InnerNode, Node,
+NodeTraits>::special_case_rl_missing(InnerNode & inserted, InnerNode &
+old_parent, InnerNode & old_r, WBTreeBase & t)
+{
+  // This is a simulated double rotation - first right around old_r, then left
+around old_parent.
+
+}
+*/
+
+/***************************************************
  * Node traits (i.e., callbacks) for the RBTree case
  ***************************************************/
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
@@ -82,6 +143,11 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::delete_leaf(
 {
 	(void)t;
 
+	// This method is only correct if the node has neither a left nor a
+	// right child (i.e., is a true leaf). Otherwise, see the splice_* methods
+	assert(node.get_left() == nullptr);
+	assert(node.get_right() == nullptr);
+	
 	// If this node is deleted, it may not carry any segment border any more
 	assert(node.agg_left == node.agg_right);
 
@@ -156,6 +222,10 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(
 {
 	InnerTree * it = static_cast<InnerTree *>(&t);
 
+	/*
+	std::cout << "## Fixing swap. Old ancestor: " << std::hex << &old_ancestor
+	          << " / Old descendant: " << &old_descendant << std::dec << "\n";
+	*/
 	// Swap labels to their old places in the tree
 	std::swap(old_ancestor.InnerNode::agg_left,
 	          old_descendant.InnerNode::agg_left);
@@ -164,6 +234,7 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(
 
 	if (get_partner(old_ancestor) == &old_descendant) {
 		// we are done. They have their contour nulled
+		// std::cout << "### Swapped nodes are partners.\n";
 		InnerTree::rebuild_combiners_at(&old_ancestor);
 		InnerTree::rebuild_combiners_at(&old_descendant); // TODO is this necessary?
 		return;
@@ -175,22 +246,35 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(
 	    static_cast<const Node *>(old_descendant.container);
 	auto old_descendant_val = NodeTraits::get_value(*old_descendant_node);
 
+
 	if (old_descendant.InnerNode::point <
 	    old_descendant_partner->InnerNode::point) {
+		/*std::cout << "### Unapplying value " << old_descendant_val << " from "
+		          << std::hex << &old_ancestor << " to " << old_descendant_partner
+		          << std::dec << "\n";*/
 		it->modify_contour(&old_ancestor, old_descendant_partner,
 		                   -1 * old_descendant_val);
+		/*		std::cout << "### Applying value " << old_descendant_val << " from "
+		          << std::hex << &old_descendant << " to " << &old_descendant_partner
+		          << std::dec << "\n";*/
 		it->modify_contour(&old_descendant, old_descendant_partner,
 		                   old_descendant_val);
 	} else {
 		// TODO
 		// empty intervals break this currently
+		/*		std::cout << "### 2: Unapplying value " << old_descendant_val << " from "
+		          << std::hex << old_descendant_partner << " to " << &old_ancestor
+		          << std::dec << "\n";*/
 		it->modify_contour(old_descendant_partner, &old_ancestor,
 		                   -1 * old_descendant_val);
+		/*		std::cout << "### 2: Applying value " << old_descendant_val << " from "
+		          << std::hex << old_descendant_partner << " to " << &old_descendant
+		          << std::dec << "\n";*/
 		it->modify_contour(old_descendant_partner, &old_descendant,
 		                   old_descendant_val);
 	}
 
-	// TODO FIXME why is this necessary? Should be done by modify_contour!
+	// TODO why is this necessary? Should be done by modify_contour!
 	InnerTree::rebuild_combiners_at(&old_descendant);
 	InnerTree::rebuild_combiners_at(&old_ancestor);
 	InnerTree::rebuild_combiners_at(&old_descendant);
@@ -498,9 +582,21 @@ void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::remove(Node & n)
 {
+	//	std::cout << "############### Unapplying interval\n";
+
 	this->unapply_interval(n);
+
+	// this->dbg_print_inner_tree();
+	// std::cout << "############### Removing at " << n.NB::start.get_point()
+	          // << "\n";
+
 	this->t.remove(n.NB::start);
+
+	// this->dbg_print_inner_tree();
+	// std::cout << "############### Removing at " << n.NB::end.get_point() << "\n";
 	this->t.remove(n.NB::end);
+
+	// this->dbg_print_inner_tree();
 }
 
 template <class Node, class NodeTraits, class Combiners, class Options,
@@ -656,6 +752,27 @@ template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
+                   Tag>::dbg_verify_start_end() const
+{
+	for (auto & n : this->t) {
+		auto outer = n.get_interval();
+		bool should_be_start = &(outer->start) == &n;
+		debug::yggassert(should_be_start == n.is_start());
+		decltype(&(outer->end)) partner;
+		if (should_be_start) {
+			partner = &outer->end;
+			debug::yggassert(partner->get_point() > n.get_point());
+		} else {
+			partner = &outer->start;
+			debug::yggassert(partner->get_point() < n.get_point());
+		}
+	}
+}
+
+template <class Node, class NodeTraits, class Combiners, class Options,
+          class TreeSelector, class Tag>
+void
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::dbg_verify_all_points() const
 {
 	using Point = std::pair<typename Node::KeyT, typename Node::AggValueT>;
@@ -739,6 +856,7 @@ void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::dbg_verify() const
 {
+	this->dbg_verify_start_end();
 	this->dbg_verify_all_points();
 	this->t.dbg_verify();
 }

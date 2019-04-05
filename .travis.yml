@@ -24,8 +24,6 @@ before_install:
   - sudo mkdir gtest-parallel
   - sudo unzip -j -d gtest-parallel gtest-parallel.zip
   - sudo cp gtest-parallel/gtest_parallel.py /usr/bin/gtest_parallel.py
-  - file /usr/bin/gtest_parallel.py
-  - python --version
   - sudo wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz
   - sudo tar xf release-1.7.0.tar.gz
   - cd googletest-release-1.7.0
@@ -48,8 +46,7 @@ compiler:
 
 script:
   - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && cd test && make -j2
-  - python /usr/bin/gtest_parallel.py --help
-  - python /usr/bin/gtest_parallel.py -w 2 ./run_tests
+  - travis_wait 30 python /usr/bin/gtest_parallel.py -w 2 ./run_tests
 
 
 after_success:

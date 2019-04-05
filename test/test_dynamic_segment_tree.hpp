@@ -18,13 +18,13 @@ namespace dynamic_segment_tree {
 using namespace boost::icl;
 using namespace ygg;
 
-constexpr int DYNSEGTREE_TESTSIZE = 5000;
+constexpr int DYNSEGTREE_TESTSIZE = 2000;
 constexpr int DYNSEGTREE_COMPREHENSIVE_TESTSIZE = 500;
 constexpr int DYNSEGTREE_DELETION_TESTSIZE = 100;
 constexpr int DYNSEGTREE_DELETION_ITERATIONS = 10;
 
 // chosen by fair xkcd
-constexpr int DYNSEGTREE_SEED = 9;
+constexpr int DYNSEGTREE_SEED = 4;
 
 using MCombiner = MaxCombiner<int, int>;
 using RMCombiner = RangedMaxCombiner<int, int>;

@@ -7,17 +7,17 @@
 #include <type_traits>
 
 #include "bst.hpp"
+#include "debug.hpp"
 #include "options.hpp"
 #include "size_holder.hpp"
 #include "tree_iterator.hpp"
-#include "debug.hpp"
 
 // Only for debugging purposes
 #include <fstream>
 #include <vector>
 
 namespace ygg {
-	// TODO unify: what to export into global namespace?
+// TODO unify: what to export into global namespace?
 namespace weight {
 
 /**
@@ -82,6 +82,22 @@ public:
 	template <class Node, class Tree>
 	static void
 	delete_leaf(Node & node, Tree & t)
+	{
+		(void)node;
+		(void)t;
+	}
+
+	template <class Node, class Tree>
+	static void
+	splice_out_left_knee(Node & node, Tree & t)
+	{
+		(void)node;
+		(void)t;
+	}
+
+	template <class Node, class Tree>
+	static void
+	splice_out_right_knee(Node & node, Tree & t)
 	{
 		(void)node;
 		(void)t;
@@ -178,7 +194,7 @@ public:
 	// TODO document
 	void insert_left_leaning(Node & node);
 	void insert_right_leaning(Node & node);
-	
+
 	/**
 	 * @brief Removes <node> from the tree
 	 *

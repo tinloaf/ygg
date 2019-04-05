@@ -80,9 +80,9 @@ TEST(ITreeTest, CatchBug3)
 	auto t = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 	ITNode nodes[5];
 	for (std::uint64_t i = 0; i < 5; i++) {
-		nodes[i].lower = i;
-		nodes[i].upper = i + 5;
-		nodes[i].data = i;
+		nodes[i].lower = (unsigned int)i;
+		nodes[i].upper = (unsigned int)i + 5;
+		nodes[i].data = (int)i;
 		t.insert(nodes[i]);
 	}
 

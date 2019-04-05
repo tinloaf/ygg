@@ -558,7 +558,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
                                                             Node * n2,
                                                             bool swap_colors)
 {
-	if (n1->NB::get_parent() == n2) {
+	if (n1->NB::get_parent() == n2) { // TODO this should never happen, since n2 is always the descendant
 		this->swap_neighbors(n2, n1);
 	} else if (n2->NB::get_parent() == n1) {
 		this->swap_neighbors(n1, n2);
