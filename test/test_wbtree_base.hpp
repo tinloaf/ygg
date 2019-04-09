@@ -4,8 +4,7 @@ using namespace ygg::weight;
 constexpr int WBTREE_TESTSIZE = 2000;
 
 class Node
-    : public weight::WBTreeNodeBase<
-          Node, DEFAULT_FLAGS> { // No multi-nodes!
+    : public weight::WBTreeNodeBase<Node, DEFAULT_FLAGS> { // No multi-nodes!
 public:
 	int data;
 
@@ -27,7 +26,19 @@ public:
 	}
 };
 
-	class EqualityNode : public weight::WBTreeNodeBase<EqualityNode, MULTI_FLAGS> {
+class NodeNameGetter {
+public:
+	::std::string
+	get_name(Node * n) const
+	{
+		std::ostringstream buf;
+		buf << n->data << " @" << std::hex << n << std::dec
+		    << " (W: " << n->_wbt_size << ")";
+		return buf.str();
+	}
+};
+
+class EqualityNode : public weight::WBTreeNodeBase<EqualityNode, MULTI_FLAGS> {
 public:
 	int data;
 	int sub_data;
@@ -53,16 +64,27 @@ public:
 	}
 };
 
+class EqualityNodeNameGetter {
+public:
+	::std::string
+	get_name(EqualityNode * n) const
+	{
+		std::ostringstream buf;
+		buf << n->data << "/" << n->sub_data << " @" << std::hex << n << std::dec;
+		return buf.str();
+	}
+};
+
 class NodeTraits : public weight::WBDefaultNodeTraits {
 public:
 	static std::string
 	get_id(const Node * node)
 	{
 		std::ostringstream os;
-		
-		os << std::to_string(node->data) <<
-			" (W: " << std::to_string(node->_wbt_size) << ")" <<
-			"@ " << std::hex << node << std::dec;
+
+		os << std::to_string(node->data)
+		   << " (W: " << std::to_string(node->_wbt_size) << ")"
+		   << "@ " << std::hex << node << std::dec;
 		return os.str();
 	}
 };
@@ -81,8 +103,7 @@ public:
 
 TEST(__WBT_BASENAME(WBTreeTest), TrivialInsertionTest)
 {
-	auto tree = weight::WBTree<Node, NodeTraits,
-	                           DEFAULT_FLAGS>();
+	auto tree = weight::WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node n;
 	n.data = 0;
@@ -114,8 +135,7 @@ TEST(__WBT_BASENAME(WBTreeTest), TrivialSizeTest)
 
 TEST(__WBT_BASENAME(WBTreeTest), RandomInsertionTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	std::mt19937 rng(4); // chosen by fair xkcd
 	std::uniform_int_distribution<int> uni(std::numeric_limits<int>::min(),
@@ -191,8 +211,7 @@ ASSERT_EQ(src_it->sub_data, dst_it->sub_data);
 
 TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node nodes[WBTREE_TESTSIZE];
 
@@ -387,8 +406,7 @@ i++;
 */
 TEST(__WBT_BASENAME(WBTreeTest), LowerBoundTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node nodes[WBTREE_TESTSIZE];
 
@@ -417,8 +435,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LowerBoundTest)
 
 TEST(__WBT_BASENAME(WBTreeTest), UpperBoundTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node nodes[WBTREE_TESTSIZE];
 
@@ -447,8 +464,7 @@ TEST(__WBT_BASENAME(WBTreeTest), UpperBoundTest)
 
 TEST(__WBT_BASENAME(WBTreeTest), TrivialDeletionTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node n1;
 	n1.data = 0;
@@ -473,8 +489,10 @@ TEST(__WBT_BASENAME(WBTreeTest), TrivialDeletionTest)
 
 TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionLinearDeletionTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+
+	auto tp = debug::TreePrinter<Node, NodeNameGetter>(tree.get_root(),
+	                                                   NodeNameGetter());
 
 	Node nodes[WBTREE_TESTSIZE];
 
@@ -486,13 +504,21 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionLinearDeletionTest)
 		ASSERT_EQ(tree.size(), i + 1);
 	}
 
+	tp.reset_root(tree.get_root());
+	// tp.print();
+
+	tree.dbg_verify();
 	ASSERT_TRUE(tree.verify_integrity());
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
+		// std::cout << "==============================================\n";
 		// std::cout << "Removing " << i << "\n";
 		tree.remove(nodes[i]);
 		/*		std::string fname = "/tmp/removed-" + std::to_string(i) + ".dot";
 		    tree.dump_to_dot<NodeTraits>(fname);*/
+		tp.reset_root(tree.get_root());
+		// tp.print();
+
 		ASSERT_EQ(tree.size(), WBTREE_TESTSIZE - 1 - i);
 
 		tree.dbg_verify();
@@ -502,8 +528,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionLinearDeletionTest)
 
 TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionRandomDeletionTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node nodes[WBTREE_TESTSIZE];
 	std::vector<unsigned int> indices;
@@ -563,8 +588,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearMultipleIterationTest)
 
 TEST(__WBT_BASENAME(WBTreeTest), LinearIterationTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node nodes[WBTREE_TESTSIZE];
 	std::vector<size_t> indices;
@@ -591,8 +615,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearIterationTest)
 
 TEST(__WBT_BASENAME(WBTreeTest), ReverseIterationTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node nodes[WBTREE_TESTSIZE];
 	std::vector<size_t> indices;
@@ -622,8 +645,7 @@ TEST(__WBT_BASENAME(WBTreeTest), ReverseIterationTest)
 
 TEST(__WBT_BASENAME(WBTreeTest), FindTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node nodes[WBTREE_TESTSIZE];
 
@@ -649,8 +671,7 @@ TEST(__WBT_BASENAME(WBTreeTest), FindTest)
 
 TEST(__WBT_BASENAME(WBTreeTest), ComprehensiveTest)
 {
-	auto tree =
-	    WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node persistent_nodes[WBTREE_TESTSIZE];
 	std::vector<unsigned int> indices;
@@ -695,12 +716,20 @@ TEST(__WBT_BASENAME(WBTreeTest), ComprehensiveTest)
 	for (auto index : indices) {
 		tree.insert(transient_nodes[index]);
 	}
+	auto tp = debug::TreePrinter<Node, NodeNameGetter>(tree.get_root(),
+	                                                   NodeNameGetter());
+	// tp.print();
 
 	ASSERT_TRUE(tree.verify_integrity());
 
 	for (int i = 0; i < WBTREE_TESTSIZE; ++i) {
+		// std::cout << " ======================== Removing " << transient_nodes[i].data << "\n";
 		tree.remove(transient_nodes[i]);
 
+		tp.reset_root(tree.get_root());
+		// tp.print();
+
+		tree.dbg_verify();
 		ASSERT_TRUE(tree.verify_integrity());
 	}
 
@@ -773,4 +802,3 @@ TEST(__WBT_BASENAME(WBTreeTest), ComprehensiveMultipleTest)
 		ASSERT_EQ(&(*it), &(persistent_nodes[i]));
 	}
 }
-

@@ -659,6 +659,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
 	    n2) { // TODO this should never happen, since n2 is always the descendant
 		this->swap_neighbors(n2, n1);
 	} else if (n2->NB::get_parent() == n1) {
+		// std::cout << " ## Swapping neighbors 2.\n";
 		this->swap_neighbors(n1, n2);
 	} else {
 		this->swap_unrelated_nodes(n1, n2);
@@ -792,8 +793,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 	 * upwards of node.
 	 */
 
-	node.NB::_wbt_size -= 1;
-
 	Node * cur = &node;
 	size_t s_cur;
 
@@ -802,14 +801,15 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 	     (cur->NB::get_left()->NB::_wbt_size >
 	      cur->NB::get_right()->NB::_wbt_size))) {
 		// Use the largest node on the left
-
+		//		std::cout << "-- Deleting from left.\n";
+		
 		Node * n_l = cur->NB::get_left();
 		size_t s_left = n_l->NB::_wbt_size - 1; // deletion occurrs here
-		cur->NB::_wbt_size -= 1;
 		s_cur = cur->NB::_wbt_size;
 
-		if (s_left * Options::wbt_delta() < (s_cur - s_left)) {
+		if (s_left * Options::wbt_delta() < (s_cur - s_left - 2)) {
 			// Out of balance with right overhang
+			// std::cout << " --- Initial right overhang\n";
 			size_t s_rl = 0;
 			size_t s_rr = 0;
 			Node * n_r = cur->NB::get_right(); // n_r can not be nullptr, since the
@@ -826,14 +826,19 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 
 			if (s_rl > Options::wbt_gamma() * s_rr) {
 				// Double rotation
+				// std::cout << " ---- Double rotation around " << std::hex << n_r << " and " << cur << std::dec << "\n";
 				this->rotate_right(n_r);
 				this->rotate_left(cur);
 
 			} else {
+				// std::cout << " ---- Single rotation around " << std::hex << cur << std::dec << "\n";
 				// Single rotation
 				this->rotate_left(cur);
 			}
 		}
+
+		// Decrement size after initial rotations are done
+		node.NB::_wbt_size -= 1;
 
 		// We descend to the left, as decided ealier.
 		// TODO FIXME decrement the size here or later during fixup?
@@ -844,11 +849,12 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		while (cur->NB::get_right() != nullptr) {
 			/* Now, we keep descending right, fixing imbalances as we go
 			 */
-
+			// std::cout << " --- Now descending at " << std::hex << cur << std::dec << "\n";
+			
 			// Step 1: Check if descending right will hurt balance
 			Node * n_r = cur->NB::get_right();
 			size_t s_r = n_r->NB::_wbt_size - 1; // this is where deletion happens
-			if (s_r * Options::wbt_delta() < (s_cur - s_r)) {
+			if (s_r * Options::wbt_delta() < (s_cur - s_r - 1)) {
 				// Out of balance with left overhang
 
 				size_t s_lr = 0;
@@ -888,16 +894,17 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		}
 	} else if (cur->NB::get_right() != nullptr) {
 		// use the smallest on the right
+		// std::cout << "-- Deleting from right.\n";
 
 		Node * n_r = cur->NB::get_right();
 		size_t s_right = n_r->NB::_wbt_size - 1; // deletion occurrs here
-		cur->NB::_wbt_size -= 1;
 		s_cur = cur->NB::_wbt_size;
 
 		if (s_right * Options::wbt_delta() <
-		    (s_cur - s_right)) { // TODO FIXME has s_cur already the -1? (also in
+		    (s_cur - s_right - 2)) { // TODO FIXME has s_cur already the -1? (also in
 			                       // other branch)
-			// Out of balance with right overhang
+			// std::cout << " --- Initial left overhang\n";
+			// Out of balance with left overhang
 			size_t s_ll = 0;
 			size_t s_lr = 0;
 			Node * n_l = cur->NB::get_left(); // n_l can not be nullptr, since the
@@ -914,14 +921,19 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 
 			if (s_lr > Options::wbt_gamma() * s_ll) {
 				// Double rotation
+				// std::cout << " ---- Double rotation.\n";
 				this->rotate_left(n_l);
 				this->rotate_right(cur);
 
 			} else {
+				// std::cout << " ---- Single rotation around " << std::hex << cur << std::dec << ".\n";
 				// Single rotation
 				this->rotate_right(cur);
 			}
 		}
+
+				// Decrement size after initial rotations are done
+		node.NB::_wbt_size -= 1;
 
 		// We descend to the right, as decided ealier.
 		// TODO FIXME decrement the size here or later during fixup?
@@ -933,11 +945,12 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			/* Now, we keep descending left, fixing imbalances as we go
 			 */
 
+			// std::cout << " --- Now descending at " << std::hex << cur << std::dec << "\n";
 			// Step 1: Check if descending left will hurt balance
 			Node * n_l = cur->NB::get_left();
 			size_t s_l = n_l->NB::_wbt_size - 1; // this is where deletion happens
 			if (s_l * Options::wbt_delta() <
-			    (s_cur - s_l)) { // TODO FIXME here the -1 is also missing!
+			    (s_cur - s_l - 1)) { // TODO FIXME here the -1 is also missing!
 				// Out of balance with right overhang
 
 				size_t s_rr = 0;
@@ -976,10 +989,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			this->fixup_after_delete(cur->get_parent(), deleted_from_right);
 		}
 	} else {
+		// std::cout << " --- Deleting leaf!\n";
 		// This is a leaf!
 		this->remove_leaf(&node);
 	}
 }
+
+// TODO every sibling-less leaf currently leads to an overhang
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
@@ -1011,6 +1027,7 @@ bool
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_swap_and_remove_right(
     Node * node, Node * replacement)
 {
+	// std::cout << " ----- SRR " << std::hex << node << " <> " << replacement << std::dec << "\n";
 	bool deleted_from_right;
 	Node * parent;
 
