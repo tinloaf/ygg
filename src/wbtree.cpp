@@ -1120,8 +1120,6 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 {
 	Node * cur = &node;
-	Node * parent;
-	bool deleted_from_right;
 
 	// Size reduction is done during up-traversal!
 
