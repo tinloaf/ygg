@@ -214,9 +214,16 @@ public:
 	void dbg_verify() const;
 
 protected:
+	void remove_onepass(Node & node);
 	void remove_to_leaf(Node & node);
 	void fixup_after_delete(Node * parent, bool deleted_left);
 
+	template<bool call_fixup>
+	bool remove_swap_and_remove_left(Node * node, Node * replacement);
+	template<bool call_fixup>
+	bool remove_swap_and_remove_right(Node * node, Node * replacement);
+	void remove_leaf(Node * node);
+	
 	template <bool on_equality_prefer_left>
 	void insert_leaf_base_twopass(Node & node, Node * start);
 	void fixup_after_insert_twopass(Node * node);

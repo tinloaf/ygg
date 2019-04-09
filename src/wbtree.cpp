@@ -116,13 +116,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						// Special case: n_rl does not exist yet, but is the node to be
 						// inserted (that is the only way it can be still empty and heavier
 						// than an empty n_rr subtree) we handle this specially.
-						// We insert the node first, then do the double rotation, and are done.
+						// We insert the node first, then do the double rotation, and are
+						// done.
 						if (n_rl == nullptr) {
 							node.NB::set_parent(n_r);
 							n_r->NB::set_left(&node);
 							n_r->NB::_wbt_size += 1;
 							cur->NB::_wbt_size += 1;
-							
+
 							NodeTraits::leaf_inserted(node, *this);
 
 							this->rotate_right(n_r);
@@ -240,22 +241,23 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						parent = cur;
 					}
 
-					if ((lr_size + 1) >= Options::wbt_gamma() * (ll_size + 1)) {
+					if ((lr_size + 1) > Options::wbt_gamma() * (ll_size + 1)) {
 						// the left-right subtree is heavy enough to just take it
 						// double rotation!
 						// std::cout << "<<< Double Rotation!\n";
-						
+
 						// Special case: n_lr does not exist yet, but is the node to be
 						// inserted (that is the only way it can be still empty and heavier
 						// than an empty n_ll subtree) we handle this specially.
-						// We insert the node first, then do the double rotation, and are done.
+						// We insert the node first, then do the double rotation, and are
+						// done.
 						if (n_lr == nullptr) {
 							// std::cout << "<<<< Super-special case!\n";
 							node.NB::set_parent(n_l);
 							n_l->NB::set_right(&node);
 							n_l->NB::_wbt_size += 1;
 							cur->NB::_wbt_size += 1;
-							
+
 							NodeTraits::leaf_inserted(node, *this);
 
 							this->rotate_left(n_l);
@@ -506,7 +508,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			if ((left_weight + 1) * Options::wbt_delta() < (last_size + 1)) {
 				// Out of balance with right-overhang
 
-				if (last_left >= Options::wbt_gamma() * last_right) {
+				if (last_left > Options::wbt_gamma() * last_right) {
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
@@ -535,7 +537,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			if ((right_weight + 1) * Options::wbt_delta() < (last_size + 1)) {
 				// Out of balance with left-overhang
 
-				if (last_right >= Options::wbt_gamma() * last_left) {
+				if (last_right > Options::wbt_gamma() * last_left) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
 					// TODO FIXME this is quick&dirty - properly implement double
@@ -653,7 +655,8 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
                                                             Node * n2)
 {
-	if (n1->NB::get_parent() == n2) { // TODO this should never happen, since n2 is always the descendant
+	if (n1->NB::get_parent() ==
+	    n2) { // TODO this should never happen, since n2 is always the descendant
 		this->swap_neighbors(n2, n1);
 	} else if (n2->NB::get_parent() == n1) {
 		this->swap_neighbors(n1, n2);
@@ -783,6 +786,320 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(Node * n1,
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
+WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
+{
+	/* Basic idea: perform fixup for the part below node as we go down. Then fix
+	 * upwards of node.
+	 */
+
+	node.NB::_wbt_size -= 1;
+
+	Node * cur = &node;
+	size_t s_cur;
+
+	if ((cur->NB::get_left() != nullptr) &&
+	    ((cur->NB::get_right() == nullptr) ||
+	     (cur->NB::get_left()->NB::_wbt_size >
+	      cur->NB::get_right()->NB::_wbt_size))) {
+		// Use the largest node on the left
+
+		Node * n_l = cur->NB::get_left();
+		size_t s_left = n_l->NB::_wbt_size - 1; // deletion occurrs here
+		cur->NB::_wbt_size -= 1;
+		s_cur = cur->NB::_wbt_size;
+
+		if (s_left * Options::wbt_delta() < (s_cur - s_left)) {
+			// Out of balance with right overhang
+			size_t s_rl = 0;
+			size_t s_rr = 0;
+			Node * n_r = cur->NB::get_right(); // n_r can not be nullptr, since the
+			                                   // right subtree is heavy
+			Node * n_rr = n_r->NB::get_right();
+			Node * n_rl = n_r->NB::get_left();
+
+			if (n_rr != nullptr) {
+				s_rr += n_rr->NB::_wbt_size;
+			}
+			if (n_rl != nullptr) {
+				s_rl += n_rl->NB::_wbt_size;
+			}
+
+			if (s_rl > Options::wbt_gamma() * s_rr) {
+				// Double rotation
+				this->rotate_right(n_r);
+				this->rotate_left(cur);
+
+			} else {
+				// Single rotation
+				this->rotate_left(cur);
+			}
+		}
+
+		// We descend to the left, as decided ealier.
+		// TODO FIXME decrement the size here or later during fixup?
+		cur = n_l;
+		s_cur = s_left;
+		cur->NB::_wbt_size -= 1;
+
+		while (cur->NB::get_right() != nullptr) {
+			/* Now, we keep descending right, fixing imbalances as we go
+			 */
+
+			// Step 1: Check if descending right will hurt balance
+			Node * n_r = cur->NB::get_right();
+			size_t s_r = n_r->NB::_wbt_size - 1; // this is where deletion happens
+			if (s_r * Options::wbt_delta() < (s_cur - s_r)) {
+				// Out of balance with left overhang
+
+				size_t s_lr = 0;
+				size_t s_ll = 0;
+				Node * n_l = cur->NB::get_left();
+				Node * n_ll = n_l->NB::get_left();
+				Node * n_lr = n_l->NB::get_right();
+
+				if (n_lr != nullptr) {
+					s_lr += n_lr->_wbt_size;
+				}
+				if (n_ll != nullptr) {
+					s_ll += n_ll->_wbt_size;
+				}
+
+				if (s_lr > Options::wbt_gamma() * s_ll) {
+					// Double rotation
+					this->rotate_left(n_l);
+					this->rotate_right(cur);
+				} else {
+					this->rotate_right(cur);
+				}
+			}
+
+			// Step 2: Actually go right
+			s_cur = s_r;
+			cur = n_r;
+			cur->NB::_wbt_size -= 1;
+		}
+
+		bool deleted_from_right =
+		    this->remove_swap_and_remove_left<false>(&node, cur);
+		// cur is now where the node originally was. We need to fixup from there to
+		// the root!
+		if (cur->NB::get_parent() != nullptr) {
+			this->fixup_after_delete(cur->get_parent(), deleted_from_right);
+		}
+	} else if (cur->NB::get_right() != nullptr) {
+		// use the smallest on the right
+
+		Node * n_r = cur->NB::get_right();
+		size_t s_right = n_r->NB::_wbt_size - 1; // deletion occurrs here
+		cur->NB::_wbt_size -= 1;
+		s_cur = cur->NB::_wbt_size;
+
+		if (s_right * Options::wbt_delta() <
+		    (s_cur - s_right)) { // TODO FIXME has s_cur already the -1? (also in
+			                       // other branch)
+			// Out of balance with right overhang
+			size_t s_ll = 0;
+			size_t s_lr = 0;
+			Node * n_l = cur->NB::get_left(); // n_l can not be nullptr, since the
+			                                  // left subtree is heavy
+			Node * n_lr = n_l->NB::get_right();
+			Node * n_ll = n_l->NB::get_left();
+
+			if (n_lr != nullptr) {
+				s_lr += n_lr->NB::_wbt_size;
+			}
+			if (n_ll != nullptr) {
+				s_ll += n_ll->NB::_wbt_size;
+			}
+
+			if (s_lr > Options::wbt_gamma() * s_ll) {
+				// Double rotation
+				this->rotate_left(n_l);
+				this->rotate_right(cur);
+
+			} else {
+				// Single rotation
+				this->rotate_right(cur);
+			}
+		}
+
+		// We descend to the right, as decided ealier.
+		// TODO FIXME decrement the size here or later during fixup?
+		cur = n_r;
+		s_cur = s_right;
+		cur->NB::_wbt_size -= 1;
+
+		while (cur->NB::get_left() != nullptr) {
+			/* Now, we keep descending left, fixing imbalances as we go
+			 */
+
+			// Step 1: Check if descending left will hurt balance
+			Node * n_l = cur->NB::get_left();
+			size_t s_l = n_l->NB::_wbt_size - 1; // this is where deletion happens
+			if (s_l * Options::wbt_delta() <
+			    (s_cur - s_l)) { // TODO FIXME here the -1 is also missing!
+				// Out of balance with right overhang
+
+				size_t s_rr = 0;
+				size_t s_rl = 0;
+				Node * n_r = cur->NB::get_right();
+				Node * n_rl = n_r->NB::get_left();
+				Node * n_rr = n_r->NB::get_right();
+
+				if (n_rr != nullptr) {
+					s_rr += n_rr->_wbt_size;
+				}
+				if (n_rl != nullptr) {
+					s_rl += n_rl->_wbt_size;
+				}
+
+				if (s_rl > Options::wbt_gamma() * s_rr) {
+					// Double rotation
+					this->rotate_right(n_r);
+					this->rotate_left(cur);
+				} else {
+					this->rotate_left(cur);
+				}
+			}
+
+			// Step 2: Actually go left
+			s_cur = s_l;
+			cur = n_l;
+			cur->NB::_wbt_size -= 1;
+		}
+
+		bool deleted_from_right =
+		    this->remove_swap_and_remove_right<false>(&node, cur);
+		// cur is now where the node originally was. We need to fixup from there to
+		// the root!
+		if (cur->NB::get_parent() != nullptr) {
+			this->fixup_after_delete(cur->get_parent(), deleted_from_right);
+		}
+	} else {
+		// This is a leaf!
+		this->remove_leaf(&node);
+	}
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+void
+WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_leaf(Node * node)
+{
+	Node * parent = node->NB::get_parent();
+	NodeTraits::delete_leaf(*node, *this);
+	bool deleted_from_right;
+	
+	if (__builtin_expect(parent == nullptr, false)) {
+		this->root = nullptr;
+		deleted_from_right = true; // doesn't make a difference
+	} else {
+		if (__builtin_expect(parent->NB::get_left() == node, true)) {
+			parent->NB::set_left(nullptr);
+			deleted_from_right = false;
+		} else {
+			parent->NB::set_right(nullptr);
+			deleted_from_right = true;
+		}
+		NodeTraits::deleted_below(*parent, *this);
+	}
+	this->fixup_after_delete(parent, deleted_from_right);
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+template <bool call_fixup>
+bool
+WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_swap_and_remove_right(
+    Node * node, Node * replacement)
+{
+	bool deleted_from_right;
+	Node * parent;
+
+	this->swap_nodes(node, replacement);
+
+	// Now, node is where replacement should point to
+	replacement = node;
+	parent = replacement->NB::get_parent();
+
+	if (replacement->NB::get_right() != nullptr) {
+		NodeTraits::splice_out_left_knee(*replacement, *this);
+		// Update child's parent if there is such a child
+		replacement->NB::get_right()->NB::set_parent(parent);
+	} else {
+		NodeTraits::delete_leaf(*replacement, *this);
+	}
+
+	if (__builtin_expect(parent == nullptr, false)) {
+		this->root = replacement->NB::get_right();
+		deleted_from_right = true; // doesn't make a difference
+	} else {
+		// TODO this is only dependent on the number of steps we took in the
+		// loop above!
+		if (__builtin_expect(parent->NB::get_left() == replacement, true)) {
+			parent->NB::set_left(replacement->NB::get_right());
+			deleted_from_right = false;
+		} else {
+			parent->NB::set_right(replacement->NB::get_right());
+			deleted_from_right = true;
+		}
+		NodeTraits::deleted_below(*parent, *this);
+	}
+
+	if constexpr (call_fixup) {
+		this->fixup_after_delete(parent, deleted_from_right);
+	}
+
+	return deleted_from_right;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+template <bool call_fixup>
+bool
+WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_swap_and_remove_left(
+    Node * node, Node * replacement)
+{
+	bool deleted_from_right;
+	Node * parent;
+
+	this->swap_nodes(node, replacement);
+
+	// Now, node is where replacement should point to
+	replacement = node;
+	parent = replacement->NB::get_parent();
+
+	if (replacement->NB::get_left() != nullptr) {
+		NodeTraits::splice_out_right_knee(*replacement, *this);
+
+		// Update child's parent if there is such a child
+		replacement->NB::get_left()->NB::set_parent(parent);
+	} else {
+		NodeTraits::delete_leaf(*replacement, *this);
+	}
+
+	if (__builtin_expect(parent == nullptr, false)) {
+		this->root = replacement->NB::get_left();
+		deleted_from_right = true; // doesn't make a difference
+	} else {
+		// TODO this is only dependent on the number of steps we took in the
+		// loop earlier!
+		if (__builtin_expect(parent->NB::get_right() == replacement, true)) {
+			parent->NB::set_right(replacement->NB::get_left());
+			deleted_from_right = true;
+		} else {
+			parent->NB::set_left(replacement->NB::get_left());
+			deleted_from_right = false;
+		}
+		NodeTraits::deleted_below(*parent, *this);
+	}
+
+	if constexpr (call_fixup) {
+		this->fixup_after_delete(parent, deleted_from_right);
+	}
+
+	return deleted_from_right;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 {
 	Node * cur = &node;
@@ -804,41 +1121,41 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 			cur = cur->NB::get_right();
 		}
 
-		if (cur != &node) {
-			this->swap_nodes(&node, cur);
-		}
+		this->remove_swap_and_remove_left<true>(&node, cur);
+		/*
+		this->swap_nodes(&node, cur);
 
 		// Now, node is where cur should point to
 		cur = &node;
 		parent = cur->NB::get_parent();
 
 		if (cur->NB::get_left() != nullptr) {
-			NodeTraits::splice_out_right_knee(*cur, *this);
+		  NodeTraits::splice_out_right_knee(*cur, *this);
 
-			// Update child's parent if there is such a child
-			cur->NB::get_left()->NB::set_parent(parent);
+		  // Update child's parent if there is such a child
+		  cur->NB::get_left()->NB::set_parent(parent);
 		} else {
-			NodeTraits::delete_leaf(*cur, *this);
+		  NodeTraits::delete_leaf(*cur, *this);
 		}
 
 		if (__builtin_expect(parent == nullptr, false)) {
-			this->root = cur->NB::get_left();
-			deleted_from_right = true; // doesn't make a difference
+		  this->root = cur->NB::get_left();
+		  deleted_from_right = true; // doesn't make a difference
 		} else {
-			// TODO this is only dependent on the number of steps we took in the
-			// loop above!
-			if (__builtin_expect(parent->NB::get_right() == cur, true)) {
-				parent->NB::set_right(cur->NB::get_left());
-				deleted_from_right = true;
-			} else {
-				parent->NB::set_left(cur->NB::get_left());
-				deleted_from_right = false;
-			}
-			NodeTraits::deleted_below(*parent, *this);
+		  // TODO this is only dependent on the number of steps we took in the
+		  // loop above!
+		  if (__builtin_expect(parent->NB::get_right() == cur, true)) {
+		    parent->NB::set_right(cur->NB::get_left());
+		    deleted_from_right = true;
+		  } else {
+		    parent->NB::set_left(cur->NB::get_left());
+		    deleted_from_right = false;
+		  }
+		  NodeTraits::deleted_below(*parent, *this);
 		}
 
 		this->fixup_after_delete(parent, deleted_from_right);
-
+		*/
 	} else if (cur->NB::get_right() != nullptr) {
 		// use the smallest on the right
 		cur = cur->NB::get_right();
@@ -846,58 +1163,43 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 			cur = cur->NB::get_left();
 		}
 
-		if (cur != &node) {
-			this->swap_nodes(&node, cur);
-		}
+		this->remove_swap_and_remove_right<true>(&node, cur);
+		/*
+		this->swap_nodes(&node, cur);
 
 		// Now, node is where cur should point to
 		cur = &node;
 		parent = cur->NB::get_parent();
 
 		if (cur->NB::get_right() != nullptr) {
-			NodeTraits::splice_out_left_knee(*cur, *this);
-			// Update child's parent if there is such a child
-			cur->NB::get_right()->NB::set_parent(parent);
+		  NodeTraits::splice_out_left_knee(*cur, *this);
+		  // Update child's parent if there is such a child
+		  cur->NB::get_right()->NB::set_parent(parent);
 		} else {
-			NodeTraits::delete_leaf(*cur, *this);
+		  NodeTraits::delete_leaf(*cur, *this);
 		}
 
 		if (__builtin_expect(parent == nullptr, false)) {
-			this->root = cur->NB::get_right();
-			deleted_from_right = true; // doesn't make a difference
+		  this->root = cur->NB::get_right();
+		  deleted_from_right = true; // doesn't make a difference
 		} else {
-			// TODO this is only dependent on the number of steps we took in the
-			// loop above!
-			if (__builtin_expect(parent->NB::get_left() == cur, true)) {
-				parent->NB::set_left(cur->NB::get_right());
-				deleted_from_right = false;
-			} else {
-				parent->NB::set_right(cur->NB::get_right());
-				deleted_from_right = true;
-			}
-			NodeTraits::deleted_below(*parent, *this);
+		  // TODO this is only dependent on the number of steps we took in the
+		  // loop above!
+		  if (__builtin_expect(parent->NB::get_left() == cur, true)) {
+		    parent->NB::set_left(cur->NB::get_right());
+		    deleted_from_right = false;
+		  } else {
+		    parent->NB::set_right(cur->NB::get_right());
+		    deleted_from_right = true;
+		  }
+		  NodeTraits::deleted_below(*parent, *this);
 		}
 
 		this->fixup_after_delete(parent, deleted_from_right);
+		*/
 	} else {
 		// This is a leaf!
-		parent = cur->NB::get_parent();
-		NodeTraits::delete_leaf(*cur, *this);
-
-		if (__builtin_expect(parent == nullptr, false)) {
-			this->root = nullptr;
-			deleted_from_right = true; // doesn't make a difference
-		} else {
-			if (__builtin_expect(parent->NB::get_left() == cur, true)) {
-				parent->NB::set_left(nullptr);
-				deleted_from_right = false;
-			} else {
-				parent->NB::set_right(nullptr);
-				deleted_from_right = true;
-			}
-			NodeTraits::deleted_below(*parent, *this);
-		}
-		this->fixup_after_delete(parent, deleted_from_right);
+		this->remove_leaf(cur);
 	}
 }
 
@@ -949,7 +1251,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					right_right = node->NB::get_right()->NB::get_right()->NB::_wbt_size;
 				}
 
-				if (right_left >= Options::wbt_gamma() * right_right) {
+				if (right_left > Options::wbt_gamma() * right_right) {
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
@@ -989,7 +1291,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					left_right = node->NB::get_left()->NB::get_right()->NB::_wbt_size;
 				}
 
-				if (left_right >= Options::wbt_gamma() * left_left) {
+				if (left_right > Options::wbt_gamma() * left_left) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
 					// TODO FIXME this is quick&dirty - properly implement double
@@ -1027,8 +1329,11 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove(Node & node)
 {
 	this->s.reduce(1);
 
-	// TODO collapse this method
-	this->remove_to_leaf(node);
+	if constexpr (Options::wbt_single_pass) {
+		this->remove_onepass(node);
+	} else {
+  	this->remove_to_leaf(node);
+	}
 }
 
 } // namespace weight
