@@ -31,12 +31,6 @@ BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)
 }
 REGISTER(DeleteYggRBBSTFixture, BM_BST_Deletion);
 
-
-
-
-
-
-
 /*
  * Ygg's Weight-Balanced Trees
  */
@@ -144,17 +138,6 @@ BENCHMARK_DEFINE_F(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
 	this->papi.report_and_reset(state);
 }
 REGISTER(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
-
-
-
-
-
-
-
-
-
-
-
 
 /*
  * Ygg's Energy-Balanced Tree

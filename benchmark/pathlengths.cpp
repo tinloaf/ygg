@@ -48,7 +48,7 @@ private:
 	std::vector<Node> nodes;
 	std::vector<size_t> path_length_histogram;
 	std::vector<size_t> path_lengths;
-	
+
 	void
 	compute_path_lengths()
 	{
@@ -77,7 +77,7 @@ private:
 };
 
 using BasicTreeOptions =
-    ygg::TreeOptions<ygg::TreeFlags::ZTREE_USE_HASH,
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
                      ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
                          9859957398433823229ul>,
@@ -85,11 +85,15 @@ using BasicTreeOptions =
                          std::numeric_limits<size_t>::max()>>;
 
 using RandomRankTreeOptions =
-    ygg::TreeOptions<ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
+                     ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
                          9859957398433823229ul>,
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
                          std::numeric_limits<size_t>::max()>>;
+
+using SinglePassTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS>;
 
 class RBTreeNode : public ygg::RBTreeNodeBase<RBTreeNode, BasicTreeOptions> {
 public:
@@ -110,6 +114,18 @@ public:
 
 bool
 operator<(const WBTreeNode & lhs, const WBTreeNode & rhs)
+{
+	return lhs.val < rhs.val;
+}
+
+class SPWBTreeNode
+    : public ygg::weight::WBTreeNodeBase<SPWBTreeNode, SinglePassTreeOptions> {
+public:
+	size_t val;
+};
+
+bool
+operator<(const SPWBTreeNode & lhs, const SPWBTreeNode & rhs)
 {
 	return lhs.val < rhs.val;
 }
@@ -162,6 +178,10 @@ main(int argc, const char ** argv)
 	using WBTree = ygg::weight::WBTree<WBTreeNode, ygg::RBDefaultNodeTraits,
 	                                   BasicTreeOptions>;
 
+	/* WBTree */
+	using SPWBTree = ygg::weight::WBTree<SPWBTreeNode, ygg::RBDefaultNodeTraits,
+	                                     SinglePassTreeOptions>;
+
 	/* Energy-Balanced Tree */
 	using EnergyTree = ygg::EnergyTree<EnergyNode, BasicTreeOptions>;
 
@@ -185,6 +205,10 @@ main(int argc, const char ** argv)
 	TreeDepthAnalyzer<WBTree, WBTreeNode> taw(count, seed);
 	taw.run();
 
+	std::cout << "==== Single-Pass Weight-Balanced Tree ====\n";
+	TreeDepthAnalyzer<SPWBTree, SPWBTreeNode> sptaw(count, seed);
+	sptaw.run();
+	
 	std::cout << "==== Energy-Balanced Tree ====\n";
 	TreeDepthAnalyzer<EnergyTree, EnergyNode> tae(count, seed);
 	tae.run();
