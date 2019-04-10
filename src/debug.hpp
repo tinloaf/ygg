@@ -38,6 +38,18 @@ dbg_find_root(Node * n)
 	return n;
 }
 
+template <class Node>
+class GenericNodeNameGetter {
+public:
+	std::string
+	get_name(const Node * node) const
+	{
+		std::ostringstream buf;
+		buf << std::hex << node << std::dec;
+		return buf.str();
+	}
+};
+
 template <class Node, class NodeNameGetter>
 class TreePrinter {
 public:

@@ -16,6 +16,7 @@ namespace testing {
 namespace wbtree_twopass {
 
 #define __WBT_BASENAME(NAME) TP_##NAME
+#define __WBT_NAMESPACE wbtree_twopass
 using MULTI_FLAGS =
     TreeOptions<TreeFlags::MULTIPLE, TreeFlags::CONSTANT_TIME_SIZE>;
 using DEFAULT_FLAGS = TreeOptions<TreeFlags::CONSTANT_TIME_SIZE>;
@@ -28,6 +29,8 @@ namespace wbtree_onepass {
 
 #undef __WBT_BASENAME
 #define __WBT_BASENAME(NAME) SP_##NAME
+#undef __WBT_NAMESPACE
+#define __WBT_NAMESPACE wbtree_onepass
 using MULTI_FLAGS =
 	TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::MULTIPLE, TreeFlags::CONSTANT_TIME_SIZE>;
 using DEFAULT_FLAGS = TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::CONSTANT_TIME_SIZE>;

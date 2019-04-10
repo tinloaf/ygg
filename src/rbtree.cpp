@@ -558,7 +558,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
                                                             Node * n2,
                                                             bool swap_colors)
 {
-	if (n1->NB::get_parent() == n2) { // TODO this should never happen, since n2 is always the descendant
+	if (n1->NB::get_parent() ==
+	    n2) { // TODO this should never happen, since n2 is always the descendant
 		this->swap_neighbors(n2, n1);
 	} else if (n2->NB::get_parent() == n1) {
 		this->swap_neighbors(n1, n2);
@@ -764,6 +765,17 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 
 	if (node.NB::get_color() == rbtree_internal::Color::BLACK) {
 		this->fixup_after_delete(node.NB::get_parent(), deleted_left);
+	}
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+template <class Comparable>
+void
+RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
+{
+	auto el = this->find(c);
+	if (el != this->end()) {
+		this->remove(*el);
 	}
 }
 

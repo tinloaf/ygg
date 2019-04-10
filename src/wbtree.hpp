@@ -195,6 +195,21 @@ public:
 	void insert_left_leaning(Node & node);
 	void insert_right_leaning(Node & node);
 
+	// TODO STL removes *all* elements
+	/**
+	 * @brief Deletes a node that compares equally to <c> from the tree
+	 *
+	 * Removes a node that compares equally to <c> from the tree.
+	 *
+	 * @param   c Anything comparable to a node. A node that compares equally will
+	 * be removed
+	 */
+	template <class Comparable>
+	void erase(const Comparable & c);
+	// TODO document
+	template<class Comparable>
+	void erase_optimistic(const Comparable & c);
+
 	/**
 	 * @brief Removes <node> from the tree
 	 *
@@ -214,14 +229,17 @@ public:
 	void dbg_verify() const;
 
 protected:
+	template<bool fix_upward>
 	void remove_onepass(Node & node);
 	void remove_to_leaf(Node & node);
 	void fixup_after_delete(Node * parent, bool deleted_left);
 
+	
 	template<bool call_fixup>
 	bool remove_swap_and_remove_left(Node * node, Node * replacement);
 	template<bool call_fixup>
 	bool remove_swap_and_remove_right(Node * node, Node * replacement);
+	template<bool call_fixup>
 	void remove_leaf(Node * node);
 	
 	template <bool on_equality_prefer_left>

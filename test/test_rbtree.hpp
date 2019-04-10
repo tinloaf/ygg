@@ -43,6 +43,23 @@ public:
 	}
 };
 
+} // namespace rbtree
+} // namespace testing
+} // namespace ygg
+
+// Make Node comparable to int
+bool operator<(const ygg::testing::rbtree::Node & lhs, int rhs) {
+	return lhs.data < rhs;
+}
+bool operator<(int lhs, const ygg::testing::rbtree::Node & rhs) {
+	return lhs < rhs.data;
+}
+
+namespace ygg {
+namespace testing {
+namespace rbtree {
+
+	
 class EqualityNode : public RBTreeNodeBase<EqualityNode> {
 public:
 	int data;
@@ -500,6 +517,33 @@ TEST(RBTreeTest, TrivialDeletionTest)
 	ASSERT_TRUE(tree.empty());
 }
 
+TEST(RBTreeTest, TrivialErasureTest)
+{
+	auto tree = RBTree<Node, NodeTraits, NonMultipleOptions>();
+
+	Node n1;
+	n1.data = 0;
+	tree.insert(n1);
+
+	Node n2;
+	n2.data = 1;
+	tree.insert(n2);
+
+	ASSERT_FALSE(tree.empty());
+	ASSERT_TRUE(tree.verify_integrity());
+
+	tree.erase(0);
+
+	ASSERT_TRUE(tree.verify_integrity());
+	ASSERT_EQ(tree.find(0), tree.end());
+	
+	tree.erase(1);
+
+	ASSERT_TRUE(tree.verify_integrity());
+	ASSERT_TRUE(tree.empty());
+}
+
+
 TEST(RBTreeTest, LinearInsertionLinearDeletionTest)
 {
 	auto tree = RBTree<Node, NodeTraits, NonMultipleOptions>();
@@ -716,7 +760,11 @@ TEST(RBTreeTest, ComprehensiveTest)
 	ASSERT_TRUE(tree.verify_integrity());
 
 	for (int i = 0; i < RBTREE_TESTSIZE; ++i) {
-		tree.remove(transient_nodes[i]);
+		if (i % 2) {
+			tree.remove(transient_nodes[i]);
+		} else {
+			tree.erase(transient_nodes[i].data);
+		}
 
 		ASSERT_TRUE(tree.verify_integrity());
 	}

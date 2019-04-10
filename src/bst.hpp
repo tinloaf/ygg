@@ -403,6 +403,19 @@ public:
 protected:
 	Node * root;
 
+
+	Node * get_smallest() const;
+	Node * get_largest() const;
+
+	Node * get_uncle(Node * node) const;
+
+		Compare cmp;
+
+	SizeHolder<Options::constant_time_size> s;
+
+	/* What follows are debugging tools */		
+	void dbg_print_tree() const;
+
 	template <class NodeNameGetter>
 	void dump_to_dot_base(const std::string & filename,
 	                      NodeNameGetter name_getter) const;
@@ -411,19 +424,12 @@ protected:
 	void output_node_base(const Node * node, std::ofstream & out,
 	                      NodeNameGetter name_getter) const;
 
-	Node * get_smallest() const;
-	Node * get_largest() const;
-
-	Node * get_uncle(Node * node) const;
-
+	
 	bool verify_tree() const;
 	bool verify_order() const;
 
 	void verify_size() const;
 
-	Compare cmp;
-
-	SizeHolder<Options::constant_time_size> s;
 };
 
 } // namespace bst

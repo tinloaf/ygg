@@ -245,6 +245,18 @@ public:
 	 */
 	void remove(Node & node);
 
+	// TODO STL removes *all* elements
+	/**
+	 * @brief Deletes a node that compares equally to <c> from the tree
+	 *
+	 * Removes a node that compares equally to <c> from the tree.
+	 *
+	 * @param   c Anything comparable to a node. A node that compares equally will
+	 * be removed
+	 */
+	template <class Comparable>
+	void erase(const Comparable & c);
+
 	// Mainly debugging methods
 	/// @cond INTERNAL
 	bool verify_integrity() const;

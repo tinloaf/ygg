@@ -222,7 +222,7 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::verify_tree()
 		if (cur->NB::get_left() != nullptr) {
 			debug::yggassert(cur->NB::get_left() != cur->NB::get_right());
 		}
-		
+
 		debug::yggassert(seen.find(cur) == seen.end());
 		seen.insert(cur);
 
@@ -413,6 +413,17 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_smallest()
 
 	return smallest;
 }
+
+template <class Node, class Options, class Tag, class Compare,
+          class ParentContainer>
+void
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::dbg_print_tree() const
+{
+	using NNG = ygg::debug::GenericNodeNameGetter<Node>;
+	ygg::debug::TreePrinter<Node, NNG> tp(this->root, NNG());
+	tp.print();
+}
+
 
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
