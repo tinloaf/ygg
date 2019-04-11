@@ -61,7 +61,7 @@ public:
 	int sub_data;
 
 	EqualityNode() : data(0){};
-	explicit EqualityNode(int data_in, int sub_data_in = 0)xbbe
+	explicit EqualityNode(int data_in, int sub_data_in = 0)
 	    : data(data_in), sub_data(sub_data_in){};
 	EqualityNode(const EqualityNode & other)
 	    : data(other.data), sub_data(other.sub_data){};
