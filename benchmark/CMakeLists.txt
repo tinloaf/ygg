@@ -13,7 +13,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 set(CMAKE_CXX_STANDARD 17)
 set(LIBS "${LIBS} Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a")
 
-SET(BINARIES "bench_bst_insert;bench_bst_delete;bench_bst_search;bench_dst_insert;bench_dst_delete;bench_dst_move;run_all")
+SET(BINARIES "bench_bst_insert;bench_bst_delete;bench_bst_search;bench_dst_insert;bench_dst_delete;bench_dst_move;run_all;bench_bst_erase")
 
 FOREACH(BINARY ${BINARIES})
 	add_executable(${BINARY} ${BINARY}.cpp)

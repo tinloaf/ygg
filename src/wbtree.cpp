@@ -505,10 +505,10 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			size_t left_weight =
 			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
 			// TODO this is wrong6k66
-			if ((left_weight + 1) * Options::wbt_delta() < (last_size + 1)) {
+			if ((double)((left_weight + 1) * Options::wbt_delta()) < (double)(last_size + 1)) {
 				// Out of balance with right-overhang
 
-				if (last_left > Options::wbt_gamma() * last_right) {
+				if ((double)last_left > (double)(Options::wbt_gamma() * last_right)) {
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
@@ -534,10 +534,10 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			size_t right_weight =
 			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
 
-			if ((right_weight + 1) * Options::wbt_delta() < (last_size + 1)) {
+			if ((double)((right_weight + 1) * Options::wbt_delta()) < (double)(last_size + 1)) {
 				// Out of balance with left-overhang
 
-				if (last_right > Options::wbt_gamma() * last_left) {
+				if ((double)last_right > (double)(Options::wbt_gamma() * last_left)) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
 					// TODO FIXME this is quick&dirty - properly implement double
@@ -787,12 +787,15 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(Node * n1,
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
-void
+bool
 WBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
 {
 	auto el = this->find(c);
 	if (el != this->end()) {
 		this->remove(*el);
+		return true;
+	} else {
+		return false;
 	}
 }
 
@@ -816,7 +819,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 			size_t s_r = n_r->NB::_wbt_size - 1;
 
 			// Step 1: Check balance
-			if (s_r * Options::wbt_delta() < (s_cur - s_r - 1)) {
+			if ((double)(s_r * Options::wbt_delta()) < (double)(s_cur - s_r - 1)) {
 				// std::cout << " ### Left-overhang \n";
 				// Out of balance with left-overhang
 				size_t s_lr = 0;
@@ -860,8 +863,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 				size_t s_rr = 0;
 				size_t s_rl = 0;
 				Node * n_r = cur->NB::get_right();
-				Node * n_rl = n_l->NB::get_left();
-				Node * n_rr = n_l->NB::get_right();
+				Node * n_rl = n_r->NB::get_left();
+				Node * n_rr = n_r->NB::get_right();
 
 				if (n_rr != nullptr) {
 					s_rr += n_rr->_wbt_size;
@@ -887,8 +890,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 		} else {
 			// std::cout << " ### Found!\n";
 			// Element found - delete it!
-			// std::cout << "Calling remove_onepass at " << std::hex << cur << std::dec
-			          // << "\n";
+			// std::cout << "Calling remove_onepass at " << std::hex << cur <<
+			// std::dec
+			// << "\n";
 			this->remove_onepass<false>(*cur);
 			return;
 		}
@@ -911,7 +915,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 	// it must be fixed upwards. Everything within it will be fixed inside this
 	// method.
 	Node * subtree_parent;
-		bool subtree_parent_right = false;
+	bool subtree_parent_right = false;
 	if constexpr (fix_upward) {
 		subtree_parent = node.NB::get_parent();
 		if (subtree_parent != nullptr) {
@@ -928,7 +932,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 
 		Node * n_l = cur->NB::get_left();
 		size_t s_left = n_l->NB::_wbt_size - 1; // deletion occurrs here
- 		cur->NB::_wbt_size -= 1;
+		cur->NB::_wbt_size -= 1;
 		s_cur = cur->NB::_wbt_size;
 
 		if (s_left * Options::wbt_delta() < (s_cur - s_left - 1)) {
@@ -951,14 +955,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			if (s_rl > Options::wbt_gamma() * s_rr) {
 				// Double rotation
 				// std::cout << " ---- Double rotation around " << std::hex << n_r
-				          // << " and " << cur << std::dec << "\n";
+				// << " and " << cur << std::dec << "\n";
 				this->rotate_right(n_r);
 				this->rotate_left(cur);
 
 			} else {
 				// Single rotation
 				// std::cout << " ---- Single rotation around " << std::hex << cur
-				          // << std::dec << "\n";
+				// << std::dec << "\n";
 				this->rotate_left(cur);
 			}
 		}
@@ -972,7 +976,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			/* Now, we keep descending right, fixing imbalances as we go
 			 */
 			// std::cout << " --- Now descending at " << std::hex << cur << std::dec
-			          // << "\n";
+			// << "\n";
 			cur->NB::_wbt_size -= 1;
 
 			// Step 1: Check if descending right will hurt balance
@@ -983,7 +987,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 
 				size_t s_lr = 0;
 				size_t s_ll = 0;
-				Node * n_l = cur->NB::get_left();
+				n_l = cur->NB::get_left();
 				Node * n_ll = n_l->NB::get_left();
 				Node * n_lr = n_l->NB::get_right();
 
@@ -1049,7 +1053,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			} else {
 				// Sinlge Rotation
 				// std::cout << " ---- Single rotation around " << std::hex << cur
-				          // << std::dec << ".\n";
+				// << std::dec << ".\n";
 				this->rotate_right(cur);
 			}
 		}
@@ -1065,7 +1069,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 
 			cur->NB::_wbt_size -= 1;
 			// std::cout << " --- Now descending at " << std::hex << cur << std::dec
-			          // << "\n";
+			// << "\n";
 			// Step 1: Check if descending left will hurt balance
 			Node * n_l = cur->NB::get_left();
 			size_t s_l = n_l->NB::_wbt_size - 1; // this is where deletion happens
@@ -1075,7 +1079,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 				// std::cout << " ---- Right overhang\n";
 				size_t s_rr = 0;
 				size_t s_rl = 0;
-				Node * n_r = cur->NB::get_right();
+				n_r = cur->NB::get_right();
 				Node * n_rl = n_r->NB::get_left();
 				Node * n_rr = n_r->NB::get_right();
 
@@ -1088,11 +1092,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 
 				if (s_rl > Options::wbt_gamma() * s_rr) {
 					// Double rotation
-					// std::cout << " ----- Double Rotation around " << std::hex << n_r << " and " << cur << std::dec << "\n";
+					// std::cout << " ----- Double Rotation around " << std::hex << n_r <<
+					// " and " << cur << std::dec << "\n";
 					this->rotate_right(n_r);
 					this->rotate_left(cur);
 				} else {
-					// std::cout << " ----- Single Rotation around " << std::hex << cur << "\n";
+					// std::cout << " ----- Single Rotation around " << std::hex << cur <<
+					// "\n";
 					this->rotate_left(cur);
 				}
 			}
@@ -1377,7 +1383,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 			size_t right_weight =
 			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
 
-			if ((last_size + 1) * Options::wbt_delta() < (right_weight + 1)) {
+			if ((double)((last_size + 1) * Options::wbt_delta()) < (double)(right_weight + 1)) {
 				// Out of balance with right-overhang
 
 				size_t right_left = 0;
@@ -1391,7 +1397,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					right_right = node->NB::get_right()->NB::get_right()->NB::_wbt_size;
 				}
 
-				if (right_left > Options::wbt_gamma() * right_right) {
+				if ((double)right_left > (double)(Options::wbt_gamma() * right_right)) {
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
@@ -1417,7 +1423,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 			size_t left_weight =
 			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
 
-			if ((last_size + 1) * Options::wbt_delta() < (left_weight + 1)) {
+			if ((double)((last_size + 1) * Options::wbt_delta()) < (double)(left_weight + 1)) {
 				// Out of balance with left-overhang
 
 				size_t left_left = 0;
@@ -1431,7 +1437,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					left_right = node->NB::get_left()->NB::get_right()->NB::_wbt_size;
 				}
 
-				if (left_right > Options::wbt_gamma() * left_left) {
+				if ((double)left_right > (double)(Options::wbt_gamma() * left_left)) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
 					// TODO FIXME this is quick&dirty - properly implement double

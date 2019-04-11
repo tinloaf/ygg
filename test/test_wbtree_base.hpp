@@ -1,8 +1,10 @@
 using namespace ygg;
 using namespace ygg::weight;
 
-constexpr int WBTREE_TESTSIZE = 3000;
+constexpr int WBTREE_TESTSIZE = 5000;
 constexpr int WBTREE_SEED = 4; // chosen by fair xkcd
+
+constexpr size_t WBTREE_CHECK_INTERVAL = 10;
 
 class Node
     : public weight::WBTreeNodeBase<Node, DEFAULT_FLAGS> { // No multi-nodes!
@@ -59,7 +61,7 @@ public:
 	int sub_data;
 
 	EqualityNode() : data(0){};
-	explicit EqualityNode(int data_in, int sub_data_in = 0)
+	explicit EqualityNode(int data_in, int sub_data_in = 0)xbbe
 	    : data(data_in), sub_data(sub_data_in){};
 	EqualityNode(const EqualityNode & other)
 	    : data(other.data), sub_data(other.sub_data){};
@@ -615,7 +617,37 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionRandomDeletionTest)
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
 		tree.remove(nodes[indices[i]]);
-		ASSERT_TRUE(tree.verify_integrity());
+		if (i % WBTREE_CHECK_INTERVAL == 0) {
+			tree.dbg_verify();
+		}
+	}
+}
+
+TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionRandomOptimisticErasureTest)
+{
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+
+	Node nodes[WBTREE_TESTSIZE];
+	std::vector<unsigned int> indices;
+
+	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
+		nodes[i] = Node((int)i);
+
+		tree.insert(nodes[i]);
+		indices.push_back(i);
+	}
+
+	std::mt19937 rng(WBTREE_SEED);
+	std::shuffle(indices.begin(), indices.end(),
+	             ygg::testing::utilities::Randomizer(WBTREE_SEED));
+
+	tree.dbg_verify();
+
+	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
+		tree.erase_optimistic(nodes[indices[i]].data);
+		if (i % WBTREE_CHECK_INTERVAL == 0) {
+			tree.dbg_verify();
+		}
 	}
 }
 

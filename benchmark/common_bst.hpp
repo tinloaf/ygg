@@ -6,6 +6,7 @@
 #include <boost/intrusive/set.hpp>
 #include <draup.hpp>
 #include <random>
+#include <unordered_set>
 #include <vector>
 
 #include "../src/ygg.hpp"
@@ -19,7 +20,8 @@
 // TODO various RBTree / Zip Tree variants!
 
 template <class Interface, typename Experiment, bool need_nodes,
-          bool need_values, bool need_node_pointers, bool values_from_fixed>
+          bool need_values, bool need_node_pointers, bool values_from_fixed,
+          bool distinct = false>
 class BSTFixture : public benchmark::Fixture {
 public:
 	static std::string
@@ -52,8 +54,16 @@ public:
 		                                      std::numeric_limits<int>::max());
 
 		this->fixed_nodes.clear();
+		std::unordered_set<int> seen_values;
 		for (size_t i = 0; i < fixed_count; ++i) {
 			int val = distr(this->rng);
+			if (distinct) {
+				while (seen_values.find(val) != seen_values.end()) {
+					val = distr(this->rng);
+				}
+				seen_values.insert(val);
+			}
+
 			this->fixed_nodes.push_back(Interface::create_node(val));
 			this->fixed_values.push_back(val);
 		}
@@ -70,6 +80,7 @@ public:
 		}
 
 		if (need_nodes) {
+			seen_values.clear();
 			this->experiment_nodes.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
 				int val;
@@ -78,6 +89,12 @@ public:
 					val = fixed_values[i % fixed_count];
 				} else {
 					val = distr(this->rng);
+					if (distinct) {
+						while (seen_values.find(val) != seen_values.end()) {
+							val = distr(this->rng);
+						}
+						seen_values.insert(val);
+					}
 				}
 
 				this->experiment_nodes.push_back(Interface::create_node(val));
@@ -85,6 +102,7 @@ public:
 		}
 
 		if (need_values) {
+			seen_values.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
 				int val;
 
@@ -92,6 +110,12 @@ public:
 					val = shuffled_values[i % fixed_count];
 				} else {
 					val = distr(this->rng);
+					if (distinct) {
+						while (seen_values.find(val) != seen_values.end()) {
+							val = distr(this->rng);
+						}
+						seen_values.insert(val);
+					}
 				}
 
 				this->experiment_values.push_back(val);
@@ -565,6 +589,7 @@ using WBTSinglepass32TreeOptions =
                      ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<2>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
+
 struct WBBSTNamerDefGDefDTP
 {
 	constexpr static const char * name = "1+sqrt(2),sqrt(2),TP";
@@ -580,6 +605,15 @@ struct WBBSTNamer3G2DSP
 struct WBBSTNamer3G2DTP
 {
 	constexpr static const char * name = "3,2,TP";
+};
+
+struct WBBSTNamerDefGDefDSPOPT
+{
+	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP,opt";
+};
+struct WBBSTNamer3G2DSPOPT
+{
+	constexpr static const char * name = "3,2,SP,opt";
 };
 
 #endif

@@ -39,7 +39,7 @@ BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(MoveRBDSTFixture, BM_DST_Move);
+REGISTER(MoveRBDSTFixture, BM_DST_Move)
 
 /*
  * Weight-Balanced DST
@@ -77,7 +77,7 @@ BENCHMARK_DEFINE_F(MoveWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(MoveWBDSTFixture, BM_DST_Move);
+REGISTER(MoveWBDSTFixture, BM_DST_Move)
 
 
 /*
@@ -116,7 +116,7 @@ BENCHMARK_DEFINE_F(MoveZDSTFixture, BM_DST_Move)(benchmark::State & state)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(MoveZDSTFixture, BM_DST_Move);
+REGISTER(MoveZDSTFixture, BM_DST_Move)
 
 #ifndef NOMAIN
 #include "main.hpp"

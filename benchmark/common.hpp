@@ -19,6 +19,8 @@
 // Experiment Names
 constexpr auto delete_experiment_c = BOOST_HANA_STRING("Delete");
 using DeleteExperiment = decltype(delete_experiment_c);
+constexpr auto erase_experiment_c = BOOST_HANA_STRING("Erase");
+using EraseExperiment = decltype(erase_experiment_c);
 constexpr auto move_experiment_c = BOOST_HANA_STRING("Move");
 using MoveExperiment = decltype(move_experiment_c);
 constexpr auto insert_experiment_c = BOOST_HANA_STRING("Insert");

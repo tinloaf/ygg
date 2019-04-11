@@ -1,21 +1,21 @@
-#ifndef BENCH_BST_DELETE_HPP
-#define BENCH_BST_DELETE_HPP
+#ifndef BENCH_BST_ERASE_HPP
+#define BENCH_BST_ERASE_HPP
 
 #include "common_bst.hpp"
 
 /*
  * Ygg's Red-Black Tree
  */
-using DeleteYggRBBSTFixture =
-    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, DeleteExperiment, false,
-               false, true, false>;
-BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)
+using EraseYggRBBSTFixture =
+    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, EraseExperiment, false,
+               false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggRBBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.remove(*n);
+			this->t.erase(n->get_value());
 		}
 		this->papi.stop();
 
@@ -29,22 +29,22 @@ BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteYggRBBSTFixture, BM_BST_Deletion)
+REGISTER(EraseYggRBBSTFixture, BM_BST_Erasure)
 
 /*
  * Ygg's Weight-Balanced Trees
  */
 // Default gamma, delta / twopass
-using DeleteYggWBDefGDefDTPBSTFixture =
+using EraseYggWBDefGDefDTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-               DeleteExperiment, false, false, true, false>;
-BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
+               EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggWBDefGDefDTPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.remove(*n);
+			this->t.erase(n->get_value());
 		}
 		this->papi.stop();
 
@@ -58,19 +58,19 @@ BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
+REGISTER(EraseYggWBDefGDefDTPBSTFixture, BM_BST_Erasure)
 
 // Default gamma, delta / single pass
-using DeleteYggWBDefGDefDSPBSTFixture =
+using EraseYggWBDefGDefDSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-               DeleteExperiment, false, false, true, false>;
-BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
+               EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.remove(*n);
+			this->t.erase(n->get_value());
 		}
 		this->papi.stop();
 
@@ -84,19 +84,46 @@ BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
+REGISTER(EraseYggWBDefGDefDSPBSTFixture, BM_BST_Erasure)
+
+// Default gamma, delta / single pass, optimistic
+using EraseYggWBDefGDefDSPOPTBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSPOPT>,
+               EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPOPTBSTFixture, BM_BST_Erasure)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.erase_optimistic(n->get_value());
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(EraseYggWBDefGDefDSPOPTBSTFixture, BM_BST_Erasure)
+
 
 // integral gamma, delta / single pass
-using DeleteYggWB3G2DSPBSTFixture =
+using EraseYggWB3G2DSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>,
-               DeleteExperiment, false, false, true, false>;
-BENCHMARK_DEFINE_F(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
+               EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.remove(*n);
+			this->t.erase(n->get_value());
 		}
 		this->papi.stop();
 
@@ -110,20 +137,46 @@ BENCHMARK_DEFINE_F(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
+REGISTER(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
+
+// integral gamma, delta / single pass
+using EraseYggWB3G2DSPOPTBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSPOPT>,
+               EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggWB3G2DSPOPTBSTFixture, BM_BST_Erasure)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.erase_optimistic(n->get_value());
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(EraseYggWB3G2DSPOPTBSTFixture, BM_BST_Erasure)
 
 
 // integral gamma, delta / twopass
-using DeleteYggWB3G2DTPBSTFixture =
+using EraseYggWB3G2DTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions, WBBSTNamer3G2DTP>,
-               DeleteExperiment, false, false, true, false>;
-BENCHMARK_DEFINE_F(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
+               EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggWB3G2DTPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.remove(*n);
+			this->t.erase(n->get_value());
 		}
 		this->papi.stop();
 
@@ -137,21 +190,22 @@ BENCHMARK_DEFINE_F(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
+REGISTER(EraseYggWB3G2DTPBSTFixture, BM_BST_Erasure)
 
 /*
  * Ygg's Energy-Balanced Tree
  */
-using DeleteYggEBSTFixture =
-    BSTFixture<YggEnergyTreeInterface<BasicTreeOptions>, DeleteExperiment,
+/*
+using EraseYggEBSTFixture =
+    BSTFixture<YggEnergyTreeInterface<BasicTreeOptions>, EraseExperiment,
                false, false, true, false>;
-BENCHMARK_DEFINE_F(DeleteYggEBSTFixture, BM_BST_Deletion)
+BENCHMARK_DEFINE_F(EraseYggEBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.remove(*n);
+			this->t.erase(n->get_value());
 		}
 		this->papi.stop();
 
@@ -165,21 +219,23 @@ BENCHMARK_DEFINE_F(DeleteYggEBSTFixture, BM_BST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteYggEBSTFixture, BM_BST_Deletion)
+REGISTER(EraseYggEBSTFixture, BM_BST_Erasure);
+*/
 
 /*
  * Ygg's Zip Tree
  */
-using DeleteYggZBSTFixture =
-    BSTFixture<YggZTreeInterface<BasicTreeOptions>, DeleteExperiment, false,
+/*
+using EraseYggZBSTFixture =
+    BSTFixture<YggZTreeInterface<BasicTreeOptions>, EraseExperiment, false,
                false, true, false>;
-BENCHMARK_DEFINE_F(DeleteYggZBSTFixture, BM_BST_Deletion)
+BENCHMARK_DEFINE_F(EraseYggZBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.remove(*n);
+			this->t.erase(n->get_value());
 		}
 		this->papi.stop();
 
@@ -193,14 +249,16 @@ BENCHMARK_DEFINE_F(DeleteYggZBSTFixture, BM_BST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteYggZBSTFixture, BM_BST_Deletion)
+REGISTER(EraseYggZBSTFixture, BM_BST_Erasure);
+*/
 
 /*
  * Boost::Intrusive::Set
  */
-using DeleteBISetBSTFixture =
-    BSTFixture<BoostSetInterface, DeleteExperiment, false, false, true, false>;
-BENCHMARK_DEFINE_F(DeleteBISetBSTFixture, BM_BST_Deletion)
+/*
+using EraseBISetBSTFixture =
+    BSTFixture<BoostSetInterface, EraseExperiment, false, false, true, false>;
+BENCHMARK_DEFINE_F(EraseBISetBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	for (auto _ : state) {
@@ -220,14 +278,15 @@ BENCHMARK_DEFINE_F(DeleteBISetBSTFixture, BM_BST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteBISetBSTFixture, BM_BST_Deletion)
-
+REGISTER(EraseBISetBSTFixture, BM_BST_Erasure);
+*/
 /*
  * std::set
  */
-using DeleteStdSetBSTFixture =
-    BSTFixture<StdSetInterface, DeleteExperiment, false, false, false, false>;
-BENCHMARK_DEFINE_F(DeleteStdSetBSTFixture, BM_BST_Deletion)
+/*
+using EraseStdSetBSTFixture =
+    BSTFixture<StdSetInterface, EraseExperiment, false, false, false, false>;
+BENCHMARK_DEFINE_F(EraseStdSetBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	std::vector<decltype(this->t)::const_iterator> experiment_iterators;
@@ -263,7 +322,8 @@ BENCHMARK_DEFINE_F(DeleteStdSetBSTFixture, BM_BST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteStdSetBSTFixture, BM_BST_Deletion)
+REGISTER(EraseStdSetBSTFixture, BM_BST_Erasure);
+*/
 
 #ifndef NOMAIN
 #include "main.hpp"

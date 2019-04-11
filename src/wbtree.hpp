@@ -205,7 +205,7 @@ public:
 	 * be removed
 	 */
 	template <class Comparable>
-	void erase(const Comparable & c);
+	bool erase(const Comparable & c);
 	// TODO document
 	template<class Comparable>
 	void erase_optimistic(const Comparable & c);
