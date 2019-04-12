@@ -505,10 +505,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			size_t left_weight =
 			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
 			// TODO this is wrong6k66
-			if ((double)((left_weight + 1) * Options::wbt_delta()) < (double)(last_size + 1)) {
+			if ((typename Options::WBTDeltaT)((left_weight + 1) *
+			                                  Options::wbt_delta()) <
+			    (typename Options::WBTDeltaT)(last_size + 1)) {
 				// Out of balance with right-overhang
 
-				if ((double)last_left > (double)(Options::wbt_gamma() * last_right)) {
+				if ((typename Options::WBTGammaT)last_left >
+				    (typename Options::WBTGammaT)(Options::wbt_gamma() * last_right)) {
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
@@ -534,10 +537,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			size_t right_weight =
 			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
 
-			if ((double)((right_weight + 1) * Options::wbt_delta()) < (double)(last_size + 1)) {
+			if ((typename Options::WBTDeltaT)((right_weight + 1) *
+			                                  Options::wbt_delta()) <
+			    (typename Options::WBTDeltaT)(last_size + 1)) {
 				// Out of balance with left-overhang
 
-				if ((double)last_right > (double)(Options::wbt_gamma() * last_left)) {
+				if ((typename Options::WBTGammaT)last_right >
+				    (typename Options::WBTGammaT)(Options::wbt_gamma() * last_left)) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
 					// TODO FIXME this is quick&dirty - properly implement double
@@ -819,7 +825,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 			size_t s_r = n_r->NB::_wbt_size - 1;
 
 			// Step 1: Check balance
-			if ((double)(s_r * Options::wbt_delta()) < (double)(s_cur - s_r - 1)) {
+			if ((typename Options::WBTDeltaT)(s_r * Options::wbt_delta()) <
+			    (typename Options::WBTDeltaT)(s_cur - s_r - 1)) {
 				// std::cout << " ### Left-overhang \n";
 				// Out of balance with left-overhang
 				size_t s_lr = 0;
@@ -835,7 +842,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 					s_ll += n_ll->_wbt_size;
 				}
 
-				if (s_lr > Options::wbt_gamma() * s_ll) {
+				if ((typename Options::WBTGammaT)s_lr >
+				    ((typename Options::WBTGammaT)Options::wbt_gamma() * s_ll)) {
 					// Double rotation
 					// std::cout << " #### Double rotation \n";
 					this->rotate_left(n_l);
@@ -1383,7 +1391,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 			size_t right_weight =
 			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
 
-			if ((double)((last_size + 1) * Options::wbt_delta()) < (double)(right_weight + 1)) {
+			if ((typename Options::WBTDeltaT)((last_size + 1) *
+			                                  Options::wbt_delta()) <
+			    (typename Options::WBTDeltaT)(right_weight + 1)) {
 				// Out of balance with right-overhang
 
 				size_t right_left = 0;
@@ -1397,7 +1407,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					right_right = node->NB::get_right()->NB::get_right()->NB::_wbt_size;
 				}
 
-				if ((double)right_left > (double)(Options::wbt_gamma() * right_right)) {
+				if ((typename Options::WBTGammaT)right_left >
+				    (typename Options::WBTGammaT)(Options::wbt_gamma() * right_right)) {
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
@@ -1423,7 +1434,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 			size_t left_weight =
 			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
 
-			if ((double)((last_size + 1) * Options::wbt_delta()) < (double)(left_weight + 1)) {
+			if ((typename Options::WBTDeltaT)((last_size + 1) *
+			                                  Options::wbt_delta()) <
+			    (typename Options::WBTDeltaT)(left_weight + 1)) {
 				// Out of balance with left-overhang
 
 				size_t left_left = 0;
@@ -1437,7 +1450,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					left_right = node->NB::get_left()->NB::get_right()->NB::_wbt_size;
 				}
 
-				if ((double)left_right > (double)(Options::wbt_gamma() * left_left)) {
+				if ((typename Options::WBTGammaT)left_right >
+				    (typename Options::WBTGammaT)(Options::wbt_gamma() * left_left)) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
 					// TODO FIXME this is quick&dirty - properly implement double

@@ -199,6 +199,45 @@ private:
 	static constexpr double wbt_delta_default = 2.41421356237; // 1 + sqrt(2)
 	static constexpr double wbt_gamma_default = 1.41421356237; // sqrt(2)
 
+	struct IntegralTypeHolder
+	{
+		using type = size_t;
+	};
+	struct FloatTypeHolder
+	{
+		using type = double;
+	};
+
+	constexpr static auto
+	compute_wbt_gamma_type()
+	{
+		if constexpr (utilities::pack_contains_tmpl<TreeFlags::WBT_GAMMA_NUMERATOR,
+		                                            Opts...>() &&
+		              utilities::pack_contains_tmpl<
+		                  TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>() &&
+		              utilities::get_value_if_present<
+		                  TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>::value == 1) {
+			return IntegralTypeHolder();
+		} else {
+			return FloatTypeHolder();
+		}
+	}
+
+	constexpr static auto
+	compute_wbt_delta_type()
+	{
+		if constexpr (utilities::pack_contains_tmpl<TreeFlags::WBT_DELTA_NUMERATOR,
+		                                            Opts...>() &&
+		              utilities::pack_contains_tmpl<
+		                  TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>() &&
+		              utilities::get_value_if_present<
+		                  TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>::value == 1) {
+			return IntegralTypeHolder();
+		} else {
+			return FloatTypeHolder();
+		}
+	}
+
 public:
 	/// @cond INTERNAL
 	static constexpr bool multiple =
@@ -238,7 +277,9 @@ public:
 	        ztree_universalize_coefficient_default, Opts...>::value;
 
 	// TODO make the type integral if possible
-	static constexpr double
+	using WBTDeltaT =
+	    typename decltype(TreeOptions<Opts...>::compute_wbt_delta_type())::type;
+	static constexpr WBTDeltaT
 	wbt_delta()
 	{
 		if (utilities::pack_contains_tmpl<TreeFlags::WBT_DELTA_NUMERATOR,
@@ -254,7 +295,9 @@ public:
 		}
 	}
 
-	static constexpr double
+	using WBTGammaT =
+	    typename decltype(TreeOptions<Opts...>::compute_wbt_gamma_type())::type;
+	static constexpr WBTGammaT
 	wbt_gamma()
 	{
 		if (utilities::pack_contains_tmpl<TreeFlags::WBT_GAMMA_NUMERATOR,
@@ -270,10 +313,8 @@ public:
 		}
 	}
 
-
 	static constexpr bool wbt_single_pass =
 	    utilities::pack_contains<TreeFlags::WBT_SINGLE_PASS, Opts...>();
-
 
 	/// @endcond
 private:
