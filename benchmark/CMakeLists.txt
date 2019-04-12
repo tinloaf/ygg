@@ -30,4 +30,5 @@ FOREACH(BINARY ${BINARIES})
 ENDFOREACH()
 										
 add_executable(pathlengths pathlengths.cpp)
+add_executable(wbtree_balance wbtree_balance.cpp)
 

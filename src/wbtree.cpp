@@ -635,6 +635,32 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::verify_sizes() const
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+size_t
+WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_count_violations() const
+{
+	size_t result = 0;
+	for (const Node & n : *this) {
+		size_t left = 0;
+		size_t right = 0;
+		if (n.NB::get_left() != nullptr) {
+			left = n.NB::get_left()->NB::_wbt_size;
+		}
+		if (n.NB::get_right() != nullptr) {
+			right = n.NB::get_right()->NB::_wbt_size;
+		}
+
+		if (((typename Options::WBTDeltaT)(left * Options::wbt_delta()) <
+		     (typename Options::WBTDeltaT)(right)) ||
+		    ((typename Options::WBTDeltaT)(right * Options::wbt_delta()) <
+		     (typename Options::WBTDeltaT)(left))) {
+			result += 1;
+		}
+	}
+
+	return result;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_verify() const
 {

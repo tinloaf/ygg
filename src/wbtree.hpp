@@ -227,7 +227,8 @@ public:
 	/* Debugging methods */
 	// TODO only here for compatibility with the Zip Tree
 	void dbg_verify() const;
-
+	size_t dbg_count_violations() const;
+	
 protected:
 	template<bool fix_upward>
 	void remove_onepass(Node & node);

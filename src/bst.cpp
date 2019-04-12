@@ -2,6 +2,7 @@
 #define YGG_BST_CPP
 
 #include "bst.hpp"
+#include "debug.hpp"
 
 namespace ygg {
 
