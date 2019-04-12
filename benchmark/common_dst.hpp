@@ -43,6 +43,8 @@ public:
 
 		size_t fixed_count = (size_t)state.range(0);
 		size_t experiment_count = (size_t)state.range(1);
+		int seed = (size_t)state.range(2);
+		this->rng = std::mt19937(seed);
 
 		std::uniform_int_distribution<> point_distr(
 		    std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
