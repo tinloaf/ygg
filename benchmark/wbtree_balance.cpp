@@ -110,5 +110,14 @@ main(int argc, char ** argv)
 	}
 	default_ba.print();
 
+	// 3,2-WBTree
+	using WBT32Options = TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_DELTA_NUMERATOR<3>, TreeFlags::WBT_DELTA_DENOMINATOR<1>, TreeFlags::WBT_GAMMA_NUMERATOR<2>, TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
+	BalanceAnalyzer<WBT32Options> wbt32_ba(node_count, reinsertion_count);
+	for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		wbt32_ba.run(seed);
+	}
+	wbt32_ba.print();
+
+	
 	return 0;
 }
