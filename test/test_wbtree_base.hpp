@@ -170,11 +170,11 @@ TEST(__WBT_BASENAME(WBTreeTest), RandomInsertionTest)
 		values_seen.insert(val);
 
 		tree.insert(nodes[i]);
-		/*
+
 		std::string fname = std::string("/tmp/trees/tree-") +
 		    std::to_string(i) + std::string(".dot");
 		tree.dump_to_dot<NodeTraits>(fname);
-		*/
+
 		tree.dbg_verify();
 		ASSERT_TRUE(tree.verify_integrity());
 	}

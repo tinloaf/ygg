@@ -35,7 +35,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 
 	node.NB::set_right(nullptr);
 	node.NB::set_left(nullptr);
-	node.NB::_wbt_size = 1;
+	node.NB::_wbt_size = 0;
 
 	if (__builtin_expect(this->root == nullptr, false)) {
 		// std::cout << "Root case.\n";
@@ -73,7 +73,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 			n_r = cur->NB::get_right();
 			if (__builtin_expect(n_r != nullptr, true)) {
 				size_t r_size = n_r->NB::_wbt_size + 1;
-				size_t l_size = cur->NB::_wbt_size - r_size - 1;
+				size_t l_size = cur->NB::_wbt_size - r_size + 1; // Cur has not been increased, r_size has been.
 
 				if ((l_size + 1) * Options::wbt_delta() <
 				    (r_size + 1)) { // TODO incorporate the plus/minus above
@@ -205,7 +205,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 
 			if (__builtin_expect(n_l != nullptr, true)) {
 				size_t l_size = n_l->NB::_wbt_size + 1;
-				size_t r_size = cur->NB::_wbt_size - l_size - 1;
+				size_t r_size = cur->NB::_wbt_size - l_size + 1; // l_size has been increased, cur size not
 
 				if ((r_size + 1) * Options::wbt_delta() <
 				    (l_size + 1)) { // TODO incorporate the plus/minus above
@@ -354,7 +354,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
 {
 	node.NB::set_right(nullptr);
 	node.NB::set_left(nullptr);
-	node.NB::_wbt_size = 1;
+	node.NB::_wbt_size = 0;
 
 	Node * parent = start;
 	Node * cur = start;
@@ -386,6 +386,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
 	} else {
 		node.NB::set_parent(parent);
 
+		// TODO put this into the loop above?
 		if (this->cmp(node, *parent)) {
 			parent->NB::set_left(&node);
 		} else if (this->cmp(*parent, node)) {
@@ -418,13 +419,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 
 	size_t right_child_old_size = right_child->NB::_wbt_size;
 	right_child->NB::_wbt_size = parent->NB::_wbt_size;
-	parent->NB::_wbt_size -= right_child_old_size;
+	parent->NB::_wbt_size -= (right_child_old_size + 1);
 
 	parent->NB::set_right(right_child->NB::get_left());
 	if (right_child->NB::get_left() != nullptr) {
 		right_child->NB::get_left()->NB::set_parent(parent);
 
-		parent->NB::_wbt_size += right_child->NB::get_left()->NB::_wbt_size;
+		parent->NB::_wbt_size += (right_child->NB::get_left()->NB::_wbt_size + 1);
 	}
 
 	Node * parents_parent = parent->NB::get_parent();
@@ -455,13 +456,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 
 	size_t left_child_old_size = left_child->NB::_wbt_size;
 	left_child->NB::_wbt_size = parent->NB::_wbt_size;
-	parent->NB::_wbt_size -= left_child_old_size;
+	parent->NB::_wbt_size -= (left_child_old_size + 1);
 
 	parent->NB::set_left(left_child->NB::get_right());
 	if (left_child->NB::get_right() != nullptr) {
 		left_child->NB::get_right()->NB::set_parent(parent);
 
-		parent->NB::_wbt_size += left_child->NB::get_right()->NB::_wbt_size;
+		parent->NB::_wbt_size += (left_child->NB::get_right()->NB::_wbt_size + 1);
 	}
 
 	Node * parents_parent = parent->NB::get_parent();
@@ -502,12 +503,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 
 	while (node != nullptr) {
 		if (ascended_right) {
-			size_t left_weight =
-			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
-			// TODO this is wrong6k66
-			if ((typename Options::WBTDeltaT)((left_weight + 1) *
+			size_t left_size =
+			    node->NB::_wbt_size - last_size; // TODO this can be reformulated
+			size_t right_size = last_size;
+			// TODO this is wrong
+			if ((typename Options::WBTDeltaT)((left_size) *
 			                                  Options::wbt_delta()) <
-			    (typename Options::WBTDeltaT)(last_size + 1)) {
+			    (typename Options::WBTDeltaT)(right_size)) {
 				// Out of balance with right-overhang
 
 				if ((typename Options::WBTGammaT)last_left >
@@ -534,12 +536,12 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 		} else {
 			// Ascended left
 
-			size_t right_weight =
-			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
-
-			if ((typename Options::WBTDeltaT)((right_weight + 1) *
+			size_t right_size =
+			    node->NB::_wbt_size - last_size; // TODO this can be reformulated
+			size_t left_size = last_size;
+			if ((typename Options::WBTDeltaT)((right_size) *
 			                                  Options::wbt_delta()) <
-			    (typename Options::WBTDeltaT)(last_size + 1)) {
+			    (typename Options::WBTDeltaT)(left_size)) {
 				// Out of balance with left-overhang
 
 				if ((typename Options::WBTGammaT)last_right >
@@ -622,12 +624,12 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::verify_sizes() const
 {
 	for (auto & node : *this) {
-		size_t size = 1;
+		size_t size = 0;
 		if (node.NB::get_left() != nullptr) {
-			size += node.NB::get_left()->NB::_wbt_size;
+			size += (node.NB::get_left()->NB::_wbt_size + 1);
 		}
 		if (node.NB::get_right() != nullptr) {
-			size += node.NB::get_right()->NB::_wbt_size;
+			size += (node.NB::get_right()->NB::_wbt_size + 1);
 		}
 
 		debug::yggassert(size == node.NB::_wbt_size);
@@ -969,7 +971,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		cur->NB::_wbt_size -= 1;
 		s_cur = cur->NB::_wbt_size;
 
-		if (s_left * Options::wbt_delta() < (s_cur - s_left - 1)) {
+		// TODO why does this not cause a warning? Is this branch never compiled?
+		if (s_left * Options::wbt_delta() < (s_cur - (s_left + 1))) {
 			// Out of balance with right overhang
 			// std::cout << " --- Initial right overhang\n";
 			size_t s_rl = 0;
@@ -1016,7 +1019,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			// Step 1: Check if descending right will hurt balance
 			Node * n_r = cur->NB::get_right();
 			size_t s_r = n_r->NB::_wbt_size - 1; // this is where deletion happens
-			if (s_r * Options::wbt_delta() < (s_cur - s_r - 1)) {
+			if (s_r * Options::wbt_delta() < (s_cur - (s_r + 1))) {
 				// Out of balance with left overhang
 
 				size_t s_lr = 0;
@@ -1060,8 +1063,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		s_cur = cur->NB::_wbt_size;
 
 		if (s_right * Options::wbt_delta() <
-		    (s_cur - s_right - 1)) { // TODO FIXME has s_cur already the -1? (also
-			                           // in other branch)
+		    (s_cur - s_right - 1)) { 
 			// std::cout << " --- Initial left overhang\n";
 			// Out of balance with left overhang
 			size_t s_ll = 0;
@@ -1108,7 +1110,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			Node * n_l = cur->NB::get_left();
 			size_t s_l = n_l->NB::_wbt_size - 1; // this is where deletion happens
 			if (s_l * Options::wbt_delta() <
-			    (s_cur - s_l - 1)) { // TODO FIXME here the -1 is also missing!
+			    (s_cur - s_l - 1)) {
 				// Out of balance with right overhang
 				// std::cout << " ---- Right overhang\n";
 				size_t s_rr = 0;
@@ -1393,7 +1395,10 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 	}
 
 	bool ascended_right = deleted_right;
-	size_t last_size = 0;
+	/* This is a hack. Below, when right_size resp. left_size are computed from
+	 * last_size, one is added to account for the node in get_right() / get_left().
+	 * However, when that node does not exist, we must start with -1. */
+	size_t last_size = -1;
 
 	if (deleted_right) {
 		if (parent->NB::get_right() != nullptr) {
@@ -1415,11 +1420,11 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 			// ascended left!
 
 			size_t right_weight =
-			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
+				node->NB::_wbt_size - (last_size + 1); // TODO this can be reformulated
 
-			if ((typename Options::WBTDeltaT)((last_size + 1) *
+			if ((typename Options::WBTDeltaT)((last_size ) *
 			                                  Options::wbt_delta()) <
-			    (typename Options::WBTDeltaT)(right_weight + 1)) {
+			    (typename Options::WBTDeltaT)(right_weight)) {
 				// Out of balance with right-overhang
 
 				size_t right_left = 0;
@@ -1458,11 +1463,11 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 			// Ascended right
 
 			size_t left_weight =
-			    node->NB::_wbt_size - 1 - last_size; // TODO this can be reformulated
+				node->NB::_wbt_size - (last_size + 1); 
 
-			if ((typename Options::WBTDeltaT)((last_size + 1) *
+			if ((typename Options::WBTDeltaT)((last_size) *
 			                                  Options::wbt_delta()) <
-			    (typename Options::WBTDeltaT)(left_weight + 1)) {
+			    (typename Options::WBTDeltaT)(left_weight)) {
 				// Out of balance with left-overhang
 
 				size_t left_left = 0;
