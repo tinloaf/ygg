@@ -3,12 +3,14 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <tuple>
+#include <fstream>
 
 template <class Tree, class Node>
 class TreeDepthAnalyzer {
 public:
-	TreeDepthAnalyzer(size_t count_in, size_t seed_in)
-	    : count(count_in), seed(seed_in){};
+	TreeDepthAnalyzer(std::string name_in, size_t count_in, size_t move_count_in, size_t seed_in, std::ofstream & os_in)
+		: name(name_in), count(count_in), move_count(move_count_in), seed(seed_in), os(os_in) {};
 
 	void
 	run()
@@ -38,12 +40,23 @@ public:
 			}
 		}
 		std::cout << "Vertices too Deep: \t" << deeper_than_balanced << std::endl;
+
+		this->os << this->name << "," << this->count << "," << this->move_count << "," << this->seed
+						 << "," << this->path_lengths[this->path_lengths.size() / 2]
+						 << "," << ((double)sum) / ((double)this->count)
+						 << "," << sum 
+						 << "," << *std::max_element(this->path_lengths.begin(),
+		                               this->path_lengths.end())
+						 << "\n";
 	}
 
 private:
+	std::string name;
 	size_t count;
+	size_t move_count;
 	size_t seed;
-
+	std::ofstream & os;
+	
 	Tree t;
 	std::vector<Node> nodes;
 	std::vector<size_t> path_length_histogram;
@@ -66,12 +79,37 @@ private:
 	create_nodes()
 	{
 		std::mt19937 rnd(this->seed);
-		std::uniform_int_distribution<size_t> rng(
+		std::uniform_int_distribution<size_t> distr(
 		    0, std::numeric_limits<size_t>::max());
+
 		this->nodes.resize(this->count);
+		std::set<size_t> values_seen;
 		for (unsigned int i = 0; i < this->count; ++i) {
-			this->nodes[i].val = rng(rnd);
+			size_t val = distr(rnd);
+			while (values_seen.find(val) != values_seen.end()) {
+				val = distr(rnd);
+			}
+			values_seen.insert(val);
+
+			this->nodes[i].val = val;
 			this->t.insert(this->nodes[i]);
+		}
+
+		std::vector<size_t> move_indices(this->count);
+		std::iota(move_indices.begin(), move_indices.end(), 0);
+		std::shuffle(move_indices.begin(), move_indices.end(), rnd);
+
+		for (size_t i = 0; i < this->move_count; ++i) {
+			this->t.erase(this->nodes[move_indices[i]]); // TODO erase optimistic!
+
+			size_t val = distr(rnd);
+			while (values_seen.find(val) != values_seen.end()) {
+				val = distr(rnd);
+			}
+			values_seen.insert(val);
+
+			this->nodes[move_indices[i]].val = val;
+			this->t.insert(this->nodes[move_indices[i]]);
 		}
 	}
 };
@@ -165,59 +203,87 @@ operator<(const RandZTreeNode & lhs, const RandZTreeNode & rhs)
 	return lhs.val < rhs.val;
 }
 
+template <class T>
+struct type_container
+{
+	using type = T;
+};
+
+/* RBTree */
+using RBTree =
+    ygg::RBTree<RBTreeNode, ygg::RBDefaultNodeTraits, BasicTreeOptions>;
+
+/* WBTree */
+using WBTree =
+	ygg::weight::WBTree<WBTreeNode, ygg::weight::WBDefaultNodeTraits, BasicTreeOptions>;
+
+/* WBTree */
+using SPWBTree = ygg::weight::WBTree<SPWBTreeNode, ygg::weight::WBDefaultNodeTraits,
+                                     SinglePassTreeOptions>;
+
+/* Energy-Balanced Tree */
+using EnergyTree = ygg::EnergyTree<EnergyNode, BasicTreeOptions>;
+
+/* ZTree */
+using ZTree = ygg::ZTree<ZTreeNode, ygg::ZTreeDefaultNodeTraits<ZTreeNode>,
+                         BasicTreeOptions>;
+
+/* RandZTree */
+using RandZTree =
+    ygg::ZTree<RandZTreeNode, ygg::ZTreeDefaultNodeTraits<RandZTreeNode>,
+               RandomRankTreeOptions>;
+
+auto 
+all_types()
+{
+	return std::make_tuple(std::make_tuple(std::string("RBTree"), type_container <RBTree>{}, type_container<RBTreeNode>{}),
+												 std::make_tuple(std::string("WBTree[default]"), type_container <WBTree>{}, type_container<WBTreeNode>{}),
+												 std::make_tuple(std::string("WBTree[SP]"), type_container <SPWBTree>{}, type_container<SPWBTreeNode>{})
+
+	);
+}
+
+template<std::size_t I = 0, typename ... Tpl>
+typename std::enable_if<I == sizeof...(Tpl), void>::type  do_analysis(std::tuple<Tpl...> tpl, size_t count, size_t move_count, size_t seed_count, size_t seed_start, std::ofstream & os) {}
+
+template<std::size_t I = 0, typename ... Tpl>
+typename std::enable_if<I < sizeof...(Tpl), void>::type  do_analysis(std::tuple<Tpl...> tpl, size_t count, size_t move_count, size_t seed_count, size_t seed_start, std::ofstream & os) {
+	auto & el = std::get<I>(tpl);
+
+	std::string name = std::get<0>(el);
+	using TreeClass = typename std::remove_reference<decltype(std::get<1>(el))>::type::type;
+	using NodeClass = typename std::remove_reference<decltype(std::get<2>(el))>::type::type;
+
+	std::cout << "================== " << name << "\n";
+	for (size_t seed = seed_start ; seed < seed_start + seed_count ; ++seed) {
+		TreeDepthAnalyzer<TreeClass, NodeClass> tda(name, count, move_count, seed, os);
+		tda.run();
+	}
+
+	do_analysis<I+1, Tpl...>(tpl, count, move_count, seed_count, seed_start, os);
+}
+
 int
 main(int argc, const char ** argv)
 {
 	(void)argc; // TODO print an error message if wrong
 
-	/* RBTree */
-	using RBTree =
-	    ygg::RBTree<RBTreeNode, ygg::RBDefaultNodeTraits, BasicTreeOptions>;
+	size_t base_count = (size_t)std::atol(argv[1]);
+	size_t doublings = (size_t)std::atol(argv[2]);
+	double move_fraction = (double)std::atof(argv[3]);
+	size_t seed_start = (size_t)std::atol(argv[4]);
+	size_t seed_count = (size_t)std::atol(argv[5]);
+	std::string file_name(argv[6]);
 
-	/* WBTree */
-	using WBTree = ygg::weight::WBTree<WBTreeNode, ygg::RBDefaultNodeTraits,
-	                                   BasicTreeOptions>;
+	std::ofstream os(file_name, std::ios::trunc);
 
-	/* WBTree */
-	using SPWBTree = ygg::weight::WBTree<SPWBTreeNode, ygg::RBDefaultNodeTraits,
-	                                     SinglePassTreeOptions>;
+	// Write header
+	os << "name,size,move_count,seed,median_depth,average_depth,depth_sum,max_depth\n";
 
-	/* Energy-Balanced Tree */
-	using EnergyTree = ygg::EnergyTree<EnergyNode, BasicTreeOptions>;
+	for (size_t d = 0 ; d <= doublings; ++d) {
+		size_t count = base_count << d;
+		size_t move_count = (size_t)(count * move_fraction);
 
-	/* ZTree */
-	using ZTree = ygg::ZTree<ZTreeNode, ygg::ZTreeDefaultNodeTraits<ZTreeNode>,
-	                         BasicTreeOptions>;
-
-	/* RandZTree */
-	using RandZTree =
-	    ygg::ZTree<RandZTreeNode, ygg::ZTreeDefaultNodeTraits<RandZTreeNode>,
-	               RandomRankTreeOptions>;
-
-	size_t count = (size_t)std::atol(argv[1]);
-	size_t seed = (size_t)std::atol(argv[2]);
-
-	std::cout << "==== Red-Black Tree ====\n";
-	TreeDepthAnalyzer<RBTree, RBTreeNode> tarb(count, seed);
-	tarb.run();
-
-	std::cout << "==== Weight-Balanced Tree ====\n";
-	TreeDepthAnalyzer<WBTree, WBTreeNode> taw(count, seed);
-	taw.run();
-
-	std::cout << "==== Single-Pass Weight-Balanced Tree ====\n";
-	TreeDepthAnalyzer<SPWBTree, SPWBTreeNode> sptaw(count, seed);
-	sptaw.run();
-	
-	std::cout << "==== Energy-Balanced Tree ====\n";
-	TreeDepthAnalyzer<EnergyTree, EnergyNode> tae(count, seed);
-	tae.run();
-
-	std::cout << "==== Zip Tree ====\n";
-	TreeDepthAnalyzer<ZTree, ZTreeNode> taz(count, seed);
-	taz.run();
-
-	std::cout << "==== Random Zip Tree ====\n";
-	TreeDepthAnalyzer<RandZTree, RandZTreeNode> rtaz(count, seed);
-	rtaz.run();
+		do_analysis(all_types(), count, move_count, seed_count, seed_start, os);
+	}
 }
