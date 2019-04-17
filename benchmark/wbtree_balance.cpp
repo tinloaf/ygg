@@ -118,6 +118,14 @@ main(int argc, char ** argv)
 	}
 	wbt32_ba.print();
 
+		// Single-Pass WBTree
+	using SPOptions = TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS>;
+	BalanceAnalyzer<SPOptions> sp_ba(node_count, reinsertion_count);
+	for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		sp_ba.run(seed);
+	}
+	sp_ba.print();
+
 	
 	return 0;
 }

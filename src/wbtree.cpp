@@ -75,8 +75,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 				size_t r_size = n_r->NB::_wbt_size + 1;
 				size_t l_size = cur->NB::_wbt_size - r_size + 1; // Cur has not been increased, r_size has been.
 
-				if ((l_size + 1) * Options::wbt_delta() <
-				    (r_size + 1)) { // TODO incorporate the plus/minus above
+				if ((l_size) * Options::wbt_delta() <
+				    (r_size)) { // TODO incorporate the plus/minus above
 					// Right-overhang - we must rotate
 					// std::cout << ">> Right-Overhang\n";
 					size_t rr_size = 0;
@@ -108,7 +108,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						parent = cur;
 					}
 
-					if ((rl_size + 1) >= Options::wbt_gamma() * (rr_size + 1)) {
+					if ((typename Options::WBTGammaT)(rl_size) >= Options::wbt_gamma() * (typename Options::WBTGammaT)(rr_size)) {
 						// the right-left subtree is heavy enough to just take it
 						// double rotation!
 						// std::cout << ">>> Double rotation.\n";
@@ -207,8 +207,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 				size_t l_size = n_l->NB::_wbt_size + 1;
 				size_t r_size = cur->NB::_wbt_size - l_size + 1; // l_size has been increased, cur size not
 
-				if ((r_size + 1) * Options::wbt_delta() <
-				    (l_size + 1)) { // TODO incorporate the plus/minus above
+				if ((r_size) * Options::wbt_delta() <
+				    (l_size)) { // TODO incorporate the plus/minus above
 					// Left-overhang - we must rotate
 					// std::cout << "<< Left-Overhang\n";
 
@@ -241,7 +241,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						parent = cur;
 					}
 
-					if ((lr_size + 1) > Options::wbt_gamma() * (ll_size + 1)) {
+					if ((lr_size) > Options::wbt_gamma() * (ll_size)) {
 						// the left-right subtree is heavy enough to just take it
 						// double rotation!
 						// std::cout << "<<< Double Rotation!\n";
@@ -854,7 +854,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 
 			// Step 1: Check balance
 			if ((typename Options::WBTDeltaT)(s_r * Options::wbt_delta()) <
-			    (typename Options::WBTDeltaT)(s_cur - s_r - 1)) {
+			    (typename Options::WBTDeltaT)(s_cur - s_r - 1)) { // TODO is this -1 correct here?
 				// std::cout << " ### Left-overhang \n";
 				// Out of balance with left-overhang
 				size_t s_lr = 0;
@@ -893,7 +893,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 			size_t s_l = n_l->NB::_wbt_size - 1;
 
 			// Step 1: Check balance
-			if (s_l * Options::wbt_delta() < (s_cur - s_l - 1)) {
+			if (s_l * Options::wbt_delta() < (s_cur - s_l - 1)) { // TODO is this -1 correct here?
 				// Out of balance with right-overhang
 				// std::cout << " ### Right overhang\n";
 				size_t s_rr = 0;
