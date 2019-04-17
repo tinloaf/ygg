@@ -43,22 +43,13 @@ public:
 	}
 };
 
-} // namespace rbtree
-} // namespace testing
-} // namespace ygg
-
 // Make Node comparable to int
-bool operator<(const ygg::testing::rbtree::Node & lhs, int rhs) {
+bool operator<(const Node & lhs, int rhs) {
 	return lhs.data < rhs;
 }
-bool operator<(int lhs, const ygg::testing::rbtree::Node & rhs) {
+bool operator<(int lhs, const Node & rhs) {
 	return lhs < rhs.data;
 }
-
-namespace ygg {
-namespace testing {
-namespace rbtree {
-
 	
 class EqualityNode : public RBTreeNodeBase<EqualityNode> {
 public:

@@ -8,19 +8,21 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
          "Valgrind")
 
 # Work around Boost bug: https://github.com/boostorg/icl/issues/21
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-new-ttp-matching")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-new-ttp-matching")
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-new-ttp-matching")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-new-ttp-matching")
+endif()
 
 #===============================================
 #==== Build type: Debug
 #===============================================
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -fno-new-ttp-matching")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal")
 			 
 #===============================================
 #==== Build type: valgrind
 #===============================================
 
-set(CMAKE_C_FLAGS_VALGRIND "-O2 -march=native -ffast-math -g -flto -fno-new-ttp-matching" CACHE STRING
+set(CMAKE_C_FLAGS_VALGRIND "${CMAKE_C_FLAGS} -O2 -march=native -ffast-math -g -flto" CACHE STRING
         "Flags used by the C++ compiler during valgrind builds."
         FORCE)
 set(CMAKE_CXX_FLAGS_VALGRIND "${CMAKE_C_FLAGS_VALGRIND}" CACHE STRING

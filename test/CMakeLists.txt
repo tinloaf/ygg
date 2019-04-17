@@ -12,15 +12,14 @@ include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 add_executable (run_tests main.cpp)
 add_dependencies(run_tests googletest)
 
-set(CMAKE_C_FLAGS_DEBUG "-fno-omit-frame-pointer -Wall -Wextra -pedantic -Wfloat-equal \
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -fno-omit-frame-pointer -Wall -Wextra -pedantic -Wfloat-equal \
 -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual \
--Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -Wswitch-default \
--fno-new-ttp-matching")
+-Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -Wswitch-default")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
 
 set_target_properties(run_tests
-                      PROPERTIES COMPILE_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage \
-                      -Wall -Wextra -pedantic -fno-new-ttp-matching"
+                      PROPERTIES COMPILE_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage \
+                      -Wall -Wextra -pedantic"
                       )
 set_target_properties(run_tests
                       PROPERTIES LINK_FLAGS "-fprofile-arcs -ftest-coverage"

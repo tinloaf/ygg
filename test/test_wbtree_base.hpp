@@ -28,20 +28,13 @@ public:
 		return *this;
 	}
 };
-}
-}
-}
 
-bool operator<(const ygg::testing::__WBT_NAMESPACE::Node & lhs, int rhs) {
+bool operator<(const Node & lhs, int rhs) {
 	return lhs.data < rhs;
 }
-bool operator<(int lhs, const ygg::testing::__WBT_NAMESPACE::Node & rhs) {
+bool operator<(int lhs, const Node & rhs) {
 	return lhs < rhs.data;
 }
-
-namespace ygg {
-namespace testing {
-namespace __WBT_NAMESPACE {
 
 class NodeNameGetter {
 public:
