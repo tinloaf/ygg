@@ -518,8 +518,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			size_t right_size = last_size;
 
 			// TODO DEBUG REMOVE
-			assert(left_size * Options::wbt_delta() >=
-			       (right_size - 1)); // Precondition
+			//assert(left_size * Options::wbt_delta() >=
+			//      (right_size - 1)); // Precondition
 
 			// TODO this is wrong
 			if ((typename Options::WBTDeltaT)((left_size)*Options::wbt_delta()) <
@@ -559,8 +559,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			size_t left_size = last_size;
 
 			// TODO DEBUG REMOVE
-			assert(right_size * Options::wbt_delta() >=
-			       (left_size - 1)); // Precondition
+			//			assert(right_size * Options::wbt_delta() >=
+			//     (left_size - 1)); // Precondition
 
 			if ((typename Options::WBTDeltaT)((right_size)*Options::wbt_delta()) <
 			    (typename Options::WBTDeltaT)(left_size)) {
