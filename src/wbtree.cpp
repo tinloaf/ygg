@@ -537,17 +537,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 					this->rotate_left(node);
 
 					// switch to new parent
-					this->dbg_assert_balance_at(node); // TODO DEBUG REMOVE
 					node = node->NB::get_parent();
-					this->dbg_assert_balance_at(node); // TODO DEBUG REMOVE
 				} else {
 					// Take the whole right subtree - single rotation
 					this->rotate_left(node);
 
 					// switch to new parent
-					this->dbg_assert_balance_at(node); // TODO DEBUG REMOVE
 					node = node->NB::get_parent();
-					this->dbg_assert_balance_at(node); // TODO DEBUG REMOVE
 				}
 			}
 
@@ -576,17 +572,13 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 					this->rotate_right(node);
 
 					// switch to new parent
-					this->dbg_assert_balance_at(node); // TODO DEBUG REMOVE
 					node = node->NB::get_parent();
-					this->dbg_assert_balance_at(node); // TODO DEBUG REMOVE
 				} else {
 					// Take the whole left subtree
 					this->rotate_right(node);
 
 					// switch to new parent
-					this->dbg_assert_balance_at(node); // TODO DEBUG REMOVE
 					node = node->NB::get_parent();
-					this->dbg_assert_balance_at(node); // TODO DEBUG REMOVE
 				}
 			}
 		} // end of "ascended left"
