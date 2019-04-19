@@ -76,8 +76,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 				size_t l_size = cur->NB::_wbt_size - r_size +
 				                1; // Cur has not been increased, r_size has been.
 
-				if ((l_size)*Options::wbt_delta() <
-				    (r_size)) { // TODO incorporate the plus/minus above
+				if ((l_size)*Options::wbt_delta() < (r_size)) {
 					// Right-overhang - we must rotate
 					// std::cout << ">> Right-Overhang\n";
 					size_t rr_size = 1;
@@ -90,6 +89,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 
 					// TODO flip this for on_equality_prefer_left
 					bool case_rr = false;        // TODO unroll this?
+					// TODO optimize this using arithmetic
 					if (this->cmp(*n_r, node)) { // Case RR
 						rr_size += 1;
 
@@ -107,7 +107,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 					}
 
 					// TODO FIXME >= ?
-					if ((typename Options::WBTGammaT)(rl_size) >=
+					if ((typename Options::WBTGammaT)(rl_size) >
 					    Options::wbt_gamma() * (typename Options::WBTGammaT)(rr_size)) {
 						// the right-left subtree is heavy enough to just take it
 						// double rotation!
@@ -518,7 +518,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			size_t right_size = last_size;
 
 			// TODO DEBUG REMOVE
-			//assert(left_size * Options::wbt_delta() >=
+			// assert(left_size * Options::wbt_delta() >=
 			//      (right_size - 1)); // Precondition
 
 			// TODO this is wrong

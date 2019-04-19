@@ -11,7 +11,7 @@
 
 #include "common.hpp"
 
-#define EXPERIMENT_SIZE 1024
+#define EXPERIMENT_SIZE 1000
 #define BASE_SIZE 2048
 #define DOUBLINGS 10
 

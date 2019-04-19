@@ -1,16 +1,18 @@
 #include "../src/ygg.hpp"
 
+#include <fstream>
 #include <iostream>
 #include <random>
-#include <vector>
 #include <tuple>
-#include <fstream>
+#include <vector>
 
 template <class Tree, class Node>
 class TreeDepthAnalyzer {
 public:
-	TreeDepthAnalyzer(std::string name_in, size_t count_in, size_t move_count_in, size_t seed_in, std::ofstream & os_in)
-		: name(name_in), count(count_in), move_count(move_count_in), seed(seed_in), os(os_in) {};
+	TreeDepthAnalyzer(std::string name_in, size_t count_in, size_t move_count_in,
+	                  size_t seed_in, std::ofstream & os_in)
+	    : name(name_in), count(count_in), move_count(move_count_in),
+	      seed(seed_in), os(os_in){};
 
 	void
 	run()
@@ -41,13 +43,13 @@ public:
 		}
 		std::cout << "Vertices too Deep: \t" << deeper_than_balanced << std::endl;
 
-		this->os << this->name << "," << this->count << "," << this->move_count << "," << this->seed
-						 << "," << this->path_lengths[this->path_lengths.size() / 2]
-						 << "," << ((double)sum) / ((double)this->count)
-						 << "," << sum 
-						 << "," << *std::max_element(this->path_lengths.begin(),
-		                               this->path_lengths.end())
-						 << "\n";
+		this->os << this->name << "," << this->count << "," << this->move_count
+		         << "," << this->seed << ","
+		         << this->path_lengths[this->path_lengths.size() / 2] << ","
+		         << ((double)sum) / ((double)this->count) << "," << sum << ","
+		         << *std::max_element(this->path_lengths.begin(),
+		                              this->path_lengths.end())
+		         << "\n";
 	}
 
 private:
@@ -56,7 +58,7 @@ private:
 	size_t move_count;
 	size_t seed;
 	std::ofstream & os;
-	
+
 	Tree t;
 	std::vector<Node> nodes;
 	std::vector<size_t> path_length_histogram;
@@ -130,8 +132,23 @@ using RandomRankTreeOptions =
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
                          std::numeric_limits<size_t>::max()>>;
 
-using SinglePassTreeOptions =
+/* WBTree Options */
+using WBTTwopassTreeOptions = ygg::TreeOptions<ygg::TreeFlags::MULTIPLE>;
+using WBTSinglepassTreeOptions =
     ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS>;
+
+using WBTTwopass32TreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
+                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<2>,
+                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
+using WBTSinglepass32TreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
+                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<2>,
+                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
 
 class RBTreeNode : public ygg::RBTreeNodeBase<RBTreeNode, BasicTreeOptions> {
 public:
@@ -144,29 +161,18 @@ operator<(const RBTreeNode & lhs, const RBTreeNode & rhs)
 	return lhs.val < rhs.val;
 }
 
+template <class Options>
 class WBTreeNode
-    : public ygg::weight::WBTreeNodeBase<WBTreeNode, BasicTreeOptions> {
+    : public ygg::weight::WBTreeNodeBase<WBTreeNode<Options>, Options> {
 public:
 	size_t val;
+
+	bool
+	operator<(const WBTreeNode & other) const
+	{
+		return this->val < other.val;
+	}
 };
-
-bool
-operator<(const WBTreeNode & lhs, const WBTreeNode & rhs)
-{
-	return lhs.val < rhs.val;
-}
-
-class SPWBTreeNode
-    : public ygg::weight::WBTreeNodeBase<SPWBTreeNode, SinglePassTreeOptions> {
-public:
-	size_t val;
-};
-
-bool
-operator<(const SPWBTreeNode & lhs, const SPWBTreeNode & rhs)
-{
-	return lhs.val < rhs.val;
-}
 
 class EnergyNode
     : public ygg::EnergyTreeNodeBase<EnergyNode, BasicTreeOptions> {
@@ -214,12 +220,9 @@ using RBTree =
     ygg::RBTree<RBTreeNode, ygg::RBDefaultNodeTraits, BasicTreeOptions>;
 
 /* WBTree */
-using WBTree =
-	ygg::weight::WBTree<WBTreeNode, ygg::weight::WBDefaultNodeTraits, BasicTreeOptions>;
-
-/* WBTree */
-using SPWBTree = ygg::weight::WBTree<SPWBTreeNode, ygg::weight::WBDefaultNodeTraits,
-                                     SinglePassTreeOptions>;
+template <class Options>
+using WBTree = ygg::weight::WBTree<WBTreeNode<Options>,
+                                   ygg::weight::WBDefaultNodeTraits, Options>;
 
 /* Energy-Balanced Tree */
 using EnergyTree = ygg::EnergyTree<EnergyNode, BasicTreeOptions>;
@@ -233,34 +236,58 @@ using RandZTree =
     ygg::ZTree<RandZTreeNode, ygg::ZTreeDefaultNodeTraits<RandZTreeNode>,
                RandomRankTreeOptions>;
 
-auto 
+auto
 all_types()
 {
-	return std::make_tuple(std::make_tuple(std::string("RBTree"), type_container <RBTree>{}, type_container<RBTreeNode>{}),
-												 std::make_tuple(std::string("WBTree[default]"), type_container <WBTree>{}, type_container<WBTreeNode>{}),
-												 std::make_tuple(std::string("WBTree[SP]"), type_container <SPWBTree>{}, type_container<SPWBTreeNode>{})
+	return std::make_tuple(
+	    std::make_tuple(std::string("RBTree"), type_container<RBTree>{},
+	                    type_container<RBTreeNode>{}),
+	    std::make_tuple(std::string("WBTree[TP]"),
+	                    type_container<WBTree<WBTTwopassTreeOptions>>{},
+	                    type_container<WBTreeNode<WBTTwopassTreeOptions>>{}),
+	    std::make_tuple(std::string("WBTree[SP]"),
+	                    type_container<WBTree<WBTSinglepassTreeOptions>>{},
+	                    type_container<WBTreeNode<WBTSinglepassTreeOptions>>{}),
+	    std::make_tuple(std::string("WBTree[TP,32]"),
+	                    type_container<WBTree<WBTTwopass32TreeOptions>>{},
+	                    type_container<WBTreeNode<WBTTwopass32TreeOptions>>{}),
+	    std::make_tuple(std::string("WBTree[SP,32]"),
+	                    type_container<WBTree<WBTSinglepass32TreeOptions>>{},
+	                    type_container<WBTreeNode<WBTSinglepass32TreeOptions>>{})
+
 
 	);
 }
 
-template<std::size_t I = 0, typename ... Tpl>
-typename std::enable_if<I == sizeof...(Tpl), void>::type  do_analysis(std::tuple<Tpl...> tpl, size_t count, size_t move_count, size_t seed_count, size_t seed_start, std::ofstream & os) {}
+template <std::size_t I = 0, typename... Tpl>
+typename std::enable_if<I == sizeof...(Tpl), void>::type
+do_analysis(std::tuple<Tpl...> tpl, size_t count, size_t move_count,
+            size_t seed_count, size_t seed_start, std::ofstream & os)
+{}
 
-template<std::size_t I = 0, typename ... Tpl>
-typename std::enable_if<I < sizeof...(Tpl), void>::type  do_analysis(std::tuple<Tpl...> tpl, size_t count, size_t move_count, size_t seed_count, size_t seed_start, std::ofstream & os) {
+template <std::size_t I = 0, typename... Tpl>
+    typename std::enable_if <
+    I<sizeof...(Tpl), void>::type
+    do_analysis(std::tuple<Tpl...> tpl, size_t count, size_t move_count,
+                size_t seed_count, size_t seed_start, std::ofstream & os)
+{
 	auto & el = std::get<I>(tpl);
 
 	std::string name = std::get<0>(el);
-	using TreeClass = typename std::remove_reference<decltype(std::get<1>(el))>::type::type;
-	using NodeClass = typename std::remove_reference<decltype(std::get<2>(el))>::type::type;
+	using TreeClass =
+	    typename std::remove_reference<decltype(std::get<1>(el))>::type::type;
+	using NodeClass =
+	    typename std::remove_reference<decltype(std::get<2>(el))>::type::type;
 
 	std::cout << "================== " << name << "\n";
-	for (size_t seed = seed_start ; seed < seed_start + seed_count ; ++seed) {
-		TreeDepthAnalyzer<TreeClass, NodeClass> tda(name, count, move_count, seed, os);
+	for (size_t seed = seed_start; seed < seed_start + seed_count; ++seed) {
+		TreeDepthAnalyzer<TreeClass, NodeClass> tda(name, count, move_count, seed,
+		                                            os);
 		tda.run();
 	}
 
-	do_analysis<I+1, Tpl...>(tpl, count, move_count, seed_count, seed_start, os);
+	do_analysis<I + 1, Tpl...>(tpl, count, move_count, seed_count, seed_start,
+	                           os);
 }
 
 int
@@ -278,9 +305,10 @@ main(int argc, const char ** argv)
 	std::ofstream os(file_name, std::ios::trunc);
 
 	// Write header
-	os << "name,size,move_count,seed,median_depth,average_depth,depth_sum,max_depth\n";
+	os << "name,size,move_count,seed,median_depth,average_depth,depth_sum,max_"
+	      "depth\n";
 
-	for (size_t d = 0 ; d <= doublings; ++d) {
+	for (size_t d = 0; d <= doublings; ++d) {
 		size_t count = base_count << d;
 		size_t move_count = (size_t)(count * move_fraction);
 
