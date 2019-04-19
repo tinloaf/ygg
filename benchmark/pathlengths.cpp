@@ -248,10 +248,10 @@ all_types()
 	    std::make_tuple(std::string("WBTree[SP]"),
 	                    type_container<WBTree<WBTSinglepassTreeOptions>>{},
 	                    type_container<WBTreeNode<WBTSinglepassTreeOptions>>{}),
-	    std::make_tuple(std::string("WBTree[TP,32]"),
+	    std::make_tuple(std::string("WBTree[TP|32]"),
 	                    type_container<WBTree<WBTTwopass32TreeOptions>>{},
 	                    type_container<WBTreeNode<WBTTwopass32TreeOptions>>{}),
-	    std::make_tuple(std::string("WBTree[SP,32]"),
+	    std::make_tuple(std::string("WBTree[SP|32]"),
 	                    type_container<WBTree<WBTSinglepass32TreeOptions>>{},
 	                    type_container<WBTreeNode<WBTSinglepass32TreeOptions>>{})
 
