@@ -33,6 +33,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 {
 	//	std::cout << "\n============= Inserting ============\n";
 
+	// assert(this->dbg_count_violations() == 0);
+
 	node.NB::set_right(nullptr);
 	node.NB::set_left(nullptr);
 	node.NB::_wbt_size = 2; // Both children are non-present
@@ -88,7 +90,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 					n_rl = n_r->NB::get_left();
 
 					// TODO flip this for on_equality_prefer_left
-					bool case_rr = false;        // TODO unroll this?
+					bool case_rr = false; // TODO unroll this?
 					// TODO optimize this using arithmetic
 					if (this->cmp(*n_r, node)) { // Case RR
 						rr_size += 1;
@@ -147,6 +149,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 							parent = n_r;
 							left_of_parent = false;
 
+							// this->dbg_assert_balance_at(cur);
+							// this->dbg_assert_balance_at(n_rl);
+
 							cur = n_rr;
 						} else {
 							// For the rl case, we need to distuinguish between rlr and rll
@@ -158,24 +163,37 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 								n_r->NB::_wbt_size += 1;
 								parent = n_r;
 								left_of_parent = true;
+
+								// this->dbg_assert_balance_at(cur);
+								// this->dbg_assert_balance_at(n_rl);
+
 								cur = n_r->NB::get_left(); // that's where rlr lives now
 							} else {                     // case rll
 								// std::cout << ">>>> Case RLL\n";
 								cur->NB::_wbt_size += 1;
+								// if (cur->get_parent() != nullptr) {
+								// this->dbg_assert_balance_at(cur->get_parent());
+								// }
 								parent = cur;
 								left_of_parent = false;
+
+								// this->dbg_assert_balance_at(n_rl);
+								// this->dbg_assert_balance_at(n_r);
+
 								cur = cur->NB::get_right(); // that's where rll lives now
 							}
 						}
-
 					} else {
 						// Single rotation does the trick
 						// std::cout << ">>> Single Rotation.\n";
 						this->rotate_left(cur);
 
-						n_r->NB::_wbt_size +=
-						    1; // n_r is a new parent below which something will be inserted
+						n_r->NB::_wbt_size += 1; // n_r is a new parent below which
+						                         // something will be inserted
 						cur->NB::_wbt_size += single_cur_delta;
+						// if (cur->get_parent() != nullptr) {
+						// this->dbg_assert_balance_at(cur->get_parent());
+						// }
 
 						// We determined above where to continue
 						left_of_parent = false;
@@ -186,8 +204,11 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 					// no rotation. Continue at r
 					// Only the size of cur must be updated
 					cur->NB::_wbt_size += 1;
-					// In this case, n_r is not null, thus we continue and do not have to
-					// set a parent
+					// if (cur->get_parent() != nullptr) {
+					// this->dbg_assert_balance_at(cur->get_parent());
+					// }
+					// In this case, n_r is not null, thus we continue and do not have
+					// to set a parent
 					cur = n_r;
 				}
 			} else {
@@ -197,6 +218,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 				// std::cout << "> Finished on the right!\n";
 
 				cur->NB::_wbt_size += 1;
+				// if (cur->get_parent() != nullptr) {
+				// this->dbg_assert_balance_at(cur->get_parent());
+				// }
 				parent = cur;
 				left_of_parent = false;
 				break;
@@ -221,6 +245,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 					n_lr = n_l->NB::get_right();
 					if (__builtin_expect(n_lr != nullptr, true)) { // TODO expectations?
 						lr_size = n_lr->NB::_wbt_size;
+						// this->dbg_assert_balance_at(n_lr);
 					}
 					size_t ll_size = (l_size - 1) - lr_size;
 					n_ll = n_l->NB::get_left();
@@ -245,13 +270,30 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 
 					// TODO FIXME >=? >?
 					if ((lr_size) > Options::wbt_gamma() * (ll_size)) {
+						/*
+						std::cout << "L: " << l_size << " LR: " << lr_size
+						          << " LL: " << ll_size << " C: " << cur->NB::_wbt_size + 1;
+
+						if (n_lr->get_left() != nullptr) {
+						  std::cout << " LRL: " << n_lr->get_left()->_wbt_size;
+						} else {
+						  std::cout << " LRL: 1";
+						}
+						if (n_lr->get_right() != nullptr) {
+						  std::cout << " LRR: " << n_lr->get_right()->_wbt_size;
+						} else {
+						  std::cout << " LRR: 1";
+						}
+						std::cout << "\n";
+						*/
+
 						// the left-right subtree is heavy enough to just take it
 						// double rotation!
 						// std::cout << "<<< Double Rotation!\n";
 
 						// Special case: n_lr does not exist yet, but is the node to be
-						// inserted (that is the only way it can be still empty and heavier
-						// than an empty n_ll subtree) we handle this specially.
+						// inserted (that is the only way it can be still empty and
+						// heavier than an empty n_ll subtree) we handle this specially.
 						// We insert the node first, then do the double rotation, and are
 						// done.
 						// TODO FIXME does this still happen?
@@ -280,6 +322,19 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 							// std::cout << "<<<< Case LL\n";
 							n_l->NB::_wbt_size += 1;
 
+							// this->dbg_assert_balance_at(cur);
+							// this->dbg_assert_balance_at(n_lr);
+							/*
+							if ((n_l->get_right() != nullptr) && (n_ll != nullptr)) {
+							  assert((n_ll->_wbt_size + 1 ) * Options::wbt_delta() >=
+							n_l->get_right()->_wbt_size); assert((n_ll->_wbt_size + 1 ) <=
+							Options::wbt_delta() * n_l->get_right()->_wbt_size); } else { if
+							(n_l->get_right() != nullptr) { assert(2 * Options::wbt_delta() >=
+							n_l->get_right()->_wbt_size);
+							  }
+							}
+							*/
+
 							cur = n_ll;
 							parent = n_l;
 							left_of_parent = true;
@@ -294,6 +349,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 								n_l->NB::_wbt_size += 1;
 								parent = n_l;
 								left_of_parent = false;
+								// this->dbg_assert_balance_at(cur);
+								// this->dbg_assert_balance_at(n_lr);
+
 								cur = n_l->NB::get_right(); // that's where lrl lives now
 							} else {                      // case lrr
 								// std::cout << "<<<< Case LRR\n";
@@ -301,6 +359,10 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 								cur->NB::_wbt_size += 1;
 								parent = cur;
 								left_of_parent = true;
+
+								// this->dbg_assert_balance_at(n_lr);
+								// this->dbg_assert_balance_at(n_l);
+
 								cur = cur->NB::get_left(); // that's where lrr lives now
 							}
 						}
@@ -316,6 +378,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 
 						// We determined above where to continue
 						left_of_parent = true;
+						// this->dbg_assert_balance_at(n_l);
+
 						cur = single_next;
 					}
 				} else {
@@ -323,14 +387,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 					// no rotation. Continue at l
 					// Only the size of cur must be updated
 					cur->NB::_wbt_size += 1;
-					// in this case, n_l is not null, thus we continue and do not need to
-					// set a parent
+					// in this case, n_l is not null, thus we continue and do not need
+					// to set a parent
 					cur = n_l;
 				}
 			} else {
 				// std::cout << "< Finished on the left!\n";
-				// we should descend left, but there is no n_l. Adjust size, set parent
-				// and break loop.
+				// we should descend left, but there is no n_l. Adjust size, set
+				// parent and break loop.
 				// TODO can this break balance?
 				cur->NB::_wbt_size += 1;
 				parent = cur;
@@ -656,7 +720,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::verify_sizes() const
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 size_t
-WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_count_violations() const
+WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_count_violations(
+    std::vector<size_t> * depths) const
 {
 	size_t result = 0;
 	for (const Node & n : *this) {
@@ -674,6 +739,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_count_violations() const
 		    ((typename Options::WBTDeltaT)(right * Options::wbt_delta()) <
 		     (typename Options::WBTDeltaT)(left))) {
 			result += 1;
+
+			if (depths != nullptr) {
+				size_t depth = n.get_depth();
+				if (depths->size() < (depth + 1)) {
+					depths->resize(depth + 1, 0);
+				}
+				depths->at(depth)++;
+			}
 		}
 	}
 
@@ -728,8 +801,8 @@ void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
                                                             Node * n2)
 {
-	if (n1->NB::get_parent() ==
-	    n2) { // TODO this should never happen, since n2 is always the descendant
+	if (n1->NB::get_parent() == n2) { // TODO this should never happen, since n2
+		                                // is always the descendant
 		this->swap_neighbors(n2, n1);
 	} else if (n2->NB::get_parent() == n1) {
 		// std::cout << " ## Swapping neighbors 2.\n";
@@ -887,8 +960,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 		if (this->cmp(*cur, c)) {
 			// descend right
 			cur->NB::_wbt_size -= 1;
-			Node * n_r = cur->NB::get_right(); // Since we're optimistic, we know that
-			                                   // n_r is not nullptr
+			Node * n_r = cur->NB::get_right(); // Since we're optimistic, we know
+			                                   // that n_r is not nullptr
 			size_t s_r = n_r->NB::_wbt_size - 1;
 			size_t s_l = s_cur - s_r; // Both are updated with -1
 			// Step 1: Check balance
@@ -924,8 +997,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 		} else if (this->cmp(c, *cur)) {
 			// descend left
 			cur->NB::_wbt_size -= 1;
-			Node * n_l = cur->NB::get_left(); // Since we're optimistic, we know that
-			                                  // n_l is not nullptr
+			Node * n_l = cur->NB::get_left(); // Since we're optimistic, we know
+			                                  // that n_l is not nullptr
 			size_t s_l = n_l->NB::_wbt_size - 1;
 			size_t s_r = s_cur - s_l;
 			// Step 1: Check balance
@@ -1045,7 +1118,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			// std::cout << " --- Now descending at " << std::hex << cur << std::dec
 			// << "\n";
 			cur->NB::_wbt_size -= 1;
-			assert(cur->NB::_wbt_size == s_cur);
+			// assert(cur->NB::_wbt_size == s_cur);
 
 			// Step 1: Check if descending right will hurt balance
 			Node * n_r = cur->NB::get_right();
@@ -1063,12 +1136,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 					s_lr = n_lr->_wbt_size;
 				}
 				size_t s_ll = s_left - s_lr;
-				// TODO DEBUG REMOVE
-				if (n_ll != nullptr) {
-					assert(s_ll == n_ll->_wbt_size);
-				} else {
-					assert(s_ll == 1);
-				}
 
 				if (s_lr > Options::wbt_gamma() * s_ll) {
 					// Double rotation
@@ -1112,13 +1179,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			}
 			size_t s_lr = s_l - s_ll;
 
-			// TODO DEBUG REMOVE
-			if (n_lr != nullptr) {
-				assert(s_lr == n_lr->_wbt_size);
-			} else {
-				assert(s_lr == 1);
-			}
-
 			if (s_lr > Options::wbt_gamma() * s_ll) {
 				// Double rotation
 				// std::cout << " ---- Double rotation.\n";
@@ -1161,21 +1221,15 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 				}
 				size_t s_rl = (s_cur - s_l) - s_rr;
 
-				// TODO DEBUG REMOVE
-				if (n_rl != nullptr) {
-					assert(s_rl == n_rl->_wbt_size);
-				} else {
-					assert(s_rl == 1);
-				}
-
 				if (s_rl > Options::wbt_gamma() * s_rr) {
 					// Double rotation
-					// std::cout << " ----- Double Rotation around " << std::hex << n_r <<
-					// " and " << cur << std::dec << "\n";
+					// std::cout << " ----- Double Rotation around " << std::hex << n_r
+					// << " and " << cur << std::dec << "\n";
 					this->rotate_right(n_r);
 					this->rotate_left(cur);
 				} else {
-					// std::cout << " ----- Single Rotation around " << std::hex << cur <<
+					// std::cout << " ----- Single Rotation around " << std::hex << cur
+					// <<
 					// "\n";
 					this->rotate_left(cur);
 				}
@@ -1187,8 +1241,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		}
 
 		this->remove_swap_and_remove_right<false>(&node, cur);
-		// cur is now where the node originally was. We need to fixup from there to
-		// the root!
+		// cur is now where the node originally was. We need to fixup from there
+		// to the root!
 		if constexpr (fix_upward) {
 			this->fixup_after_delete(subtree_parent, subtree_parent_right);
 		}
@@ -1235,8 +1289,8 @@ bool
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_swap_and_remove_right(
     Node * node, Node * replacement)
 {
-	// std::cout << " ----- SRR " << std::hex << node << " <> " << replacement <<
-	// std::dec << "\n";
+	// std::cout << " ----- SRR " << std::hex << node << " <> " << replacement
+	// << std::dec << "\n";
 	bool deleted_from_right;
 	Node * parent;
 
@@ -1510,12 +1564,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					left_left = node->NB::get_left()->NB::get_left()->NB::_wbt_size;
 				}
 				size_t left_right = left_weight - left_left;
-				// TODO DEBUG REMOVE
-				if (node->get_left()->get_right() != nullptr) {
-					assert(left_right == node->get_left()->get_right()->_wbt_size);
-				} else {
-					assert(left_right == 1);
-				}
 
 				if ((typename Options::WBTGammaT)left_right >
 				    (typename Options::WBTGammaT)(Options::wbt_gamma() * left_left)) {

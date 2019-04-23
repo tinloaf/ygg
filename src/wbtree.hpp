@@ -227,7 +227,7 @@ public:
 	/* Debugging methods */
 	// TODO only here for compatibility with the Zip Tree
 	void dbg_verify() const;
-	size_t dbg_count_violations() const;
+	size_t dbg_count_violations(std::vector<size_t> * depths = nullptr) const;
 	void dbg_assert_balance_at(Node * n) const;
 	
 protected:
