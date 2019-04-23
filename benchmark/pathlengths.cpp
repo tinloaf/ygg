@@ -150,6 +150,13 @@ using WBTSinglepass32TreeOptions =
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<2>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
 
+using WBTSinglepassLWTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
+                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<4>,
+                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<3>>;
+
 class RBTreeNode : public ygg::RBTreeNodeBase<RBTreeNode, BasicTreeOptions> {
 public:
 	size_t val;
@@ -248,13 +255,15 @@ all_types()
 	    std::make_tuple(std::string("WBTree[SP]"),
 	                    type_container<WBTree<WBTSinglepassTreeOptions>>{},
 	                    type_container<WBTreeNode<WBTSinglepassTreeOptions>>{}),
-	    std::make_tuple(std::string("WBTree[TP|32]"),
+	    /*	    std::make_tuple(std::string("WBTree[TP|32]"),
 	                    type_container<WBTree<WBTTwopass32TreeOptions>>{},
-	                    type_container<WBTreeNode<WBTTwopass32TreeOptions>>{}),
+	                    type_container<WBTreeNode<WBTTwopass32TreeOptions>>{}),*/
 	    std::make_tuple(std::string("WBTree[SP|32]"),
 	                    type_container<WBTree<WBTSinglepass32TreeOptions>>{},
-	                    type_container<WBTreeNode<WBTSinglepass32TreeOptions>>{})
-
+	                    type_container<WBTreeNode<WBTSinglepass32TreeOptions>>{}),
+	    std::make_tuple(std::string("WBTree[SP|LW]"),
+	                    type_container<WBTree<WBTSinglepassLWTreeOptions>>{},
+	                    type_container<WBTreeNode<WBTSinglepassLWTreeOptions>>{})
 
 	);
 }
@@ -296,11 +305,12 @@ main(int argc, const char ** argv)
 	(void)argc; // TODO print an error message if wrong
 
 	size_t base_count = (size_t)std::atol(argv[1]);
-	size_t doublings = (size_t)std::atol(argv[2]);
-	double move_fraction = (double)std::atof(argv[3]);
-	size_t seed_start = (size_t)std::atol(argv[4]);
-	size_t seed_count = (size_t)std::atol(argv[5]);
-	std::string file_name(argv[6]);
+	size_t offset = (size_t)std::atol(argv[2]);
+	size_t additions = (size_t)std::atol(argv[3]);
+	double move_fraction = (double)std::atof(argv[4]);
+	size_t seed_start = (size_t)std::atol(argv[5]);
+	size_t seed_count = (size_t)std::atol(argv[6]);
+	std::string file_name(argv[7]);
 
 	std::ofstream os(file_name, std::ios::trunc);
 
@@ -308,8 +318,9 @@ main(int argc, const char ** argv)
 	os << "name,size,move_count,seed,median_depth,average_depth,depth_sum,max_"
 	      "depth\n";
 
-	for (size_t d = 0; d <= doublings; ++d) {
-		size_t count = base_count << d;
+	for (size_t a = 0; a <= additions; ++a) {
+		std::cout << "################### " << a << " / " << additions << "\n";
+		size_t count = base_count + (a * offset);
 		size_t move_count = (size_t)(count * move_fraction);
 
 		do_analysis(all_types(), count, move_count, seed_count, seed_start, os);

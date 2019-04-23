@@ -1,6 +1,8 @@
 #ifndef YGG_WBTREE_CPP
 #define YGG_WBTREE_CPP
 
+#include <cmath>
+
 #include "wbtree.hpp"
 
 namespace ygg {
@@ -721,7 +723,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::verify_sizes() const
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 size_t
 WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_count_violations(
-    std::vector<size_t> * depths) const
+    std::vector<size_t> * depths, std::vector<size_t> * amounts) const
 {
 	size_t result = 0;
 	for (const Node & n : *this) {
@@ -746,6 +748,20 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_count_violations(
 					depths->resize(depth + 1, 0);
 				}
 				depths->at(depth)++;
+			}
+
+			if (amounts != nullptr) {
+				size_t amount = 0;
+				if (right > left * Options::wbt_delta()) {
+					amount = right - (size_t)std::floor(left * Options::wbt_delta());
+				} else {
+					amount = left - (size_t)std::floor(right * Options::wbt_delta());
+				}
+
+				if (amount + 1 > amounts->size()) {
+					amounts->resize(amount + 1, 0);
+				}
+				amounts->at(amount)++;
 			}
 		}
 	}
@@ -1083,7 +1099,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			// std::cout << " --- Initial right overhang\n";
 			Node * n_r = cur->NB::get_right(); // n_r can not be nullptr, since the
 			                                   // right subtree is heavy
-			Node * n_rr = n_r->NB::get_right();
 			Node * n_rl = n_r->NB::get_left();
 
 			size_t s_rl = 1;

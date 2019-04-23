@@ -27,10 +27,12 @@ private:
 	using Tree = weight::WBTree<Node<Flags>, weight::WBDefaultNodeTraits, Flags>;
 
 public:
-	BalanceAnalyzer(size_t node_count_in, size_t reinsertion_count_in,
-	                std::ofstream & series_of_in, std::ofstream & distr_of_in)
-	    : node_count(node_count_in), reinsertion_count(reinsertion_count_in),
-	      series_of(series_of_in), distr_of(distr_of_in)
+	BalanceAnalyzer(std::string name_in, size_t node_count_in,
+	                size_t reinsertion_count_in, std::ofstream & series_of_in,
+	                std::ofstream & distr_of_in, std::ofstream & amounts_of_in)
+	    : name(name_in), node_count(node_count_in),
+	      reinsertion_count(reinsertion_count_in), series_of(series_of_in),
+	      distr_of(distr_of_in), amounts_of(amounts_of_in)
 	{
 		this->nodes.resize(this->node_count);
 	}
@@ -56,24 +58,32 @@ public:
 			size_t index = std::abs(distr(rnd)) % this->node_count;
 
 			// TODO optimistic - also needs distinct values!
-			this->init_t.remove(*(Node<InitialFlags> *)(&this->nodes[index]));
-			//			this->t->remove(this->nodes[index]);
+			// this->init_t.remove(*(Node<InitialFlags> *)(&this->nodes[index]));
+			this->t->remove(this->nodes[index]);
 			//			assert(this->t->dbg_count_violations() == 0);
 			this->nodes[index].key = distr(rnd);
 			this->t->insert(this->nodes[index]);
 
 			if (i % COUNT_INTERVAL == 0) {
-				this->series_of << seed << "," << i << ","
+				this->series_of << this->name << "," << seed << "," << i << ","
 				                << this->t->dbg_count_violations() << "\n";
 			}
 		}
 
 		std::vector<size_t> depths;
-		this->counts.push_back(this->t->dbg_count_violations(&depths));
+		std::vector<size_t> amounts;
+		this->counts.push_back(this->t->dbg_count_violations(&depths, &amounts));
 
 		for (size_t depth = 0; depth < depths.size(); ++depth) {
-			this->distr_of << seed << "," << depth << "," << depths[depth] << "\n";
+			this->distr_of << this->name << "," << seed << "," << depth << ","
+			               << depths[depth] << "\n";
 		}
+		for (size_t amount = 0; amount < amounts.size(); ++amount) {
+			this->amounts_of << this->name << "," << seed << "," << amount << ","
+			                 << amounts[amount] << "\n";
+		}
+
+		this->amounts_of << std::flush;
 		this->distr_of << std::flush;
 		this->series_of << std::flush;
 	}
@@ -112,6 +122,7 @@ public:
 	}
 
 private:
+	std::string name;
 	size_t node_count;
 	size_t reinsertion_count;
 	std::vector<Node<Flags>> nodes;
@@ -120,6 +131,7 @@ private:
 	Tree * t;
 	std::ofstream & series_of;
 	std::ofstream & distr_of;
+	std::ofstream & amounts_of;
 };
 
 int
@@ -133,13 +145,17 @@ main(int argc, char ** argv)
 	std::string out_dir(argv[4]);
 	std::string series_fname = out_dir + "/series.csv";
 	std::ofstream series_os(series_fname, std::ios::trunc);
-	series_os << "Seed,Iteration,Count\n";
+	series_os << "Name,Seed,Iteration,Count\n";
 
 	std::string distr_fname = out_dir + "/distribution.csv";
 	std::ofstream distr_os(distr_fname, std::ios::trunc);
-	distr_os << "Seed,Depth,Count\n";
+	distr_os << "Name,Seed,Depth,Count\n";
 
-	// Initialize with Two-Pass, then switch to one-pass
+	std::string amounts_fname = out_dir + "/amounts.csv";
+	std::ofstream amounts_os(amounts_fname, std::ios::trunc);
+	amounts_os << "Name,Seed,Amount,Count\n";
+
+	/*
 	using DefaultOptions =
 	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_DELTA_NUMERATOR<3>,
 	                TreeFlags::WBT_DELTA_DENOMINATOR<1>,
@@ -149,13 +165,39 @@ main(int argc, char ** argv)
 	    TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS,
 	    TreeFlags::WBT_DELTA_NUMERATOR<3>, TreeFlags::WBT_DELTA_DENOMINATOR<1>,
 	    TreeFlags::WBT_GAMMA_NUMERATOR<4>, TreeFlags::WBT_GAMMA_DENOMINATOR<3>>;
-	BalanceAnalyzer<DefaultOptions, SPOptions> ba(node_count, reinsertion_count,
-	                                              series_os, distr_os);
+	*/
+
+	// Initialize with Two-Pass, then switch to one-pass
+	using DefaultOptions = TreeOptions<TreeFlags::MULTIPLE>;
+	using SPOptions =
+	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS>;
+	BalanceAnalyzer<DefaultOptions, SPOptions> ba("WBTree[Default]", node_count,
+	                                              reinsertion_count, series_os,
+	                                              distr_os, amounts_os);
 	for (int seed = 42; seed < 42 + seed_count; ++seed) {
 		std::cout << "Seed: " << seed << "\n";
 		ba.run(seed);
 	}
 	ba.print();
+
+	using Default32Options =
+	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_DELTA_NUMERATOR<3>,
+	                TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+	                TreeFlags::WBT_GAMMA_NUMERATOR<2>,
+	                TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
+	using SP32Options = TreeOptions<
+	    TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS,
+	    TreeFlags::WBT_DELTA_NUMERATOR<3>, TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+	    TreeFlags::WBT_GAMMA_NUMERATOR<2>, TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
+
+	BalanceAnalyzer<Default32Options, SP32Options> ba32(
+	    "WBTree[3|2]", node_count, reinsertion_count, series_os, distr_os,
+	    amounts_os);
+	for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		std::cout << "Seed: " << seed << "\n";
+		ba32.run(seed);
+	}
+	ba32.print();
 
 	/*
 

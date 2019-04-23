@@ -207,7 +207,7 @@ public:
 	template <class Comparable>
 	bool erase(const Comparable & c);
 	// TODO document
-	template<class Comparable>
+	template <class Comparable>
 	void erase_optimistic(const Comparable & c);
 
 	/**
@@ -227,23 +227,23 @@ public:
 	/* Debugging methods */
 	// TODO only here for compatibility with the Zip Tree
 	void dbg_verify() const;
-	size_t dbg_count_violations(std::vector<size_t> * depths = nullptr) const;
+	size_t dbg_count_violations(std::vector<size_t> * depths = nullptr,
+	                            std::vector<size_t> * amounts = nullptr) const;
 	void dbg_assert_balance_at(Node * n) const;
-	
+
 protected:
-	template<bool fix_upward>
+	template <bool fix_upward>
 	void remove_onepass(Node & node);
 	void remove_to_leaf(Node & node);
 	void fixup_after_delete(Node * parent, bool deleted_left);
 
-	
-	template<bool call_fixup>
+	template <bool call_fixup>
 	bool remove_swap_and_remove_left(Node * node, Node * replacement);
-	template<bool call_fixup>
+	template <bool call_fixup>
 	bool remove_swap_and_remove_right(Node * node, Node * replacement);
-	template<bool call_fixup>
+	template <bool call_fixup>
 	void remove_leaf(Node * node);
-	
+
 	template <bool on_equality_prefer_left>
 	void insert_leaf_base_twopass(Node & node, Node * start);
 	void fixup_after_insert_twopass(Node * node);
