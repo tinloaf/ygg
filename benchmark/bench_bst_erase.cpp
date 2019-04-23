@@ -86,6 +86,33 @@ BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPBSTFixture, BM_BST_Erasure)
 }
 REGISTER(EraseYggWBDefGDefDSPBSTFixture, BM_BST_Erasure)
 
+// Lai and Wood Gamma, Delta / single pass
+using EraseYggWBLWSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassLWTreeOptions, WBBSTNamerLWSP>,
+               EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggWBLWSPBSTFixture, BM_BST_Erasure)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.erase(n->get_value());
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(EraseYggWBLWSPBSTFixture, BM_BST_Erasure)
+
+
 // Default gamma, delta / single pass, optimistic
 using EraseYggWBDefGDefDSPOPTBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSPOPT>,

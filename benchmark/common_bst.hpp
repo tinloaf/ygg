@@ -592,6 +592,14 @@ using WBTSinglepass32TreeOptions =
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<2>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
 
+using WBTSinglepassLWTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
+                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<4>,
+                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<3>>;
+
+
 struct WBBSTNamerDefGDefDTP
 {
 	constexpr static const char * name = "1+sqrt(2),sqrt(2),TP";
@@ -599,6 +607,10 @@ struct WBBSTNamerDefGDefDTP
 struct WBBSTNamerDefGDefDSP
 {
 	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP";
+};
+struct WBBSTNamerLWSP
+{
+	constexpr static const char * name = "3,4/3,SP";
 };
 struct WBBSTNamer3G2DSP
 {
