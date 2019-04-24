@@ -199,6 +199,27 @@ main(int argc, char ** argv)
 	}
 	ba32.print();
 
+
+	using DefaultBalOptions =
+	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_DELTA_NUMERATOR<2>,
+	                TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+	                TreeFlags::WBT_GAMMA_NUMERATOR<5>,
+	                TreeFlags::WBT_GAMMA_DENOMINATOR<3>>;
+	using SPBalOptions = TreeOptions<
+	    TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS,
+	    TreeFlags::WBT_DELTA_NUMERATOR<2>, TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+	    TreeFlags::WBT_GAMMA_NUMERATOR<5>, TreeFlags::WBT_GAMMA_DENOMINATOR<3>>;
+
+	BalanceAnalyzer<DefaultBalOptions, SPBalOptions> baBal(
+	    "WBTree[2|5/3]", node_count, reinsertion_count, series_os, distr_os,
+	    amounts_os);
+	for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		std::cout << "Seed: " << seed << "\n";
+		baBal.run(seed);
+	}
+	baBal.print();
+
+	
 	/*
 
 	// Standard WBTree

@@ -110,7 +110,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						parent = cur;
 					}
 
-					// TODO FIXME >= ?
 					if ((typename Options::WBTGammaT)(rl_size) >
 					    Options::wbt_gamma() * (typename Options::WBTGammaT)(rr_size)) {
 						// the right-left subtree is heavy enough to just take it
@@ -122,21 +121,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						// than an empty n_rr subtree) we handle this specially.
 						// We insert the node first, then do the double rotation, and are
 						// done.
-						// TODO FIXME with the new notion of weight, this should not happen
-						// anymore!
-						if (n_rl == nullptr) {
-							node.NB::set_parent(n_r);
-							n_r->NB::set_left(&node);
-							n_r->NB::_wbt_size += 1;
-							cur->NB::_wbt_size += 1;
-
-							NodeTraits::leaf_inserted(node, *this);
-
-							this->rotate_right(n_r);
-							this->rotate_left(cur);
-
-							return;
-						}
 
 						this->rotate_right(n_r);
 						this->rotate_left(cur);
@@ -238,8 +222,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 				size_t r_size = cur->NB::_wbt_size - l_size +
 				                1; // l_size has been increased, cur size not
 
-				if ((r_size)*Options::wbt_delta() <
-				    (l_size)) { // TODO incorporate the plus/minus above
+				if ((r_size)*Options::wbt_delta() < (l_size)) {
 					// Left-overhang - we must rotate
 					// std::cout << "<< Left-Overhang\n";
 
@@ -270,7 +253,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						parent = cur;
 					}
 
-					// TODO FIXME >=? >?
 					if ((lr_size) > Options::wbt_gamma() * (ll_size)) {
 						/*
 						std::cout << "L: " << l_size << " LR: " << lr_size
@@ -292,27 +274,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						// the left-right subtree is heavy enough to just take it
 						// double rotation!
 						// std::cout << "<<< Double Rotation!\n";
-
-						// Special case: n_lr does not exist yet, but is the node to be
-						// inserted (that is the only way it can be still empty and
-						// heavier than an empty n_ll subtree) we handle this specially.
-						// We insert the node first, then do the double rotation, and are
-						// done.
-						// TODO FIXME does this still happen?
-						if (n_lr == nullptr) {
-							// std::cout << "<<<< Super-special case!\n";
-							node.NB::set_parent(n_l);
-							n_l->NB::set_right(&node);
-							n_l->NB::_wbt_size += 1;
-							cur->NB::_wbt_size += 1;
-
-							NodeTraits::leaf_inserted(node, *this);
-
-							this->rotate_left(n_l);
-							this->rotate_right(cur);
-
-							return;
-						}
 
 						this->rotate_left(n_l);
 						this->rotate_right(cur);
@@ -561,7 +522,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 	NodeTraits::rotated_right(*parent, *this);
 }
 
-// TODO do the fixup already when running down!
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
@@ -587,7 +547,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			// assert(left_size * Options::wbt_delta() >=
 			//      (right_size - 1)); // Precondition
 
-			// TODO this is wrong
 			if ((typename Options::WBTDeltaT)((left_size)*Options::wbt_delta()) <
 			    (typename Options::WBTDeltaT)(right_size)) {
 				// Out of balance with right-overhang
@@ -819,6 +778,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
 {
 	if (n1->NB::get_parent() == n2) { // TODO this should never happen, since n2
 		                                // is always the descendant
+		assert(false);
 		this->swap_neighbors(n2, n1);
 	} else if (n2->NB::get_parent() == n1) {
 		// std::cout << " ## Swapping neighbors 2.\n";
@@ -1269,8 +1229,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 	}
 }
 
-// TODO every sibling-less leaf currently leads to an overhang
-
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool call_fixup>
 void
@@ -1401,7 +1359,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 
 	// Size reduction is done during up-traversal!
 
-	// TODO follow both paths and see where less fixups are necessary?
 	// TODO make configurable whether right-leaning or left-leaning?
 	// or use size? (currently implemented)
 	if ((cur->NB::get_left() != nullptr) &&

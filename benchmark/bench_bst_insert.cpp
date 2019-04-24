@@ -112,6 +112,32 @@ BENCHMARK_DEFINE_F(InsertYggWBLWSPBSTFixture, BM_BST_Insertion)
 }
 REGISTER(InsertYggWBLWSPBSTFixture, BM_BST_Insertion)
 
+// Balance-focussed gamma, delta / single pass
+using InsertYggWBBalSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassBalTreeOptions, WBBSTNamerBalSP>,
+               InsertExperiment, true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertYggWBBalSPBSTFixture, BM_BST_Insertion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto & n : this->experiment_nodes) {
+			this->t.insert(n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto & n : this->experiment_nodes) {
+			this->t.remove(n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(InsertYggWBBalSPBSTFixture, BM_BST_Insertion)
+
 
 // integral gamma, delta / single pass
 using InsertYggWB3G2DSPBSTFixture =
