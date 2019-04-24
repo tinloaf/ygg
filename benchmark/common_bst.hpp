@@ -617,7 +617,7 @@ struct WBBSTNamerDefGDefDSP
 };
 struct WBBSTNamerBalSP
 {
-	constexpr static const char * name = "2,5/3,SP(opt)";
+	constexpr static const char * name = "2,3/2,SP(opt)";
 };
 struct WBBSTNamerLWSP
 {
