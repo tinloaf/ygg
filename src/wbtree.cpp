@@ -121,6 +121,19 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						// than an empty n_rr subtree) we handle this specially.
 						// We insert the node first, then do the double rotation, and are
 						// done.
+						if (n_rl == nullptr) {
+							node.NB::set_parent(n_r);
+							n_r->NB::set_left(&node);
+							n_r->NB::_wbt_size += 1;
+							cur->NB::_wbt_size += 1;
+
+							NodeTraits::leaf_inserted(node, *this);
+
+							this->rotate_right(n_r);
+							this->rotate_left(cur);
+
+							return;
+						}
 
 						this->rotate_right(n_r);
 						this->rotate_left(cur);
@@ -274,6 +287,26 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						// the left-right subtree is heavy enough to just take it
 						// double rotation!
 						// std::cout << "<<< Double Rotation!\n";
+
+						// Special case: n_lr does not exist yet, but is the node to be
+						// inserted (that is the only way it can be still empty and
+						// heavier than an empty n_ll subtree) we handle this specially.
+						// We insert the node first, then do the double rotation, and are
+						// done.
+						if (n_lr == nullptr) {
+							// std::cout << "<<<< Super-special case!\n";
+							node.NB::set_parent(n_l);
+							n_l->NB::set_right(&node);
+							n_l->NB::_wbt_size += 1;
+							cur->NB::_wbt_size += 1;
+
+							NodeTraits::leaf_inserted(node, *this);
+
+							this->rotate_left(n_l);
+							this->rotate_right(cur);
+
+							return;
+						}
 
 						this->rotate_left(n_l);
 						this->rotate_right(cur);
