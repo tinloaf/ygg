@@ -30,18 +30,21 @@ public:
 	}
 
 	static void
-	reset() {
+	reset()
+	{
 		CountingNodeTraits::count = 0;
 		CountingNodeTraits::size = 0;
 	}
 
 	static size_t
-	get_count() {
+	get_count()
+	{
 		return CountingNodeTraits::count;
 	}
 
 	static size_t
-	get_size() {
+	get_size()
+	{
 		return CountingNodeTraits::size;
 	}
 
@@ -51,9 +54,10 @@ public:
 
 class RBCountingNodeTraits : public RBDefaultNodeTraits {
 public:
-
 	template <class Node>
-	static size_t compute_size(Node & n) {
+	static size_t
+	compute_size(Node & n)
+	{
 		size_t res = 0;
 		if (n.get_left() == nullptr) {
 			res += 1;
@@ -69,7 +73,7 @@ public:
 
 		return res;
 	}
-	
+
 	template <class Node, class Tree>
 	static void
 	rotated_left(Node & node, Tree & t)
@@ -93,25 +97,27 @@ public:
 	}
 
 	static void
-	reset() {
+	reset()
+	{
 		CountingNodeTraits::count = 0;
 		CountingNodeTraits::size = 0;
 	}
 
 	static size_t
-	get_count() {
+	get_count()
+	{
 		return CountingNodeTraits::count;
 	}
 
 	static size_t
-	get_size() {
+	get_size()
+	{
 		return CountingNodeTraits::size;
 	}
 
 	static size_t count;
 	static size_t size;
 };
-
 
 size_t CountingNodeTraits::count = 0;
 size_t CountingNodeTraits::size = 0;
@@ -173,8 +179,10 @@ public:
 			this->t.insert(this->nodes[index]);
 		}
 
-		this->outfile << this->name << "," << seed << "," << this->node_count << "," << this->operation_count << "," << CountingNodeTraits::get_count() << "," << CountingNodeTraits::get_size() << "\n";
-
+		this->outfile << this->name << "," << seed << "," << this->node_count << ","
+		              << this->operation_count << ","
+		              << CountingNodeTraits::get_count() << ","
+		              << CountingNodeTraits::get_size() << "\n";
 	}
 
 private:
@@ -203,7 +211,7 @@ private:
 
 public:
 	RBRotationCounter(std::string name_in, size_t node_count_in,
-										size_t operation_count_in, std::ofstream & outfile_in)
+	                  size_t operation_count_in, std::ofstream & outfile_in)
 
 	    : name(name_in), node_count(node_count_in),
 	      operation_count(operation_count_in), outfile(outfile_in)
@@ -237,7 +245,10 @@ public:
 			this->t.insert(this->nodes[index]);
 		}
 
-		this->outfile << this->name << "," << seed << "," << this->node_count << "," << this->operation_count << "," << RBCountingNodeTraits::get_count() << "," << RBCountingNodeTraits::get_size() << "\n";
+		this->outfile << this->name << "," << seed << "," << this->node_count << ","
+		              << this->operation_count << ","
+		              << RBCountingNodeTraits::get_count() << ","
+		              << RBCountingNodeTraits::get_size() << "\n";
 	}
 
 private:
@@ -277,54 +288,52 @@ main(int argc, char ** argv)
 	    TreeFlags::WBT_DELTA_NUMERATOR<2>, TreeFlags::WBT_DELTA_DENOMINATOR<1>,
 	    TreeFlags::WBT_GAMMA_NUMERATOR<3>, TreeFlags::WBT_GAMMA_DENOMINATOR<2>>;
 	using SPLWOptions =
-    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
-                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
-                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
-                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<4>,
-                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<3>>;
+	    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
+	                     ygg::TreeFlags::WBT_SINGLE_PASS,
+	                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+	                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+	                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<4>,
+	                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<3>>;
 
-	
-	for (size_t i = 0 ; i < operation_count_steps ; ++i) {
+	for (size_t i = 0; i < operation_count_steps; ++i) {
 		size_t opcount = operation_count_base + (i * operation_count_increment);
 
-		RBRotationCounter rcRB("RBTree", node_count,
-													 opcount, outfile);
+		RBRotationCounter rcRB("RBTree", node_count, opcount, outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
 			rcRB.run((int)seed);
 		}
 
-		
-		RotationCounter<DefOptions> rcTP("WBTree[Default|TP]", node_count,
-																				 opcount, outfile);
+		RotationCounter<DefOptions> rcTP("WBTree[Default|TP]", node_count, opcount,
+		                                 outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
 			rcTP.run((int)seed);
 		}
 
-		RotationCounter<SPOptions> rcSP("WBTree[Default|SP]", node_count,
-																				 opcount, outfile);
+		RotationCounter<SPOptions> rcSP("WBTree[Default|SP]", node_count, opcount,
+		                                outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
 			rcSP.run((int)seed);
 		}
 
-		RotationCounter<SP32Options> rc32("WBTree[3|2|SP]", node_count,
-																		opcount, outfile);
+		RotationCounter<SP32Options> rc32("WBTree[3|2|SP]", node_count, opcount,
+		                                  outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
 			rc32.run((int)seed);
 		}
 
-		RotationCounter<SPBalOptions> rcBal("WBTree[2|3/2|SP]", node_count,
-																			 opcount, outfile);
+		RotationCounter<SPBalOptions> rcBal("WBTree[2|3/2|SP]", node_count, opcount,
+		                                    outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
 			rcBal.run((int)seed);
 		}
 
-		RotationCounter<SPLWOptions> rcLW("WBTree[3|4/3|SP]", node_count,
-																			opcount, outfile);
+		RotationCounter<SPLWOptions> rcLW("WBTree[3|4/3|SP]", node_count, opcount,
+		                                  outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
 			rcLW.run((int)seed);

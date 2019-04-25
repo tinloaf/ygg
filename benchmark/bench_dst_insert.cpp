@@ -27,7 +27,7 @@ BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)(benchmark::State & stat
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(InsertRBDSTFixture, BM_DST_Insertion);
+REGISTER(InsertRBDSTFixture, BM_DST_Insertion)
 
 /*
  * Zip DST
@@ -53,7 +53,7 @@ BENCHMARK_DEFINE_F(InsertZDSTFixture, BM_DST_Insertion)(benchmark::State & state
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(InsertZDSTFixture, BM_DST_Insertion);
+REGISTER(InsertZDSTFixture, BM_DST_Insertion)
 
 #ifndef NOMAIN
 #include "main.hpp"

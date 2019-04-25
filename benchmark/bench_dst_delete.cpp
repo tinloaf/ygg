@@ -27,7 +27,7 @@ BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)(benchmark::State & state
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteRBDSTFixture, BM_DST_Deletion);
+REGISTER(DeleteRBDSTFixture, BM_DST_Deletion)
 
 
 
@@ -55,7 +55,7 @@ BENCHMARK_DEFINE_F(DeleteZDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteZDSTFixture, BM_DST_Deletion);
+REGISTER(DeleteZDSTFixture, BM_DST_Deletion)
 
 #ifndef NOMAIN
 #include "main.hpp"

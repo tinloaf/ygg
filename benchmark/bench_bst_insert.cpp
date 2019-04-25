@@ -247,7 +247,7 @@ BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)
 	}
 	this->papi.report_and_reset(state);
 }
-REGISTER(InsertYggZBSTFixture, BM_BST_Insertion);
+REGISTER(InsertYggZBSTFixture, BM_BST_Insertion)
 
 /*
  * Boost::Intrusive::Set
@@ -273,7 +273,7 @@ BENCHMARK_DEFINE_F(InsertBISetBSTFixture, BM_BST_Insertion)
 	}
 	this->papi.report_and_reset(state);
 }
-REGISTER(InsertBISetBSTFixture, BM_BST_Insertion);
+REGISTER(InsertBISetBSTFixture, BM_BST_Insertion)
 
 /*
  * std::set
@@ -311,7 +311,7 @@ BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(InsertStdSetBSTFixture, BM_BST_Insertion);
+REGISTER(InsertStdSetBSTFixture, BM_BST_Insertion)
 
 #ifndef NOMAIN
 #include "main.hpp"

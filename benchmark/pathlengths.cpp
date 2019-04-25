@@ -171,7 +171,6 @@ using WBTSinglepassMostBalTreeOptions =
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<1>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
 
-
 class RBTreeNode : public ygg::RBTreeNodeBase<RBTreeNode, BasicTreeOptions> {
 public:
 	size_t val;
@@ -279,12 +278,14 @@ all_types()
 	    std::make_tuple(std::string("WBTree[SP|LW]"),
 	                    type_container<WBTree<WBTSinglepassLWTreeOptions>>{},
 	                    type_container<WBTreeNode<WBTSinglepassLWTreeOptions>>{}),
-	    std::make_tuple(std::string("WBTree[SP|Bal]"),
-	                    type_container<WBTree<WBTSinglepassBalTreeOptions>>{},
-	                    type_container<WBTreeNode<WBTSinglepassBalTreeOptions>>{}),
-	    std::make_tuple(std::string("WBTree[SP|MostBal]"),
-	                    type_container<WBTree<WBTSinglepassMostBalTreeOptions>>{},
-	                    type_container<WBTreeNode<WBTSinglepassMostBalTreeOptions>>{})
+	    std::make_tuple(
+	        std::string("WBTree[SP|Bal]"),
+	        type_container<WBTree<WBTSinglepassBalTreeOptions>>{},
+	        type_container<WBTreeNode<WBTSinglepassBalTreeOptions>>{}),
+	    std::make_tuple(
+	        std::string("WBTree[SP|MostBal]"),
+	        type_container<WBTree<WBTSinglepassMostBalTreeOptions>>{},
+	        type_container<WBTreeNode<WBTSinglepassMostBalTreeOptions>>{})
 
 	);
 }

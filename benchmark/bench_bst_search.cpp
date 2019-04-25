@@ -24,7 +24,7 @@ BENCHMARK_DEFINE_F(SearchYggRBBSTFixture, BM_BST_Search)(benchmark::State & stat
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(SearchYggRBBSTFixture, BM_BST_Search);
+REGISTER(SearchYggRBBSTFixture, BM_BST_Search)
 
 /*
  * Ygg's Zip Tree
@@ -43,7 +43,7 @@ BENCHMARK_DEFINE_F(SearchYggZBSTFixture, BM_BST_Search)(benchmark::State & state
 	}
 	this->papi.report_and_reset(state);
 }
-REGISTER(SearchYggZBSTFixture, BM_BST_Search);
+REGISTER(SearchYggZBSTFixture, BM_BST_Search)
 
 /*
  * Boost::Intrusive::Set
@@ -62,7 +62,7 @@ BENCHMARK_DEFINE_F(SearchBISetBSTFixture, BM_BST_Search)(benchmark::State & stat
 	}
 	this->papi.report_and_reset(state);
 }
-REGISTER(SearchBISetBSTFixture, BM_BST_Search);
+REGISTER(SearchBISetBSTFixture, BM_BST_Search)
 
 /*
  * std::set
@@ -81,7 +81,7 @@ BENCHMARK_DEFINE_F(SearchStdSetBSTFixture, BM_BST_Search)(benchmark::State & sta
 	}
 	this->papi.report_and_reset(state);
 }
-REGISTER(SearchStdSetBSTFixture, BM_BST_Search);
+REGISTER(SearchStdSetBSTFixture, BM_BST_Search)
 
 #ifndef NOMAIN
 #include "main.hpp"

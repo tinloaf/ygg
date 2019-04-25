@@ -199,7 +199,6 @@ main(int argc, char ** argv)
 	}
 	ba32.print();
 
-
 	using DefaultBalOptions =
 	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_DELTA_NUMERATOR<2>,
 	                TreeFlags::WBT_DELTA_DENOMINATOR<1>,
@@ -219,7 +218,6 @@ main(int argc, char ** argv)
 	}
 	baBal.print();
 
-	
 	/*
 
 	// Standard WBTree

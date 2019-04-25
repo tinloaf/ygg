@@ -116,7 +116,7 @@ public:
 	{
 #ifdef USEPAPI
 		for (size_t i = 0; i < PAPI_MEASUREMENTS.size(); ++i) {
-			state.counters[PAPI_MEASUREMENTS[i]] = this->event_count_accu[i];
+			state.counters[PAPI_MEASUREMENTS[i]] = (double)this->event_count_accu[i];
 		}
 		std::fill(this->event_count_accu.begin(), this->event_count_accu.end(), 0);
 #else
