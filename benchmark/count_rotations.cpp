@@ -54,20 +54,20 @@ public:
 
 	template <class Node>
 	static size_t compute_size(Node & n) {
-		size_t size = 0;
+		size_t res = 0;
 		if (n.get_left() == nullptr) {
-			size += 1;
+			res += 1;
 		} else {
-			size += compute_size(*n.get_left());
+			res += compute_size(*n.get_left());
 		}
 
 		if (n.get_right() == nullptr) {
-			size += 1;
+			res += 1;
 		} else {
-			size += compute_size(*n.get_right());
+			res += compute_size(*n.get_right());
 		}
 
-		return size;
+		return res;
 	}
 	
 	template <class Node, class Tree>
@@ -163,7 +163,7 @@ public:
 
 		CountingNodeTraits::reset();
 		for (size_t i = 0; i < this->operation_count; ++i) {
-			size_t index = std::abs(distr(rnd)) % this->node_count;
+			size_t index = (size_t)(std::abs(distr(rnd))) % this->node_count;
 
 			// TODO optimistic - also needs distinct values!
 			// this->init_t.remove(*(Node<InitialFlags> *)(&this->nodes[index]));
@@ -227,7 +227,7 @@ public:
 
 		RBCountingNodeTraits::reset();
 		for (size_t i = 0; i < this->operation_count; ++i) {
-			size_t index = std::abs(distr(rnd)) % this->node_count;
+			size_t index = (size_t)(std::abs(distr(rnd))) % this->node_count;
 
 			// TODO optimistic - also needs distinct values!
 			// this->init_t.remove(*(Node<InitialFlags> *)(&this->nodes[index]));
@@ -252,11 +252,12 @@ private:
 int
 main(int argc, char ** argv)
 {
-	size_t node_count = atoi(argv[1]);
-	size_t operation_count_base = atoi(argv[2]);
-	size_t operation_count_increment = atoi(argv[3]);
-	size_t operation_count_steps = atoi(argv[4]);
-	size_t seed_count = atoi(argv[5]);
+	(void)argc;
+	size_t node_count = (size_t)atoi(argv[1]);
+	size_t operation_count_base = (size_t)atoi(argv[2]);
+	size_t operation_count_increment = (size_t)atoi(argv[3]);
+	size_t operation_count_steps = (size_t)atoi(argv[4]);
+	size_t seed_count = (size_t)atoi(argv[5]);
 
 	// CSV file to write gradual counts to
 	std::string out_dir(argv[6]);
@@ -264,7 +265,7 @@ main(int argc, char ** argv)
 	std::ofstream outfile(out_fname, std::ios::trunc);
 	outfile << "name,seed,nodecount,opcount,rotations,size\n";
 
-	using DefaultOptions = TreeOptions<TreeFlags::MULTIPLE>;
+	using DefOptions = TreeOptions<TreeFlags::MULTIPLE>;
 	using SPOptions =
 	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS>;
 	using SP32Options = TreeOptions<
@@ -288,45 +289,45 @@ main(int argc, char ** argv)
 
 		RBRotationCounter rcRB("RBTree", node_count,
 													 opcount, outfile);
-		for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcRB.run(seed);
+			rcRB.run((int)seed);
 		}
 
 		
-		RotationCounter<DefaultOptions> rcTP("WBTree[Default|TP]", node_count,
+		RotationCounter<DefOptions> rcTP("WBTree[Default|TP]", node_count,
 																				 opcount, outfile);
-		for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcTP.run(seed);
+			rcTP.run((int)seed);
 		}
 
 		RotationCounter<SPOptions> rcSP("WBTree[Default|SP]", node_count,
 																				 opcount, outfile);
-		for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcSP.run(seed);
+			rcSP.run((int)seed);
 		}
 
 		RotationCounter<SP32Options> rc32("WBTree[3|2|SP]", node_count,
 																		opcount, outfile);
-		for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rc32.run(seed);
+			rc32.run((int)seed);
 		}
 
 		RotationCounter<SPBalOptions> rcBal("WBTree[2|3/2|SP]", node_count,
 																			 opcount, outfile);
-		for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcBal.run(seed);
+			rcBal.run((int)seed);
 		}
 
 		RotationCounter<SPLWOptions> rcLW("WBTree[3|4/3|SP]", node_count,
 																			opcount, outfile);
-		for (int seed = 42; seed < 42 + seed_count; ++seed) {
+		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcLW.run(seed);
+			rcLW.run((int)seed);
 		}
 	}
 

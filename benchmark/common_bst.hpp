@@ -49,7 +49,7 @@ public:
 
 		size_t fixed_count = (size_t)state.range(0);
 		size_t experiment_count = (size_t)state.range(1);
-		int seed = (size_t)state.range(2);
+		int seed = (int)state.range(2);
 		this->rng = std::mt19937(seed);
 		
 		std::uniform_int_distribution<> distr(std::numeric_limits<int>::min(),

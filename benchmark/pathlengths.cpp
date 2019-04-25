@@ -293,7 +293,14 @@ template <std::size_t I = 0, typename... Tpl>
 typename std::enable_if<I == sizeof...(Tpl), void>::type
 do_analysis(std::tuple<Tpl...> tpl, size_t count, size_t move_count,
             size_t seed_count, size_t seed_start, std::ofstream & os)
-{}
+{
+	(void)tpl;
+	(void)count;
+	(void)move_count;
+	(void)seed_count;
+	(void)seed_start;
+	(void)os;
+}
 
 template <std::size_t I = 0, typename... Tpl>
     typename std::enable_if <

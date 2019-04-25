@@ -143,14 +143,6 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::delete_leaf(
 {
 	(void)t;
 
-	// This method is only correct if the node has neither a left nor a
-	// right child (i.e., is a true leaf). Otherwise, see the splice_* methods
-	assert(node.get_left() == nullptr);
-	assert(node.get_right() == nullptr);
-	
-	// If this node is deleted, it may not carry any segment border any more
-	assert(node.agg_left == node.agg_right);
-
 	// TODO is this really necessary everywhere we call delete_leaf?
 	InnerNode * parent = node.get_parent();
 	if (parent != nullptr) {

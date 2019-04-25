@@ -30,7 +30,7 @@ ConfigHolder CFG;
 void
 BuildRange(::benchmark::internal::Benchmark * b)
 {
-	for (int64_t seed = CFG.seed_start; seed < CFG.seed_start + CFG.seed_count;
+	for (int64_t seed = CFG.seed_start; seed < CFG.seed_start + (int64_t)CFG.seed_count;
 	     ++seed) {
 		for (size_t doubling = 0; doubling < CFG.doublings; ++doubling) {
 			b->Args({CFG.base_size << doubling, CFG.experiment_size, seed});
@@ -67,7 +67,7 @@ main(int argc, char ** argv)
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--doublings", strlen("--doublings")) == 0) {
-			CFG.doublings = (int64_t)atoi(argv[i + 1]);
+			CFG.doublings = (size_t)atoi(argv[i + 1]);
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--base_size", strlen("--base_size")) == 0) {
@@ -101,7 +101,6 @@ main(int argc, char ** argv)
 	 * Register all tests
 	 */
 	auto plugins = DRAUP_GET_REGISTERED();
-	using RangeVector = std::vector<std::pair<int64_t, int64_t>>;
 
 	boost::hana::for_each(plugins, [&](auto plugin_cls) {
 		using plugin = typename decltype(plugin_cls)::type;

@@ -979,7 +979,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 				// std::cout << " ### Left-overhang \n";
 				// Out of balance with left-overhang
 				Node * n_l = cur->NB::get_left();
-				Node * n_ll = n_l->NB::get_left();
 				Node * n_lr = n_l->NB::get_right();
 
 				size_t s_lr = 1;
@@ -1015,7 +1014,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 				// Out of balance with right-overhang
 				// std::cout << " ### Right overhang\n";
 				Node * n_r = cur->NB::get_right();
-				Node * n_rl = n_r->NB::get_left();
 				Node * n_rr = n_r->NB::get_right();
 
 				size_t s_rr = 1;
@@ -1136,7 +1134,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 				// Out of balance with left overhang
 
 				n_l = cur->NB::get_left();
-				Node * n_ll = n_l->NB::get_left();
 				Node * n_lr = n_l->NB::get_right();
 
 				size_t s_lr = 1;
@@ -1178,7 +1175,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			// Out of balance with left overhang
 			Node * n_l = cur->NB::get_left(); // n_l can not be nullptr, since the
 			                                  // left subtree is heavy
-			Node * n_lr = n_l->NB::get_right();
 			Node * n_ll = n_l->NB::get_left();
 
 			size_t s_ll = 1;
@@ -1220,7 +1216,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 				// Out of balance with right overhang
 				// std::cout << " ---- Right overhang\n";
 				n_r = cur->NB::get_right();
-				Node * n_rl = n_r->NB::get_left();
 				Node * n_rr = n_r->NB::get_right();
 
 				size_t s_rr = 1;

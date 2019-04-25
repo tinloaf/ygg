@@ -439,6 +439,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(
     RBTree<Node, NodeTraits, Options, Tag, Compare>::iterator<false> hint)
 {
 	this->insert(node);
+	(void)hint;
 	/* TODO see above.*/
 	/*
 	if (hint == this->end()) {
