@@ -183,8 +183,7 @@ operator<(const RBTreeNode & lhs, const RBTreeNode & rhs)
 }
 
 template <class Options>
-class WBTreeNode
-    : public ygg::weight::WBTreeNodeBase<WBTreeNode<Options>, Options> {
+class WBTreeNode : public ygg::WBTreeNodeBase<WBTreeNode<Options>, Options> {
 public:
 	size_t val;
 
@@ -242,8 +241,8 @@ using RBTree =
 
 /* WBTree */
 template <class Options>
-using WBTree = ygg::weight::WBTree<WBTreeNode<Options>,
-                                   ygg::weight::WBDefaultNodeTraits, Options>;
+using WBTree =
+    ygg::WBTree<WBTreeNode<Options>, ygg::WBDefaultNodeTraits, Options>;
 
 /* Energy-Balanced Tree */
 using EnergyTree = ygg::EnergyTree<EnergyNode, BasicTreeOptions>;

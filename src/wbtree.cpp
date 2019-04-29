@@ -6,7 +6,6 @@
 #include "wbtree.hpp"
 
 namespace ygg {
-namespace weight {
 
 template <class Node, class Tag, class Options>
 void
@@ -36,7 +35,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 	//	std::cout << "\n============= Inserting ============\n";
 
 	// assert(this->dbg_count_violations() == 0);
-
 	node.NB::set_right(nullptr);
 	node.NB::set_left(nullptr);
 	node.NB::_wbt_size = 2; // Both children are non-present
@@ -1634,7 +1632,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove(Node & node)
 	}
 }
 
-} // namespace weight
 } // namespace ygg
 
 #endif // YGG_RBTREE_CPP

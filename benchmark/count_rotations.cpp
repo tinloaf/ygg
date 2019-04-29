@@ -5,7 +5,7 @@
 
 using namespace ygg;
 
-class CountingNodeTraits : public weight::WBDefaultNodeTraits {
+class CountingNodeTraits : public WBDefaultNodeTraits {
 public:
 	template <class Node, class Tree>
 	static void
@@ -130,7 +130,7 @@ private:
 	constexpr static size_t COUNT_INTERVAL = 1000;
 
 	template <class NodeFlags>
-	class Node : public weight::WBTreeNodeBase<Node<NodeFlags>, NodeFlags> {
+	class Node : public WBTreeNodeBase<Node<NodeFlags>, NodeFlags> {
 	public:
 		int key;
 
@@ -141,7 +141,7 @@ private:
 		}
 	};
 
-	using Tree = weight::WBTree<Node<Flags>, CountingNodeTraits, Flags>;
+	using Tree = WBTree<Node<Flags>, CountingNodeTraits, Flags>;
 
 public:
 	RotationCounter(std::string name_in, size_t node_count_in,

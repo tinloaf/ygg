@@ -15,7 +15,7 @@ using MyTreeOptions = TreeOptions<TreeFlags::MULTIPLE>;
  * Provides a simple key -> value mapping, where the key is an integer and the
  * value is a string.
  */
-class Node : public weight::WBTreeNodeBase<Node, MyTreeOptions> {
+class Node : public WBTreeNodeBase<Node, MyTreeOptions> {
 public:
 	int key;
 	std::string value;
@@ -30,7 +30,7 @@ public:
 };
 
 // Configure the RBTree based on Node and the default NodeTraits
-using MyTree = weight::WBTree<Node, weight::WBDefaultNodeTraits, MyTreeOptions>;
+using MyTree = WBTree<Node, WBDefaultNodeTraits, MyTreeOptions>;
 
 // We need this s.t. we can query by key value (i.e, an int) directly
 bool

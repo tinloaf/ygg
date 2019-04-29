@@ -11,7 +11,7 @@ private:
 	constexpr static size_t COUNT_INTERVAL = 1000;
 
 	template <class NodeFlags>
-	class Node : public weight::WBTreeNodeBase<Node<NodeFlags>, NodeFlags> {
+	class Node : public WBTreeNodeBase<Node<NodeFlags>, NodeFlags> {
 	public:
 		int key;
 
@@ -22,9 +22,9 @@ private:
 		}
 	};
 
-	using InitialTree = weight::WBTree<Node<InitialFlags>,
-	                                   weight::WBDefaultNodeTraits, InitialFlags>;
-	using Tree = weight::WBTree<Node<Flags>, weight::WBDefaultNodeTraits, Flags>;
+	using InitialTree =
+	    WBTree<Node<InitialFlags>, WBDefaultNodeTraits, InitialFlags>;
+	using Tree = WBTree<Node<Flags>, WBDefaultNodeTraits, Flags>;
 
 public:
 	BalanceAnalyzer(std::string name_in, size_t node_count_in,

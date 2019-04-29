@@ -51,7 +51,7 @@ public:
 		size_t experiment_count = (size_t)state.range(1);
 		int seed = (int)state.range(2);
 		this->rng = std::mt19937(seed);
-		
+
 		std::uniform_int_distribution<> distr(std::numeric_limits<int>::min(),
 		                                      std::numeric_limits<int>::max());
 
@@ -238,7 +238,7 @@ public:
  */
 template <class MyTreeOptions>
 class WBNode
-    : public ygg::weight::WBTreeNodeBase<WBNode<MyTreeOptions>, MyTreeOptions> {
+    : public ygg::WBTreeNodeBase<WBNode<MyTreeOptions>, MyTreeOptions> {
 private:
 	int value;
 
@@ -281,8 +281,7 @@ template <class MyTreeOptions, class BenchmarkNamer>
 class YggWBTreeInterface {
 public:
 	using Node = WBNode<MyTreeOptions>;
-	using Tree = ygg::weight::WBTree<Node, ygg::weight::WBDefaultNodeTraits,
-	                                 MyTreeOptions>;
+	using Tree = ygg::WBTree<Node, ygg::WBDefaultNodeTraits, MyTreeOptions>;
 
 	static void
 	insert(Tree & t, Node & n)
@@ -605,7 +604,6 @@ using WBTSinglepassBalTreeOptions =
                      ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>>;
-
 
 struct WBBSTNamerDefGDefDTP
 {

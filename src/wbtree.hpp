@@ -17,9 +17,6 @@
 #include <vector>
 
 namespace ygg {
-// TODO unify: what to export into global namespace?
-namespace weight {
-
 /**
  * @brief Base class (template) to supply your node class with metainformation
  *
@@ -262,7 +259,6 @@ protected:
 	void verify_sizes() const;
 };
 
-} // namespace weight
 } // namespace ygg
 
 #include "wbtree.cpp"

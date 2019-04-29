@@ -1,13 +1,11 @@
 using namespace ygg;
-using namespace ygg::weight;
 
 constexpr int WBTREE_TESTSIZE = 5000;
 constexpr int WBTREE_SEED = 4; // chosen by fair xkcd
 
 constexpr size_t WBTREE_CHECK_INTERVAL = 10;
 
-class Node
-    : public weight::WBTreeNodeBase<Node, DEFAULT_FLAGS> { // No multi-nodes!
+class Node : public WBTreeNodeBase<Node, DEFAULT_FLAGS> { // No multi-nodes!
 public:
 	int data;
 
@@ -29,10 +27,14 @@ public:
 	}
 };
 
-bool operator<(const Node & lhs, int rhs) {
+bool
+operator<(const Node & lhs, int rhs)
+{
 	return lhs.data < rhs;
 }
-bool operator<(int lhs, const Node & rhs) {
+bool
+operator<(int lhs, const Node & rhs)
+{
 	return lhs < rhs.data;
 }
 
@@ -48,7 +50,7 @@ public:
 	}
 };
 
-class EqualityNode : public weight::WBTreeNodeBase<EqualityNode, MULTI_FLAGS> {
+class EqualityNode : public WBTreeNodeBase<EqualityNode, MULTI_FLAGS> {
 public:
 	int data;
 	int sub_data;
@@ -85,7 +87,7 @@ public:
 	}
 };
 
-class NodeTraits : public weight::WBDefaultNodeTraits {
+class NodeTraits : public WBDefaultNodeTraits {
 public:
 	static std::string
 	get_id(const Node * node)
@@ -99,7 +101,7 @@ public:
 	}
 };
 
-class EqualityNodeTraits : public weight::WBDefaultNodeTraits {
+class EqualityNodeTraits : public WBDefaultNodeTraits {
 public:
 	static std::string
 	get_id(const EqualityNode * node)
@@ -113,7 +115,7 @@ public:
 
 TEST(__WBT_BASENAME(WBTreeTest), TrivialInsertionTest)
 {
-	auto tree = weight::WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
 
 	Node n;
 	n.data = 0;
@@ -164,8 +166,8 @@ TEST(__WBT_BASENAME(WBTreeTest), RandomInsertionTest)
 
 		tree.insert(nodes[i]);
 
-		std::string fname = std::string("/tmp/trees/tree-") +
-		    std::to_string(i) + std::string(".dot");
+		std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i) +
+		                    std::string(".dot");
 		tree.dump_to_dot<NodeTraits>(fname);
 
 		tree.dbg_verify();
@@ -815,15 +817,15 @@ TEST(__WBT_BASENAME(WBTreeTest), ComprehensiveTest)
 	ASSERT_TRUE(tree.verify_integrity());
 
 	for (int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		 // std::cout << " ======================== Removing " <<
-	  // transient_nodes[i].data << "\n";
-				if (i % 3 == 0) {
+		// std::cout << " ======================== Removing " <<
+		// transient_nodes[i].data << "\n";
+		if (i % 3 == 0) {
 			tree.remove(transient_nodes[i]);
 		} else if (i % 3 == 1) {
 			tree.erase(transient_nodes[i].data);
-			} else {
+		} else {
 			tree.erase_optimistic(transient_nodes[i].data);
-					}
+		}
 
 		tp.reset_root(tree.get_root());
 		//		tp.print();

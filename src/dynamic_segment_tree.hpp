@@ -81,7 +81,7 @@ struct UseWBTree
 	struct InnerNodeBaseBuilder
 	{
 		template <class InnerNodeCRTP>
-		using Base = weight::WBTreeNodeBase<
+		using Base = WBTreeNodeBase<
 		    InnerNodeCRTP,
 		    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS>,
 		    Tag>; // TODO make options passable here
@@ -89,14 +89,14 @@ struct UseWBTree
 
 	template <class CRTP, class Node, class NodeTraits, class InnerNode,
 	          class Tag>
-	using BaseTree = weight::WBTree<
-	    InnerNode,
-	    dyn_segtree_internal::InnerWBNodeTraits<CRTP, InnerNode, Node,
-	                                            NodeTraits>,
-	    TreeOptions<TreeFlags::MULTIPLE,
-	                TreeFlags::WBT_SINGLE_PASS>, // TODO make options passable
-	                                             // here
-	    dyn_segtree_internal::InnerWBTTag<Tag>, Compare<InnerNode>>;
+	using BaseTree =
+	    WBTree<InnerNode,
+	           dyn_segtree_internal::InnerWBNodeTraits<CRTP, InnerNode, Node,
+	                                                   NodeTraits>,
+	           TreeOptions<TreeFlags::MULTIPLE,
+	                       TreeFlags::WBT_SINGLE_PASS>, // TODO make options
+	                                                    // passable here
+	           dyn_segtree_internal::InnerWBTTag<Tag>, Compare<InnerNode>>;
 
 	template <class TagType>
 	using Tag = InnerWBTTag<TagType>;
