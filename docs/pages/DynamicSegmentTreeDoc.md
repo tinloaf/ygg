@@ -17,7 +17,8 @@ reasonable (and in fact, pre-defined) combiner. Adding this combiner to your dyn
  allows you to efficiently (see TODO) query for the maximum aggregated value over any arbitrary 
  interval in your key space. Possible combiners need to satisfy a couple of constraints, see TODO.
 
-The DynamicSegmentTree needs an underlying balanced binary search tree, for which you can either use the supplied red-black tree or the supplied Zip Tree. The selection is done via the TreeSelector template parameter.
+The DynamicSegmentTree needs an underlying balanced binary search tree, for which you can either use the supplied red-black tree, 
+the weight balanced tree or the Zip Tree. The selection is done via the TreeSelector template parameter.
 
 An in-depth technical description of how the dynamic segment tree works can be found at TODO.
 

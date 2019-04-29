@@ -20,7 +20,7 @@ namespace ygg {
 /**
  * @brief Base class (template) to supply your node class with metainformation
  *
- * The class you use as nodes for the Red-Black Tree *must* derive from this
+ * The class you use as nodes for the Weight Balanced Tree *must* derive from this
  * class (template). It supplies your class with the necessary members to
  * contain the linking between the tree nodes.
  *
@@ -41,13 +41,11 @@ public:
 };
 
 /**
- * @brief   Helper base class for the NodeTraits you need to implement
+ * @brief   Helper base class for the NodeTraits you need to implement for the weight balanced tree
  *
  * This class serves as an (optional) base class for the NodeTraits you need to
  * implement. See DOCTODO for details on NodeTraits. This class just implements
  * the various hooks as empty functions.
- *
- * TODO this is the same as the red-black traits - factor it out.
  */
 class WBDefaultNodeTraits {
 public:
@@ -120,19 +118,19 @@ public:
 
 /**
  * TODO change this
- * @brief The Red-Black Tree
+ * @brief The Weight Balanced Tree
  *
- * This is the main Red-Black Tree class.
+ * This is the main Weight Balanced Tree class.
  *
  * @tparam Node         The node class for this tree. It must be derived from
- * RBTreeNodeBase.
+ * WBTreeNodeBase.
  * @tparam NodeTraits   A class implementing various hooks and functions on your
  * node class. See DOCTODO for details.
  * @tparam Options			The TreeOptions class specifying the
- * parameters of this RBTree. See the TreeOptions and TreeFlags classes for
+ * parameters of this WBTree. See the TreeOptions and TreeFlags classes for
  * details.
- * @tparam Tag					An class tag that identifies
- * this tree. Can be used to insert the same nodes into multiple trees. See
+ * @tparam Tag					An class tag that identifies this tree. Can be used
+ * to insert the same nodes into multiple trees. See
  * DOCTODO for details. Can be any class, the class can be empty.
  * @tparam Compare      A compare class. The Red-Black Tree follows STL
  * semantics for 'Compare'. Defaults to ygg::utilities::flexible_less. Implement
@@ -150,17 +148,17 @@ public:
 	              "Node class not properly derived from WBTreeNodeBase");
 
 	/**
-	 * @brief Create a new empty red-black tree.
+	 * @brief Create a new empty weight balanced tree.
 	 */
 	WBTree();
 
 	/**
-	 * @brief Create a new red-black tree from a different red-black tree.
+	 * @brief Create a new weight balanced tree from a different weight balanced tree.
 	 *
-	 * The other red-black tree is moved into this one, i.e., using it
+	 * The other weight balanced tree is moved into this one, i.e., using it
 	 * afterwards is undefined behavior.
 	 *
-	 * @param other  The red-black tree that this one is constructed from
+	 * @param other  The weight balanced tree that this one is constructed from
 	 */
 	WBTree(MyClass && other);
 

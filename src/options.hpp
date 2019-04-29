@@ -141,24 +141,70 @@ public:
 		constexpr static size_t value = modul_in;
 	};
 
+	/**
+	 * @brief Weight Balanced Tree Option: Sets the numerator of the Delta balance
+	 * parameter
+	 *
+	 * This sets the numerator of the Delta balance parameter. See
+	 * https://www.cambridge.org/core/journals/journal-of-functional-programming/article/balancing-weightbalanced-trees/7281C4DE7E56B74F2D13F06E31DCBC5B
+	 * for information on Delta.
+	 *
+	 * @tparam delta_numerator The numerator of Delta
+	 */
 	template <size_t delta_numerator>
 	class WBT_DELTA_NUMERATOR {
 	public:
 		constexpr static size_t value = delta_numerator;
 	};
 
+	/**
+	 * @brief Weight Balanced Tree Option: Sets the numerator of the Gamma balance
+	 * parameter
+	 *
+	 * This sets the numerator of the Gamma balance parameter. See
+	 * https://www.cambridge.org/core/journals/journal-of-functional-programming/article/balancing-weightbalanced-trees/7281C4DE7E56B74F2D13F06E31DCBC5B
+	 * for information on Gamma.
+	 *
+	 * @tparam delta_numerator The numerator of Gamma
+	 */
 	template <size_t gamma_numerator>
 	class WBT_GAMMA_NUMERATOR {
 	public:
 		constexpr static size_t value = (double)gamma_numerator;
 	};
 
+	/**
+	 * @brief Weight Balanced Tree Option: Sets the denominator of the Delta
+	 * balance parameter
+	 *
+	 * This sets the denominator of the Delta balance parameter. See
+	 * https://www.cambridge.org/core/journals/journal-of-functional-programming/article/balancing-weightbalanced-trees/7281C4DE7E56B74F2D13F06E31DCBC5B
+	 * for information on Delta.
+	 *
+	 * Note that setting this to 1 (i.e., chosing an integral Delta) improves
+	 * performance.
+	 *
+	 * @tparam delta_numerator The denominator of Delta
+	 */
 	template <size_t delta_denominator>
 	class WBT_DELTA_DENOMINATOR {
 	public:
 		constexpr static size_t value = delta_denominator;
 	};
 
+	/**
+	 * @brief Weight Balanced Tree Option: Sets the denominator of the Gamma
+	 * balance parameter
+	 *
+	 * This sets the denominator of the Gamma balance parameter. See
+	 * https://www.cambridge.org/core/journals/journal-of-functional-programming/article/balancing-weightbalanced-trees/7281C4DE7E56B74F2D13F06E31DCBC5B
+	 * for information on Gamma.
+	 *
+	 * Note that setting this to 1 (i.e., chosing an integral Gamma) improves
+	 * performance.
+	 *
+	 * @tparam delta_numerator The denominator of Gamma
+	 */
 	template <size_t gamma_denominator>
 	class WBT_GAMMA_DENOMINATOR {
 	public:

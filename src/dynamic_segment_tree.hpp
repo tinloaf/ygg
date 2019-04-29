@@ -577,11 +577,11 @@ class UseZipTree : public dyn_segtree_internal::UseZipTree {
 };
 
 /**
- * @brief Class used to select the Zip Tree tree as underlying tree for the
+ * @brief Class used to select the weight balanced tree as underlying tree for the
  * DynamicSegmentTree
  *
  * Use this class as the TreeSelector template parameter of the
- * DynamicSegmentTree to chose a ZipTree (an ZTree) as underlying tree for the
+ * DynamicSegmentTree to chose a weight balanced tree (see WBTree) as underlying tree for the
  * DynamicSegmentTree.
  */
 class UseWBTree : public dyn_segtree_internal::UseWBTree {

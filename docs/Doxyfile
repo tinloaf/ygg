@@ -792,11 +792,13 @@ WARN_LOGFILE           =
 
 INPUT                =  pages/Quickstart.md pages/License.md pages/Startpage.md ../src/rbtree.hpp \
                         ../src/intervaltree.hpp ../src/list.hpp ../src/intervalmap.hpp \
-			../src/ziptree.hpp ../src/dynamic_segment_tree.hpp \
+			                  ../src/ziptree.hpp ../src/dynamic_segment_tree.hpp \
+												../src/wbtree.hpp \
                         pages/DatastructuresOverview.md pages/IntervalMapExample.md \
                         pages/IntervalTreeExample.md pages/RBTreeExample.md \
                         pages/DynamicSegmentTreeExample.md \
-                        pages/DynamicSegmentTreeDoc.md pages/ZipTreeExample.md
+                        pages/DynamicSegmentTreeDoc.md pages/ZipTreeExample.md \
+												pages/WBTreeExample.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

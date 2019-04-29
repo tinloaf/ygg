@@ -1,3 +1,11 @@
+@page wbtreeexample Weight Balanced Tree Example
+
+This page provides an example of how to use the weight balanced tree. For information on what a weight balanced
+ tree is and how it behaves, please see @ref datastructuresoverview.
+
+The code can also be found in the examples directory.
+
+~~~~~~~~~~~~~{.cpp}
 #include "../src/ygg.hpp"
 
 using namespace ygg;
@@ -79,3 +87,4 @@ main(int argc, char ** argv)
 
 	return 0;
 }
+~~~~~~~~~~~~~
