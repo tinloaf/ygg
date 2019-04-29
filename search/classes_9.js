@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['ztree',['ZTree',['../classygg_1_1ZTree.html',1,'ygg']]],
-  ['ztreedefaultnodetraits',['ZTreeDefaultNodeTraits',['../classygg_1_1ZTreeDefaultNodeTraits.html',1,'ygg']]],
-  ['ztreenodebase',['ZTreeNodeBase',['../classygg_1_1ZTreeNodeBase.html',1,'ygg']]]
+  ['userbtree',['UseRBTree',['../classygg_1_1UseRBTree.html',1,'ygg']]],
+  ['usewbtree',['UseWBTree',['../classygg_1_1UseWBTree.html',1,'ygg']]],
+  ['useziptree',['UseZipTree',['../classygg_1_1UseZipTree.html',1,'ygg']]]
 ];

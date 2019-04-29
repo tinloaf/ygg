@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Yggdrasill: ygg::intervaltree_internal::ExtendedNodeTraits&lt; Node, NB, NodeTraits &gt; Class Template Reference</title>
+<title>Yggdrasill: ygg::intervaltree_internal::ExtendedNodeTraits&lt; Node, INB, NodeTraits &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,47 +67,53 @@ $(function() {
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classygg_1_1intervaltree__internal_1_1ExtendedNodeTraits-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">ygg::intervaltree_internal::ExtendedNodeTraits&lt; Node, NB, NodeTraits &gt; Class Template Reference</div>  </div>
+<div class="title">ygg::intervaltree_internal::ExtendedNodeTraits&lt; Node, INB, NodeTraits &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
-Inheritance diagram for ygg::intervaltree_internal::ExtendedNodeTraits&lt; Node, NB, NodeTraits &gt;:</div>
+Inheritance diagram for ygg::intervaltree_internal::ExtendedNodeTraits&lt; Node, INB, NodeTraits &gt;:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classygg_1_1intervaltree__internal_1_1ExtendedNodeTraits.png" usemap="#ygg::intervaltree_5Finternal::ExtendedNodeTraits_3C_20Node_2C_20NB_2C_20NodeTraits_20_3E_map" alt=""/>
-  <map id="ygg::intervaltree_5Finternal::ExtendedNodeTraits_3C_20Node_2C_20NB_2C_20NodeTraits_20_3E_map" name="ygg::intervaltree_5Finternal::ExtendedNodeTraits_3C_20Node_2C_20NB_2C_20NodeTraits_20_3E_map">
+  <img src="classygg_1_1intervaltree__internal_1_1ExtendedNodeTraits.png" usemap="#ygg::intervaltree_5Finternal::ExtendedNodeTraits_3C_20Node_2C_20INB_2C_20NodeTraits_20_3E_map" alt=""/>
+  <map id="ygg::intervaltree_5Finternal::ExtendedNodeTraits_3C_20Node_2C_20INB_2C_20NodeTraits_20_3E_map" name="ygg::intervaltree_5Finternal::ExtendedNodeTraits_3C_20Node_2C_20INB_2C_20NodeTraits_20_3E_map">
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a23cc0eb443ce6e74e9bf298ad7eebb35"><td class="memItemLeft" align="right" valign="top"><a id="a23cc0eb443ce6e74e9bf298ad7eebb35"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>leaf_inserted</b> (Node &amp;node)</td></tr>
-<tr class="separator:a23cc0eb443ce6e74e9bf298ad7eebb35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab19b0fa43728cf4ba388844b7996ef5f"><td class="memItemLeft" align="right" valign="top"><a id="ab19b0fa43728cf4ba388844b7996ef5f"></a>
+<tr class="memitem:a941f539d0b29b089bfbca50f52b13bef"><td class="memTemplParams" colspan="2"><a id="a941f539d0b29b089bfbca50f52b13bef"></a>
+template&lt;class BaseTree &gt; </td></tr>
+<tr class="memitem:a941f539d0b29b089bfbca50f52b13bef"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>leaf_inserted</b> (Node &amp;node, BaseTree &amp;t)</td></tr>
+<tr class="separator:a941f539d0b29b089bfbca50f52b13bef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94084c352db3c27646ec3900a688c3d2"><td class="memItemLeft" align="right" valign="top"><a id="a94084c352db3c27646ec3900a688c3d2"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>fix_node</b> (Node &amp;node)</td></tr>
-<tr class="separator:ab19b0fa43728cf4ba388844b7996ef5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2761d0c3982f57a650c1b347fd31080"><td class="memItemLeft" align="right" valign="top"><a id="af2761d0c3982f57a650c1b347fd31080"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>rotated_left</b> (Node &amp;node)</td></tr>
-<tr class="separator:af2761d0c3982f57a650c1b347fd31080"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9e2b2521b7db1f90780aec7ae56f26a"><td class="memItemLeft" align="right" valign="top"><a id="af9e2b2521b7db1f90780aec7ae56f26a"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>rotated_right</b> (Node &amp;node)</td></tr>
-<tr class="separator:af9e2b2521b7db1f90780aec7ae56f26a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a799138fcab63680872723d2f9c2d6c81"><td class="memItemLeft" align="right" valign="top"><a id="a799138fcab63680872723d2f9c2d6c81"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>deleted_below</b> (Node &amp;node)</td></tr>
-<tr class="separator:a799138fcab63680872723d2f9c2d6c81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a941540238f617400b75e85b90db29de7"><td class="memItemLeft" align="right" valign="top"><a id="a941540238f617400b75e85b90db29de7"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_leaf</b> (Node &amp;node)</td></tr>
-<tr class="separator:a941540238f617400b75e85b90db29de7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5074966869b43d8cf6d38b7968e642fc"><td class="memItemLeft" align="right" valign="top"><a id="a5074966869b43d8cf6d38b7968e642fc"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>swapped</b> (Node &amp;n1, Node &amp;n2)</td></tr>
-<tr class="separator:a5074966869b43d8cf6d38b7968e642fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa35040bfe20050e79a5c6808d4b88386"><td class="memItemLeft" align="right" valign="top"><a id="aa35040bfe20050e79a5c6808d4b88386"></a>
+<tr class="separator:a94084c352db3c27646ec3900a688c3d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd8914326a539ca472197a64a86c5f12"><td class="memTemplParams" colspan="2"><a id="afd8914326a539ca472197a64a86c5f12"></a>
+template&lt;class BaseTree &gt; </td></tr>
+<tr class="memitem:afd8914326a539ca472197a64a86c5f12"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>rotated_left</b> (Node &amp;node, BaseTree &amp;t)</td></tr>
+<tr class="separator:afd8914326a539ca472197a64a86c5f12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97e901c9ca492e2723ad338cf27d1283"><td class="memTemplParams" colspan="2"><a id="a97e901c9ca492e2723ad338cf27d1283"></a>
+template&lt;class BaseTree &gt; </td></tr>
+<tr class="memitem:a97e901c9ca492e2723ad338cf27d1283"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>rotated_right</b> (Node &amp;node, BaseTree &amp;t)</td></tr>
+<tr class="separator:a97e901c9ca492e2723ad338cf27d1283"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afca871f032d00f87fbfa4a3a0e7fd282"><td class="memTemplParams" colspan="2"><a id="afca871f032d00f87fbfa4a3a0e7fd282"></a>
+template&lt;class BaseTree &gt; </td></tr>
+<tr class="memitem:afca871f032d00f87fbfa4a3a0e7fd282"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>deleted_below</b> (Node &amp;node, BaseTree &amp;t)</td></tr>
+<tr class="separator:afca871f032d00f87fbfa4a3a0e7fd282"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a917790680800a90630701de7380a7d5b"><td class="memTemplParams" colspan="2"><a id="a917790680800a90630701de7380a7d5b"></a>
+template&lt;class BaseTree &gt; </td></tr>
+<tr class="memitem:a917790680800a90630701de7380a7d5b"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>delete_leaf</b> (Node &amp;node, BaseTree &amp;t)</td></tr>
+<tr class="separator:a917790680800a90630701de7380a7d5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43e64da19d3b781add5f1307ebf57837"><td class="memTemplParams" colspan="2"><a id="a43e64da19d3b781add5f1307ebf57837"></a>
+template&lt;class BaseTree &gt; </td></tr>
+<tr class="memitem:a43e64da19d3b781add5f1307ebf57837"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>swapped</b> (Node &amp;n1, Node &amp;n2, BaseTree &amp;t)</td></tr>
+<tr class="separator:a43e64da19d3b781add5f1307ebf57837"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae41abbac95b8734c1afe244ebd86ec1a"><td class="memItemLeft" align="right" valign="top"><a id="ae41abbac95b8734c1afe244ebd86ec1a"></a>
 static NodeTraits::key_type&#160;</td><td class="memItemRight" valign="bottom"><b>get_lower</b> (const <a class="el" href="classygg_1_1intervaltree__internal_1_1DummyRange.html">intervaltree_internal::DummyRange</a>&lt; typename NodeTraits::key_type &gt; &amp;range)</td></tr>
-<tr class="separator:aa35040bfe20050e79a5c6808d4b88386"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa329d41faacdb3052fdc3e114e229be0"><td class="memItemLeft" align="right" valign="top"><a id="aa329d41faacdb3052fdc3e114e229be0"></a>
+<tr class="separator:ae41abbac95b8734c1afe244ebd86ec1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23317100f576d5cac3b2c531327b51a8"><td class="memItemLeft" align="right" valign="top"><a id="a23317100f576d5cac3b2c531327b51a8"></a>
 static NodeTraits::key_type&#160;</td><td class="memItemRight" valign="bottom"><b>get_upper</b> (const <a class="el" href="classygg_1_1intervaltree__internal_1_1DummyRange.html">intervaltree_internal::DummyRange</a>&lt; typename NodeTraits::key_type &gt; &amp;range)</td></tr>
-<tr class="separator:aa329d41faacdb3052fdc3e114e229be0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a23317100f576d5cac3b2c531327b51a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/lukas/src/intervaltree/ygg/src/<a class="el" href="intervaltree_8hpp_source.html">intervaltree.hpp</a></li>

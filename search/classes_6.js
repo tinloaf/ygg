@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['queryresult',['QueryResult',['../classygg_1_1IntervalTree_1_1QueryResult.html',1,'ygg::IntervalTree']]]
+  ['maxcombiner',['MaxCombiner',['../classygg_1_1MaxCombiner.html',1,'ygg']]]
 ];

@@ -89,6 +89,9 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>ValueT</b> = typenam
 <tr class="memitem:ae105d087543b7492ffd9647a99e7ff2b"><td class="memItemLeft" align="right" valign="top"><a id="ae105d087543b7492ffd9647a99e7ff2b"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>AggValueT</b> = typename Node::AggValueT</td></tr>
 <tr class="separator:ae105d087543b7492ffd9647a99e7ff2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedf70b122b9b0f1a033d3661c89479ed"><td class="memItemLeft" align="right" valign="top"><a id="aedf70b122b9b0f1a033d3661c89479ed"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>MyClass</b> = <a class="el" href="classygg_1_1DynamicSegmentTree.html">DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;</td></tr>
+<tr class="separator:aedf70b122b9b0f1a033d3661c89479ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8fb6a3da25d6e22e51f67b02e5d0c96"><td class="memTemplParams" colspan="2"><a id="ae8fb6a3da25d6e22e51f67b02e5d0c96"></a>
 template&lt;bool reverse&gt; </td></tr>
 <tr class="memitem:ae8fb6a3da25d6e22e51f67b02e5d0c96"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>const_iterator</b> = typename InnerTree::template const_iterator&lt; reverse &gt;</td></tr>
@@ -100,6 +103,14 @@ template&lt;bool reverse&gt; </td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a1061b56cc773e75f8369c80cb3eadc2c"><td class="memItemLeft" align="right" valign="top"><a id="a1061b56cc773e75f8369c80cb3eadc2c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1DynamicSegmentTree.html#a1061b56cc773e75f8369c80cb3eadc2c">DynamicSegmentTree</a> (<a class="el" href="classygg_1_1DynamicSegmentTree.html">MyClass</a> &amp;&amp;other)</td></tr>
+<tr class="memdesc:a1061b56cc773e75f8369c80cb3eadc2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor. <br /></td></tr>
+<tr class="separator:a1061b56cc773e75f8369c80cb3eadc2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b4a5718dd1010c0742d0895e44e1577"><td class="memItemLeft" align="right" valign="top"><a id="a7b4a5718dd1010c0742d0895e44e1577"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1DynamicSegmentTree.html#a7b4a5718dd1010c0742d0895e44e1577">DynamicSegmentTree</a> ()</td></tr>
+<tr class="memdesc:a7b4a5718dd1010c0742d0895e44e1577"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:a7b4a5718dd1010c0742d0895e44e1577"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0996731522cdad19988ec6d58596c17c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1DynamicSegmentTree.html#a0996731522cdad19988ec6d58596c17c">insert</a> (Node &amp;n)</td></tr>
 <tr class="memdesc:a0996731522cdad19988ec6d58596c17c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert an interval into the dynamic segment tree.  <a href="#a0996731522cdad19988ec6d58596c17c">More...</a><br /></td></tr>
 <tr class="separator:a0996731522cdad19988ec6d58596c17c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -166,6 +177,9 @@ iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>lo
 <tr class="memitem:a68d19d516aab45893345fc5ecc947c33"><td class="memItemLeft" align="right" valign="top"><a id="a68d19d516aab45893345fc5ecc947c33"></a>
 iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>upper_bound_event</b> (const typename Node::KeyT &amp;key)</td></tr>
 <tr class="separator:a68d19d516aab45893345fc5ecc947c33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2161c3541163dbee4860467d71c48f26"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1DynamicSegmentTree.html#a2161c3541163dbee4860467d71c48f26">clear</a> ()</td></tr>
+<tr class="memdesc:a2161c3541163dbee4860467d71c48f26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all elements from the tree.  <a href="#a2161c3541163dbee4860467d71c48f26">More...</a><br /></td></tr>
+<tr class="separator:a2161c3541163dbee4860467d71c48f26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad0d6db955cb26bc43d206f42304fc5d5"><td class="memItemLeft" align="right" valign="top"><a id="ad0d6db955cb26bc43d206f42304fc5d5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>dbg_verify</b> () const</td></tr>
 <tr class="separator:ad0d6db955cb26bc43d206f42304fc5d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -262,6 +276,29 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
       </table>
 </div><div class="memdoc">
 <p>Returns an iterator pointing after the largest <a class="el" href="classygg_1_1dyn__segtree__internal_1_1InnerNode.html">InnerNode</a> representing a start or end event. </p>
+
+</div>
+</div>
+<a id="a2161c3541163dbee4860467d71c48f26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2161c3541163dbee4860467d71c48f26">&#9670;&nbsp;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes all elements from the tree. </p>
+<p>TODO write a test for this method</p>
+<p>Removes all elements from the tree. </p>
 
 </div>
 </div>

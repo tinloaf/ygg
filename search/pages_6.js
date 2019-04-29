@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['zip_20tree_20example',['Zip Tree Example',['../ziptreeexample.html',1,'']]]
+  ['weight_20balanced_20tree_20example',['Weight Balanced Tree Example',['../wbtreeexample.html',1,'']]]
 ];

@@ -63,10 +63,14 @@ $(function() {
 <div class="title">Yggdrasill Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This is Ygg (short for <a href="https://en.wikipedia.org/wiki/Yggdrasil">Yggdrasil</a>), a C++14 implementation of intrusive search tree and interval data structures. It currently contains:</p>
+<div class="textblock"><p>This is Ygg (short for <a href="https://en.wikipedia.org/wiki/Yggdrasil">Yggdrasil</a>), a C++17 implementation of intrusive search tree and interval data structures. It currently contains:</p>
 <ul>
+<li>several balanced binary search trees:<ul>
 <li>a red-black tree</li>
+<li>a weight balanced tree (aka BB[α]-tree)</li>
 <li>a zip tree</li>
+</ul>
+</li>
 <li>an interval tree</li>
 <li>an interval map</li>
 <li>a dynamic segment tree<ul>
@@ -76,7 +80,7 @@ $(function() {
 </li>
 <li>a doubly-linked list</li>
 </ul>
-<p>If you need a Red-Black-Tree, a Zip Tree, an Interval Tree or an Interval Map in your C++ application, and for some reason the existing implementations (like std::set or boost::instrusive::rbtree) are not suited for you, Ygg may be the answer. Also, I do not know of any other implementation of what I call the "Dynamic Segment Tree" (if you know something similar, please let me know!)</p>
+<p>If you need a Red-Black-Tree, a Zip Tree, an Interval Tree or an Interval Map in your C++ application, and for some reason the existing implementations (like std::set or boost::instrusive::rbtree) are not suited for you, Ygg may be the answer. Also, I do not know of any other implementation of the "Dynamic Segment Tree" (if you know something similar, please let me know!)</p>
 <p>See the list of features below for why Ygg is awesome!</p>
 <p>If you are not sure whether one of these data structures is right for your application, check out the <a class="el" href="datastructuresoverview.html">Overview over the Data Structures</a>.</p>
 <h1>Features </h1>
@@ -92,6 +96,7 @@ $(function() {
 <ul>
 <li>Example of using the red-black tree: <a class="el" href="rbtreeexample.html">Red-Black Tree Example</a></li>
 <li>Example of using the zip tree: <a class="el" href="ziptreeexample.html">Zip Tree Example</a></li>
+<li>Example of using the weight balanced tree: <a class="el" href="wbtreeexample.html">Weight Balanced Tree Example</a></li>
 <li>Example of using the interval tree: <a class="el" href="intervaltreeexample.html">IntervalTree Example</a></li>
 <li>Example of using the interval map: <a class="el" href="intervalmapexample.html">IntervalMap Example</a></li>
 <li>Example of using the dynamic segment tree: <a class="el" href="dynamicsegmenttreeexample.html">DynamicSegmentTree Example</a></li>

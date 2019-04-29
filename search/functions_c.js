@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['update_5frank',['update_rank',['../classygg_1_1ZTreeNodeBase.html#a3bd770811de3b995b45635d72643e894',1,'ygg::ZTreeNodeBase']]],
-  ['upper_5fbound',['upper_bound',['../classygg_1_1RBTree.html#a978f4d37ed5b4c3c38528c324faa4ce2',1,'ygg::RBTree::upper_bound()'],['../classygg_1_1ZTree.html#acdbc8ab365970492de38097319c31157',1,'ygg::ZTree::upper_bound()']]],
-  ['upper_5fbound_5fevent',['upper_bound_event',['../classygg_1_1DynamicSegmentTree.html#a3e330e5e85ab4f56ea5da6e3b7627f61',1,'ygg::DynamicSegmentTree']]]
+  ['size',['size',['../classygg_1_1List.html#ac7c43af07f924a7b8e985e0fce77b940',1,'ygg::List::size()'],['../classygg_1_1ZTree.html#a843c94db6110457283c9a8b35e6d365a',1,'ygg::ZTree::size()'],['../classygg_1_1bst_1_1BinarySearchTree.html#a8eacc5c04824b6a13655f69f6c92c32b',1,'ygg::bst::BinarySearchTree::size()']]]
 ];

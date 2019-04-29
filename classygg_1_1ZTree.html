@@ -90,9 +90,9 @@ Public Types</h2></td></tr>
 <tr class="memitem:a68002a10ed606edf5fd5208d80cae78d"><td class="memItemLeft" align="right" valign="top"><a id="a68002a10ed606edf5fd5208d80cae78d"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>NB</b> = <a class="el" href="classygg_1_1ZTreeNodeBase.html">ZTreeNodeBase</a>&lt; Node, Options, Tag &gt;</td></tr>
 <tr class="separator:a68002a10ed606edf5fd5208d80cae78d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a314c9362e9ac88eb544878cbe10aa41f"><td class="memItemLeft" align="right" valign="top"><a id="a314c9362e9ac88eb544878cbe10aa41f"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>my_type</b> = <a class="el" href="classygg_1_1ZTree.html">ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;</td></tr>
-<tr class="separator:a314c9362e9ac88eb544878cbe10aa41f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ba909227343d4b42c409445f65edd4d"><td class="memItemLeft" align="right" valign="top"><a id="a5ba909227343d4b42c409445f65edd4d"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>MyClass</b> = <a class="el" href="classygg_1_1ZTree.html">ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;</td></tr>
+<tr class="separator:a5ba909227343d4b42c409445f65edd4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -100,6 +100,15 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a25fefa2b8b8e1571686760de65acdc2c">ZTree</a> () noexcept</td></tr>
 <tr class="memdesc:a25fefa2b8b8e1571686760de65acdc2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new empty Zip Tree. <br /></td></tr>
 <tr class="separator:a25fefa2b8b8e1571686760de65acdc2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9aa58dc78af2b04af5a4f00c439b908"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#aa9aa58dc78af2b04af5a4f00c439b908">ZTree</a> (<a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&amp;other)</td></tr>
+<tr class="memdesc:aa9aa58dc78af2b04af5a4f00c439b908"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new Zip Tree from a different Zip Tree.  <a href="#aa9aa58dc78af2b04af5a4f00c439b908">More...</a><br /></td></tr>
+<tr class="separator:aa9aa58dc78af2b04af5a4f00c439b908"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9030fb4cd2672dfc5e68f63ca6cf744b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a9030fb4cd2672dfc5e68f63ca6cf744b">operator=</a> (<a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&amp;other)</td></tr>
+<tr class="memdesc:a9030fb4cd2672dfc5e68f63ca6cf744b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move-assign an other Zip Tree to this one.  <a href="#a9030fb4cd2672dfc5e68f63ca6cf744b">More...</a><br /></td></tr>
+<tr class="separator:a9030fb4cd2672dfc5e68f63ca6cf744b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cc2d4df960f179398d97eb4d2f5ee3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a4cc2d4df960f179398d97eb4d2f5ee3c">operator=</a> (const <a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;other)</td></tr>
+<tr class="memdesc:a4cc2d4df960f179398d97eb4d2f5ee3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy an other tree into this one.  <a href="#a4cc2d4df960f179398d97eb4d2f5ee3c">More...</a><br /></td></tr>
+<tr class="separator:a4cc2d4df960f179398d97eb4d2f5ee3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c9d11401e7ab570db3311190aeb7b6f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a3c9d11401e7ab570db3311190aeb7b6f">insert</a> (Node &amp;node) noexcept</td></tr>
 <tr class="memdesc:a3c9d11401e7ab570db3311190aeb7b6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts &lt;node&gt; into the tree.  <a href="#a3c9d11401e7ab570db3311190aeb7b6f">More...</a><br /></td></tr>
 <tr class="separator:a3c9d11401e7ab570db3311190aeb7b6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -188,7 +197,7 @@ Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_root</b> () con
 <tr class="separator:ad2eac00f7842b6dcacee164a101f5757"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt;<br />
+<div class="textblock"><h3>template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt;<br />
 class ygg::ZTree&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;</h3>
 
 <p>The Zip Tree. </p>
@@ -204,14 +213,44 @@ class ygg::ZTree&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;</h
   </table>
   </dd>
 </dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aa9aa58dc78af2b04af5a4f00c439b908"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9aa58dc78af2b04af5a4f00c439b908">&#9670;&nbsp;</a></span>ZTree()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::<a class="el" href="classygg_1_1ZTree.html">ZTree</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a new Zip Tree from a different Zip Tree. </p>
+<p>The other Zip Tree is moved into this one, i.e., using it afterwards is undefined behavior.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The Zip Tree that this one is constructed from </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="af18a53d58fa18d04066fb7416693469f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af18a53d58fa18d04066fb7416693469f">&#9670;&nbsp;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::begin </td>
@@ -231,7 +270,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::cbegin </td>
@@ -251,7 +290,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::cend </td>
@@ -271,7 +310,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::clear </td>
@@ -293,7 +332,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;true&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::crbegin </td>
@@ -313,7 +352,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;true&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::crend </td>
@@ -333,7 +372,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::dump_to_dot </td>
@@ -362,7 +401,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::empty </td>
@@ -385,7 +424,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::end </td>
@@ -405,7 +444,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class Comparable &gt; </div>
       <table class="memname">
@@ -437,7 +476,7 @@ template&lt;class Comparable &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -476,7 +515,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::iterator_to </td>
@@ -503,7 +542,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class Comparable &gt; </div>
       <table class="memname">
@@ -530,13 +569,79 @@ template&lt;class Comparable &gt; </div>
 
 </div>
 </div>
+<a id="a9030fb4cd2672dfc5e68f63ca6cf744b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9030fb4cd2672dfc5e68f63ca6cf744b">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classygg_1_1ZTree.html">MyClass</a>&amp; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Move-assign an other Zip Tree to this one. </p>
+<p>The other Zip Tree is moved into this one, i.e., using it afterwards is undefined behavior.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The Zip Tree that this one is constructed from </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4cc2d4df960f179398d97eb4d2f5ee3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4cc2d4df960f179398d97eb4d2f5ee3c">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classygg_1_1ZTree.html">MyClass</a>&amp; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copy an other tree into this one. </p>
+<dl class="section warning"><dt>Warning</dt><dd>Both trees must have the same size! The nodes in this tree will be overwritten.</dd>
+<dd>
+Your node class must implement an <a class="el" href="classygg_1_1ZTree.html#a9030fb4cd2672dfc5e68f63ca6cf744b" title="Move-assign an other Zip Tree to this one. ">operator=()</a>. However, the <a class="el" href="classygg_1_1ZTree.html#a9030fb4cd2672dfc5e68f63ca6cf744b" title="Move-assign an other Zip Tree to this one. ">operator=()</a> must not change the assigned rank of a node!</dd>
+<dd>
+This method is only available for trees which:<ul>
+<li>use hash-based ranking and</li>
+<li>store the rank, i.e., for which TreeFlags::ZTREE_RANK_TYPE is set.</li>
+</ul>
+</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The Zip Tree that this one is copied from </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a23119af9adc1bd5bcc44077fcdcfb84a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a23119af9adc1bd5bcc44077fcdcfb84a">&#9670;&nbsp;</a></span>rbegin()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;true&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::rbegin </td>
@@ -556,7 +661,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -593,7 +698,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;true&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::rend </td>
@@ -613,7 +718,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">size_t <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::size </td>
@@ -636,7 +741,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::rbtree_internal::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class Comparable &gt; </div>
       <table class="memname">
