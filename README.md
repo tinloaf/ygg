@@ -3,8 +3,10 @@
 This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++17
 implementation of several intrusive data structures:
 
-* a Red-Black Tree
-* a Zip Tree
+* several balanced binary search trees:
+  * a red-black Tree
+  * a Zip Tree
+  * a weight balanced tree (aka BB[α]-tree)
 * an Interval Tree
 * an Interval Map
 * a Doubly-Linked List
@@ -14,8 +16,8 @@ implementation of several intrusive data structures:
 
 If you need a Red-Black-Tree, a Zip Tree, an Interval Tree or an Interval Map in your C++ application, and for 
 some reason the existing implementations (like std::set or boost::instrusive::rbtree) are not 
-suited for you, Ygg may be the answer. Also, I do not know of any other implementation of what I 
-call the "Dynamic Segment Tree" (if you know something similar, please let me know!)
+suited for you, Ygg may be the answer. Also, I do not know of any other implementation of the 
+"Dynamic Segment Tree" (if you know something similar, please let me know!)
 
 See the list of features below for why Ygg is awesome!
 

@@ -793,7 +793,7 @@ WARN_LOGFILE           =
 INPUT                =  pages/Quickstart.md pages/License.md pages/Startpage.md ../src/rbtree.hpp \
                         ../src/intervaltree.hpp ../src/list.hpp ../src/intervalmap.hpp \
 			                  ../src/ziptree.hpp ../src/dynamic_segment_tree.hpp \
-												../src/wbtree.hpp \
+												../src/wbtree.hpp ../src/bst.hpp \
                         pages/DatastructuresOverview.md pages/IntervalMapExample.md \
                         pages/IntervalTreeExample.md pages/RBTreeExample.md \
                         pages/DynamicSegmentTreeExample.md \
