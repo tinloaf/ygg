@@ -12,9 +12,11 @@ void
 ColorParentStorage<Node, true>::set_color(Color new_color)
 {
 	if (new_color == Color::RED) {
-		this->parent = (Node *)((size_t)this->parent | 1);
+		this->parent = reinterpret_cast<Node *>(
+		    (reinterpret_cast<size_t>(this->parent) | size_t{1}));
 	} else {
-		this->parent = (Node *)((size_t)this->parent & ~((size_t)1));
+		this->parent = reinterpret_cast<Node *>(
+		    (reinterpret_cast<size_t>(this->parent) & ~(size_t{1})));
 	}
 }
 
@@ -33,14 +35,17 @@ template <class Node>
 void
 ColorParentStorage<Node, true>::set_parent(Node * new_parent)
 {
-	this->parent = (Node *)((size_t)new_parent | ((size_t)this->parent & 1));
+	this->parent = reinterpret_cast<Node *>(
+	    reinterpret_cast<size_t>(new_parent) |
+	    (reinterpret_cast<size_t>(this->parent) & size_t{1}));
 }
 
 template <class Node>
 Node *
 ColorParentStorage<Node, true>::get_parent() const
 {
-	return (Node *)((size_t)this->parent & (~((size_t)1)));
+	return reinterpret_cast<Node *>(reinterpret_cast<size_t>(this->parent) &
+	                                (~(size_t{1})));
 }
 
 template <class Node>

@@ -14,7 +14,7 @@ size_t
 ZTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
 {
 	size_t depth = 0;
-	const Node * n = (const Node *)this;
+	const Node * n = static_cast<const Node *>(this);
 
 	while (n->get_parent() != nullptr) {
 		depth++;

@@ -27,7 +27,7 @@ size_t
 BSTNodeBase<Node, Tag, ParentContainer>::get_depth() const noexcept
 {
 	size_t depth = 0;
-	const Node * n = (const Node *)this;
+	const Node * n = static_cast<const Node *>(this);
 
 	while (n->get_parent() != nullptr) {
 		depth++;
@@ -418,13 +418,13 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_smallest()
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 void
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::dbg_print_tree() const
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::dbg_print_tree()
+    const
 {
 	using NNG = ygg::debug::GenericNodeNameGetter<Node>;
 	ygg::debug::TreePrinter<Node, NNG> tp(this->root, NNG());
 	tp.print();
 }
-
 
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>

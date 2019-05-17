@@ -18,7 +18,7 @@ size_t
 EnergyTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
 {
 	size_t depth = 0;
-	const Node * n = (const Node *)this;
+	const Node * n = static_cast<const Node *>(this);
 
 	while (n->_et_parent != nullptr) {
 		depth++;

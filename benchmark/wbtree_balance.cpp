@@ -55,7 +55,8 @@ public:
 		this->t = (Tree *)(&this->init_t);
 
 		for (size_t i = 0; i < this->reinsertion_count; ++i) {
-			size_t index = std::abs(distr(rnd)) % this->node_count;
+			size_t index =
+			    static_cast<unsigned long>(std::abs(distr(rnd))) % this->node_count;
 
 			// TODO optimistic - also needs distinct values!
 			// this->init_t.remove(*(Node<InitialFlags> *)(&this->nodes[index]));
@@ -97,7 +98,8 @@ public:
 		std::cout << "Min: \t"
 		          << *(std::min_element(this->counts.begin(), this->counts.end()))
 		          << "\n";
-		size_t sum = std::accumulate(this->counts.begin(), this->counts.end(), 0);
+		size_t sum =
+		    std::accumulate(this->counts.begin(), this->counts.end(), size_t{0});
 		std::cout << "Mean: \t" << (double)sum / (double)this->counts.size()
 		          << "\n";
 		if (this->counts.size() % 2 == 0) {
@@ -114,7 +116,7 @@ public:
 			          << "\n";
 		} else {
 			std::nth_element(this->counts.begin(),
-			                 this->counts.begin() + (size_t)(this->counts.size() / 2),
+			                 this->counts.begin() + (this->counts.size() / size_t{2}),
 			                 this->counts.end());
 			std::cout << "Median: \t"
 			          << this->counts[(size_t)(this->counts.size() / 2)] << "\n";
@@ -137,9 +139,11 @@ private:
 int
 main(int argc, char ** argv)
 {
-	size_t node_count = atoi(argv[1]);
-	size_t reinsertion_count = atoi(argv[2]);
-	size_t seed_count = atoi(argv[3]);
+	(void)argc;
+
+	size_t node_count = static_cast<size_t>(atoi(argv[1]));
+	size_t reinsertion_count = static_cast<size_t>(atoi(argv[2]));
+	size_t seed_count = static_cast<size_t>(atoi(argv[3]));
 
 	// CSV file to write gradual counts to
 	std::string out_dir(argv[4]);
@@ -168,15 +172,15 @@ main(int argc, char ** argv)
 	*/
 
 	// Initialize with Two-Pass, then switch to one-pass
-	using DefaultOptions = TreeOptions<TreeFlags::MULTIPLE>;
+	using DefOptions = TreeOptions<TreeFlags::MULTIPLE>;
 	using SPOptions =
 	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS>;
-	BalanceAnalyzer<DefaultOptions, SPOptions> ba("WBTree[Default]", node_count,
-	                                              reinsertion_count, series_os,
-	                                              distr_os, amounts_os);
-	for (int seed = 42; seed < 42 + seed_count; ++seed) {
+	BalanceAnalyzer<DefOptions, SPOptions> ba("WBTree[Default]", node_count,
+	                                          reinsertion_count, series_os,
+	                                          distr_os, amounts_os);
+	for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 		std::cout << "Seed: " << seed << "\n";
-		ba.run(seed);
+		ba.run(static_cast<int>(seed));
 	}
 	ba.print();
 
@@ -193,9 +197,9 @@ main(int argc, char ** argv)
 	BalanceAnalyzer<Default32Options, SP32Options> ba32(
 	    "WBTree[3|2]", node_count, reinsertion_count, series_os, distr_os,
 	    amounts_os);
-	for (int seed = 42; seed < 42 + seed_count; ++seed) {
+	for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 		std::cout << "Seed: " << seed << "\n";
-		ba32.run(seed);
+		ba32.run(static_cast<int>(seed));
 	}
 	ba32.print();
 
@@ -212,9 +216,9 @@ main(int argc, char ** argv)
 	BalanceAnalyzer<DefaultBalOptions, SPBalOptions> baBal(
 	    "WBTree[2|3/2]", node_count, reinsertion_count, series_os, distr_os,
 	    amounts_os);
-	for (int seed = 42; seed < 42 + seed_count; ++seed) {
+	for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 		std::cout << "Seed: " << seed << "\n";
-		baBal.run(seed);
+		baBal.run(static_cast<int>(seed));
 	}
 	baBal.print();
 
