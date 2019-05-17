@@ -19,10 +19,10 @@ namespace ygg {
 namespace rbtree_internal {
 /// @cond INTERNAL
 
-enum class Color
+enum class Color : unsigned char
 {
-	RED,
-	BLACK
+	BLACK = 0,
+	RED = 1
 };
 
 template <class Node, bool compress_color>

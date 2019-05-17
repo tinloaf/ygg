@@ -47,9 +47,9 @@ public:
 	{
 		this->papi.initialize();
 
-		size_t fixed_count = (size_t)state.range(0);
-		size_t experiment_count = (size_t)state.range(1);
-		int seed = (int)state.range(2);
+		size_t fixed_count = static_cast<size_t>(state.range(0));
+		size_t experiment_count = static_cast<size_t>(state.range(1));
+		int seed = static_cast<int>(state.range(2));
 		this->rng = std::mt19937(seed);
 
 		std::uniform_int_distribution<> distr(std::numeric_limits<int>::min(),
@@ -133,7 +133,7 @@ public:
 			std::shuffle(ptrs.begin(), ptrs.end(), this->rng);
 			this->experiment_node_pointers.insert(
 			    this->experiment_node_pointers.begin(), ptrs.begin(),
-			    ptrs.begin() + (long)experiment_count);
+			    ptrs.begin() + static_cast<long>(experiment_count));
 		}
 	}
 
@@ -469,7 +469,7 @@ struct hash<ZipNode<T>>
 	size_t
 	operator()(const ZipNode<T> & n) const
 	{
-		return (size_t)n.get_value();
+		return static_cast<size_t>(n.get_value());
 	}
 };
 } // namespace std

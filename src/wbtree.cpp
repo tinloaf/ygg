@@ -78,8 +78,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 				size_t l_size = cur->NB::_wbt_size - r_size +
 				                1; // Cur has not been increased, r_size has been.
 
-				if (((typename Options::WBTDeltaT)l_size) * Options::wbt_delta() <
-				    ((typename Options::WBTDeltaT)r_size)) {
+				if ((static_cast<typename Options::WBTDeltaT>(l_size)) *
+				        Options::wbt_delta() <
+				    (static_cast<typename Options::WBTDeltaT>(r_size))) {
 					// Right-overhang - we must rotate
 					// std::cout << ">> Right-Overhang\n";
 					size_t rr_size = 1;
@@ -109,8 +110,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						parent = cur;
 					}
 
-					if ((typename Options::WBTGammaT)(rl_size) >
-					    Options::wbt_gamma() * (typename Options::WBTGammaT)(rr_size)) {
+					if (static_cast<typename Options::WBTGammaT>(rl_size) >
+					    Options::wbt_gamma() *
+					        static_cast<typename Options::WBTGammaT>(rr_size)) {
 						// the right-left subtree is heavy enough to just take it
 						// double rotation!
 						// std::cout << ">>> Double rotation.\n";
@@ -234,8 +236,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 				size_t r_size = cur->NB::_wbt_size - l_size +
 				                1; // l_size has been increased, cur size not
 
-				if (((typename Options::WBTDeltaT)r_size) * Options::wbt_delta() <
-				    ((typename Options::WBTDeltaT)l_size)) {
+				if (static_cast<typename Options::WBTDeltaT>(r_size) *
+				        Options::wbt_delta() <
+				    (static_cast<typename Options::WBTDeltaT>(l_size))) {
 					// Left-overhang - we must rotate
 					// std::cout << "<< Left-Overhang\n";
 
@@ -266,8 +269,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
 						parent = cur;
 					}
 
-					if (((typename Options::WBTGammaT)lr_size) >
-					    Options::wbt_gamma() * ((typename Options::WBTGammaT)ll_size)) {
+					if (static_cast<typename Options::WBTGammaT>(lr_size) >
+					    Options::wbt_gamma() *
+					        static_cast<typename Options::WBTGammaT>(ll_size)) {
 						/*
 						std::cout << "L: " << l_size << " LR: " << lr_size
 						          << " LL: " << ll_size << " C: " << cur->NB::_wbt_size + 1;
@@ -581,12 +585,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			// assert(left_size * Options::wbt_delta() >=
 			//      (right_size - 1)); // Precondition
 
-			if (((typename Options::WBTDeltaT)left_size) * Options::wbt_delta() <
-			    (typename Options::WBTDeltaT)(right_size)) {
+			if (static_cast<typename Options::WBTDeltaT>(left_size) *
+			        Options::wbt_delta() <
+			    static_cast<typename Options::WBTDeltaT>(right_size)) {
 				// Out of balance with right-overhang
 
-				if ((typename Options::WBTGammaT)last_left >
-				    ((typename Options::WBTGammaT)last_right) * Options::wbt_gamma()) {
+				if (static_cast<typename Options::WBTGammaT>(last_left) >
+				    static_cast<typename Options::WBTGammaT>(last_right) *
+				        Options::wbt_gamma()) {
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
@@ -617,12 +623,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 			//			assert(right_size * Options::wbt_delta() >=
 			//     (left_size - 1)); // Precondition
 
-			if (((typename Options::WBTDeltaT)right_size) * Options::wbt_delta() <
-			    (typename Options::WBTDeltaT)(left_size)) {
+			if (static_cast<typename Options::WBTDeltaT>(right_size) *
+			        Options::wbt_delta() <
+			    static_cast<typename Options::WBTDeltaT>(left_size)) {
 				// Out of balance with left-overhang
 
-				if ((typename Options::WBTGammaT)last_right >
-				    ((typename Options::WBTGammaT)last_left) * Options::wbt_gamma()) {
+				if (static_cast<typename Options::WBTGammaT>(last_right) >
+				    static_cast<typename Options::WBTGammaT>(last_left) *
+				        Options::wbt_gamma()) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
 					// TODO FIXME this is quick&dirty - properly implement double
@@ -729,10 +737,11 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_count_violations(
 			right = n.NB::get_right()->NB::_wbt_size;
 		}
 
-		if (((typename Options::WBTDeltaT)left * Options::wbt_delta() <
-		     (typename Options::WBTDeltaT)(right)) ||
-		    ((typename Options::WBTDeltaT)right * Options::wbt_delta() <
-		     (typename Options::WBTDeltaT)(left))) {
+		if ((static_cast<typename Options::WBTDeltaT>(left) * Options::wbt_delta() <
+		     static_cast<typename Options::WBTDeltaT>(right)) ||
+		    (static_cast<typename Options::WBTDeltaT>(right) *
+		         Options::wbt_delta() <
+		     static_cast<typename Options::WBTDeltaT>(left))) {
 			result += 1;
 
 			if (depths != nullptr) {
@@ -745,15 +754,16 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_count_violations(
 
 			if (amounts != nullptr) {
 				size_t amount = 0;
-				if (((typename Options::WBTDeltaT)right) >
-				    (typename Options::WBTDeltaT)left * Options::wbt_delta()) {
-					amount =
-					    right - (size_t)std::floor((typename Options::WBTDeltaT)left *
-					                               Options::wbt_delta());
+				if (static_cast<typename Options::WBTDeltaT>(right) >
+				    static_cast<typename Options::WBTDeltaT>(left) *
+				        Options::wbt_delta()) {
+					amount = right - static_cast<size_t>(std::floor(
+					                     static_cast<typename Options::WBTDeltaT>(left) *
+					                     Options::wbt_delta()));
 				} else {
-					amount =
-					    left - (size_t)std::floor((typename Options::WBTDeltaT)right *
-					                              Options::wbt_delta());
+					amount = left - static_cast<size_t>(std::floor(
+					                    static_cast<typename Options::WBTDeltaT>(right) *
+					                    Options::wbt_delta()));
 				}
 
 				if (amount + 1 > amounts->size()) {
@@ -980,8 +990,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 			size_t s_r = n_r->NB::_wbt_size - 1;
 			size_t s_l = s_cur - s_r; // Both are updated with -1
 			// Step 1: Check balance
-			if ((typename Options::WBTDeltaT)s_r * Options::wbt_delta() <
-			    (typename Options::WBTDeltaT)s_l) {
+			if (static_cast<typename Options::WBTDeltaT>(s_r) * Options::wbt_delta() <
+			    static_cast<typename Options::WBTDeltaT>(s_l)) {
 				// std::cout << " ### Left-overhang \n";
 				// Out of balance with left-overhang
 				Node * n_l = cur->NB::get_left();
@@ -993,8 +1003,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 				}
 				size_t s_ll = (s_l + 1) - s_lr; // s_l already has the -1
 
-				if ((typename Options::WBTGammaT)s_lr >
-				    ((typename Options::WBTGammaT)s_ll) * Options::wbt_gamma()) {
+				if (static_cast<typename Options::WBTGammaT>(s_lr) >
+				    static_cast<typename Options::WBTGammaT>(s_ll) *
+				        Options::wbt_gamma()) {
 					// Double rotation
 					// std::cout << " #### Double rotation \n";
 					this->rotate_left(n_l);
@@ -1016,8 +1027,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 			size_t s_l = n_l->NB::_wbt_size - 1;
 			size_t s_r = s_cur - s_l;
 			// Step 1: Check balance
-			if ((typename Options::WBTDeltaT)s_l * Options::wbt_delta() <
-			    ((typename Options::WBTDeltaT)s_r)) {
+			if (static_cast<typename Options::WBTDeltaT>(s_l) * Options::wbt_delta() <
+			    (static_cast<typename Options::WBTDeltaT>(s_r))) {
 				// Out of balance with right-overhang
 				// std::cout << " ### Right overhang\n";
 				Node * n_r = cur->NB::get_right();
@@ -1029,8 +1040,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 				}
 				size_t s_rl = (s_r + 1) - s_rr;
 
-				if ((typename Options::WBTGammaT)s_rl >
-				    Options::wbt_gamma() * (typename Options::WBTGammaT)s_rr) {
+				if (static_cast<typename Options::WBTGammaT>(s_rl) >
+				    Options::wbt_gamma() *
+				        static_cast<typename Options::WBTGammaT>(s_rr)) {
 					// std::cout << " #### double rotation\n";
 					// Double rotation
 					this->rotate_right(n_r);
@@ -1096,8 +1108,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		size_t s_right = s_cur - s_left;
 
 		// TODO why does this not cause a warning? Is this branch never compiled?
-		if (((typename Options::WBTDeltaT)s_left) * Options::wbt_delta() <
-		    ((typename Options::WBTDeltaT)s_right)) {
+		if (static_cast<typename Options::WBTDeltaT>(s_left) *
+		        Options::wbt_delta() <
+		    static_cast<typename Options::WBTDeltaT>(s_right)) {
 			// Out of balance with right overhang
 			// std::cout << " --- Initial right overhang\n";
 			Node * n_r = cur->NB::get_right(); // n_r can not be nullptr, since the
@@ -1110,8 +1123,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			}
 			size_t s_rr = (s_right + 1) - s_rl;
 
-			if (((typename Options::WBTGammaT)s_rl) >
-			    Options::wbt_gamma() * ((typename Options::WBTGammaT)s_rr)) {
+			if (static_cast<typename Options::WBTGammaT>(s_rl) >
+			    Options::wbt_gamma() *
+			        static_cast<typename Options::WBTGammaT>(s_rr)) {
 				// Double rotation
 				// std::cout << " ---- Double rotation around " << std::hex << n_r
 				// << " and " << cur << std::dec << "\n";
@@ -1143,8 +1157,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			Node * n_r = cur->NB::get_right();
 			size_t s_r = n_r->NB::_wbt_size - 1; // this is where deletion happens
 			s_left = s_cur - s_r;
-			if (((typename Options::WBTDeltaT)s_r) * Options::wbt_delta() <
-			    ((typename Options::WBTDeltaT)s_left)) {
+			if (static_cast<typename Options::WBTDeltaT>(s_r) * Options::wbt_delta() <
+			    static_cast<typename Options::WBTDeltaT>(s_left)) {
 				// Out of balance with left overhang
 
 				n_l = cur->NB::get_left();
@@ -1156,8 +1170,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 				}
 				size_t s_ll = s_left - s_lr;
 
-				if (((typename Options::WBTGammaT)s_lr) >
-				    Options::wbt_gamma() * ((typename Options::WBTGammaT)s_ll)) {
+				if (static_cast<typename Options::WBTGammaT>(s_lr) >
+				    Options::wbt_gamma() *
+				        static_cast<typename Options::WBTGammaT>(s_ll)) {
 					// Double rotation
 					this->rotate_left(n_l);
 					this->rotate_right(cur);
@@ -1185,8 +1200,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		s_cur = cur->NB::_wbt_size;
 		size_t s_l = s_cur - s_right;
 
-		if (((typename Options::WBTDeltaT)s_right) * Options::wbt_delta() <
-		    ((typename Options::WBTDeltaT)s_l)) {
+		if (static_cast<typename Options::WBTDeltaT>(s_right) *
+		        Options::wbt_delta() <
+		    static_cast<typename Options::WBTDeltaT>(s_l)) {
 			// std::cout << " --- Initial left overhang\n";
 			// Out of balance with left overhang
 			Node * n_l = cur->NB::get_left(); // n_l can not be nullptr, since the
@@ -1199,8 +1215,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			}
 			size_t s_lr = s_l - s_ll;
 
-			if (((typename Options::WBTGammaT)s_lr) >
-			    Options::wbt_gamma() * ((typename Options::WBTGammaT)s_ll)) {
+			if (static_cast<typename Options::WBTGammaT>(s_lr) >
+			    Options::wbt_gamma() *
+			        static_cast<typename Options::WBTGammaT>(s_ll)) {
 				// Double rotation
 				// std::cout << " ---- Double rotation.\n";
 				this->rotate_left(n_l);
@@ -1229,8 +1246,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			// Step 1: Check if descending left will hurt balance
 			Node * n_l = cur->NB::get_left();
 			s_l = n_l->NB::_wbt_size - 1; // this is where deletion happens
-			if (((typename Options::WBTDeltaT)s_l) * Options::wbt_delta() <
-			    (typename Options::WBTDeltaT)(s_cur - s_l - 1)) {
+			if (static_cast<typename Options::WBTDeltaT>(s_l) * Options::wbt_delta() <
+			    static_cast<typename Options::WBTDeltaT>(s_cur - s_l - 1)) {
 				// Out of balance with right overhang
 				// std::cout << " ---- Right overhang\n";
 				n_r = cur->NB::get_right();
@@ -1242,8 +1259,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 				}
 				size_t s_rl = (s_cur - s_l) - s_rr;
 
-				if (((typename Options::WBTGammaT)s_rl) >
-				    Options::wbt_gamma() * ((typename Options::WBTGammaT)s_rr)) {
+				if (static_cast<typename Options::WBTGammaT>(s_rl) >
+				    Options::wbt_gamma() *
+				        static_cast<typename Options::WBTGammaT>(s_rr)) {
 					// Double rotation
 					// std::cout << " ----- Double Rotation around " << std::hex << n_r
 					// << " and " << cur << std::dec << "\n";
@@ -1536,8 +1554,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 			size_t right_weight =
 			    node->NB::_wbt_size - (last_size); // TODO this can be reformulated
 
-			if (((typename Options::WBTDeltaT)last_size) * Options::wbt_delta() <
-			    (typename Options::WBTDeltaT)right_weight) {
+			if (static_cast<typename Options::WBTDeltaT>(last_size) *
+			        Options::wbt_delta() <
+			    static_cast<typename Options::WBTDeltaT>(right_weight)) {
 				// Out of balance with right-overhang
 
 				size_t right_left = 1;
@@ -1548,8 +1567,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 				}
 				size_t right_right = right_weight - right_left;
 
-				if ((typename Options::WBTGammaT)right_left >
-				    ((typename Options::WBTGammaT)right_right) * Options::wbt_gamma()) {
+				if (static_cast<typename Options::WBTGammaT>(right_left) >
+				    static_cast<typename Options::WBTGammaT>(right_right) *
+				        Options::wbt_gamma()) {
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
@@ -1574,8 +1594,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 
 			size_t left_weight = node->NB::_wbt_size - last_size;
 
-			if (((typename Options::WBTDeltaT)last_size) * Options::wbt_delta() <
-			    (typename Options::WBTDeltaT)(left_weight)) {
+			if (static_cast<typename Options::WBTDeltaT>(last_size) *
+			        Options::wbt_delta() <
+			    static_cast<typename Options::WBTDeltaT>(left_weight)) {
 				// Out of balance with left-overhang
 
 				size_t left_left = 1;
@@ -1586,8 +1607,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 				}
 				size_t left_right = left_weight - left_left;
 
-				if ((typename Options::WBTGammaT)left_right >
-				    ((typename Options::WBTGammaT)left_left) * Options::wbt_gamma()) {
+				if (static_cast<typename Options::WBTGammaT>(left_right) >
+				    static_cast<typename Options::WBTGammaT>(left_left) *
+				        Options::wbt_gamma()) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
 					// TODO FIXME this is quick&dirty - properly implement double

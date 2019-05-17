@@ -361,7 +361,7 @@ BinarySearchTree<Node, Options, Tag, Compare,
 		return;
 	}
 
-	out << "  " << std::to_string((long unsigned int)node) << "[ "
+	out << "  " << std::hex << node << std::dec << "[ "
 	    << " label=\"" << name_getter(node) << "\"]\n";
 
 	if (node->NB::get_parent() != nullptr) {
@@ -372,9 +372,8 @@ BinarySearchTree<Node, Options, Tag, Compare,
 			label = std::string("R");
 		}
 
-		out << "  " << std::to_string((long unsigned int)node->NB::get_parent())
-		    << " -> " << std::to_string((long unsigned int)node) << "[ label=\""
-		    << label << "\"]\n";
+		out << "  " << std::hex << node->NB::get_parent() << std::dec << " -> "
+		    << std::hex << node << std::dec << "[ label=\"" << label << "\"]\n";
 	}
 
 	this->output_node_base(node->NB::get_left(), out, name_getter);

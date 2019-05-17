@@ -30,8 +30,8 @@ ConfigHolder CFG;
 void
 BuildRange(::benchmark::internal::Benchmark * b)
 {
-	for (int64_t seed = CFG.seed_start; seed < CFG.seed_start + (int64_t)CFG.seed_count;
-	     ++seed) {
+	for (int64_t seed = CFG.seed_start;
+	     seed < CFG.seed_start + static_cast<int64_t>(CFG.seed_count); ++seed) {
 		for (size_t doubling = 0; doubling < CFG.doublings; ++doubling) {
 			b->Args({CFG.base_size << doubling, CFG.experiment_size, seed});
 		}
@@ -42,19 +42,20 @@ int
 main(int argc, char ** argv)
 {
 	int remaining_argc = argc;
-	char ** remaining_argv = (char **)malloc((size_t)argc * sizeof(char *));
+	char ** remaining_argv = reinterpret_cast<char **>(
+	    malloc(static_cast<size_t>(argc) * sizeof(char *)));
 
 	CFG.experiment_size = EXPERIMENT_SIZE;
 	CFG.base_size = BASE_SIZE;
 	CFG.doublings = DOUBLINGS;
 	CFG.seed_start = 4;
 	CFG.seed_count = 2;
-	
+
 	std::string filter_re = "";
 
 	remaining_argv[0] = argv[0];
 	size_t j = 1;
-	for (size_t i = 1; i < (size_t)argc; ++i) {
+	for (size_t i = 1; i < static_cast<size_t>(argc); ++i) {
 		if (strncmp(argv[i], "--papi", strlen("--papi")) == 0) {
 			char * tok = strtok(argv[i + 1], ",");
 
@@ -67,19 +68,19 @@ main(int argc, char ** argv)
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--doublings", strlen("--doublings")) == 0) {
-			CFG.doublings = (size_t)atoi(argv[i + 1]);
+			CFG.doublings = static_cast<size_t>(atoi(argv[i + 1]));
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--base_size", strlen("--base_size")) == 0) {
-			CFG.base_size = (int64_t)atoi(argv[i + 1]);
+			CFG.base_size = static_cast<int64_t>(atoi(argv[i + 1]));
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--seed_start", strlen("--seed_start")) == 0) {
-			CFG.seed_start = (int)atoi(argv[i + 1]);
+			CFG.seed_start = static_cast<int>(atoi(argv[i + 1]));
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--seed_count", strlen("--seed_count")) == 0) {
-			CFG.seed_count = (size_t)atoi(argv[i + 1]);
+			CFG.seed_count = static_cast<size_t>(atoi(argv[i + 1]));
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--filter", strlen("--filter")) == 0) {
@@ -89,7 +90,7 @@ main(int argc, char ** argv)
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--experiment_size",
 		                   strlen("--experiment_size")) == 0) {
-			CFG.experiment_size = (int64_t)atoi(argv[i + 1]);
+			CFG.experiment_size = static_cast<int64_t>(atoi(argv[i + 1]));
 			i += 1;
 			remaining_argc -= 2;
 		} else {

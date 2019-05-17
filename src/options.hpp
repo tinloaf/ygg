@@ -170,7 +170,7 @@ public:
 	template <size_t gamma_numerator>
 	class WBT_GAMMA_NUMERATOR {
 	public:
-		constexpr static size_t value = (double)gamma_numerator;
+		constexpr static size_t value = gamma_numerator;
 	};
 
 	/**
@@ -208,7 +208,7 @@ public:
 	template <size_t gamma_denominator>
 	class WBT_GAMMA_DENOMINATOR {
 	public:
-		constexpr static size_t value = (double)gamma_denominator;
+		constexpr static size_t value = gamma_denominator;
 	};
 
 	class WBT_SINGLE_PASS {

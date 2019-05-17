@@ -43,8 +43,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::ZTree(
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter> &
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::
-operator=(MyClass && other)
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::operator=(
+    MyClass && other)
 {
 	this->root = other.root;
 	other.root = nullptr;
@@ -54,8 +54,8 @@ operator=(MyClass && other)
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter> &
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::
-operator=(const MyClass & other)
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::operator=(
+    const MyClass & other)
 {
 	static_assert(Options::ztree_store_rank,
 	              "Zip Trees must store node ranks to support copy assignment.");
@@ -684,8 +684,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::output_node_base(
 	node_label += std::to_string(RankGetter::get_rank(*node));
 	node_label += ")";
 
-	out << "  " << std::to_string((long unsigned int)node) << "[ label=\""
-	    << node_label << "\"]\n";
+	out << "  " << std::hex << node << std::dec << "[ label=\"" << node_label
+	    << "\"]\n";
 
 	if (node->NB::_zt_parent != nullptr) {
 		std::string label;
@@ -695,9 +695,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::output_node_base(
 			label = std::string("R");
 		}
 
-		out << "  " << std::to_string((long unsigned int)node->NB::_zt_parent)
-		    << " -> " << std::to_string((long unsigned int)node) << "[ label=\""
-		    << label << "\"]\n";
+		out << "  " << std::hex << node->NB::_zt_parent << std::dec << " -> "
+		    << std::hex << node << std::dec << "[ label=\"" << label << "\"]\n";
 	}
 
 	this->output_node_base(node->NB::_zt_left, out, name_getter);

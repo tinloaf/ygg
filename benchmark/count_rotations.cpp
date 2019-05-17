@@ -169,7 +169,8 @@ public:
 
 		CountingNodeTraits::reset();
 		for (size_t i = 0; i < this->operation_count; ++i) {
-			size_t index = (size_t)(std::abs(distr(rnd))) % this->node_count;
+			size_t index =
+			    static_cast<size_t>(std::abs(distr(rnd))) % this->node_count;
 
 			// TODO optimistic - also needs distinct values!
 			// this->init_t.remove(*(Node<InitialFlags> *)(&this->nodes[index]));
@@ -235,7 +236,8 @@ public:
 
 		RBCountingNodeTraits::reset();
 		for (size_t i = 0; i < this->operation_count; ++i) {
-			size_t index = (size_t)(std::abs(distr(rnd))) % this->node_count;
+			size_t index =
+			    static_cast<size_t>(std::abs(distr(rnd))) % this->node_count;
 
 			// TODO optimistic - also needs distinct values!
 			// this->init_t.remove(*(Node<InitialFlags> *)(&this->nodes[index]));
@@ -264,11 +266,11 @@ int
 main(int argc, char ** argv)
 {
 	(void)argc;
-	size_t node_count = (size_t)atoi(argv[1]);
-	size_t operation_count_base = (size_t)atoi(argv[2]);
-	size_t operation_count_increment = (size_t)atoi(argv[3]);
-	size_t operation_count_steps = (size_t)atoi(argv[4]);
-	size_t seed_count = (size_t)atoi(argv[5]);
+	size_t node_count = static_cast<size_t>(atoi(argv[1]));
+	size_t operation_count_base = static_cast<size_t>(atoi(argv[2]));
+	size_t operation_count_increment = static_cast<size_t>(atoi(argv[3]));
+	size_t operation_count_steps = static_cast<size_t>(atoi(argv[4]));
+	size_t seed_count = static_cast<size_t>(atoi(argv[5]));
 
 	// CSV file to write gradual counts to
 	std::string out_dir(argv[6]);
@@ -301,42 +303,42 @@ main(int argc, char ** argv)
 		RBRotationCounter rcRB("RBTree", node_count, opcount, outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcRB.run((int)seed);
+			rcRB.run(static_cast<int>(seed));
 		}
 
 		RotationCounter<DefOptions> rcTP("WBTree[Default|TP]", node_count, opcount,
 		                                 outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcTP.run((int)seed);
+			rcTP.run(static_cast<int>(seed));
 		}
 
 		RotationCounter<SPOptions> rcSP("WBTree[Default|SP]", node_count, opcount,
 		                                outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcSP.run((int)seed);
+			rcSP.run(static_cast<int>(seed));
 		}
 
 		RotationCounter<SP32Options> rc32("WBTree[3|2|SP]", node_count, opcount,
 		                                  outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rc32.run((int)seed);
+			rc32.run(static_cast<int>(seed));
 		}
 
 		RotationCounter<SPBalOptions> rcBal("WBTree[2|3/2|SP]", node_count, opcount,
 		                                    outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcBal.run((int)seed);
+			rcBal.run(static_cast<int>(seed));
 		}
 
 		RotationCounter<SPLWOptions> rcLW("WBTree[3|4/3|SP]", node_count, opcount,
 		                                  outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcLW.run((int)seed);
+			rcLW.run(static_cast<int>(seed));
 		}
 	}
 

@@ -24,11 +24,17 @@ template <class Node>
 ygg::rbtree_internal::Color
 ColorParentStorage<Node, true>::get_color() const
 {
-	if ((size_t)this->parent & 1) {
-		return Color::RED;
+	// Hacky hack to avoid branching. Red is defined as 1, black as 0, and
+	// true is 1, false is 0, so…
+	return static_cast<ygg::rbtree_internal::Color>(
+	    reinterpret_cast<size_t>(this->parent) & 1);
+	/* Is equivalent to:
+	if (reinterpret_cast<size_t>(this->parent) & 1) {
+	  return Color::RED;
 	} else {
-		return Color::BLACK;
+	  return Color::BLACK;
 	}
+	*/
 }
 
 template <class Node>

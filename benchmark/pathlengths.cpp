@@ -24,9 +24,10 @@ public:
 
 		std::cout << "Median Depth: \t\t"
 		          << this->path_lengths[this->path_lengths.size() / 2] << std::endl;
-		size_t sum = (size_t)std::accumulate(this->path_lengths.begin(),
-		                                     this->path_lengths.end(), 0);
-		std::cout << "Average Depth: \t\t" << ((double)sum) / ((double)this->count)
+		size_t sum = std::accumulate(this->path_lengths.begin(),
+		                             this->path_lengths.end(), size_t{0});
+		std::cout << "Average Depth: \t\t"
+		          << (static_cast<double>(sum) / static_cast<double>(this->count))
 		          << std::endl;
 		std::cout << "Depth Sum: \t\t" << sum << std::endl;
 		std::cout << "Maximum Depth: \t\t"
@@ -46,7 +47,8 @@ public:
 		this->os << this->name << "," << this->count << "," << this->move_count
 		         << "," << this->seed << ","
 		         << this->path_lengths[this->path_lengths.size() / 2] << ","
-		         << ((double)sum) / ((double)this->count) << "," << sum << ","
+		         << (static_cast<double>(sum) / static_cast<double>(this->count))
+		         << "," << sum << ","
 		         << *std::max_element(this->path_lengths.begin(),
 		                              this->path_lengths.end())
 		         << "\n";
@@ -332,12 +334,12 @@ main(int argc, const char ** argv)
 {
 	(void)argc; // TODO print an error message if wrong
 
-	size_t base_count = (size_t)std::atol(argv[1]);
-	size_t offset = (size_t)std::atol(argv[2]);
-	size_t additions = (size_t)std::atol(argv[3]);
-	double move_fraction = (double)std::atof(argv[4]);
-	size_t seed_start = (size_t)std::atol(argv[5]);
-	size_t seed_count = (size_t)std::atol(argv[6]);
+	size_t base_count = static_cast<size_t>(std::atol(argv[1]));
+	size_t offset = static_cast<size_t>(std::atol(argv[2]));
+	size_t additions = static_cast<size_t>(std::atol(argv[3]));
+	double move_fraction = static_cast<double>(std::atof(argv[4]));
+	size_t seed_start = static_cast<size_t>(std::atol(argv[5]));
+	size_t seed_count = static_cast<size_t>(std::atol(argv[6]));
 	std::string file_name(argv[7]);
 
 	std::ofstream os(file_name, std::ios::trunc);
@@ -349,7 +351,7 @@ main(int argc, const char ** argv)
 	for (size_t a = 0; a <= additions; ++a) {
 		std::cout << "################### " << a << " / " << additions << "\n";
 		size_t count = base_count + (a * offset);
-		size_t move_count = (size_t)(count * move_fraction);
+		size_t move_count = static_cast<size_t>(count * move_fraction);
 
 		do_analysis(all_types(), count, move_count, seed_count, seed_start, os);
 	}

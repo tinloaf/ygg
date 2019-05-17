@@ -94,7 +94,7 @@ public:
 #ifdef USEPAPI
 		// TODO error handling
 		PAPI_start_counters(this->selected_events.data(),
-		                    (int)this->selected_events.size());
+		                    static_cast<int>(this->selected_events.size()));
 #endif
 	}
 
@@ -104,7 +104,7 @@ public:
 #ifdef USEPAPI
 		// TODO error handling
 		PAPI_stop_counters(this->event_counts.data(),
-		                   (int)this->event_counts.size());
+		                   static_cast<int>(this->event_counts.size()));
 		std::transform(this->event_counts.begin(), this->event_counts.end(),
 		               this->event_count_accu.begin(),
 		               this->event_count_accu.begin(), std::plus<long long>());
@@ -116,7 +116,8 @@ public:
 	{
 #ifdef USEPAPI
 		for (size_t i = 0; i < PAPI_MEASUREMENTS.size(); ++i) {
-			state.counters[PAPI_MEASUREMENTS[i]] = (double)this->event_count_accu[i];
+			state.counters[PAPI_MEASUREMENTS[i]] =
+			    static_cast<double>(this->event_count_accu[i]);
 		}
 		std::fill(this->event_count_accu.begin(), this->event_count_accu.end(), 0);
 #else

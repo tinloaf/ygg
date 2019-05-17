@@ -401,7 +401,8 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 	// TODO this is a wild hack. Is this portable?
 	//	size_t full_tree_size = 1 << (fls(node->NB::_et_size) + (1 -
 	//__builtin_parity(node->NB::_et_size)));
-	int tree_levels = (int)(std::ceil(std::log2(node->NB::_et_size + 1)));
+	int tree_levels =
+	    static_cast<int>(std::ceil(std::log2(node->NB::_et_size + 1)));
 	size_t full_tree_size = (1 << tree_levels) - 1;
 
 	this->rebuild_buffer.resize(full_tree_size);
@@ -476,7 +477,8 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 		          << index_in_level << "\n";
 		*/
 
-		this->rebuild_buffer[level_offset + (unsigned long)index_in_level] = &(*it);
+		this->rebuild_buffer[level_offset +
+		                     static_cast<unsigned long>(index_in_level)] = &(*it);
 	}
 
 	//	std::cout << "--------------------\n";
@@ -545,7 +547,8 @@ EnergyTree<Node, Options, Tag, Compare>::rebuild_below(Node * node)
 			i += 2;
 		}
 
-		for (size_t j = i / 2; j < (size_t)(1 << (tree_levels - 2)); j++) {
+		for (size_t j = i / 2; j < static_cast<size_t>(1 << (tree_levels - 2));
+		     j++) {
 			// Remaining nodes in the second-to-last level
 			/*
 			std::cout << "## Zero-ing out to below " << std::hex

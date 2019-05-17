@@ -61,9 +61,9 @@ BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
 REGISTER(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
 
 // Default gamma, delta / single pass
-using DeleteYggWBDefGDefDSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-               DeleteExperiment, false, false, true, false>;
+using DeleteYggWBDefGDefDSPBSTFixture = BSTFixture<
+    YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
+    DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -111,7 +111,6 @@ BENCHMARK_DEFINE_F(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
 	this->papi.report_and_reset(state);
 }
 REGISTER(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
-
 
 // integral gamma, delta / twopass
 using DeleteYggWB3G2DTPBSTFixture =
@@ -232,7 +231,7 @@ BENCHMARK_DEFINE_F(DeleteStdSetBSTFixture, BM_BST_Deletion)
 {
 	std::vector<decltype(this->t)::const_iterator> experiment_iterators;
 	std::vector<decltype(std::multiset<int>().extract(0))> extracted_nodes;
-	extracted_nodes.reserve((size_t)state.range(1));
+	extracted_nodes.reserve(static_cast<size_t>(state.range(1)));
 	std::vector<decltype(this->t)::const_iterator> all_iterators;
 	auto it = this->t.begin();
 	while (it != this->t.end()) {

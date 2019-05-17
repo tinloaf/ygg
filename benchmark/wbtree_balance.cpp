@@ -48,11 +48,12 @@ public:
 
 		for (size_t i = 0; i < this->node_count; ++i) {
 			this->nodes[i].key = distr(rnd);
-			this->init_t.insert(*(Node<InitialFlags> *)(&this->nodes[i]));
+			this->init_t.insert(
+			    *reinterpret_cast<Node<InitialFlags> *>(&this->nodes[i]));
 		}
 
 		// Bad Hack.
-		this->t = (Tree *)(&this->init_t);
+		this->t = reinterpret_cast<Tree *>(&this->init_t);
 
 		for (size_t i = 0; i < this->reinsertion_count; ++i) {
 			size_t index =
@@ -100,7 +101,9 @@ public:
 		          << "\n";
 		size_t sum =
 		    std::accumulate(this->counts.begin(), this->counts.end(), size_t{0});
-		std::cout << "Mean: \t" << (double)sum / (double)this->counts.size()
+		std::cout << "Mean: \t"
+		          << static_cast<double>(sum) /
+		                 static_cast<double>(this->counts.size())
 		          << "\n";
 		if (this->counts.size() % 2 == 0) {
 			std::nth_element(this->counts.begin(),
@@ -110,8 +113,9 @@ public:
 			                 this->counts.begin() + (this->counts.size() / 2) - 1,
 			                 this->counts.end());
 			std::cout << "Median: \t"
-			          << (double)(this->counts[this->counts.size() / 2] +
-			                      this->counts[this->counts.size() / 2 - 1]) /
+			          << static_cast<double>(
+			                 this->counts[this->counts.size() / 2] +
+			                 this->counts[this->counts.size() / 2 - 1]) /
 			                 2.0
 			          << "\n";
 		} else {
@@ -119,7 +123,8 @@ public:
 			                 this->counts.begin() + (this->counts.size() / size_t{2}),
 			                 this->counts.end());
 			std::cout << "Median: \t"
-			          << this->counts[(size_t)(this->counts.size() / 2)] << "\n";
+			          << this->counts[static_cast<size_t>(this->counts.size() / 2)]
+			          << "\n";
 		}
 	}
 

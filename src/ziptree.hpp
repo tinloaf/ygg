@@ -67,15 +67,14 @@ public:
 	get_rank(const Node & node) noexcept
 	{
 		// TODO ffsl? ffs?
-		// TODO if constrexpr when switching to C++17
-		if (Options::ztree_universalize) {
+		if constexpr (Options::ztree_universalize) {
 			// TODO this is not strictly a universal family
 			size_t universalized =
 			    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
 			    Options::ztree_universalize_modul;
-			return __builtin_ffsl((long int)universalized);
+			return __builtin_ffsl(static_cast<long int>(universalized));
 		} else {
-			return __builtin_ffsl((long int)std::hash<Node>{}(node));
+			return __builtin_ffsl(static_cast<long int>(std::hash<Node>{}(node)));
 		}
 	}
 };
@@ -95,18 +94,18 @@ public:
 			size_t universalized =
 			    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
 			    Options::ztree_universalize_modul;
-			node._zt_rank.rank =
-			    (decltype(node._zt_rank.rank))__builtin_ffsl((long int)universalized);
+			node._zt_rank.rank = static_cast<decltype(node._zt_rank.rank)>(
+			    __builtin_ffsl(static_cast<long int>(universalized)));
 		} else {
-			node._zt_rank.rank = (decltype(node._zt_rank.rank))__builtin_ffsl(
-			    (long int)std::hash<Node>{}(node));
+			node._zt_rank.rank = static_cast<decltype(node._zt_rank.rank)>(
+			    __builtin_ffsl(static_cast<long int>(std::hash<Node>{}(node))));
 		}
 	}
 
 	static size_t
 	get_rank(const Node & node) noexcept
 	{
-		return (size_t)node._zt_rank.rank;
+		return static_cast<size_t>(node._zt_rank.rank);
 	}
 
 private:
@@ -123,11 +122,12 @@ public:
 		auto rand_val = std::rand();
 		this->rank = 0;
 		while (rand_val == RAND_MAX) {
-			this->rank = (decltype(this->rank))(
-			    this->rank + (decltype(this->rank))std::log2(RAND_MAX));
+			this->rank = static_cast<decltype(this->rank)>((
+			    this->rank + static_cast<decltype(this->rank)>(std::log2(RAND_MAX))));
 			rand_val = std::rand();
 		}
-		this->rank = (decltype(this->rank))__builtin_ffsl((long int)rand_val);
+		this->rank = static_cast<decltype(this->rank)>(
+		    __builtin_ffsl(static_cast<long int>(rand_val)));
 	};
 
 	template <class URBG>
@@ -136,10 +136,10 @@ public:
 		auto rand_val = g();
 		this->rank = 0;
 		while (rand_val == g.max()) {
-			this->rank += (size_t)std::log2(g.max());
+			this->rank += static_cast<size_t>(std::log2(g.max()));
 			rand_val = g();
 		}
-		this->rank = __builtin_ffsl((long int)rand_val);
+		this->rank = __builtin_ffsl(static_cast<long int>(rand_val));
 	}
 
 	static void
@@ -151,7 +151,7 @@ public:
 	static size_t
 	get_rank(const Node & node) noexcept
 	{
-		return (size_t)node._zt_rank.rank;
+		return static_cast<size_t>(node._zt_rank.rank);
 	}
 
 private:
