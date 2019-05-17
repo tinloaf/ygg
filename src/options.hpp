@@ -322,16 +322,18 @@ public:
 	        TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT,
 	        ztree_universalize_coefficient_default, Opts...>::value;
 
-	// TODO make the type integral if possible
 	using WBTDeltaT =
 	    typename decltype(TreeOptions<Opts...>::compute_wbt_delta_type())::type;
 	static constexpr WBTDeltaT
 	wbt_delta()
 	{
-		if (utilities::pack_contains_tmpl<TreeFlags::WBT_DELTA_NUMERATOR,
-		                                  Opts...>() &&
-		    utilities::pack_contains_tmpl<TreeFlags::WBT_DELTA_DENOMINATOR,
-		                                  Opts...>()) {
+		if constexpr (utilities::pack_contains_tmpl<TreeFlags::WBT_DELTA_NUMERATOR,
+		                                            Opts...>() &&
+		              utilities::pack_contains_tmpl<
+		                  TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>() &&
+		              (utilities::get_value_if_present<
+		                   TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>::value !=
+		               0)) {
 			return (utilities::get_value_if_present<TreeFlags::WBT_DELTA_NUMERATOR,
 			                                        Opts...>::value /
 			        utilities::get_value_if_present<TreeFlags::WBT_DELTA_DENOMINATOR,
@@ -346,10 +348,13 @@ public:
 	static constexpr WBTGammaT
 	wbt_gamma()
 	{
-		if (utilities::pack_contains_tmpl<TreeFlags::WBT_GAMMA_NUMERATOR,
-		                                  Opts...>() &&
-		    utilities::pack_contains_tmpl<TreeFlags::WBT_GAMMA_DENOMINATOR,
-		                                  Opts...>()) {
+		if constexpr (utilities::pack_contains_tmpl<TreeFlags::WBT_GAMMA_NUMERATOR,
+		                                            Opts...>() &&
+		              utilities::pack_contains_tmpl<
+		                  TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>() &&
+		              (utilities::get_value_if_present<
+		                   TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>::value !=
+		               0)) {
 			return (utilities::get_value_if_present<TreeFlags::WBT_GAMMA_NUMERATOR,
 			                                        Opts...>::value /
 			        utilities::get_value_if_present<TreeFlags::WBT_GAMMA_DENOMINATOR,
