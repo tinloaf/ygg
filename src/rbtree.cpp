@@ -2,7 +2,7 @@
 #define YGG_RBTREE_CPP
 
 #include "rbtree.hpp"
-#include "/home/lukas/src/intervaltree/ygg/src/util.hpp"
+#include "util.hpp"
 
 namespace ygg {
 
