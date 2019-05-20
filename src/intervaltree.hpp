@@ -123,7 +123,7 @@ public:
 template <class Node, class NodeTraits, class Options = DefaultOptions,
           class Tag = int>
 class IntervalTree
-    : public RBTree<
+    : private RBTree<
           Node,
           intervaltree_internal::ExtendedNodeTraits<
               Node, ITreeNodeBase<Node, NodeTraits, Options, Tag>, NodeTraits>,
@@ -132,8 +132,6 @@ class IntervalTree
 public:
 	using Key = typename NodeTraits::key_type;
 	using MyClass = IntervalTree<Node, NodeTraits, Options, Tag>;
-
-	// TODO why do I need to specify this again?
 
 	using INB = ITreeNodeBase<Node, NodeTraits, Options, Tag>;
 	static_assert(std::is_base_of<INB, Node>::value,
@@ -152,6 +150,11 @@ public:
 
 	bool verify_integrity() const;
 	void dump_to_dot(const std::string & filename) const;
+
+	/* Import some of RBTree's methods into the public namespace */
+	using BaseTree::empty;
+	using BaseTree::insert;
+	using BaseTree::remove;
 
 	// Iteration of sets of intervals
 	template <class Comparable>
@@ -200,13 +203,15 @@ public:
 	 *
 	 * This method queries for intervals overlapping a query interval.
 	 * The query parameter q can be anything that is comparable to an interval.
-	 * A class <Comparable> is comparable to an interval if the NodeTraits implement a 
-	 * get_lower(const Comparable &) and get_upper(const Comparable &) method.
-	 * 
+	 * A class <Comparable> is comparable to an interval if the NodeTraits
+	 * implement a get_lower(const Comparable &) and get_upper(const Comparable &)
+	 * method.
+	 *
 	 * The return value is a QueryResult that contains all intervals that overlap
 	 * the given query.
 	 *
-	 * @param q Anything that is comparable (i.e., has get_lower() and get_upper() methods in NodeTraits) to an interval
+	 * @param q Anything that is comparable (i.e., has get_lower() and get_upper()
+	 * methods in NodeTraits) to an interval
 	 * @result A QueryResult holding all intervals in the tree that overlap q
 	 */
 	template <class Comparable>
