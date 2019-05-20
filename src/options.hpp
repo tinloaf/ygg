@@ -213,6 +213,12 @@ public:
 
 	class WBT_SINGLE_PASS {
 	};
+
+	/******************************************************
+	 * Micro-Optimization Options
+	 ******************************************************/
+	class MICRO_PREFER_ARITH_OVER_CONDITIONALS {
+	};
 };
 
 /**
@@ -366,6 +372,13 @@ public:
 
 	static constexpr bool wbt_single_pass =
 	    utilities::pack_contains<TreeFlags::WBT_SINGLE_PASS, Opts...>();
+
+	/**********************************************
+	 * Micro-Optimization
+	 **********************************************/
+	static constexpr bool micro_prefer_arith_over_conditionals =
+	    utilities::pack_contains<TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS,
+	                             Opts...>();
 
 	/// @endcond
 private:

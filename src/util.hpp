@@ -11,6 +11,58 @@ namespace ygg {
 
 namespace utilities {
 
+template <bool use_arith>
+struct choose_ptr_impl
+{
+	template <class T>
+	static inline T * choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
+	    __attribute__((always_inline, const));
+};
+
+template <>
+struct choose_ptr_impl<true>
+{
+	template <class T>
+	static inline T *
+	choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
+	{
+		return reinterpret_cast<T *>(
+		    // TODO verify
+		    static_cast<size_t>(condition) * reinterpret_cast<size_t>(yes_ptr) +
+		    (size_t{1} - static_cast<size_t>(condition)) *
+		        reinterpret_cast<size_t>(no_ptr));
+	}
+};
+
+template <>
+struct choose_ptr_impl<false>
+{
+	template <class T>
+	static inline T *
+	choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
+	{
+		if (condition) {
+			return yes_ptr;
+		} else {
+			return no_ptr;
+		}
+	}
+};
+
+template <class Options, class T>
+static inline T * choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
+    __attribute__((always_inline, const));
+
+template <class Options, class T>
+static inline T *
+choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
+{
+	return choose_ptr_impl<
+	    Options::micro_prefer_arith_over_conditionals>::choose_ptr(condition,
+	                                                               yes_ptr,
+	                                                               no_ptr);
+}
+
 template <class T>
 class TypeHolder {
 public:
@@ -57,7 +109,8 @@ get_value_if_present_func()
 }
 
 template <template <std::size_t> class TMPL, class T, class... Rest>
-constexpr auto get_value_if_present_func(
+constexpr auto
+get_value_if_present_func(
     typename std::enable_if<is_numeric_specialization<T, TMPL>{}, bool>::type
         dummy = true)
 {
@@ -66,7 +119,8 @@ constexpr auto get_value_if_present_func(
 }
 
 template <template <std::size_t> class TMPL, class T, class... Rest>
-constexpr auto get_value_if_present_func(
+constexpr auto
+get_value_if_present_func(
     typename std::enable_if<!is_numeric_specialization<T, TMPL>{}, bool>::type
         dummy = true)
 {
@@ -104,18 +158,18 @@ get_type_if_present_func()
 }
 
 template <template <class> class TMPL, class Default, class T, class... Rest>
-constexpr auto get_type_if_present_func(
-    typename std::enable_if<is_specialization<T, TMPL>{}, bool>::type dummy =
-        true)
+constexpr auto
+get_type_if_present_func(typename std::enable_if<is_specialization<T, TMPL>{},
+                                                 bool>::type dummy = true)
 {
 	(void)dummy;
 	return TypeHolder<T>{};
 }
 
 template <template <class> class TMPL, class Default, class T, class... Rest>
-constexpr auto get_type_if_present_func(
-    typename std::enable_if<!is_specialization<T, TMPL>{}, bool>::type dummy =
-        true)
+constexpr auto
+get_type_if_present_func(typename std::enable_if<!is_specialization<T, TMPL>{},
+                                                 bool>::type dummy = true)
 {
 	(void)dummy;
 	return get_type_if_present_func<TMPL, Default, Rest...>();

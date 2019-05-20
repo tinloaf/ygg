@@ -631,16 +631,29 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 	Node * last_left = nullptr;
 
 	while (cur != nullptr) {
-		if (this->cmp(*cur, query)) {
-			cur = cur->NB::get_right();
+		if constexpr (Options::micro_prefer_arith_over_conditionals) {
+			if (__builtin_expect(
+			        (!this->cmp(*cur, query)) && (!this->cmp(query, *cur)), false)) {
+				return iterator<false>(cur);
+			}
+			cur = utilities::choose_ptr<Options>(
+			    this->cmp(*cur, query), cur->NB::get_right(), cur->NB::get_left());
 		} else {
-			last_left = cur;
-			cur = cur->NB::get_left();
+			if (this->cmp(*cur, query)) {
+				cur = cur->NB::get_right();
+			} else {
+				last_left = cur;
+				cur = cur->NB::get_left();
+			}
 		}
 	}
 
-	if ((last_left != nullptr) && (!this->cmp(query, *last_left))) {
-		return iterator<false>(last_left);
+	if constexpr (!Options::micro_prefer_arith_over_conditionals) {
+		if ((last_left != nullptr) && (!this->cmp(query, *last_left))) {
+			return iterator<false>(last_left);
+		} else {
+			return this->end();
+		}
 	} else {
 		return this->end();
 	}

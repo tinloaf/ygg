@@ -17,6 +17,48 @@
 #include <papi.h>
 #endif
 
+struct WBBSTNamerDefGDefDTP
+{
+	constexpr static const char * name = "1+sqrt(2),sqrt(2),TP";
+};
+struct WBBSTNamerDefGDefDSP
+{
+	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP";
+};
+struct WBBSTNamerBalSP
+{
+	constexpr static const char * name = "2,3/2,SP(opt)";
+};
+struct WBBSTNamerLWSP
+{
+	constexpr static const char * name = "3,4/3,SP(opt)";
+};
+struct WBBSTNamer3G2DSP
+{
+	constexpr static const char * name = "3,2,SP";
+};
+struct WBBSTNamer3G2DTP
+{
+	constexpr static const char * name = "3,2,TP";
+};
+
+struct WBBSTNamerDefGDefDSPOPT
+{
+	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP,opt";
+};
+struct WBBSTNamer3G2DSPOPT
+{
+	constexpr static const char * name = "3,2,SP,opt";
+};
+struct RBBSTNamerDefault
+{
+	constexpr static const char * name = "RBTree ";
+};
+struct RBBSTNamerArith
+{
+	constexpr static const char * name = "RBTree[arith] ";
+};
+
 // TODO various RBTree / Zip Tree variants!
 
 template <class Interface, typename Experiment, bool need_nodes,
@@ -45,6 +87,7 @@ public:
 	void
 	SetUp(const ::benchmark::State & state)
 	{
+		Interface::clear(this->t);
 		this->papi.initialize();
 
 		size_t fixed_count = static_cast<size_t>(state.range(0));
@@ -105,6 +148,7 @@ public:
 
 		if (need_values) {
 			seen_values.clear();
+			this->experiment_values.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
 				int val;
 
@@ -202,7 +246,7 @@ operator<(int lhs, const RBNode<T> & rhs)
 	return lhs < rhs.get_value();
 }
 
-template <class MyTreeOptions>
+template <class MyTreeOptions, class Namer = RBBSTNamerDefault>
 class YggRBTreeInterface {
 public:
 	using Node = RBNode<MyTreeOptions>;
@@ -217,7 +261,7 @@ public:
 	static std::string
 	get_name()
 	{
-		return "RBTree ";
+		return Namer::name;
 	}
 
 	static Node
@@ -573,6 +617,15 @@ using BasicTreeOptions =
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
                          std::numeric_limits<size_t>::max()>>;
 
+using ArithTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
+                     ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
+                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
+                         9859957398433823229ul>,
+                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
+                         std::numeric_limits<size_t>::max()>,
+                     ygg::TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS>;
+
 /* Variants of the weight-balanced tree */
 using WBTTwopassTreeOptions = ygg::TreeOptions<ygg::TreeFlags::MULTIPLE>;
 using WBTSinglepassTreeOptions =
@@ -604,39 +657,5 @@ using WBTSinglepassBalTreeOptions =
                      ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>>;
-
-struct WBBSTNamerDefGDefDTP
-{
-	constexpr static const char * name = "1+sqrt(2),sqrt(2),TP";
-};
-struct WBBSTNamerDefGDefDSP
-{
-	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP";
-};
-struct WBBSTNamerBalSP
-{
-	constexpr static const char * name = "2,3/2,SP(opt)";
-};
-struct WBBSTNamerLWSP
-{
-	constexpr static const char * name = "3,4/3,SP(opt)";
-};
-struct WBBSTNamer3G2DSP
-{
-	constexpr static const char * name = "3,2,SP";
-};
-struct WBBSTNamer3G2DTP
-{
-	constexpr static const char * name = "3,2,TP";
-};
-
-struct WBBSTNamerDefGDefDSPOPT
-{
-	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP,opt";
-};
-struct WBBSTNamer3G2DSPOPT
-{
-	constexpr static const char * name = "3,2,SP,opt";
-};
 
 #endif

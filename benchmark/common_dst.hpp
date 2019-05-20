@@ -101,6 +101,7 @@ public:
 
 		if (need_values) {
 			// TODO values-from-fixed is not respected? Is it for the BST?
+			this->experiment_values.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
 				int p1 = point_distr(this->rng);
 				int p2 = point_distr(this->rng);

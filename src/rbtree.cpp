@@ -2,6 +2,7 @@
 #define YGG_RBTREE_CPP
 
 #include "rbtree.hpp"
+#include "/home/lukas/src/intervaltree/ygg/src/util.hpp"
 
 namespace ygg {
 
@@ -180,30 +181,51 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 
 		if constexpr (Options::multiple) {
 			if constexpr (on_equality_prefer_left) {
+				cur = utilities::choose_ptr<Options>(
+				    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
+				/*
 				if (this->cmp(*cur, node)) {
-					cur = cur->NB::get_right();
+				  cur = cur->NB::get_right();
 				} else {
-					cur = cur->NB::get_left();
+				  cur = cur->NB::get_left();
 				}
+				*/
 			} else {
+				cur = utilities::choose_ptr<Options>(
+				    this->cmp(*cur, node), cur->NB::get_left(), cur->NB::get_right());
+				/*
 				if (this->cmp(node, *cur)) {
-					cur = cur->NB::get_left();
+				  cur = cur->NB::get_left();
 				} else {
-					cur = cur->NB::get_right();
+				  cur = cur->NB::get_right();
 				}
+				*/
 			}
 		} else {
 			// Multiple are not allowed - we need three-way comparisons!
 			// on_equality_prefer_left has no effect here
-			if (this->cmp(*cur, node)) {
-				cur = cur->NB::get_right();
-			} else if (this->cmp(node, *cur)) {
-				cur = cur->NB::get_left();
+
+			if constexpr (Options::micro_prefer_arith_over_conditionals) {
+				cur = utilities::choose_ptr<Options>(
+				    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
+				if (__builtin_expect(
+				        (!this->cmp(*cur, node)) && (!this->cmp(node, *cur)), false)) {
+					// Same as existing. Reduce size (because we increased it earlier)
+					// and exit.
+					this->s.reduce(1);
+					return;
+				}
 			} else {
-				// Same as existing. Reduce size (because we increased it earlier)
-				// and exit.
-				this->s.reduce(1);
-				return;
+				if (this->cmp(*cur, node)) {
+					cur = cur->NB::get_right();
+				} else if (this->cmp(node, *cur)) {
+					cur = cur->NB::get_left();
+				} else {
+					// Same as existing. Reduce size (because we increased it earlier)
+					// and exit.
+					this->s.reduce(1);
+					return;
+				}
 			}
 		}
 	}

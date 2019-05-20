@@ -41,6 +41,21 @@ BuildRange(::benchmark::internal::Benchmark * b)
 int
 main(int argc, char ** argv)
 {
+#ifndef __OPTIMIZE__
+	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+	std::cout << "!!                  Warning                   !!\n";
+	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+	std::cout << "Either you compiled this binary without optimization,\nor my "
+	             "optimization detection hack does not work for your compiler.\n";
+	std::cout << "Doing benchmarks without optimization is not very useful,\nthe "
+	             "numbers you derive from it will not be meaningful.\n";
+	std::cout << "Please make sure optimization is turned on, and if so,\nsubmit "
+	             "a bug report.\n";
+	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+	std::cout << "\n\n";
+
+#endif
+
 	int remaining_argc = argc;
 	char ** remaining_argv = reinterpret_cast<char **>(
 	    malloc(static_cast<size_t>(argc) * sizeof(char *)));
