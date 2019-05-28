@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#include "/home/lukas/src/intervaltree/ygg/src/util.hpp"
+#include "util.hpp"
 #include "wbtree.hpp"
 
 namespace ygg {
