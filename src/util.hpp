@@ -38,8 +38,8 @@ template <>
 struct choose_ptr_impl<false>
 {
 	template <class T>
-	static inline T *
-	choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
+	static inline T *&
+	choose_ptr(bool condition, T *& yes_ptr, T *& no_ptr)
 	{
 		if (condition) {
 			return yes_ptr;
@@ -62,7 +62,7 @@ choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
 	                                                               yes_ptr,
 	                                                               no_ptr);
 }
-
+	
 template <class T>
 class TypeHolder {
 public:
@@ -501,19 +501,29 @@ struct pass_pack<From<Ts...>, To>
 };
 
 /*
- * Cut out a number of parameters and pass from one template to another
+ * Allows your classes to optionally contain members, without re-writing the
+ * whole class in a partial specialization.
  */
-// template<class From,
-//				 template <class ...> class To,
-//				 class prefix_skip_pack,
-//				 class postfix_skip_pack>
-// struct pack_transfer {
-//	using type = pass_pack<pack_remove_postfix<
-//					pack_remove_prefix<From,
-// prefix_skip_pack>::type,
-// postfix_skip_pack>::type,
-// To>::type;
-//};
+template <class T, bool enabled>
+struct OptionalMember
+{
+};
+
+template <class T>
+struct OptionalMember<T, false>
+{
+	/* Accept anything inside the constructor */
+	template <class... Ts>
+	OptionalMember(Ts...)
+	{}
+};
+
+template <class T>
+struct OptionalMember<T, true> : public T
+{
+public:
+	using T::T;
+};
 
 } // namespace utilities
 } // namespace ygg

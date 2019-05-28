@@ -21,7 +21,9 @@ template <class Node>
 class DefaultParentContainer {
 public:
 	Node * get_parent() const;
+	Node *& get_parent();
 	void set_parent(Node * parent);
+	static constexpr bool parent_reference = true;
 
 private:
 	Node * _bst_parent;
@@ -59,6 +61,20 @@ public:
 template <class Node, class Tag = int,
           class ParentContainer = DefaultParentContainer<Node>>
 class BSTNodeBase {
+
+private:
+	/* Determine whether our parent storage allows us to obtain a
+	 * reference to the parent pointer. Used for set-by-arithmetic magic. */
+	constexpr static auto
+	compute_parent_pointer_type()
+	{
+		if constexpr (ParentContainer::parent_reference) {
+			return utilities::TypeHolder<Node *&>{};
+		} else {
+			return utilities::TypeHolder<Node *>{};
+		}
+	}
+
 protected:
 	Node * _bst_left = nullptr;
 	Node * _bst_right = nullptr;
@@ -67,6 +83,8 @@ protected:
 public:
 	void set_parent(Node * new_parent);
 	Node * get_parent() const;
+	template<class InnerPC = ParentContainer>
+	std::enable_if_t<InnerPC::parent_reference, Node *&> get_parent();
 
 	void set_left(Node * new_left);
 	void set_right(Node * new_right);
@@ -115,17 +133,6 @@ public:
 	 * @param other  The red-black tree that this one is constructed from
 	 */
 	MyClass & operator=(MyClass && other);
-
-	// Copying
-	/**
-	 * @brief Copy an other tree into this one
-	 *
-	 * @warning Both trees must have the same size! The nodes in this tree
-	 * will be overwritten. Your node class must implement an operator=()!
-	 *
-	 * @param other  The red-black tree that this one is copied from
-	 */
-	MyClass & mimic(const MyClass & other);
 
 	/******************************************************
 	 ******************************************************
@@ -398,22 +405,22 @@ public:
 	// Mainly debugging methods
 	/// @cond INTERNAL
 	bool verify_integrity() const;
+	void dbg_verify() const;
 	/// @endcond
 
 protected:
 	Node * root;
-
 
 	Node * get_smallest() const;
 	Node * get_largest() const;
 
 	Node * get_uncle(Node * node) const;
 
-		Compare cmp;
+	Compare cmp;
 
 	SizeHolder<Options::constant_time_size> s;
 
-	/* What follows are debugging tools */		
+	/* What follows are debugging tools */
 	void dbg_print_tree() const;
 
 	template <class NodeNameGetter>
@@ -424,12 +431,12 @@ protected:
 	void output_node_base(const Node * node, std::ofstream & out,
 	                      NodeNameGetter name_getter) const;
 
-	
-	bool verify_tree() const;
-	bool verify_order() const;
 
+	// @cond INTERNAL
+	void verify_tree() const;
+	void verify_order() const;
 	void verify_size() const;
-
+	// @endcond
 };
 
 } // namespace bst

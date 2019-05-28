@@ -20,8 +20,8 @@ namespace ygg {
 /**
  * @brief Base class (template) to supply your node class with metainformation
  *
- * The class you use as nodes for the Weight Balanced Tree *must* derive from this
- * class (template). It supplies your class with the necessary members to
+ * The class you use as nodes for the Weight Balanced Tree *must* derive from
+ * this class (template). It supplies your class with the necessary members to
  * contain the linking between the tree nodes.
  *
  * @tparam Node    The node class itself. Yes, that's the class derived from
@@ -41,7 +41,8 @@ public:
 };
 
 /**
- * @brief   Helper base class for the NodeTraits you need to implement for the weight balanced tree
+ * @brief   Helper base class for the NodeTraits you need to implement for the
+ * weight balanced tree
  *
  * This class serves as an (optional) base class for the NodeTraits you need to
  * implement. See DOCTODO for details on NodeTraits. This class just implements
@@ -153,7 +154,8 @@ public:
 	WBTree();
 
 	/**
-	 * @brief Create a new weight balanced tree from a different weight balanced tree.
+	 * @brief Create a new weight balanced tree from a different weight balanced
+	 * tree.
 	 *
 	 * The other weight balanced tree is moved into this one, i.e., using it
 	 * afterwards is undefined behavior.
@@ -217,7 +219,6 @@ public:
 	// Mainly debugging methods
 	/// @cond INTERNAL
 	bool verify_integrity() const;
-	/// @endcond
 
 	/* Debugging methods */
 	// TODO only here for compatibility with the Zip Tree
@@ -225,6 +226,7 @@ public:
 	size_t dbg_count_violations(std::vector<size_t> * depths = nullptr,
 	                            std::vector<size_t> * amounts = nullptr) const;
 	void dbg_assert_balance_at(Node * n) const;
+	/// @endcond
 
 protected:
 	template <bool fix_upward>
@@ -255,6 +257,12 @@ protected:
 	void swap_neighbors(Node * parent, Node * child);
 
 	void verify_sizes() const;
+
+	/* Dummy values for optimization */
+	// TODO make this optional
+	Node * dummy_node_ptr;
+	//utilities::OptionalMember<NB *, Options::micro_setting_dummy_pointer> dummy_node_ptr;
+	utilities::OptionalMember<NB, Options::micro_setting_dummy_pointer> dummy_node;
 };
 
 } // namespace ygg

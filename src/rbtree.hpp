@@ -32,12 +32,17 @@ template <class Node>
 class ColorParentStorage<Node, true> {
 public:
 	void set_color(Color new_color);
+	void make_black();
+	void make_red();
+
 	Color get_color() const;
 	void set_parent(Node * new_parent);
 	Node * get_parent() const;
 
 	void swap_parent_with(ColorParentStorage<Node, true> & other);
 	void swap_color_with(ColorParentStorage<Node, true> & other);
+
+	static constexpr bool parent_reference = false;
 
 private:
 	Node * parent;
@@ -47,12 +52,18 @@ template <class Node>
 class ColorParentStorage<Node, false> {
 public:
 	void set_color(Color new_color);
+	void make_black();
+	void make_red();
+
 	Color get_color() const;
 	void set_parent(Node * new_parent);
+	Node *& get_parent();
 	Node * get_parent() const;
 
 	void swap_parent_with(ColorParentStorage<Node, false> & other);
 	void swap_color_with(ColorParentStorage<Node, false> & other);
+
+	static constexpr bool parent_reference = true;
 
 private:
 	Node * parent = nullptr;
@@ -86,10 +97,17 @@ public:
 	// TODO namespacing!
 
 	void set_color(rbtree_internal::Color new_color);
+	void make_black();
+	void make_red();
 	rbtree_internal::Color get_color() const;
 
 	void swap_parent_with(Node * other);
 	void swap_color_with(Node * other);
+
+private:
+	using ActiveOptions = Options;
+	friend class rbtree_internal::ColorParentStorage<Node,
+	                                                 Options::compress_color>;
 };
 
 /**
@@ -259,12 +277,9 @@ public:
 
 	// Mainly debugging methods
 	/// @cond INTERNAL
+	void dbg_verify() const;
 	bool verify_integrity() const;
 	/// @endcond
-
-	/* Debugging methods */
-	// TODO only here for compatibility with the Zip Tree
-	void dbg_verify() const noexcept {};
 
 protected:
 	using Path = std::vector<Node *>;
@@ -284,9 +299,17 @@ protected:
 	void swap_unrelated_nodes(Node * n1, Node * n2);
 	void swap_neighbors(Node * parent, Node * child);
 
-	bool verify_black_root() const;
-	bool verify_black_paths(const Node * node, unsigned int * path_length) const;
-	bool verify_red_black(const Node * node) const;
+	void verify_black_root() const;
+	void verify_black_paths(const Node * node, unsigned int * path_length) const;
+	void verify_red_black(const Node * node) const;
+
+	/* Dummy values for optimization */
+	// TODO make this optional
+	Node * dummy_node_ptr;
+	// utilities::OptionalMember<NB *, Options::micro_setting_dummy_pointer>
+	// dummy_node_ptr;
+	utilities::OptionalMember<NB, Options::micro_setting_dummy_pointer>
+	    dummy_node;
 };
 
 } // namespace ygg

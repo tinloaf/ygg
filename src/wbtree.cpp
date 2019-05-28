@@ -3,6 +3,7 @@
 
 #include <cmath>
 
+#include "/home/lukas/src/intervaltree/ygg/src/util.hpp"
 #include "wbtree.hpp"
 
 namespace ygg {
@@ -434,22 +435,32 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
 		parent = cur;
 		parent->NB::_wbt_size += 1;
 
-		if constexpr (on_equality_prefer_left) {
-			if (this->cmp(*cur, node)) {
-				cur = cur->NB::get_right();
+		if constexpr (Options::micro_prefer_arith_over_conditionals) {
+			if constexpr (on_equality_prefer_left) {
+				cur = utilities::choose_ptr<Options>(
+				    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
 			} else {
-				cur = cur->NB::get_left();
+				cur = utilities::choose_ptr<Options>(
+				    this->cmp(*cur, node), cur->NB::get_left(), cur->NB::get_right());
 			}
 		} else {
-			if (this->cmp(node, *cur)) {
-				cur = cur->NB::get_left();
+			if constexpr (on_equality_prefer_left) {
+				if (this->cmp(*cur, node)) {
+					cur = cur->NB::get_right();
+				} else {
+					cur = cur->NB::get_left();
+				}
 			} else {
-				cur = cur->NB::get_right();
+				if (this->cmp(node, *cur)) {
+					cur = cur->NB::get_left();
+				} else {
+					cur = cur->NB::get_right();
+				}
 			}
 		}
 	}
 
-	if (parent == nullptr) {
+	if (__builtin_expect(parent == nullptr, false)) {
 		// new root!
 		node.NB::set_parent(nullptr);
 		this->root = &node;
@@ -458,20 +469,37 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
 		node.NB::set_parent(parent);
 
 		// TODO put this into the loop above?
-		if (this->cmp(node, *parent)) {
-			parent->NB::set_left(&node);
-		} else if (this->cmp(*parent, node)) {
-			parent->NB::set_right(&node);
-		} else {
-			// assert(multiple);
-			if constexpr (!Options::multiple) {
-				return;
-			}
+		if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+			bool left = this->cmp(node, *parent);
+			*(utilities::choose_ptr<Options>(left, &parent->NB::get_left(),
+			                                 &parent->NB::get_right())) = &node;
+			if (__builtin_expect(!left && (!this->cmp(*parent, node)), false)) {
+				if constexpr (!Options::multiple) {
+					return;
+				}
 
-			if constexpr (on_equality_prefer_left) {
+				if constexpr (on_equality_prefer_left) {
+					parent->NB::set_left(&node);
+				} else {
+					parent->NB::set_right(&node);
+				}
+			}
+		} else {
+			if (this->cmp(node, *parent)) {
 				parent->NB::set_left(&node);
-			} else {
+			} else if (this->cmp(*parent, node)) {
 				parent->NB::set_right(&node);
+			} else {
+				// assert(multiple);
+				if constexpr (!Options::multiple) {
+					return;
+				}
+
+				if constexpr (on_equality_prefer_left) {
+					parent->NB::set_left(&node);
+				} else {
+					parent->NB::set_right(&node);
+				}
 			}
 		}
 
@@ -493,12 +521,37 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 	parent->NB::_wbt_size -= right_child_old_size;
 
 	parent->NB::set_right(right_child->NB::get_left());
-	if (right_child->NB::get_left() != nullptr) {
-		right_child->NB::get_left()->NB::set_parent(parent);
-
-		parent->NB::_wbt_size += right_child->NB::get_left()->NB::_wbt_size;
+	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+		bool right_not_null = (right_child->NB::get_left() != nullptr);
+		if constexpr (Options::micro_setting_dummy_pointer) {
+			// reinterpret_cast safety: We only access a field available in the node
+			// base.
+			utilities::choose_ptr<Options>(
+			    right_not_null, right_child->NB::get_left(),
+			    reinterpret_cast<Node *>(&this->dummy_node))
+			    ->get_parent() = parent;
+		} else {
+			if (right_not_null) {
+				right_child->NB::get_left()->NB::set_parent(parent);
+			}
+		}
+		// TODO the choice should not be made twice
+		// reinterpret_cast safety: We only access a field available in the node
+		// base.
+		parent->NB::_wbt_size += (1 - static_cast<size_t>(right_not_null)) +
+		                         (static_cast<size_t>(right_not_null) *
+		                          utilities::choose_ptr<Options>(
+		                              right_not_null, right_child->NB::get_left(),
+		                              reinterpret_cast<Node *>(&this->dummy_node))
+		                              ->NB::_wbt_size);
 	} else {
-		parent->NB::_wbt_size += 1; // Pseudo-Leaf on the right
+		if (right_child->NB::get_left() != nullptr) {
+			right_child->NB::get_left()->NB::set_parent(parent);
+
+			parent->NB::_wbt_size += right_child->NB::get_left()->NB::_wbt_size;
+		} else {
+			parent->NB::_wbt_size += 1; // Pseudo-Leaf on the right
+		}
 	}
 
 	Node * parents_parent = parent->NB::get_parent();
@@ -506,14 +559,34 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 	right_child->NB::set_left(parent);
 	right_child->NB::set_parent(parents_parent);
 
-	if (parents_parent != nullptr) {
-		if (parents_parent->NB::get_left() == parent) {
-			parents_parent->NB::set_left(right_child);
-		} else {
-			parents_parent->NB::set_right(right_child);
-		}
+	if constexpr (Options::micro_prefer_arith_over_conditionals_setting &&
+	              Options::micro_setting_dummy_pointer) {
+		// reinterpret_cast safety: We only access a field available in the node
+		// base.
+		Node ** ppl = &(utilities::choose_ptr<Options>(
+		                    parents_parent != nullptr, parents_parent,
+		                    reinterpret_cast<Node *>(&this->dummy_node))
+		                    ->NB::get_left());
+		Node ** ppr = &(utilities::choose_ptr<Options>(
+		                    parents_parent != nullptr, parents_parent,
+		                    reinterpret_cast<Node *>(&this->dummy_node))
+		                    ->NB::get_right());
+		// If parent_parent == nullptr: Set root.
+		// else, if ppl == parent, set ppl, otherwise set ppr
+		Node ** to_be_set = utilities::choose_ptr<Options>(
+		    parents_parent == nullptr, &this->root,
+		    utilities::choose_ptr<Options>(*ppl == parent, ppl, ppr));
+		*to_be_set = right_child;
 	} else {
-		this->root = right_child;
+		if (parents_parent != nullptr) {
+			if (parents_parent->NB::get_left() == parent) {
+				parents_parent->NB::set_left(right_child);
+			} else {
+				parents_parent->NB::set_right(right_child);
+			}
+		} else {
+			this->root = right_child;
+		}
 	}
 
 	parent->NB::set_parent(right_child);
@@ -525,6 +598,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 {
+	// TODO adapt rotate_right to arithmetics
 	Node * left_child = parent->NB::get_left();
 
 	size_t left_child_old_size = left_child->NB::_wbt_size;

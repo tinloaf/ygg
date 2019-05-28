@@ -16,6 +16,13 @@ DefaultParentContainer<Node>::get_parent() const
 }
 
 template <class Node>
+Node *&
+DefaultParentContainer<Node>::get_parent()
+{
+	return this->_bst_parent;
+}
+
+template <class Node>
 void
 DefaultParentContainer<Node>::set_parent(Node * parent)
 {
@@ -42,7 +49,14 @@ Node *
 BSTNodeBase<Node, Tag, ParentContainer>::get_parent() const
 {
 	return this->_bst_parent.get_parent();
-	;
+}
+
+template <class Node, class Tag, class ParentContainer>
+template <class InnerPC>
+std::enable_if_t<InnerPC::parent_reference, Node *&>
+BSTNodeBase<Node, Tag, ParentContainer>::get_parent()
+{
+	return this->_bst_parent.get_parent();
 }
 
 template <class Node, class Tag, class ParentContainer>
@@ -124,29 +138,6 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::operator=(
 
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer> &
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::mimic(
-    const MyClass & other)
-{
-	auto from_it = other.begin();
-	auto dest_it = this->begin();
-
-	while (from_it != other.end()) {
-		assert(dest_it != this->end());
-
-		*dest_it = *from_it;
-
-		++dest_it;
-		++from_it;
-	}
-
-	this->s = other.s;
-
-	return *this;
-}
-
-template <class Node, class Options, class Tag, class Compare,
-          class ParentContainer>
 void
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::clear()
 {
@@ -172,39 +163,31 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_uncle(
 
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
-bool
+void
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::verify_order()
     const
 {
 	for (const Node & n : *this) {
 		if (n.NB::get_left() != nullptr) {
 			// left may not be larger
-			if (this->cmp(n, *(n.NB::get_left()))) {
-				assert(false);
-				return false;
-			}
+			debug::yggassert(! (this->cmp(n, *(n.NB::get_left()))));
 		}
 
 		if (n.NB::get_right() != nullptr) {
 			// right may not be smaller
-			if (this->cmp(*(n.NB::get_right()), n)) {
-				assert(false);
-				return false;
-			}
+			debug::yggassert(! (this->cmp(*(n.NB::get_right()), n)));
 		}
 	}
-
-	return true;
 }
 
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
-bool
+void
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::verify_tree()
     const
 {
 	if (this->root == nullptr) {
-		return true;
+		return;
 	}
 
 	Node * cur = this->root;
@@ -276,8 +259,17 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::verify_tree()
 		 * End: find the next-largest vertex
 		 */
 	}
+}
 
-	return true;
+template <class Node, class Options, class Tag, class Compare,
+          class ParentContainer>
+void
+BinarySearchTree<Node, Options, Tag, Compare,
+                 ParentContainer>::dbg_verify() const
+{
+	this->verify_tree();
+	this->verify_order();
+	this->verify_size();
 }
 
 template <class Node, class Options, class Tag, class Compare,
@@ -286,22 +278,13 @@ bool
 BinarySearchTree<Node, Options, Tag, Compare,
                  ParentContainer>::verify_integrity() const
 {
-	unsigned int dummy;
+	try {
+		this->dbg_verify();
+	} catch (debug::VerifyException & e) {
+		return false;
+	}
 
-	bool tree_okay = this->verify_tree();
-	bool order_okay = this->verify_order();
-
-	// TODO move to new debug scheme
-	debug::yggassert(tree_okay);
-	debug::yggassert(order_okay);
-
-	this->verify_size();
-
-	assert(tree_okay && order_okay);
-
-	(void)dummy;
-
-	return tree_okay && order_okay;
+	return true;
 }
 
 template <class Node, class Options, class Tag, class Compare,

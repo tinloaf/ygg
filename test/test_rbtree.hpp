@@ -18,7 +18,10 @@ using namespace ygg;
 constexpr int RBTREE_TESTSIZE = 2000;
 
 using NonMultipleOptions =
-    TreeOptions<TreeFlags::COMPRESS_COLOR, TreeFlags::CONSTANT_TIME_SIZE>;
+    TreeOptions<TreeFlags::COMPRESS_COLOR, TreeFlags::CONSTANT_TIME_SIZE,
+                TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS,
+                TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING,
+                TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
 
 class Node
     : public RBTreeNodeBase<Node, NonMultipleOptions> { // No multi-nodes!
@@ -44,13 +47,17 @@ public:
 };
 
 // Make Node comparable to int
-bool operator<(const Node & lhs, int rhs) {
+bool
+operator<(const Node & lhs, int rhs)
+{
 	return lhs.data < rhs;
 }
-bool operator<(int lhs, const Node & rhs) {
+bool
+operator<(int lhs, const Node & rhs)
+{
 	return lhs < rhs.data;
 }
-	
+
 class EqualityNode : public RBTreeNodeBase<EqualityNode> {
 public:
 	int data;
@@ -104,7 +111,7 @@ TEST(RBTreeTest, TrivialInsertionTest)
 	n.data = 0;
 	tree.insert(n);
 	ASSERT_FALSE(tree.empty());
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 }
 
 TEST(RBTreeTest, TrivialSizeTest)
@@ -151,51 +158,7 @@ TEST(RBTreeTest, RandomInsertionTest)
 		// std::string fname = std::string("/tmp/trees/tree-") + std::to_string(i) +
 		// std::string(".dot"); tree.dump_to_dot(fname);
 
-		ASSERT_TRUE(tree.verify_integrity());
-	}
-}
-
-TEST(RBTreeTest, CopyAssignmentTest)
-{
-	auto src = RBTree<EqualityNode, EqualityNodeTraits>();
-	auto dst = RBTree<EqualityNode, EqualityNodeTraits>();
-
-	std::mt19937 rng(4); // chosen by fair xkcd
-	std::uniform_int_distribution<int> uni(std::numeric_limits<int>::min(),
-	                                       std::numeric_limits<int>::max());
-
-	EqualityNode nodes_src[RBTREE_TESTSIZE];
-	EqualityNode nodes_dst[RBTREE_TESTSIZE];
-
-	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-		int val = uni(rng);
-
-		nodes_src[i] = EqualityNode(val, (int)i);
-		nodes_dst[i] = EqualityNode(0, (int)i);
-
-		src.insert(nodes_src[i]);
-		dst.insert(nodes_dst[i]);
-	}
-
-	ASSERT_TRUE(src.verify_integrity());
-	ASSERT_TRUE(dst.verify_integrity());
-
-	dst.mimic(src);
-
-	ASSERT_TRUE(src.verify_integrity());
-	ASSERT_TRUE(dst.verify_integrity());
-
-	auto src_it = src.begin();
-	auto dst_it = dst.begin();
-
-	while (src_it != src.end()) {
-		ASSERT_TRUE(dst_it != dst.end());
-
-		ASSERT_EQ(src_it->data, dst_it->data);
-		ASSERT_EQ(src_it->sub_data, dst_it->sub_data);
-
-		++src_it;
-		++dst_it;
+		tree.dbg_verify();
 	}
 }
 
@@ -210,7 +173,7 @@ TEST(RBTreeTest, LinearInsertionTest)
 
 		tree.insert(nodes[i]);
 
-		ASSERT_TRUE(tree.verify_integrity());
+		tree.dbg_verify();
 	}
 }
 
@@ -226,13 +189,15 @@ TEST(RBTreeTest, HintedPostEqualInsertionTest)
 	tree.insert(n_pre);
 	tree.insert(n_post);
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	// should be inserted before pre
 	tree.insert_left_leaning(n_insert_before);
+	tree.dbg_verify();
 
 	// should be inserted between pre and post
 	tree.insert_right_leaning(n_insert_between);
+	tree.dbg_verify();
 
 	// TODO once hinted insertion is fixed, check that the order is upheld
 	// if not using the _*_leaning versions, but the hinted version
@@ -284,7 +249,7 @@ for (int i = 0; i < RBTREE_TESTSIZE; ++i) {
 
 tree.insert(node_border_large, nodes_post[0]);
 tree.insert(node_border_small, node_border_large);
-ASSERT_TRUE(tree.verify_integrity());
+tree.dbg_verify();
 
 auto it = tree.begin();
 for (int i = 0; i < RBTREE_TESTSIZE; ++i) {
@@ -325,7 +290,7 @@ tree.insert(nodes[RBTREE_TESTSIZE - 1]);
 
 for (int i = RBTREE_TESTSIZE - 2; i >= 0; --i) {
   tree.insert(nodes[i], nodes[RBTREE_TESTSIZE - 1]);
-  ASSERT_TRUE(tree.verify_integrity());
+  tree.dbg_verify();
 }
 
 int i = 0;
@@ -415,7 +380,7 @@ TEST(RBTreeTest, LinearNextHintedInsertionTest)
 
 	for (int i = RBTREE_TESTSIZE - 2; i >= 0; --i) {
 		tree.insert(nodes[i], nodes[i + 1]);
-		ASSERT_TRUE(tree.verify_integrity());
+		tree.dbg_verify();
 	}
 
 	int i = 0;
@@ -436,7 +401,7 @@ TEST(RBTreeTest, LowerBoundTest)
 		tree.insert(nodes[i]);
 	}
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE - 1; ++i) {
 		Node query_next((int)(2 * i + 1));
@@ -465,7 +430,7 @@ TEST(RBTreeTest, UpperBoundTest)
 		tree.insert(nodes[i]);
 	}
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE - 1; ++i) {
 		Node query_next((int)(2 * i + 1));
@@ -496,15 +461,15 @@ TEST(RBTreeTest, TrivialDeletionTest)
 	tree.insert(n2);
 
 	ASSERT_FALSE(tree.empty());
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	tree.remove(n2);
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	tree.remove(n1);
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 	ASSERT_TRUE(tree.empty());
 }
 
@@ -521,19 +486,18 @@ TEST(RBTreeTest, TrivialErasureTest)
 	tree.insert(n2);
 
 	ASSERT_FALSE(tree.empty());
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	tree.erase(0);
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 	ASSERT_EQ(tree.find(0), tree.end());
-	
+
 	tree.erase(1);
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 	ASSERT_TRUE(tree.empty());
 }
-
 
 TEST(RBTreeTest, LinearInsertionLinearDeletionTest)
 {
@@ -547,13 +511,13 @@ TEST(RBTreeTest, LinearInsertionLinearDeletionTest)
 		tree.insert(nodes[i]);
 	}
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
 		// std::cout << "\n\n Removing " << i << "\n";
 		tree.remove(nodes[i]);
 
-		ASSERT_TRUE(tree.verify_integrity());
+		tree.dbg_verify();
 	}
 }
 
@@ -575,11 +539,11 @@ TEST(RBTreeTest, LinearInsertionRandomDeletionTest)
 	std::shuffle(indices.begin(), indices.end(),
 	             ygg::testing::utilities::Randomizer(4));
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
 		tree.remove(nodes[indices[i]]);
-		ASSERT_TRUE(tree.verify_integrity());
+		tree.dbg_verify();
 	}
 }
 
@@ -608,7 +572,7 @@ TEST(RBTreeTest, LinearMultipleIterationTest)
 		ASSERT_EQ(tree.size(), size);
 	}
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	unsigned int i = 0;
 	for (auto & n : tree) {
@@ -635,7 +599,7 @@ TEST(RBTreeTest, LinearIterationTest)
 		tree.insert(nodes[index]);
 	}
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	unsigned int i = 0;
 	for (auto & n : tree) {
@@ -663,7 +627,7 @@ TEST(RBTreeTest, ReverseIterationTest)
 		tree.insert(nodes[index]);
 	}
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	auto it = tree.rbegin();
 	unsigned int i = RBTREE_TESTSIZE - 1;
@@ -724,7 +688,7 @@ TEST(RBTreeTest, ComprehensiveTest)
 		tree.insert(persistent_nodes[index]);
 	}
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	Node transient_nodes[RBTREE_TESTSIZE];
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
@@ -748,7 +712,7 @@ TEST(RBTreeTest, ComprehensiveTest)
 		tree.insert(transient_nodes[index]);
 	}
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	for (int i = 0; i < RBTREE_TESTSIZE; ++i) {
 		if (i % 2) {
@@ -757,7 +721,7 @@ TEST(RBTreeTest, ComprehensiveTest)
 			tree.erase(transient_nodes[i].data);
 		}
 
-		ASSERT_TRUE(tree.verify_integrity());
+		tree.dbg_verify();
 	}
 
 	// Query elements
@@ -791,7 +755,7 @@ TEST(RBTreeTest, ComprehensiveMultipleTest)
 		size++;
 	}
 
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	EqualityNode transient_nodes[RBTREE_TESTSIZE];
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
@@ -812,7 +776,7 @@ TEST(RBTreeTest, ComprehensiveMultipleTest)
 	}
 
 	ASSERT_EQ(tree.size(), size);
-	ASSERT_TRUE(tree.verify_integrity());
+	tree.dbg_verify();
 
 	// std::string fname_before =
 	// std::string("/tmp/trees/rbt-comprehensive-before.dot");
@@ -825,7 +789,7 @@ TEST(RBTreeTest, ComprehensiveMultipleTest)
 		// std::to_string(i) + std::string(".dot"); std::cout << "Step " << i << ":
 		// removing data " << transient_nodes[i].data << "\n";
 		// tree.dump_to_dot(rem_fname);
-		ASSERT_TRUE(tree.verify_integrity());
+		tree.dbg_verify();
 		ASSERT_EQ(tree.size(), size);
 	}
 

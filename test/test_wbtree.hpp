@@ -10,7 +10,6 @@
 #include "../src/wbtree.hpp"
 #include "randomizer.hpp"
 
-
 namespace ygg {
 namespace testing {
 namespace wbtree_twopass {
@@ -19,7 +18,11 @@ namespace wbtree_twopass {
 #define __WBT_NAMESPACE wbtree_twopass
 using MULTI_FLAGS =
     TreeOptions<TreeFlags::MULTIPLE, TreeFlags::CONSTANT_TIME_SIZE>;
-using DEFAULT_FLAGS = TreeOptions<TreeFlags::CONSTANT_TIME_SIZE>;
+using DEFAULT_FLAGS =
+    TreeOptions<TreeFlags::CONSTANT_TIME_SIZE,
+                TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS,
+                TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING,
+                TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
 
 #include "test_wbtree_base.hpp"
 
@@ -31,9 +34,13 @@ namespace wbtree_onepass {
 #define __WBT_BASENAME(NAME) SP_##NAME
 #undef __WBT_NAMESPACE
 #define __WBT_NAMESPACE wbtree_onepass
-using MULTI_FLAGS =
-	TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::MULTIPLE, TreeFlags::CONSTANT_TIME_SIZE>;
-using DEFAULT_FLAGS = TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::CONSTANT_TIME_SIZE>;
+using MULTI_FLAGS = TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::MULTIPLE,
+                                TreeFlags::CONSTANT_TIME_SIZE>;
+using DEFAULT_FLAGS =
+    TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::CONSTANT_TIME_SIZE,
+                TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS,
+                TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING,
+                TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
 
 #include "test_wbtree_base.hpp"
 
@@ -41,6 +48,5 @@ using DEFAULT_FLAGS = TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::CONSTAN
 
 } // namespace testing
 } // namespace ygg
-
 
 #endif

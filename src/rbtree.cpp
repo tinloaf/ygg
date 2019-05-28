@@ -12,13 +12,36 @@ template <class Node>
 void
 ColorParentStorage<Node, true>::set_color(Color new_color)
 {
-	if (new_color == Color::RED) {
+	if constexpr (Node::ActiveOptions::
+	                  micro_prefer_arith_over_conditionals_setting) {
 		this->parent = reinterpret_cast<Node *>(
-		    (reinterpret_cast<size_t>(this->parent) | size_t{1}));
+		    ((reinterpret_cast<size_t>(this->parent) & ~(size_t{1})) +
+		     static_cast<size_t>(new_color))); // red is defined to be 1
 	} else {
-		this->parent = reinterpret_cast<Node *>(
-		    (reinterpret_cast<size_t>(this->parent) & ~(size_t{1})));
+		if (new_color == Color::RED) {
+			this->parent = reinterpret_cast<Node *>(
+			    (reinterpret_cast<size_t>(this->parent) | size_t{1}));
+		} else {
+			this->parent = reinterpret_cast<Node *>(
+			    (reinterpret_cast<size_t>(this->parent) & ~(size_t{1})));
+		}
 	}
+}
+
+template <class Node>
+void
+ColorParentStorage<Node, true>::make_red()
+{
+	this->parent = reinterpret_cast<Node *>(
+	    (reinterpret_cast<size_t>(this->parent) | size_t{1}));
+}
+
+template <class Node>
+void
+ColorParentStorage<Node, true>::make_black()
+{
+	this->parent = reinterpret_cast<Node *>(
+	    (reinterpret_cast<size_t>(this->parent) & ~(size_t{1})));
 }
 
 template <class Node>
@@ -28,7 +51,7 @@ ColorParentStorage<Node, true>::get_color() const
 	// Hacky hack to avoid branching. Red is defined as 1, black as 0, and
 	// true is 1, false is 0, so…
 	return static_cast<ygg::rbtree_internal::Color>(
-	    reinterpret_cast<size_t>(this->parent) & 1);
+	    reinterpret_cast<size_t>(this->parent) & size_t{1});
 	/* Is equivalent to:
 	if (reinterpret_cast<size_t>(this->parent) & 1) {
 	  return Color::RED;
@@ -87,6 +110,20 @@ ColorParentStorage<Node, false>::set_color(Color new_color)
 }
 
 template <class Node>
+void
+ColorParentStorage<Node, false>::make_black()
+{
+	this->color = Color::BLACK;
+}
+
+template <class Node>
+void
+ColorParentStorage<Node, false>::make_red()
+{
+	this->color = Color::RED;
+}
+
+template <class Node>
 ygg::rbtree_internal::Color
 ColorParentStorage<Node, false>::get_color() const
 {
@@ -98,6 +135,13 @@ void
 ColorParentStorage<Node, false>::set_parent(Node * new_parent)
 {
 	this->parent = new_parent;
+}
+
+template <class Node>
+Node *&
+ColorParentStorage<Node, false>::get_parent()
+{
+	return this->parent;
 }
 
 template <class Node>
@@ -129,6 +173,20 @@ void
 RBTreeNodeBase<Node, Tag, Options>::set_color(rbtree_internal::Color new_color)
 {
 	this->_bst_parent.set_color(new_color);
+}
+
+template <class Node, class Tag, class Options>
+void
+RBTreeNodeBase<Node, Tag, Options>::make_red()
+{
+	this->_bst_parent.make_red();
+}
+
+template <class Node, class Tag, class Options>
+void
+RBTreeNodeBase<Node, Tag, Options>::make_black()
+{
+	this->_bst_parent.make_black();
 }
 
 template <class Node, class Tag, class Options>
@@ -180,34 +238,34 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 		parent = cur;
 
 		if constexpr (Options::multiple) {
-			if constexpr (on_equality_prefer_left) {
-				cur = utilities::choose_ptr<Options>(
-				    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
-				/*
-				if (this->cmp(*cur, node)) {
-				  cur = cur->NB::get_right();
+			if constexpr (Options::micro_prefer_arith_over_conditionals) {
+				if constexpr (on_equality_prefer_left) {
+					cur = utilities::choose_ptr<Options>(
+					    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
 				} else {
-				  cur = cur->NB::get_left();
+					cur = utilities::choose_ptr<Options>(
+					    this->cmp(*cur, node), cur->NB::get_left(), cur->NB::get_right());
 				}
-				*/
 			} else {
-				cur = utilities::choose_ptr<Options>(
-				    this->cmp(*cur, node), cur->NB::get_left(), cur->NB::get_right());
-				/*
-				if (this->cmp(node, *cur)) {
-				  cur = cur->NB::get_left();
+				if constexpr (on_equality_prefer_left) {
+					if (this->cmp(*cur, node)) {
+						cur = cur->NB::get_right();
+					} else {
+						cur = cur->NB::get_left();
+					}
 				} else {
-				  cur = cur->NB::get_right();
+					if (this->cmp(node, *cur)) {
+						cur = cur->NB::get_left();
+					} else {
+						cur = cur->NB::get_right();
+					}
 				}
-				*/
 			}
 		} else {
 			// Multiple are not allowed - we need three-way comparisons!
 			// on_equality_prefer_left has no effect here
 
 			if constexpr (Options::micro_prefer_arith_over_conditionals) {
-				cur = utilities::choose_ptr<Options>(
-				    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
 				if (__builtin_expect(
 				        (!this->cmp(*cur, node)) && (!this->cmp(node, *cur)), false)) {
 					// Same as existing. Reduce size (because we increased it earlier)
@@ -215,6 +273,9 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 					this->s.reduce(1);
 					return;
 				}
+
+				cur = utilities::choose_ptr<Options>(
+				    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
 			} else {
 				if (this->cmp(*cur, node)) {
 					cur = cur->NB::get_right();
@@ -233,14 +294,15 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 	if (parent == nullptr) {
 		// new root!
 		node.NB::set_parent(nullptr);
-		node.NB::set_color(rbtree_internal::Color::BLACK);
+		node.NB::make_black();
 		this->root = &node;
 		NodeTraits::leaf_inserted(node, *this);
 	} else {
 		node.NB::set_parent(parent);
-		node.NB::set_color(rbtree_internal::Color::RED);
+		node.NB::make_red();
 
 		// TODO if multiple are allowed, we can make this a two-way comparison!
+		// TODO not in a tight loop - still replace with arithmetics?
 		if (this->cmp(node, *parent)) {
 			parent->NB::set_left(&node);
 		} else if (this->cmp(*parent, node)) {
@@ -248,14 +310,12 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 		} else {
 			// assert(multiple);
 
-			// TODO constexpr - if
 			if constexpr (!Options::multiple) {
 				// We already added to the size, subtract it again!
 				this->s.reduce(1);
 				return;
 			} else {
 
-				// TODO constexpr - if
 				if constexpr (on_equality_prefer_left) {
 					parent->NB::set_left(&node);
 				} else {
@@ -277,8 +337,15 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 {
 	Node * right_child = parent->NB::get_right();
 	parent->NB::set_right(right_child->NB::get_left());
-	if (right_child->NB::get_left() != nullptr) {
-		right_child->NB::get_left()->NB::set_parent(parent);
+	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+		utilities::choose_ptr<Options>(right_child->NB::get_left() != nullptr,
+		                               right_child->NB::get_left(),
+		                               reinterpret_cast<Node *>(&this->dummy_node))
+		    ->NB::set_parent(parent);
+	} else {
+		if (right_child->NB::get_left() != nullptr) {
+			right_child->NB::get_left()->NB::set_parent(parent);
+		}
 	}
 
 	Node * parents_parent = parent->NB::get_parent();
@@ -286,14 +353,34 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 	right_child->NB::set_left(parent);
 	right_child->NB::set_parent(parents_parent);
 
-	if (parents_parent != nullptr) {
-		if (parents_parent->NB::get_left() == parent) {
-			parents_parent->NB::set_left(right_child);
-		} else {
-			parents_parent->NB::set_right(right_child);
-		}
+	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+		// reinterpret_cast safety: We only access a field available in the node
+		// base.
+		Node ** ppl = &(utilities::choose_ptr<Options>(
+		                    parents_parent != nullptr, parents_parent,
+		                    reinterpret_cast<Node *>(&this->dummy_node))
+		                    ->NB::get_left());
+		Node ** ppr = &(utilities::choose_ptr<Options>(
+		                    parents_parent != nullptr, parents_parent,
+		                    reinterpret_cast<Node *>(&this->dummy_node))
+		                    ->NB::get_right());
+
+		// If parent_parent == nullptr: Set root.
+		// else, if ppl == parent, set ppl, otherwise set ppr
+		Node ** to_be_set = utilities::choose_ptr<Options>(
+		    parents_parent == nullptr, &this->root,
+		    utilities::choose_ptr<Options>(*ppl == parent, ppl, ppr));
+		*to_be_set = right_child;
 	} else {
-		this->root = right_child;
+		if (parents_parent != nullptr) {
+			if (parents_parent->NB::get_left() == parent) {
+				parents_parent->NB::set_left(right_child);
+			} else {
+				parents_parent->NB::set_right(right_child);
+			}
+		} else {
+			this->root = right_child;
+		}
 	}
 
 	parent->NB::set_parent(right_child);
@@ -307,8 +394,16 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 {
 	Node * left_child = parent->NB::get_left();
 	parent->NB::set_left(left_child->NB::get_right());
-	if (left_child->NB::get_right() != nullptr) {
-		left_child->NB::get_right()->NB::set_parent(parent);
+
+	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+		utilities::choose_ptr<Options>(left_child->NB::get_right() != nullptr,
+		                               left_child->NB::get_right(),
+		                               reinterpret_cast<Node *>(&this->dummy_node))
+		    ->NB::set_parent(parent);
+	} else {
+		if (left_child->NB::get_right() != nullptr) {
+			left_child->NB::get_right()->NB::set_parent(parent);
+		}
 	}
 
 	Node * parents_parent = parent->NB::get_parent();
@@ -316,14 +411,33 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 	left_child->NB::set_right(parent);
 	left_child->NB::set_parent(parents_parent);
 
-	if (parents_parent != nullptr) {
-		if (parents_parent->NB::get_left() == parent) {
-			parents_parent->NB::set_left(left_child);
-		} else {
-			parents_parent->NB::set_right(left_child);
-		}
+	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+		// reinterpret_cast safety: We only access a field available in the node
+		// base.
+		Node ** ppl = &(utilities::choose_ptr<Options>(
+		                    parents_parent != nullptr, parents_parent,
+		                    reinterpret_cast<Node *>(&this->dummy_node))
+		                    ->NB::get_left());
+		Node ** ppr = &(utilities::choose_ptr<Options>(
+		                    parents_parent != nullptr, parents_parent,
+		                    reinterpret_cast<Node *>(&this->dummy_node))
+		                    ->NB::get_right());
+		// If parent_parent == nullptr: Set root.
+		// else, if ppl == parent, set ppl, otherwise set ppr
+		Node ** to_be_set = utilities::choose_ptr<Options>(
+		    parents_parent == nullptr, &this->root,
+		    utilities::choose_ptr<Options>(*ppl == parent, ppl, ppr));
+		*to_be_set = left_child;
 	} else {
-		this->root = left_child;
+		if (parents_parent != nullptr) {
+			if (parents_parent->NB::get_left() == parent) {
+				parents_parent->NB::set_left(left_child);
+			} else {
+				parents_parent->NB::set_right(left_child);
+			}
+		} else {
+			this->root = left_child;
+		}
 	}
 
 	parent->NB::set_parent(left_child);
@@ -349,13 +463,13 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(Node * node)
 	    (this->get_uncle(node) != nullptr) &&
 	    (this->get_uncle(node)->NB::get_color() == rbtree_internal::Color::RED)) {
 		Node * parent = node->NB::get_parent();
-		parent->NB::set_color(rbtree_internal::Color::BLACK);
-		this->get_uncle(node)->NB::set_color(rbtree_internal::Color::BLACK);
+		parent->NB::make_black();
+		this->get_uncle(node)->NB::make_black();
 
 		Node * grandparent = parent->NB::get_parent();
 		if (grandparent->NB::get_parent() !=
 		    nullptr) { // never iterate into the root
-			grandparent->NB::set_color(rbtree_internal::Color::RED);
+			grandparent->NB::make_red();
 			node = grandparent;
 		} else {
 			// Don't recurse into the root; don't color it red. We could immediately
@@ -376,10 +490,10 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(Node * node)
 		if (parent->NB::get_right() == node) {
 			// 'folded in' situation
 			this->rotate_left(parent);
-			node->NB::set_color(rbtree_internal::Color::BLACK);
+			node->NB::make_black();
 		} else {
 			// 'straight' situation
-			parent->NB::set_color(rbtree_internal::Color::BLACK);
+			parent->NB::make_black();
 		}
 
 		this->rotate_right(grandparent);
@@ -387,15 +501,15 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(Node * node)
 		if (parent->NB::get_left() == node) {
 			// 'folded in'
 			this->rotate_right(parent);
-			node->NB::set_color(rbtree_internal::Color::BLACK);
+			node->NB::make_black();
 		} else {
 			// 'straight'
-			parent->NB::set_color(rbtree_internal::Color::BLACK);
+			parent->NB::make_black();
 		}
 		this->rotate_left(grandparent);
 	}
 
-	grandparent->NB::set_color(rbtree_internal::Color::RED);
+	grandparent->NB::make_red();
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -494,15 +608,15 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-bool
+void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::verify_black_root() const
 {
-	return ((this->root == nullptr) ||
-	        (this->root->NB::get_color() == rbtree_internal::Color::BLACK));
+	debug::yggassert((this->root == nullptr) || (this->root->NB::get_color() ==
+	                                             rbtree_internal::Color::BLACK));
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-bool
+void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::verify_black_paths(
     const Node * node, unsigned int * path_length) const
 {
@@ -511,79 +625,73 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::verify_black_paths(
 	if (node->NB::get_left() == nullptr) {
 		left_length = 0;
 	} else {
-		if (!this->verify_black_paths(node->NB::get_left(), &left_length)) {
-			return false;
-		}
+		this->verify_black_paths(node->NB::get_left(), &left_length);
 	}
 
 	if (node->NB::get_right() == nullptr) {
 		right_length = 0;
 	} else {
-		if (!this->verify_black_paths(node->NB::get_right(), &right_length)) {
-			return false;
-		}
+		this->verify_black_paths(node->NB::get_right(), &right_length);
 	}
 
-	if (left_length != right_length) {
-		return false;
-	}
+	debug::yggassert(left_length == right_length);
 
 	if (node->NB::get_color() == rbtree_internal::Color::BLACK) {
 		*path_length = left_length + 1;
 	} else {
 		*path_length = left_length;
 	}
-
-	return true;
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-bool
+void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::verify_red_black(
     const Node * node) const
 {
 	if (node == nullptr) {
-		return true;
+		return;
 	}
 
 	if (node->NB::get_color() == rbtree_internal::Color::RED) {
-		if ((node->NB::get_right() != nullptr) &&
-		    (node->NB::get_right()->NB::get_color() ==
-		     rbtree_internal::Color::RED)) {
-			return false;
-		}
+		debug::yggassert((node->NB::get_right() == nullptr) ||
+		                 (node->NB::get_right()->NB::get_color() !=
+		                  rbtree_internal::Color::RED));
 
-		if ((node->NB::get_left() != nullptr) &&
-		    (node->NB::get_left()->NB::get_color() ==
-		     rbtree_internal::Color::RED)) {
-			return false;
-		}
+		debug::yggassert(
+		    (node->NB::get_left() == nullptr) ||
+		    (node->NB::get_left()->NB::get_color() != rbtree_internal::Color::RED));
 	}
 
-	return this->verify_red_black(node->NB::get_left()) &&
-	       this->verify_red_black(node->NB::get_right());
+	this->verify_red_black(node->NB::get_left());
+	this->verify_red_black(node->NB::get_right());
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 bool
 RBTree<Node, NodeTraits, Options, Tag, Compare>::verify_integrity() const
 {
+	try {
+		this->dbg_verify();
+	} catch (debug::VerifyException & e) {
+		return false;
+	}
+
+	return true;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+void
+RBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_verify() const
+{
+	this->TB::dbg_verify();
+
 	unsigned int dummy;
 
-	bool paths_okay =
-	    (this->root == nullptr) || this->verify_black_paths(this->root, &dummy);
-	bool children_okay = this->verify_red_black(this->root);
-
-	bool root_okay = this->verify_black_root();
-
-	bool bst_okay = this->TB::verify_integrity();
-
-	// TODO adapt to new verification scheme
-	assert(root_okay && paths_okay && children_okay && bst_okay);
-
-	(void)dummy;
-
-	return (root_okay && paths_okay && children_okay && bst_okay);
+	if (this->root != nullptr) {
+		this->verify_black_paths(this->root, &dummy);
+		this->verify_red_black(this->root);
+	}
+	this->verify_black_root();
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -762,14 +870,16 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 		MyClass>) {
 		  // Not overridden
 		  this->replace_node(&node, right_child);
-		  right_child->NB::set_color(rbtree_internal::Color::BLACK);
+		  right_child->NB::make_black();
 		  } else {*/
 		// Overridden
+
+		// TODO why is color swapped here?
 		this->swap_nodes(&node, right_child, true);
 
 		NodeTraits::delete_leaf(node, *this);
 
-		right_child->NB::set_color(rbtree_internal::Color::BLACK);
+		right_child->NB::make_black();
 		right_child->NB::set_right(nullptr); // this stored the node to be deleted…
 		                                     // TODO null the pointers in node?
 		                                     //}
@@ -784,6 +894,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 	bool deleted_left = false;
 	NodeTraits::delete_leaf(node, *this);
 	if (node.NB::get_parent() != nullptr) {
+		// TODO arith
 		if (node.NB::get_parent()->NB::get_left() == &node) {
 			node.NB::get_parent()->NB::set_left(nullptr);
 			deleted_left = true;
@@ -823,10 +934,15 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 
 	while (propagating_up) {
 		// We just deleted a black node from under parent.
-		if (deleted_left) {
-			sibling = parent->NB::get_right();
+		if constexpr (Options::micro_prefer_arith_over_conditionals) {
+			sibling = utilities::choose_ptr<Options>(
+			    deleted_left, parent->NB::get_right(), parent->NB::get_left());
 		} else {
-			sibling = parent->NB::get_left();
+			if (deleted_left) {
+				sibling = parent->NB::get_right();
+			} else {
+				sibling = parent->NB::get_left();
+			}
 		}
 
 		// sibling must exist! If it didn't, then that branch would have had too few
@@ -841,7 +957,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 		      rbtree_internal::Color::BLACK))) {
 
 			// We can recolor and propagate up! (Case 3)
-			sibling->NB::set_color(rbtree_internal::Color::RED);
+			sibling->NB::make_red();
 			// Now everything below parent is okay, but the branch started in parent
 			// lost a black!
 			if (parent->NB::get_parent() == nullptr) {
@@ -859,8 +975,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 
 	if (sibling->NB::get_color() == rbtree_internal::Color::RED) {
 		// Case 2
-		sibling->NB::set_color(rbtree_internal::Color::BLACK);
-		parent->NB::set_color(rbtree_internal::Color::RED);
+		sibling->NB::make_black();
+		parent->NB::make_red();
 		if (deleted_left) {
 			this->rotate_left(parent);
 			sibling = parent->NB::get_right();
@@ -878,8 +994,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 	     (sibling->NB::get_right()->NB::get_color() ==
 	      rbtree_internal::Color::BLACK))) {
 		// case 4
-		parent->NB::set_color(rbtree_internal::Color::BLACK);
-		sibling->NB::set_color(rbtree_internal::Color::RED);
+		parent->NB::make_black();
+		sibling->NB::make_red();
 
 		return; // No further fixup necessary
 	}
@@ -891,10 +1007,10 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 			// left child of sibling must be red! This is the folded case. (Case 5)
 			// Unfold!
 			this->rotate_right(sibling);
-			sibling->NB::set_color(rbtree_internal::Color::RED);
+			sibling->NB::make_red();
 			// The new sibling is now the parent of the sibling
 			sibling = sibling->NB::get_parent();
-			sibling->NB::set_color(rbtree_internal::Color::BLACK);
+			sibling->NB::make_black();
 		}
 
 		// straight situation, case 6 applies!
@@ -902,7 +1018,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 
 		parent->NB::swap_color_with(sibling);
 
-		sibling->NB::get_right()->NB::set_color(rbtree_internal::Color::BLACK);
+		sibling->NB::get_right()->NB::make_black();
 	} else {
 		if ((sibling->NB::get_left() == nullptr) ||
 		    (sibling->NB::get_left()->NB::get_color() ==
@@ -911,16 +1027,16 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 			// Unfold!
 
 			this->rotate_left(sibling);
-			sibling->NB::set_color(rbtree_internal::Color::RED);
+			sibling->NB::make_red();
 			// The new sibling is now the parent of the sibling
 			sibling = sibling->NB::get_parent();
-			sibling->NB::set_color(rbtree_internal::Color::BLACK);
+			sibling->NB::make_black();
 		}
 
 		// straight situation, case 6 applies!
 		this->rotate_right(parent);
 		parent->NB::swap_color_with(sibling);
-		sibling->NB::get_left()->NB::set_color(rbtree_internal::Color::BLACK);
+		sibling->NB::get_left()->NB::make_black();
 	}
 }
 
@@ -928,10 +1044,9 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::remove(Node & node)
 {
-	this->s.reduce(1);
-
 	// TODO collapse this method
 	this->remove_to_leaf(node);
+	this->s.reduce(1);
 }
 
 } // namespace ygg

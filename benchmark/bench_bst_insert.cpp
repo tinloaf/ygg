@@ -32,6 +32,34 @@ BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)
 REGISTER(InsertYggRBBSTFixture, BM_BST_Insertion)
 
 /*
+ * Ygg's Red-Black Tree, avoiding conditional branches
+ */
+using InsertYggRBBSTFixtureArith =
+    BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
+               InsertExperiment, true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto & n : this->experiment_nodes) {
+			this->t.insert(n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto & n : this->experiment_nodes) {
+			this->t.remove(n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
+
+/*
  * Ygg's Weight-Balanced Tree
  */
 // Default gamma, delta / twopass
@@ -61,9 +89,9 @@ BENCHMARK_DEFINE_F(InsertYggWBDefGDefDTPBSTFixture, BM_BST_Insertion)
 REGISTER(InsertYggWBDefGDefDTPBSTFixture, BM_BST_Insertion)
 
 // Default gamma, delta / single pass
-using InsertYggWBDefGDefDSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-               InsertExperiment, true, false, false, false>;
+using InsertYggWBDefGDefDSPBSTFixture = BSTFixture<
+    YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
+    InsertExperiment, true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertYggWBDefGDefDSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -138,7 +166,6 @@ BENCHMARK_DEFINE_F(InsertYggWBBalSPBSTFixture, BM_BST_Insertion)
 }
 REGISTER(InsertYggWBBalSPBSTFixture, BM_BST_Insertion)
 
-
 // integral gamma, delta / single pass
 using InsertYggWB3G2DSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>,
@@ -165,7 +192,6 @@ BENCHMARK_DEFINE_F(InsertYggWB3G2DSPBSTFixture, BM_BST_Insertion)
 }
 REGISTER(InsertYggWB3G2DSPBSTFixture, BM_BST_Insertion)
 
-
 // integral gamma, delta / twopass
 using InsertYggWB3G2DTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions, WBBSTNamer3G2DTP>,
@@ -191,8 +217,6 @@ BENCHMARK_DEFINE_F(InsertYggWB3G2DTPBSTFixture, BM_BST_Insertion)
 	this->papi.report_and_reset(state);
 }
 REGISTER(InsertYggWB3G2DTPBSTFixture, BM_BST_Insertion)
-
-
 
 /*
  * Ygg's Energy-Balanced Tree

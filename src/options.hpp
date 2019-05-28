@@ -219,6 +219,10 @@ public:
 	 ******************************************************/
 	class MICRO_PREFER_ARITH_OVER_CONDITIONALS {
 	};
+	class MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING {
+	};
+	class MICRO_DUMMY_SETTING_POINTER {
+	};
 };
 
 /**
@@ -379,7 +383,13 @@ public:
 	static constexpr bool micro_prefer_arith_over_conditionals =
 	    utilities::pack_contains<TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS,
 	                             Opts...>();
-
+	static constexpr bool micro_prefer_arith_over_conditionals_setting =
+	    utilities::pack_contains<
+	        TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING, Opts...>();
+	static constexpr bool micro_setting_dummy_pointer =
+	    utilities::pack_contains<TreeFlags::MICRO_DUMMY_SETTING_POINTER,
+	                             Opts...>();
+	// TODO make sure that this is consistently enabled
 	/// @endcond
 private:
 	TreeOptions(); // Instantiation not allowed
