@@ -60,6 +60,34 @@ BENCHMARK_DEFINE_F(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
 REGISTER(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
 
 /*
+ * Ygg's Red-Black Tree, avoiding conditional branches even harder
+ */
+using EraseYggRBBSTFixtureArithFull =
+    BSTFixture<YggRBTreeInterface<FullArithTreeOptions, RBBSTNamerArithFull>,
+               EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggRBBSTFixtureArithFull, BM_BST_Erasure)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.erase(n->get_value());
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(EraseYggRBBSTFixtureArithFull, BM_BST_Erasure)
+
+/*
  * Ygg's Weight-Balanced Trees
  */
 // Default gamma, delta / twopass
@@ -165,6 +193,60 @@ BENCHMARK_DEFINE_F(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
 	this->papi.report_and_reset(state);
 }
 REGISTER(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
+
+// Balance-focussed Gamma, Delta / single pass, avoiding conditionals
+using EraseYggWBBalSPArithBSTFixture = BSTFixture<
+    YggWBTreeInterface<WBTSinglepassBalArithTreeOptions, WBBSTNamerBalSPArith>,
+    EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggWBBalSPArithBSTFixture, BM_BST_Erasure)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.erase_optimistic(n->get_value());
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(EraseYggWBBalSPArithBSTFixture, BM_BST_Erasure)
+
+// Balance-focussed Gamma, Delta / single pass, avoiding conditionals even
+// harder
+using EraseYggWBBalSPArithFullBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassBalArithFullTreeOptions,
+                                  WBBSTNamerBalSPArithFull>,
+               EraseExperiment, false, false, true, false, true>;
+BENCHMARK_DEFINE_F(EraseYggWBBalSPArithFullBSTFixture, BM_BST_Erasure)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.erase_optimistic(n->get_value());
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(EraseYggWBBalSPArithFullBSTFixture, BM_BST_Erasure)
 
 // Default gamma, delta / single pass, optimistic
 using EraseYggWBDefGDefDSPOPTBSTFixture = BSTFixture<
