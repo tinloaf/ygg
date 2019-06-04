@@ -2,6 +2,7 @@
 #define YGG_RBTREE_CPP
 
 #include "rbtree.hpp"
+
 #include "util.hpp"
 
 namespace ygg {
@@ -240,11 +241,9 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 		if constexpr (Options::multiple) {
 			if constexpr (Options::micro_prefer_arith_over_conditionals) {
 				if constexpr (on_equality_prefer_left) {
-					cur = utilities::choose_ptr<Options>(
-					    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
+					cur = utilities::go_right_if(this->cmp(*cur, node), cur);
 				} else {
-					cur = utilities::choose_ptr<Options>(
-					    this->cmp(*cur, node), cur->NB::get_left(), cur->NB::get_right());
+					cur = utilities::go_left_if(this->cmp(node, *cur), cur);
 				}
 			} else {
 				if constexpr (on_equality_prefer_left) {
@@ -274,8 +273,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 					return;
 				}
 
-				cur = utilities::choose_ptr<Options>(
-				    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
+				cur = utilities::go_left_if(this->cmp(node, *cur), cur);
 			} else {
 				if (this->cmp(*cur, node)) {
 					cur = cur->NB::get_right();
@@ -935,8 +933,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 	while (propagating_up) {
 		// We just deleted a black node from under parent.
 		if constexpr (Options::micro_prefer_arith_over_conditionals) {
-			sibling = utilities::choose_ptr<Options>(
-			    deleted_left, parent->NB::get_right(), parent->NB::get_left());
+			sibling = utilities::go_right_if(deleted_left, parent);
 		} else {
 			if (deleted_left) {
 				sibling = parent->NB::get_right();

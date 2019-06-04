@@ -1,10 +1,11 @@
 #ifndef YGG_WBTREE_CPP
 #define YGG_WBTREE_CPP
 
-#include <cmath>
+#include "wbtree.hpp"
 
 #include "util.hpp"
-#include "wbtree.hpp"
+
+#include <cmath>
 
 namespace ygg {
 
@@ -437,11 +438,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
 
 		if constexpr (Options::micro_prefer_arith_over_conditionals) {
 			if constexpr (on_equality_prefer_left) {
-				cur = utilities::choose_ptr<Options>(
-				    this->cmp(*cur, node), cur->NB::get_right(), cur->NB::get_left());
+				cur = utilities::go_right_if(this->cmp(*cur, node), cur);
 			} else {
-				cur = utilities::choose_ptr<Options>(
-				    this->cmp(*cur, node), cur->NB::get_left(), cur->NB::get_right());
+				cur = utilities::go_left_if(this->cmp(node, *cur), cur);
 			}
 		} else {
 			if constexpr (on_equality_prefer_left) {
@@ -471,6 +470,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
 		// TODO put this into the loop above?
 		if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
 			bool left = this->cmp(node, *parent);
+			// TODO move this to go_left_if
 			*(utilities::choose_ptr<Options>(left, &parent->NB::get_left(),
 			                                 &parent->NB::get_right())) = &node;
 			if (__builtin_expect(!left && (!this->cmp(*parent, node)), false)) {

@@ -1,14 +1,15 @@
 #ifndef YGG_BST_HPP
 #define YGG_BST_HPP
 
+#include "options.hpp"
+#include "size_holder.hpp"
+#include "tree_iterator.hpp"
+#include "util.hpp"
+
 #include <cassert>
 #include <cstddef>
 #include <set>
 #include <type_traits>
-
-#include "options.hpp"
-#include "size_holder.hpp"
-#include "tree_iterator.hpp"
 
 // Only for debugging purposes
 #include <fstream>
@@ -76,9 +77,13 @@ private:
 	}
 
 protected:
-	Node * _bst_left = nullptr;
-	Node * _bst_right = nullptr;
+	Node * _bst_children[2];
 	ParentContainer _bst_parent;
+
+	template <class InnerNode>
+	friend InnerNode * utilities::go_right_if(bool cond, InnerNode * parent);
+	template <class InnerNode>
+	friend InnerNode * utilities::go_left_if(bool cond, InnerNode * parent);
 
 public:
 	void set_parent(Node * new_parent);
@@ -446,6 +451,8 @@ protected:
 } // namespace bst
 } // namespace ygg
 
+#ifndef YGG_BST_CPP
 #include "bst.cpp"
+#endif
 
 #endif // YGG_BST_HPP

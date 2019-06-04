@@ -2,6 +2,7 @@
 #define YGG_BST_CPP
 
 #include "bst.hpp"
+
 #include "debug.hpp"
 
 namespace ygg {
@@ -63,28 +64,28 @@ template <class Node, class Tag, class ParentContainer>
 Node *&
 BSTNodeBase<Node, Tag, ParentContainer>::get_left()
 {
-	return this->_bst_left;
+	return this->_bst_children[0];
 }
 
 template <class Node, class Tag, class ParentContainer>
 Node *&
 BSTNodeBase<Node, Tag, ParentContainer>::get_right()
 {
-	return this->_bst_right;
+	return this->_bst_children[1];
 }
 
 template <class Node, class Tag, class ParentContainer>
 Node * const &
 BSTNodeBase<Node, Tag, ParentContainer>::get_left() const
 {
-	return this->_bst_left;
+	return this->_bst_children[0];
 }
 
 template <class Node, class Tag, class ParentContainer>
 Node * const &
 BSTNodeBase<Node, Tag, ParentContainer>::get_right() const
 {
-	return this->_bst_right;
+	return this->_bst_children[1];
 }
 
 template <class Node, class Tag, class ParentContainer>
@@ -98,14 +99,14 @@ template <class Node, class Tag, class ParentContainer>
 void
 BSTNodeBase<Node, Tag, ParentContainer>::set_left(Node * new_left)
 {
-	this->_bst_left = new_left;
+	this->_bst_children[0] = new_left;
 }
 
 template <class Node, class Tag, class ParentContainer>
 void
 BSTNodeBase<Node, Tag, ParentContainer>::set_right(Node * new_right)
 {
-	this->_bst_right = new_right;
+	this->_bst_children[1] = new_right;
 }
 
 template <class Node, class Options, class Tag, class Compare,
@@ -621,8 +622,7 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 			        (!this->cmp(*cur, query)) && (!this->cmp(query, *cur)), false)) {
 				return iterator<false>(cur);
 			}
-			cur = utilities::choose_ptr<Options>(
-			    this->cmp(*cur, query), cur->NB::get_right(), cur->NB::get_left());
+			cur = utilities::go_right_if(this->cmp(*cur, query), cur);
 		} else {
 			if (this->cmp(*cur, query)) {
 				cur = cur->NB::get_right();

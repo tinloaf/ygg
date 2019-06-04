@@ -62,7 +62,21 @@ choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
 	                                                               yes_ptr,
 	                                                               no_ptr);
 }
+
+template <class Node>
+static inline Node *
+go_right_if(bool cond, Node * parent)
+{
+	return parent->_bst_children[cond];
+}
 	
+template <class Node>
+static inline Node *
+go_left_if(bool cond, Node * parent)
+{
+	return parent->_bst_children[(1 - cond)];
+}
+
 template <class T>
 class TypeHolder {
 public:
