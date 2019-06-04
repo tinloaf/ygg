@@ -1490,6 +1490,8 @@ private:
 
 } // namespace ygg
 
+#ifndef YGG_DYNAMIC_SEGMENT_TREE_CPP
 #include "dynamic_segment_tree.cpp"
+#endif
 
 #endif // YGG_DYNAMIC_SEGMENT_TREE_HPP

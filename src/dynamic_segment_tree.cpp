@@ -1,11 +1,10 @@
-//
-// Created by lukas on 16.11.17.
-//
+#ifndef YGG_DYNAMIC_SEGMENT_TREE_CPP
+#define YGG_DYNAMIC_SEGMENT_TREE_CPP
 
 #include "dynamic_segment_tree.hpp"
-#include "util.hpp"
 
 #include "debug.hpp"
+#include "util.hpp"
 #include "ygg.hpp"
 
 #include <algorithm>
@@ -68,47 +67,46 @@ InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners,
  * thus we do not need to reimplement them.
  ***************************************************/
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
-template<class WBTreeBase>
+template <class WBTreeBase>
 void
-InnerWBNodeTraits<InnerTree, InnerNode, Node,
-                  NodeTraits>::splice_out_left_knee(InnerNode & node, WBTreeBase & t)
+InnerWBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::splice_out_left_knee(
+    InnerNode & node, WBTreeBase & t)
 {
 	// the path-sum to the right of the left knee should equal to it's
-	// mirror equivalent, i.e., the path-sum to the right of the next-but-one node.
-	// Just push down whatever is right
+	// mirror equivalent, i.e., the path-sum to the right of the next-but-one
+	// node. Just push down whatever is right
 	(void)t;
 	node.get_right()->agg_left += node.agg_right;
 	node.get_right()->agg_right += node.agg_right;
 
-	// Combiners may now be wrong at the right child. To fix them, we need to wipe our
-	// agg_right
+	// Combiners may now be wrong at the right child. To fix them, we need to wipe
+	// our agg_right
 	node.agg_left = typename Node::AggValueT();
 	node.agg_right = typename Node::AggValueT();
 	InnerTree::rebuild_combiners_at(node.get_right());
 }
 
-
-	template <class InnerTree, class InnerNode, class Node, class NodeTraits>
-template<class WBTreeBase>
+template <class InnerTree, class InnerNode, class Node, class NodeTraits>
+template <class WBTreeBase>
 void
 InnerWBNodeTraits<InnerTree, InnerNode, Node,
-                  NodeTraits>::splice_out_right_knee(InnerNode & node, WBTreeBase & t)
+                  NodeTraits>::splice_out_right_knee(InnerNode & node,
+                                                     WBTreeBase & t)
 {
 	// the path-sum to the left of the right knee should equal to it's
-	// mirror equivalent, i.e., the path-sum to the right of the previous-but-one node.
-	// Just push down whatever is left
+	// mirror equivalent, i.e., the path-sum to the right of the previous-but-one
+	// node. Just push down whatever is left
 	(void)t;
 	node.get_left()->agg_left += node.agg_left;
 	node.get_left()->agg_right += node.agg_left;
 
-	// Combiners may now be wrong at the right child. To fix them, we need to wipe our
-	// agg_right
+	// Combiners may now be wrong at the right child. To fix them, we need to wipe
+	// our agg_right
 	node.agg_right = typename Node::AggValueT();
 	node.agg_left = typename Node::AggValueT();
 	InnerTree::rebuild_combiners_at(node.get_left());
 }
 
-	
 /*template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 template <class WBTreeBase>
 void
@@ -238,7 +236,6 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(
 	    static_cast<const Node *>(old_descendant.container);
 	auto old_descendant_val = NodeTraits::get_value(*old_descendant_node);
 
-
 	if (old_descendant.InnerNode::point <
 	    old_descendant_partner->InnerNode::point) {
 		/*std::cout << "### Unapplying value " << old_descendant_val << " from "
@@ -247,19 +244,22 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(
 		it->modify_contour(&old_ancestor, old_descendant_partner,
 		                   -1 * old_descendant_val);
 		/*		std::cout << "### Applying value " << old_descendant_val << " from "
-		          << std::hex << &old_descendant << " to " << &old_descendant_partner
+		          << std::hex << &old_descendant << " to " <<
+		   &old_descendant_partner
 		          << std::dec << "\n";*/
 		it->modify_contour(&old_descendant, old_descendant_partner,
 		                   old_descendant_val);
 	} else {
 		// TODO
 		// empty intervals break this currently
-		/*		std::cout << "### 2: Unapplying value " << old_descendant_val << " from "
+		/*		std::cout << "### 2: Unapplying value " << old_descendant_val << "
+		   from "
 		          << std::hex << old_descendant_partner << " to " << &old_ancestor
 		          << std::dec << "\n";*/
 		it->modify_contour(old_descendant_partner, &old_ancestor,
 		                   -1 * old_descendant_val);
-		/*		std::cout << "### 2: Applying value " << old_descendant_val << " from "
+		/*		std::cout << "### 2: Applying value " << old_descendant_val << " from
+		   "
 		          << std::hex << old_descendant_partner << " to " << &old_descendant
 		          << std::dec << "\n";*/
 		it->modify_contour(old_descendant_partner, &old_descendant,
@@ -580,12 +580,13 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 
 	// this->dbg_print_inner_tree();
 	// std::cout << "############### Removing at " << n.NB::start.get_point()
-	          // << "\n";
+	// << "\n";
 
 	this->t.remove(n.NB::start);
 
 	// this->dbg_print_inner_tree();
-	// std::cout << "############### Removing at " << n.NB::end.get_point() << "\n";
+	// std::cout << "############### Removing at " << n.NB::end.get_point() <<
+	// "\n";
 	this->t.remove(n.NB::end);
 
 	// this->dbg_print_inner_tree();
@@ -1767,14 +1768,22 @@ CombinerPack<KeyT, AggValueT, Combiners...>::rebuild(KeyT my_point,
                                                      const MyType * right_child,
                                                      AggValueT right_edge_val)
 {
+	if constexpr (sizeof...(Combiners) == 0) {
+		(void)my_point;
+		(void)left_child;
+		(void)left_edge_val;
+		(void)right_child;
+		(void)right_edge_val;
+		return false;
+	} else {
+		return utilities::any_of(
+		    std::get<Combiners>(this->data)
+		        .rebuild(my_point, child_combiner<Combiners>(left_child),
+		                 left_edge_val, child_combiner<Combiners>(right_child),
+		                 right_edge_val)...
 
-	return utilities::any_of(
-	    std::get<Combiners>(this->data)
-	        .rebuild(my_point, child_combiner<Combiners>(left_child),
-	                 left_edge_val, child_combiner<Combiners>(right_child),
-	                 right_edge_val)...
-
-	);
+		);
+	}
 } // namespace ygg
 
 template <class KeyT, class AggValueT, class... Combiners>
@@ -1853,3 +1862,5 @@ CombinerPack<KeyT, AggValueT, Combiners...>::get_combiner() const
 }
 
 } // namespace ygg
+
+#endif

@@ -2,6 +2,7 @@
 #define BENCH_COMMON_HPP
 
 #include "benchmark.h"
+
 #include <algorithm>
 #include <boost/intrusive/set.hpp>
 #include <draup.hpp>

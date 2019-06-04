@@ -91,7 +91,7 @@ main(int argc, char ** argv)
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--seed_start", strlen("--seed_start")) == 0) {
-			CFG.seed_start = static_cast<int>(atoi(argv[i + 1]));
+			CFG.seed_start = atoi(argv[i + 1]);
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--seed_count", strlen("--seed_count")) == 0) {

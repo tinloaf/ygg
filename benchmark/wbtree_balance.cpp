@@ -122,8 +122,7 @@ public:
 			std::nth_element(this->counts.begin(),
 			                 this->counts.begin() + (this->counts.size() / size_t{2}),
 			                 this->counts.end());
-			std::cout << "Median: \t"
-			          << this->counts[static_cast<size_t>(this->counts.size() / 2)]
+			std::cout << "Median: \t" << this->counts[this->counts.size() / 2]
 			          << "\n";
 		}
 	}
