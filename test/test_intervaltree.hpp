@@ -61,6 +61,7 @@ public:
 	    : data(data_in), lower(lower_in), upper(upper_in){};
 	ITNode(const ITNode & other)
 	    : data(other.data), lower(other.lower), upper(other.upper){};
+	ITNode & operator=(const ITNode & other) = default;
 };
 
 TEST(ITreeTest, TrivialInsertionTest)

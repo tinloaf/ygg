@@ -83,7 +83,7 @@ protected:
 public:
 	void set_parent(Node * new_parent);
 	Node * get_parent() const;
-	template<class InnerPC = ParentContainer>
+	template <class InnerPC = ParentContainer>
 	std::enable_if_t<InnerPC::parent_reference, Node *&> get_parent();
 
 	void set_left(Node * new_left);
@@ -194,6 +194,8 @@ public:
 		    : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
 		                             reverse>(){};
 
+		iterator<reverse> & operator=(const iterator<reverse> & orig) = default;
+
 	private:
 		friend class const_iterator<reverse>;
 	};
@@ -214,6 +216,9 @@ public:
 		const_iterator()
 		    : internal::IteratorBase<const_iterator<reverse>, const Node,
 		                             NodeInterface, reverse>(){};
+
+		const_iterator<reverse> &
+		operator=(const const_iterator<reverse> & orig) = default;
 	};
 
 	/******************************************************
@@ -430,7 +435,6 @@ protected:
 	template <class NodeNameGetter>
 	void output_node_base(const Node * node, std::ofstream & out,
 	                      NodeNameGetter name_getter) const;
-
 
 	// @cond INTERNAL
 	void verify_tree() const;

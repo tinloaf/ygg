@@ -170,12 +170,12 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::verify_order()
 	for (const Node & n : *this) {
 		if (n.NB::get_left() != nullptr) {
 			// left may not be larger
-			debug::yggassert(! (this->cmp(n, *(n.NB::get_left()))));
+			debug::yggassert(!(this->cmp(n, *(n.NB::get_left()))));
 		}
 
 		if (n.NB::get_right() != nullptr) {
 			// right may not be smaller
-			debug::yggassert(! (this->cmp(*(n.NB::get_right()), n)));
+			debug::yggassert(!(this->cmp(*(n.NB::get_right()), n)));
 		}
 	}
 }
@@ -264,8 +264,8 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::verify_tree()
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 void
-BinarySearchTree<Node, Options, Tag, Compare,
-                 ParentContainer>::dbg_verify() const
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::dbg_verify()
+    const
 {
 	this->verify_tree();
 	this->verify_order();
@@ -615,6 +615,8 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 
 	while (cur != nullptr) {
 		if constexpr (Options::micro_prefer_arith_over_conditionals) {
+			(void)last_left;
+
 			if (__builtin_expect(
 			        (!this->cmp(*cur, query)) && (!this->cmp(query, *cur)), false)) {
 				return iterator<false>(cur);

@@ -33,7 +33,6 @@ public:
 
 	Node() : data(0), rank(0){};
 	Node(int data_in, int rank_in) : data(data_in), rank(rank_in){};
-	Node(const Node & other) : data(other.data), rank(other.rank){};
 
 	bool
 	operator<(const Node & other) const
@@ -341,49 +340,6 @@ TEST(ZipTreeTest, InsertionAndIterationTest)
 	for (auto & node : itree) {
 		ASSERT_EQ(node.get_data(), i);
 		i++;
-	}
-}
-
-TEST(ZipTreeTest, CopyAssignmentTest)
-{
-	ImplicitRankTree src;
-	ImplicitRankTree dst;
-
-	std::mt19937 rng(ZIPTREE_SEED);
-	std::uniform_int_distribution<int> uni(std::numeric_limits<int>::min(),
-	                                       std::numeric_limits<int>::max());
-
-	HashRankNode nodes_src[ZIPTREE_TESTSIZE];
-	HashRankNode nodes_dst[ZIPTREE_TESTSIZE];
-
-	for (unsigned int i = 0; i < ZIPTREE_TESTSIZE; ++i) {
-		int val = uni(rng);
-
-		nodes_src[i].set_from(HashRankNode(val));
-		nodes_dst[i].set_from(HashRankNode(0));
-
-		src.insert(nodes_src[i]);
-		dst.insert(nodes_dst[i]);
-	}
-
-	src.dbg_verify();
-	dst.dbg_verify();
-
-	dst = src;
-
-	src.dbg_verify();
-	dst.dbg_verify();
-
-	auto src_it = src.begin();
-	auto dst_it = dst.begin();
-
-	while (src_it != src.end()) {
-		ASSERT_TRUE(dst_it != dst.end());
-
-		ASSERT_EQ(src_it->data, dst_it->data);
-
-		++src_it;
-		++dst_it;
 	}
 }
 

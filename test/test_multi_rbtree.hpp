@@ -34,8 +34,6 @@ public:
 
 	explicit Node(int dataA_in, int dataB_in)
 	    : dataA(dataA_in), dataB(dataB_in){};
-
-	Node(const Node & other) : dataA(other.dataA), dataB(other.dataB){};
 };
 
 using NodeBaseA = RBTreeNodeBase<Node, TreeOptions<TreeFlags::MULTIPLE>, TAG_A>;

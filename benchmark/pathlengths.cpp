@@ -38,7 +38,7 @@ public:
 		double balanced_depth = std::floor(std::log2(this->count));
 		size_t deeper_than_balanced = 0;
 		for (size_t depth : this->path_lengths) {
-			if (depth > balanced_depth) {
+			if (static_cast<double>(depth) > balanced_depth) {
 				deeper_than_balanced++;
 			}
 		}
@@ -337,7 +337,7 @@ main(int argc, const char ** argv)
 	size_t base_count = static_cast<size_t>(std::atol(argv[1]));
 	size_t offset = static_cast<size_t>(std::atol(argv[2]));
 	size_t additions = static_cast<size_t>(std::atol(argv[3]));
-	double move_fraction = static_cast<double>(std::atof(argv[4]));
+	double move_fraction = std::atof(argv[4]);
 	size_t seed_start = static_cast<size_t>(std::atol(argv[5]));
 	size_t seed_count = static_cast<size_t>(std::atol(argv[6]));
 	std::string file_name(argv[7]);
@@ -351,7 +351,7 @@ main(int argc, const char ** argv)
 	for (size_t a = 0; a <= additions; ++a) {
 		std::cout << "################### " << a << " / " << additions << "\n";
 		size_t count = base_count + (a * offset);
-		size_t move_count = static_cast<size_t>(count * move_fraction);
+		size_t move_count = static_cast<size_t>(static_cast<double>(count) * move_fraction);
 
 		do_analysis(all_types(), count, move_count, seed_count, seed_start, os);
 	}

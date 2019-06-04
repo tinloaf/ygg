@@ -44,7 +44,7 @@ public:
 		size_t fixed_count = static_cast<size_t>(state.range(0));
 		size_t experiment_count = static_cast<size_t>(state.range(1));
 		int seed = static_cast<int>(state.range(2));
-		this->rng = std::mt19937(seed);
+		this->rng = std::mt19937(static_cast<unsigned long>(seed));
 
 		std::uniform_int_distribution<> point_distr(
 		    std::numeric_limits<int>::min(), std::numeric_limits<int>::max());

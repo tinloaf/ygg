@@ -9,8 +9,10 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
 
 # Work around Boost bug: https://github.com/boostorg/icl/issues/21
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-new-ttp-matching")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-new-ttp-matching")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "7.0")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-new-ttp-matching")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-new-ttp-matching")
+	endif()
 endif()
 
 #===============================================
@@ -22,8 +24,14 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -ffast-math -march=native -f
 #===============================================
 #==== Build type: Debug
 #===============================================
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -Wold-style-cast -Wuseless-cast -Wlogical-op -Wduplicated-branches -Wduplicated-cond -Wnull-dereference")
-			 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -pedantic -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -Wold-style-cast -Wnull-dereference")
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "7.0")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wuseless-cast -Wlogical-op -Wduplicated-branches -Wduplicated-cond")
+  endif()
+endif()
+
+
 #===============================================
 #==== Build type: valgrind
 #===============================================

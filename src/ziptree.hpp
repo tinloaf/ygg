@@ -340,24 +340,6 @@ public:
 	 */
 	MyClass & operator=(MyClass && other);
 
-	// Copying
-	/**
-	 * @brief Copy an other tree into this one
-	 *
-	 * @warning Both trees must have the same size! The nodes in this tree
-	 * will be overwritten.
-	 *
-	 * @warning Your node class must implement an operator=(). However,
-	 * the operator=() must not change the assigned rank of a node!
-	 *
-	 * @warning This method is only available for trees which:
-	 *    * use hash-based ranking and
-	 *    * store the rank, i.e., for which TreeFlags::ZTREE_RANK_TYPE is set.
-	 *
-	 * @param other  The Zip Tree that this one is copied from
-	 */
-	MyClass & operator=(const MyClass & other);
-
 private:
 	// Class to tell the abstract search tree iterator how to handle
 	// our nodes
@@ -410,6 +392,8 @@ public:
 		iterator(const iterator<reverse> & orig)
 		    : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
 		                             reverse>(orig.n){};
+		iterator<reverse> & operator=(const iterator<reverse> & orig) = default;
+
 		iterator()
 		    : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
 		                             reverse>(){};
@@ -431,6 +415,9 @@ public:
 		const_iterator(const iterator<reverse> & orig)
 		    : internal::IteratorBase<const_iterator<reverse>, const Node,
 		                             NodeInterface, reverse>(orig.n){};
+		const_iterator<reverse> &
+		operator=(const const_iterator<reverse> & orig) = default;
+
 		const_iterator()
 		    : internal::IteratorBase<const_iterator<reverse>, const Node,
 		                             NodeInterface, reverse>(){};

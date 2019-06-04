@@ -40,7 +40,7 @@ public:
 	void
 	run(int seed)
 	{
-		std::mt19937 rnd(seed);
+		std::mt19937 rnd(static_cast<unsigned long>(seed));
 		std::uniform_int_distribution distr(std::numeric_limits<int>::min(),
 		                                    std::numeric_limits<int>::max());
 

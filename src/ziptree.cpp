@@ -53,34 +53,6 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::operator=(
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter> &
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::operator=(
-    const MyClass & other)
-{
-	static_assert(Options::ztree_store_rank,
-	              "Zip Trees must store node ranks to support copy assignment.");
-	static_assert(Options::ztree_use_hash,
-	              "Zip Trees must use rank-by-hash to support copy assignment.");
-
-	auto from_it = other.begin();
-	auto dest_it = this->begin();
-
-	while (from_it != other.end()) {
-		assert(dest_it != this->end());
-
-		*dest_it = *from_it;
-
-		++dest_it;
-		++from_it;
-	}
-
-	this->s = other.s;
-
-	return *this;
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
 void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
     Node & node) noexcept

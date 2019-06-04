@@ -12,7 +12,6 @@
 #include "util.hpp"
 
 namespace ygg {
-
 /**
  * @brief Contains possible options for the RBTree
  *
@@ -224,6 +223,7 @@ public:
 	class MICRO_DUMMY_SETTING_POINTER {
 	};
 };
+
 
 /**
  * @brief Class holding the options for the data structures in this library.
