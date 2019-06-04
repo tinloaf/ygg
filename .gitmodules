@@ -1,0 +1,3 @@
+[submodule "benchmark/draup"]
+	path = benchmark/draup
+	url = https://github.com/tinloaf/draup.git
