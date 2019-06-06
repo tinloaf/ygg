@@ -423,8 +423,13 @@ TEST(ZipTreeTest, InsertionAndDeletionTest)
 	itree.dbg_verify();
 
 	for (auto index : remove_indices) {
-		tree.remove(nodes[index]);
-		itree.remove(inodes[index]);
+		if (index % 2 == 0) {
+			tree.remove(nodes[index]);
+			itree.remove(inodes[index]);
+		} else {
+			tree.erase(nodes[index].data);
+			itree.erase(inodes[index].data);
+		}			
 
 		i--;
 		ASSERT_EQ(i, tree.size());

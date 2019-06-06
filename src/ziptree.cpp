@@ -403,6 +403,19 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::remove(
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
+template <class Comparable>
+void
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::erase(
+    const Comparable & c)
+{
+	auto el = this->find(c);
+	if (el != this->end()) {
+		this->remove(*el);
+	}
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
 void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     Node & old_root) noexcept

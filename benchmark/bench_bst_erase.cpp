@@ -278,7 +278,6 @@ REGISTER(EraseYggEBSTFixture, BM_BST_Erasure);
 /*
  * Ygg's Zip Tree
  */
-/*
 using EraseYggZBSTFixture =
     BSTFixture<YggZTreeInterface<BasicTreeOptions>, EraseExperiment, false,
                false, true, false>;
@@ -303,7 +302,6 @@ BENCHMARK_DEFINE_F(EraseYggZBSTFixture, BM_BST_Erasure)
 	this->papi.report_and_reset(state);
 }
 REGISTER(EraseYggZBSTFixture, BM_BST_Erasure);
-*/
 
 /*
  * Boost::Intrusive::Set
