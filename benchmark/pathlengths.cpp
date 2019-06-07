@@ -1,5 +1,5 @@
 #include "../src/ygg.hpp"
-#include "/home/lukas/src/intervaltree/ygg/src/options.hpp"
+#include "../src/options.hpp"
 
 #include <fstream>
 #include <iostream>
