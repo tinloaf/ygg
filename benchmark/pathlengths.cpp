@@ -1,4 +1,5 @@
 #include "../src/ygg.hpp"
+#include "/home/lukas/src/intervaltree/ygg/src/options.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -104,7 +105,7 @@ private:
 		std::shuffle(move_indices.begin(), move_indices.end(), rnd);
 
 		for (size_t i = 0; i < this->move_count; ++i) {
-			this->t.erase(this->nodes[move_indices[i]]); // TODO erase optimistic!
+			this->t.remove(this->nodes[move_indices[i]]); // TODO erase optimistic!
 
 			size_t val = distr(rnd);
 			while (values_seen.find(val) != values_seen.end()) {
@@ -220,13 +221,16 @@ public:
 };
 
 namespace std {
-	template<>
-	struct hash<ZTreeNode> {
-		size_t operator()(const ZTreeNode & node) {
-			return hash<size_t>{}(node.val);
-		}
-	};
-}
+template <>
+struct hash<ZTreeNode>
+{
+	size_t
+	operator()(const ZTreeNode & node)
+	{
+		return hash<size_t>{}(node.val);
+	}
+};
+} // namespace std
 
 class RandZTreeNode
     : public ygg::ZTreeNodeBase<RandZTreeNode, RandomRankTreeOptions> {
@@ -285,22 +289,33 @@ using RandZTree =
     ygg::ZTree<RandZTreeNode, ygg::ZTreeDefaultNodeTraits<RandZTreeNode>,
                RandomRankTreeOptions>;
 
+/* AvgMinTree */
+using AvgMinTree =
+    ygg::AvgMinTree<AvgMinTreeNode,
+                    ygg::AvgMinTreeDefaultNodeTraits<AvgMinTreeNode>,
+                    ygg::DefaultOptions>;
+
 auto
 all_types()
 {
 	return std::make_tuple(
 	    std::make_tuple(std::string("RBTree"), type_container<RBTree>{},
 	                    type_container<RBTreeNode>{}),
+	    std::make_tuple(std::string("ZipTree"), type_container<ZTree>{},
+	                    type_container<ZTreeNode>{}),
+	    std::make_tuple(std::string("AvgMinTree"), type_container<AvgMinTree>{},
+	                    type_container<AvgMinTreeNode>{})
+	    /*
 	    std::make_tuple(std::string("WBTree[TP]"),
 	                    type_container<WBTree<WBTTwopassTreeOptions>>{},
 	                    type_container<WBTreeNode<WBTTwopassTreeOptions>>{}),
 	    std::make_tuple(std::string("WBTree[SP]"),
 	                    type_container<WBTree<WBTSinglepassTreeOptions>>{},
-	                    type_container<WBTreeNode<WBTSinglepassTreeOptions>>{}),
+	                    type_container<WBTreeNode<WBTSinglepassTreeOptions>>{}),*/
 	    /*	    std::make_tuple(std::string("WBTree[TP|32]"),
 	                    type_container<WBTree<WBTTwopass32TreeOptions>>{},
 	                    type_container<WBTreeNode<WBTTwopass32TreeOptions>>{}),*/
-	    std::make_tuple(std::string("WBTree[SP|32]"),
+	    /*	    std::make_tuple(std::string("WBTree[SP|32]"),
 	                    type_container<WBTree<WBTSinglepass32TreeOptions>>{},
 	                    type_container<WBTreeNode<WBTSinglepass32TreeOptions>>{}),
 	    std::make_tuple(std::string("WBTree[SP|LW]"),
@@ -313,7 +328,7 @@ all_types()
 	    std::make_tuple(
 	        std::string("WBTree[SP|MostBal]"),
 	        type_container<WBTree<WBTSinglepassMostBalTreeOptions>>{},
-	        type_container<WBTreeNode<WBTSinglepassMostBalTreeOptions>>{})
+	        type_container<WBTreeNode<WBTSinglepassMostBalTreeOptions>>{})*/
 
 	);
 }
@@ -356,7 +371,7 @@ template <std::size_t I = 0, typename... Tpl>
 	                           os);
 }
 
-	template <class Node>
+template <class Node>
 void
 update_hash(Node & n)
 {}
@@ -367,7 +382,6 @@ update_hash<ZTreeNode>(ZTreeNode & n)
 {
 	n.update();
 }
-
 
 int
 main(int argc, const char ** argv)
