@@ -182,7 +182,7 @@ public:
  */
 
 template <class Node, class NodeTraits, class Options = DefaultOptions,
-          class Tag = int, class Compare = ygg::rbtree_internal::flexible_less>
+          class Tag = int, class Compare = ygg::utilities::flexible_less>
 class AvgMinTree {
 public:
 	using NB = AvgMinTreeNodeBase<Node, Options, Tag>;
