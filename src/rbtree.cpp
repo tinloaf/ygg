@@ -13,8 +13,7 @@ template <class Node>
 void
 ColorParentStorage<Node, true>::set_color(Color new_color)
 {
-	if constexpr (Node::ActiveOptions::
-	                  micro_prefer_arith_over_conditionals_setting) {
+	if constexpr (Node::ActiveOptions::micro_avoid_conditionals_setting) {
 		this->parent = reinterpret_cast<Node *>(
 		    ((reinterpret_cast<size_t>(this->parent) & ~(size_t{1})) +
 		     static_cast<size_t>(new_color))); // red is defined to be 1
@@ -239,7 +238,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 		parent = cur;
 
 		if constexpr (Options::multiple) {
-			if constexpr (Options::micro_prefer_arith_over_conditionals) {
+			if constexpr (Options::micro_avoid_conditionals) {
 				if constexpr (on_equality_prefer_left) {
 					cur = utilities::go_right_if(this->cmp(*cur, node), cur);
 				} else {
@@ -264,7 +263,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 			// Multiple are not allowed - we need three-way comparisons!
 			// on_equality_prefer_left has no effect here
 
-			if constexpr (Options::micro_prefer_arith_over_conditionals) {
+			if constexpr (Options::micro_avoid_conditionals) {
 				if (__builtin_expect(
 				        (!this->cmp(*cur, node)) && (!this->cmp(node, *cur)), false)) {
 					// Same as existing. Reduce size (because we increased it earlier)
@@ -335,7 +334,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 {
 	Node * right_child = parent->NB::get_right();
 	parent->NB::set_right(right_child->NB::get_left());
-	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+	if constexpr (Options::micro_avoid_conditionals_setting) {
 		utilities::choose_ptr<Options>(right_child->NB::get_left() != nullptr,
 		                               right_child->NB::get_left(),
 		                               reinterpret_cast<Node *>(&this->dummy_node))
@@ -351,7 +350,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 	right_child->NB::set_left(parent);
 	right_child->NB::set_parent(parents_parent);
 
-	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+	if constexpr (Options::micro_avoid_conditionals_setting) {
 		// reinterpret_cast safety: We only access a field available in the node
 		// base.
 		Node ** ppl = &(utilities::choose_ptr<Options>(
@@ -393,7 +392,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 	Node * left_child = parent->NB::get_left();
 	parent->NB::set_left(left_child->NB::get_right());
 
-	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+	if constexpr (Options::micro_avoid_conditionals_setting) {
 		utilities::choose_ptr<Options>(left_child->NB::get_right() != nullptr,
 		                               left_child->NB::get_right(),
 		                               reinterpret_cast<Node *>(&this->dummy_node))
@@ -409,7 +408,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 	left_child->NB::set_right(parent);
 	left_child->NB::set_parent(parents_parent);
 
-	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+	if constexpr (Options::micro_avoid_conditionals_setting) {
 		// reinterpret_cast safety: We only access a field available in the node
 		// base.
 		Node ** ppl = &(utilities::choose_ptr<Options>(
@@ -932,7 +931,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 
 	while (propagating_up) {
 		// We just deleted a black node from under parent.
-		if constexpr (Options::micro_prefer_arith_over_conditionals) {
+		if constexpr (Options::micro_avoid_conditionals) {
 			sibling = utilities::go_right_if(deleted_left, parent);
 		} else {
 			if (deleted_left) {

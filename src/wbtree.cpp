@@ -436,7 +436,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
 		parent = cur;
 		parent->NB::_wbt_size += 1;
 
-		if constexpr (Options::micro_prefer_arith_over_conditionals) {
+		if constexpr (Options::micro_avoid_conditionals) {
 			if constexpr (on_equality_prefer_left) {
 				cur = utilities::go_right_if(this->cmp(*cur, node), cur);
 			} else {
@@ -468,7 +468,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
 		node.NB::set_parent(parent);
 
 		// TODO put this into the loop above?
-		if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+		if constexpr (Options::micro_avoid_conditionals_setting) {
 			bool left = this->cmp(node, *parent);
 			// TODO move this to go_left_if
 			*(utilities::choose_ptr<Options>(left, &parent->NB::get_left(),
@@ -521,7 +521,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 	parent->NB::_wbt_size -= right_child_old_size;
 
 	parent->NB::set_right(right_child->NB::get_left());
-	if constexpr (Options::micro_prefer_arith_over_conditionals_setting) {
+	if constexpr (Options::micro_avoid_conditionals_setting) {
 		bool right_not_null = (right_child->NB::get_left() != nullptr);
 		if constexpr (Options::micro_setting_dummy_pointer) {
 			// reinterpret_cast safety: We only access a field available in the node
@@ -559,7 +559,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 	right_child->NB::set_left(parent);
 	right_child->NB::set_parent(parents_parent);
 
-	if constexpr (Options::micro_prefer_arith_over_conditionals_setting &&
+	if constexpr (Options::micro_avoid_conditionals_setting &&
 	              Options::micro_setting_dummy_pointer) {
 		// reinterpret_cast safety: We only access a field available in the node
 		// base.

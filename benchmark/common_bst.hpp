@@ -1,17 +1,16 @@
 #ifndef BENCH_COMMON_BST_HPP
 #define BENCH_COMMON_BST_HPP
 
+#include "../src/ygg.hpp"
 #include "benchmark.h"
+#include "common.hpp"
+
 #include <algorithm>
 #include <boost/intrusive/set.hpp>
 #include <draup.hpp>
 #include <random>
 #include <unordered_set>
 #include <vector>
-
-#include "../src/ygg.hpp"
-
-#include "common.hpp"
 
 #ifdef USEPAPI
 #include <papi.h>
@@ -636,17 +635,17 @@ using ArithTreeOptions =
                          9859957398433823229ul>,
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
                          std::numeric_limits<size_t>::max()>,
-                     ygg::TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS>;
-using FullArithTreeOptions = ygg::TreeOptions<
-    ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
-    ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
-    ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
-        9859957398433823229ul>,
-    ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
-        std::numeric_limits<size_t>::max()>,
-    ygg::TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS,
-    ygg::TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING,
-    ygg::TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
+                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS>;
+using FullArithTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
+                     ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
+                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
+                         9859957398433823229ul>,
+                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
+                         std::numeric_limits<size_t>::max()>,
+                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS,
+                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
+                     ygg::TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
 
 /* Variants of the weight-balanced tree */
 using WBTTwopassTreeOptions = ygg::TreeOptions<ygg::TreeFlags::MULTIPLE>;
@@ -685,15 +684,15 @@ using WBTSinglepassBalArithTreeOptions =
                      ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>,
-                     ygg::TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS>;
-using WBTSinglepassBalArithFullTreeOptions = ygg::TreeOptions<
-    ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
-    ygg::TreeFlags::WBT_DELTA_NUMERATOR<2>,
-    ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
-    ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
-    ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>,
-    ygg::TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS,
-    ygg::TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING,
-    ygg::TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
+                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS>;
+using WBTSinglepassBalArithFullTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
+                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<2>,
+                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
+                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>,
+                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS,
+                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
+                     ygg::TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
 
 #endif

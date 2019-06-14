@@ -57,10 +57,8 @@ template <class Options, class T>
 static inline T *
 choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
 {
-	return choose_ptr_impl<
-	    Options::micro_prefer_arith_over_conditionals>::choose_ptr(condition,
-	                                                               yes_ptr,
-	                                                               no_ptr);
+	return choose_ptr_impl<Options::micro_avoid_conditionals>::choose_ptr(
+	    condition, yes_ptr, no_ptr);
 }
 
 template <class Node>
@@ -69,7 +67,7 @@ go_right_if(bool cond, Node * parent)
 {
 	return parent->_bst_children[cond];
 }
-	
+
 template <class Node>
 static inline Node *
 go_left_if(bool cond, Node * parent)

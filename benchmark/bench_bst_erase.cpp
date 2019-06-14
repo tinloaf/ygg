@@ -391,24 +391,24 @@ using EraseYggZBSTFixture =
 BENCHMARK_DEFINE_F(EraseYggZBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
-  for (auto _ : state) {
-    this->papi.start();
-    for (auto n : this->experiment_node_pointers) {
-      this->t.erase(n->get_value());
-    }
-    this->papi.stop();
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.erase(n->get_value());
+		}
+		this->papi.stop();
 
-    state.PauseTiming();
-    for (auto n : this->experiment_node_pointers) {
-      this->t.insert(*n);
-    }
-    // TODO shuffling here?
-    state.ResumeTiming();
-  }
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
 
-  this->papi.report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
-REGISTER(EraseYggZBSTFixture, BM_BST_Erasure);
+REGISTER(EraseYggZBSTFixture, BM_BST_Erasure)
 
 /*
  * Boost::Intrusive::Set

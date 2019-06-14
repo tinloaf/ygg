@@ -1,13 +1,13 @@
 #ifndef TEST_RBTREE_HPP
 #define TEST_RBTREE_HPP
 
+#include "../src/rbtree.hpp"
+#include "randomizer.hpp"
+
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <random>
 #include <vector>
-
-#include "../src/rbtree.hpp"
-#include "randomizer.hpp"
 
 namespace ygg {
 namespace testing {
@@ -19,8 +19,8 @@ constexpr int RBTREE_TESTSIZE = 2000;
 
 using NonMultipleOptions =
     TreeOptions<TreeFlags::COMPRESS_COLOR, TreeFlags::CONSTANT_TIME_SIZE,
-                TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS,
-                TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING,
+                TreeFlags::MICRO_AVOID_CONDITIONALS,
+                TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
                 TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
 
 class Node

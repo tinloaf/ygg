@@ -615,7 +615,7 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 	Node * last_left = nullptr;
 
 	while (cur != nullptr) {
-		if constexpr (Options::micro_prefer_arith_over_conditionals) {
+		if constexpr (Options::micro_avoid_conditionals) {
 			(void)last_left;
 
 			if (__builtin_expect(
@@ -633,7 +633,7 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 		}
 	}
 
-	if constexpr (!Options::micro_prefer_arith_over_conditionals) {
+	if constexpr (!Options::micro_avoid_conditionals) {
 		if ((last_left != nullptr) && (!this->cmp(query, *last_left))) {
 			return iterator<false>(last_left);
 		} else {

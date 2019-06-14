@@ -5,11 +5,11 @@
 #ifndef YGG_OPTIONS_HPP
 #define YGG_OPTIONS_HPP
 
+#include "util.hpp"
+
 #include <cstddef>
 #include <limits>
 #include <type_traits>
-
-#include "util.hpp"
 
 namespace ygg {
 /**
@@ -216,14 +216,13 @@ public:
 	/******************************************************
 	 * Micro-Optimization Options
 	 ******************************************************/
-	class MICRO_PREFER_ARITH_OVER_CONDITIONALS {
+	class MICRO_AVOID_CONDITIONALS {
 	};
-	class MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING {
+	class MICRO_AVOID_CONDITIONALS_SETTING {
 	};
 	class MICRO_DUMMY_SETTING_POINTER {
 	};
 };
-
 
 /**
  * @brief Class holding the options for the data structures in this library.
@@ -380,12 +379,11 @@ public:
 	/**********************************************
 	 * Micro-Optimization
 	 **********************************************/
-	static constexpr bool micro_prefer_arith_over_conditionals =
-	    utilities::pack_contains<TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS,
+	static constexpr bool micro_avoid_conditionals =
+	    utilities::pack_contains<TreeFlags::MICRO_AVOID_CONDITIONALS, Opts...>();
+	static constexpr bool micro_avoid_conditionals_setting =
+	    utilities::pack_contains<TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
 	                             Opts...>();
-	static constexpr bool micro_prefer_arith_over_conditionals_setting =
-	    utilities::pack_contains<
-	        TreeFlags::MICRO_PREFER_ARITH_OVER_CONDITIONALS_SETTING, Opts...>();
 	static constexpr bool micro_setting_dummy_pointer =
 	    utilities::pack_contains<TreeFlags::MICRO_DUMMY_SETTING_POINTER,
 	                             Opts...>();
