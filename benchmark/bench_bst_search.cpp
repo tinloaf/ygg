@@ -8,29 +8,6 @@
 /*
  * Ygg's Red-Black Tree, using arithmetics instead of conditionals
  */
-using SearchYggRBBSTFixtureArithFull =
-    BSTFixture<YggRBTreeInterface<FullArithTreeOptions, RBBSTNamerArithFull>,
-               SearchExperiment, false, true, false, true>;
-BENCHMARK_DEFINE_F(SearchYggRBBSTFixtureArithFull, BM_BST_Search)
-(benchmark::State & state)
-{
-	for (auto _ : state) {
-		this->papi.start();
-		for (auto val : this->experiment_values) {
-			auto node = this->t.find(val);
-			benchmark::DoNotOptimize(node);
-		}
-		this->papi.stop();
-		// TODO shuffling?
-	}
-
-	this->papi.report_and_reset(state);
-}
-REGISTER(SearchYggRBBSTFixtureArithFull, BM_BST_Search)
-
-/*
- * Ygg's Red-Black Tree, using arithmetics instead of conditionals
- */
 using SearchYggRBBSTFixtureArith =
     BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
                SearchExperiment, false, true, false, true>;

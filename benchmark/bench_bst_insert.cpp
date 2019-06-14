@@ -60,34 +60,6 @@ BENCHMARK_DEFINE_F(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
 REGISTER(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
 
 /*
- * Ygg's Red-Black Tree, avoiding conditional branches even harder
- */
-using InsertYggRBBSTFixtureArithFull =
-    BSTFixture<YggRBTreeInterface<FullArithTreeOptions, RBBSTNamerArithFull>,
-               InsertExperiment, true, false, false, false>;
-BENCHMARK_DEFINE_F(InsertYggRBBSTFixtureArithFull, BM_BST_Insertion)
-(benchmark::State & state)
-{
-	for (auto _ : state) {
-		this->papi.start();
-		for (auto & n : this->experiment_nodes) {
-			this->t.insert(n);
-		}
-		this->papi.stop();
-
-		state.PauseTiming();
-		for (auto & n : this->experiment_nodes) {
-			this->t.remove(n);
-		}
-		// TODO shuffling here?
-		state.ResumeTiming();
-	}
-
-	this->papi.report_and_reset(state);
-}
-REGISTER(InsertYggRBBSTFixtureArithFull, BM_BST_Insertion)
-
-/*
  * Ygg's Weight-Balanced Tree
  */
 // Default gamma, delta / twopass
@@ -219,34 +191,6 @@ BENCHMARK_DEFINE_F(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 	this->papi.report_and_reset(state);
 }
 REGISTER(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
-
-// Balance-focussed gamma, delta / single pass, avoiding conditionals even
-// harder
-using InsertYggWBBalSPArithFullBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassBalArithFullTreeOptions,
-                                  WBBSTNamerBalSPArith>,
-               InsertExperiment, true, false, false, false>;
-BENCHMARK_DEFINE_F(InsertYggWBBalSPArithFullBSTFixture, BM_BST_Insertion)
-(benchmark::State & state)
-{
-	for (auto _ : state) {
-		this->papi.start();
-		for (auto & n : this->experiment_nodes) {
-			this->t.insert(n);
-		}
-		this->papi.stop();
-
-		state.PauseTiming();
-		for (auto & n : this->experiment_nodes) {
-			this->t.remove(n);
-		}
-		// TODO shuffling here?
-		state.ResumeTiming();
-	}
-
-	this->papi.report_and_reset(state);
-}
-REGISTER(InsertYggWBBalSPArithFullBSTFixture, BM_BST_Insertion)
 
 // integral gamma, delta / single pass
 using InsertYggWB3G2DSPBSTFixture =

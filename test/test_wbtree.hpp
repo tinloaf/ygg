@@ -19,9 +19,7 @@ namespace wbtree_twopass {
 using MULTI_FLAGS =
     TreeOptions<TreeFlags::MULTIPLE, TreeFlags::CONSTANT_TIME_SIZE>;
 using DEFAULT_FLAGS = TreeOptions<TreeFlags::CONSTANT_TIME_SIZE,
-                                  TreeFlags::MICRO_AVOID_CONDITIONALS,
-                                  TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
-                                  TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
+                                  TreeFlags::MICRO_AVOID_CONDITIONALS>;
 
 #include "test_wbtree_base.hpp"
 
@@ -37,9 +35,7 @@ using MULTI_FLAGS = TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::MULTIPLE,
                                 TreeFlags::CONSTANT_TIME_SIZE>;
 using DEFAULT_FLAGS =
     TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::CONSTANT_TIME_SIZE,
-                TreeFlags::MICRO_AVOID_CONDITIONALS,
-                TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
-                TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
+                TreeFlags::MICRO_AVOID_CONDITIONALS>;
 
 #include "test_wbtree_base.hpp"
 

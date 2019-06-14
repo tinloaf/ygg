@@ -1,16 +1,16 @@
 #ifndef YGG_WBTREE_HPP
 #define YGG_WBTREE_HPP
 
-#include <cassert>
-#include <cstddef>
-#include <set>
-#include <type_traits>
-
 #include "bst.hpp"
 #include "debug.hpp"
 #include "options.hpp"
 #include "size_holder.hpp"
 #include "tree_iterator.hpp"
+
+#include <cassert>
+#include <cstddef>
+#include <set>
+#include <type_traits>
 
 // Only for debugging purposes
 #include <fstream>
@@ -257,12 +257,6 @@ protected:
 	void swap_neighbors(Node * parent, Node * child);
 
 	void verify_sizes() const;
-
-	/* Dummy values for optimization */
-	// TODO make this optional
-	Node * dummy_node_ptr;
-	//utilities::OptionalMember<NB *, Options::micro_setting_dummy_pointer> dummy_node_ptr;
-	utilities::OptionalMember<NB, Options::micro_setting_dummy_pointer> dummy_node;
 };
 
 } // namespace ygg

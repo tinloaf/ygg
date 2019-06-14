@@ -216,11 +216,17 @@ public:
 	/******************************************************
 	 * Micro-Optimization Options
 	 ******************************************************/
+	/**
+	 * @brief Enables tricks to avoid conditional branching
+	 *
+	 * Enabling this will cause the various data structures to enable tricks to
+	 * avoid conditional branching, using e.g. pointer arithmetic instead. This
+	 * can siginificantly increase performance on certain architectures, e.g.
+	 * modern SkyLake CPUs. However, if you enable this, make sure you profile
+	 * your performance to determine whether this actually helps with your
+	 * specific workload.
+	 */
 	class MICRO_AVOID_CONDITIONALS {
-	};
-	class MICRO_AVOID_CONDITIONALS_SETTING {
-	};
-	class MICRO_DUMMY_SETTING_POINTER {
 	};
 };
 
@@ -381,13 +387,6 @@ public:
 	 **********************************************/
 	static constexpr bool micro_avoid_conditionals =
 	    utilities::pack_contains<TreeFlags::MICRO_AVOID_CONDITIONALS, Opts...>();
-	static constexpr bool micro_avoid_conditionals_setting =
-	    utilities::pack_contains<TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
-	                             Opts...>();
-	static constexpr bool micro_setting_dummy_pointer =
-	    utilities::pack_contains<TreeFlags::MICRO_DUMMY_SETTING_POINTER,
-	                             Opts...>();
-	// TODO make sure that this is consistently enabled
 	/// @endcond
 private:
 	TreeOptions(); // Instantiation not allowed

@@ -32,10 +32,6 @@ struct WBBSTNamerBalSPArith
 {
 	constexpr static const char * name = "2,3/2,SP(opt),arith";
 };
-struct WBBSTNamerBalSPArithFull
-{
-	constexpr static const char * name = "2,3/2,SP(opt),arith-ull";
-};
 struct WBBSTNamerLWSP
 {
 	constexpr static const char * name = "3,4/3,SP(opt)";
@@ -64,10 +60,6 @@ struct RBBSTNamerDefault
 struct RBBSTNamerArith
 {
 	constexpr static const char * name = "RBTree[arith] ";
-};
-struct RBBSTNamerArithFull
-{
-	constexpr static const char * name = "RBTree[arith-full] ";
 };
 
 // TODO various RBTree / Zip Tree variants!
@@ -636,16 +628,6 @@ using ArithTreeOptions =
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
                          std::numeric_limits<size_t>::max()>,
                      ygg::TreeFlags::MICRO_AVOID_CONDITIONALS>;
-using FullArithTreeOptions =
-    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
-                     ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
-                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
-                         9859957398433823229ul>,
-                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
-                         std::numeric_limits<size_t>::max()>,
-                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS,
-                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
-                     ygg::TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
 
 /* Variants of the weight-balanced tree */
 using WBTTwopassTreeOptions = ygg::TreeOptions<ygg::TreeFlags::MULTIPLE>;
@@ -685,14 +667,5 @@ using WBTSinglepassBalArithTreeOptions =
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>,
                      ygg::TreeFlags::MICRO_AVOID_CONDITIONALS>;
-using WBTSinglepassBalArithFullTreeOptions =
-    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
-                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<2>,
-                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
-                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
-                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>,
-                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS,
-                     ygg::TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
-                     ygg::TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
 
 #endif

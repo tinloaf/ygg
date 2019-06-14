@@ -13,18 +13,13 @@ template <class Node>
 void
 ColorParentStorage<Node, true>::set_color(Color new_color)
 {
-	if constexpr (Node::ActiveOptions::micro_avoid_conditionals_setting) {
+	// TODO add to avoid_conditionals?
+	if (new_color == Color::RED) {
 		this->parent = reinterpret_cast<Node *>(
-		    ((reinterpret_cast<size_t>(this->parent) & ~(size_t{1})) +
-		     static_cast<size_t>(new_color))); // red is defined to be 1
+		    (reinterpret_cast<size_t>(this->parent) | size_t{1}));
 	} else {
-		if (new_color == Color::RED) {
-			this->parent = reinterpret_cast<Node *>(
-			    (reinterpret_cast<size_t>(this->parent) | size_t{1}));
-		} else {
-			this->parent = reinterpret_cast<Node *>(
-			    (reinterpret_cast<size_t>(this->parent) & ~(size_t{1})));
-		}
+		this->parent = reinterpret_cast<Node *>(
+		    (reinterpret_cast<size_t>(this->parent) & ~(size_t{1})));
 	}
 }
 
@@ -334,15 +329,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 {
 	Node * right_child = parent->NB::get_right();
 	parent->NB::set_right(right_child->NB::get_left());
-	if constexpr (Options::micro_avoid_conditionals_setting) {
-		utilities::choose_ptr<Options>(right_child->NB::get_left() != nullptr,
-		                               right_child->NB::get_left(),
-		                               reinterpret_cast<Node *>(&this->dummy_node))
-		    ->NB::set_parent(parent);
-	} else {
-		if (right_child->NB::get_left() != nullptr) {
-			right_child->NB::get_left()->NB::set_parent(parent);
-		}
+	if (right_child->NB::get_left() != nullptr) {
+		right_child->NB::get_left()->NB::set_parent(parent);
 	}
 
 	Node * parents_parent = parent->NB::get_parent();
@@ -350,34 +338,14 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 	right_child->NB::set_left(parent);
 	right_child->NB::set_parent(parents_parent);
 
-	if constexpr (Options::micro_avoid_conditionals_setting) {
-		// reinterpret_cast safety: We only access a field available in the node
-		// base.
-		Node ** ppl = &(utilities::choose_ptr<Options>(
-		                    parents_parent != nullptr, parents_parent,
-		                    reinterpret_cast<Node *>(&this->dummy_node))
-		                    ->NB::get_left());
-		Node ** ppr = &(utilities::choose_ptr<Options>(
-		                    parents_parent != nullptr, parents_parent,
-		                    reinterpret_cast<Node *>(&this->dummy_node))
-		                    ->NB::get_right());
-
-		// If parent_parent == nullptr: Set root.
-		// else, if ppl == parent, set ppl, otherwise set ppr
-		Node ** to_be_set = utilities::choose_ptr<Options>(
-		    parents_parent == nullptr, &this->root,
-		    utilities::choose_ptr<Options>(*ppl == parent, ppl, ppr));
-		*to_be_set = right_child;
-	} else {
-		if (parents_parent != nullptr) {
-			if (parents_parent->NB::get_left() == parent) {
-				parents_parent->NB::set_left(right_child);
-			} else {
-				parents_parent->NB::set_right(right_child);
-			}
+	if (parents_parent != nullptr) {
+		if (parents_parent->NB::get_left() == parent) {
+			parents_parent->NB::set_left(right_child);
 		} else {
-			this->root = right_child;
+			parents_parent->NB::set_right(right_child);
 		}
+	} else {
+		this->root = right_child;
 	}
 
 	parent->NB::set_parent(right_child);
@@ -392,15 +360,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 	Node * left_child = parent->NB::get_left();
 	parent->NB::set_left(left_child->NB::get_right());
 
-	if constexpr (Options::micro_avoid_conditionals_setting) {
-		utilities::choose_ptr<Options>(left_child->NB::get_right() != nullptr,
-		                               left_child->NB::get_right(),
-		                               reinterpret_cast<Node *>(&this->dummy_node))
-		    ->NB::set_parent(parent);
-	} else {
-		if (left_child->NB::get_right() != nullptr) {
-			left_child->NB::get_right()->NB::set_parent(parent);
-		}
+	if (left_child->NB::get_right() != nullptr) {
+		left_child->NB::get_right()->NB::set_parent(parent);
 	}
 
 	Node * parents_parent = parent->NB::get_parent();
@@ -408,33 +369,14 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 	left_child->NB::set_right(parent);
 	left_child->NB::set_parent(parents_parent);
 
-	if constexpr (Options::micro_avoid_conditionals_setting) {
-		// reinterpret_cast safety: We only access a field available in the node
-		// base.
-		Node ** ppl = &(utilities::choose_ptr<Options>(
-		                    parents_parent != nullptr, parents_parent,
-		                    reinterpret_cast<Node *>(&this->dummy_node))
-		                    ->NB::get_left());
-		Node ** ppr = &(utilities::choose_ptr<Options>(
-		                    parents_parent != nullptr, parents_parent,
-		                    reinterpret_cast<Node *>(&this->dummy_node))
-		                    ->NB::get_right());
-		// If parent_parent == nullptr: Set root.
-		// else, if ppl == parent, set ppl, otherwise set ppr
-		Node ** to_be_set = utilities::choose_ptr<Options>(
-		    parents_parent == nullptr, &this->root,
-		    utilities::choose_ptr<Options>(*ppl == parent, ppl, ppr));
-		*to_be_set = left_child;
-	} else {
-		if (parents_parent != nullptr) {
-			if (parents_parent->NB::get_left() == parent) {
-				parents_parent->NB::set_left(left_child);
-			} else {
-				parents_parent->NB::set_right(left_child);
-			}
+	if (parents_parent != nullptr) {
+		if (parents_parent->NB::get_left() == parent) {
+			parents_parent->NB::set_left(left_child);
 		} else {
-			this->root = left_child;
+			parents_parent->NB::set_right(left_child);
 		}
+	} else {
+		this->root = left_child;
 	}
 
 	parent->NB::set_parent(left_child);

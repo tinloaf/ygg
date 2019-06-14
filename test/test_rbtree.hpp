@@ -19,10 +19,7 @@ constexpr int RBTREE_TESTSIZE = 2000;
 
 using NonMultipleOptions =
     TreeOptions<TreeFlags::COMPRESS_COLOR, TreeFlags::CONSTANT_TIME_SIZE,
-                TreeFlags::MICRO_AVOID_CONDITIONALS,
-                TreeFlags::MICRO_AVOID_CONDITIONALS_SETTING,
-                TreeFlags::MICRO_DUMMY_SETTING_POINTER>;
-
+                TreeFlags::MICRO_AVOID_CONDITIONALS>;
 class Node
     : public RBTreeNodeBase<Node, NonMultipleOptions> { // No multi-nodes!
 public:

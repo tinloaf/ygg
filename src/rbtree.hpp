@@ -1,15 +1,15 @@
 #ifndef YGG_RBTREE_HPP
 #define YGG_RBTREE_HPP
 
-#include <cassert>
-#include <cstddef>
-#include <set>
-#include <type_traits>
-
 #include "bst.hpp"
 #include "options.hpp"
 #include "size_holder.hpp"
 #include "tree_iterator.hpp"
+
+#include <cassert>
+#include <cstddef>
+#include <set>
+#include <type_traits>
 
 // Only for debugging purposes
 #include <fstream>
@@ -302,14 +302,6 @@ protected:
 	void verify_black_root() const;
 	void verify_black_paths(const Node * node, unsigned int * path_length) const;
 	void verify_red_black(const Node * node) const;
-
-	/* Dummy values for optimization */
-	// TODO make this optional
-	Node * dummy_node_ptr;
-	// utilities::OptionalMember<NB *, Options::micro_setting_dummy_pointer>
-	// dummy_node_ptr;
-	utilities::OptionalMember<NB, Options::micro_setting_dummy_pointer>
-	    dummy_node;
 };
 
 } // namespace ygg
