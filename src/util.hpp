@@ -104,11 +104,6 @@ struct is_numeric_specialization<Template<N>, Template> : std::true_type
 {
 };
 
-template <class... Ts>
-void
-throw_away(Ts...)
-{}
-
 class NotFoundMarker {
 public:
 	static constexpr std::size_t value = 0;
@@ -194,24 +189,6 @@ public:
 	using type =
 	    typename decltype(get_type_if_present_func<TMPL, Default, Ts...>())::type;
 };
-
-/* Return true if any of the arguments returns true */
-template <class... Bools>
-constexpr bool any_of(Bools... arguments);
-
-template <class First, class... Remainder>
-constexpr bool
-any_of(First first, Remainder... remainder)
-{
-	return first || any_of(remainder...);
-}
-
-template <>
-constexpr bool
-any_of()
-{
-	return false;
-}
 
 /* @brief A class providing an iterator over the integers 1, 2, … <n>
  */

@@ -1776,13 +1776,11 @@ CombinerPack<KeyT, AggValueT, Combiners...>::rebuild(KeyT my_point,
 		(void)right_edge_val;
 		return false;
 	} else {
-		return utilities::any_of(
-		    std::get<Combiners>(this->data)
-		        .rebuild(my_point, child_combiner<Combiners>(left_child),
-		                 left_edge_val, child_combiner<Combiners>(right_child),
-		                 right_edge_val)...
-
-		);
+		return (std::get<Combiners>(this->data)
+		            .rebuild(my_point, child_combiner<Combiners>(left_child),
+		                     left_edge_val, child_combiner<Combiners>(right_child),
+		                     right_edge_val) |
+		        ...);
 	}
 } // namespace ygg
 
@@ -1791,11 +1789,11 @@ bool
 CombinerPack<KeyT, AggValueT, Combiners...>::collect_left(
     KeyT my_point, const MyType * left_child_combiner, AggValueT edge_val)
 {
-	utilities::throw_away(
-	    std::get<Combiners>(this->data)
-	        .collect_left(my_point,
-	                      child_combiner<Combiners>(left_child_combiner),
-	                      edge_val)...);
+	// This is a fold expression with a comma operator!
+	(std::get<Combiners>(this->data)
+	     .collect_left(my_point, child_combiner<Combiners>(left_child_combiner),
+	                   edge_val),
+	 ...);
 	return false;
 }
 
@@ -1804,11 +1802,11 @@ bool
 CombinerPack<KeyT, AggValueT, Combiners...>::collect_right(
     KeyT my_point, const MyType * right_child_combiner, AggValueT edge_val)
 {
-	utilities::throw_away(
-	    std::get<Combiners>(this->data)
-	        .collect_right(my_point,
-	                       child_combiner<Combiners>(right_child_combiner),
-	                       edge_val)...);
+	// This is a fold expression with a comma operator!
+	(std::get<Combiners>(this->data)
+	     .collect_right(my_point, child_combiner<Combiners>(right_child_combiner),
+	                    edge_val),
+	 ...);
 	return false;
 }
 
@@ -1817,8 +1815,9 @@ bool
 CombinerPack<KeyT, AggValueT, Combiners...>::traverse_left_edge_up(
     KeyT new_point, AggValueT edge_val)
 {
-	utilities::throw_away(std::get<Combiners>(this->data)
-	                          .traverse_left_edge_up(new_point, edge_val)...);
+	// This is a fold expression with a comma operator!
+	(std::get<Combiners>(this->data).traverse_left_edge_up(new_point, edge_val),
+	 ...);
 	return false;
 }
 
@@ -1827,8 +1826,9 @@ bool
 CombinerPack<KeyT, AggValueT, Combiners...>::traverse_right_edge_up(
     KeyT new_point, AggValueT edge_val)
 {
-	utilities::throw_away(std::get<Combiners>(this->data)
-	                          .traverse_right_edge_up(new_point, edge_val)...);
+	// This is a fold expression with a comma operator!
+	(std::get<Combiners>(this->data).traverse_right_edge_up(new_point, edge_val),
+	 ...);
 	return false;
 }
 
