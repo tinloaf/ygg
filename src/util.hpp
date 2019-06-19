@@ -2,6 +2,7 @@
 // Created by Lukas Barth on 09.08.17.
 //
 
+#include <utility>
 #ifndef YGG_UTIL_HPP
 
 #include <iterator>
@@ -374,92 +375,87 @@ public:
 	}
 };
 
-/*
- * This is inspired by
+/*****************************************************
  *
- * https://stackoverflow.com/questions/34099597/check-if-a-type-is-passed-in-variadic-template-parameter-pack
+ * Parameter Pack handling
  *
- * and should be converted to std::disjunction as soon as C++17 becomes
- * available on reasonable compilers.
- */
-// template<typename QueryT, typename ...Ts>
-// constexpr bool pack_contains();
-
-template <typename QueryT>
-constexpr bool
-pack_contains()
+ *****************************************************/
+template <std::size_t I, class T>
+struct PackEntry
 {
-	return false;
-}
+	using type = T;
+};
 
-// Forward
-template <typename QueryT, typename First, typename... Rest>
-constexpr bool pack_contains();
+template <class Is, class... Ts>
+struct PackIndex;
 
-template <typename QueryT, bool found, typename... Rest>
-constexpr typename std::enable_if<found, bool>::type
-pack_contains_forward()
+template <std::size_t... Is, class... Ts>
+struct PackIndex<std::index_sequence<Is...>, Ts...> : PackEntry<Is, Ts>...
 {
-	return true;
-}
+};
 
-template <typename QueryT, bool found, typename... Rest>
-constexpr typename std::enable_if<!found, bool>::type
-pack_contains_forward()
+template <std::size_t I, class T>
+static constexpr PackEntry<I, T> pack_select(PackEntry<I, T>);
+
+template <std::size_t I, class... Ts>
+using nth_element = typename decltype(
+    pack_select<I>(PackIndex<std::index_sequence_for<Ts...>, Ts...>{}))::type;
+
+template <class T, class... Ts>
+struct PackSearcher
 {
-	return pack_contains<QueryT, Rest...>();
-}
+	static constexpr std::false_type check(...);
 
-template <typename QueryT, typename First, typename... Rest>
-constexpr bool
-pack_contains()
+	template <std::size_t I>
+	static constexpr std::true_type check(PackEntry<I, T>);
+
+	using type =
+	    decltype(check(PackIndex<std::index_sequence_for<Ts...>, Ts...>{}));
+
+	static constexpr bool
+	value()
+	{
+		return type{};
+	}
+};
+
+template <template <std::size_t> class T, class... Ts>
+struct TmplPackSearcher
 {
-	return pack_contains_forward<QueryT, std::is_same<QueryT, First>::value,
-	                             Rest...>();
-}
+	static constexpr std::false_type check(...);
 
-/*
- * Version to check for the presence of a size_t template
- */
-template <template <size_t> class QueryT>
-constexpr bool
-pack_contains_tmpl()
+	template <std::size_t I, std::size_t N>
+	static constexpr std::true_type check(PackEntry<I, T<N>>);
+
+	using type =
+	    decltype(check(PackIndex<std::index_sequence_for<Ts...>, Ts...>{}));
+
+	static constexpr bool
+	value()
+	{
+		return type{};
+	}
+};
+
+template <class... Ts>
+struct Pack
 {
-	return false;
-}
+	template <std::size_t I>
+	using get = nth_element<I, Ts...>;
 
-// Forward
-template <template <size_t> class QueryT, typename First, typename... Rest>
-constexpr bool pack_contains_tmpl();
+	template <class T>
+	static constexpr bool
+	has()
+	{
+		return PackSearcher<T, Ts...>::value();
+	}
 
-template <template <size_t> class QueryT, bool found, typename... Rest>
-constexpr typename std::enable_if<found, bool>::type
-pack_contains_forward_tmpl()
-{
-	return true;
-}
-
-template <template <size_t> class QueryT, bool found, typename... Rest>
-constexpr typename std::enable_if<!found, bool>::type
-pack_contains_forward_tmpl()
-{
-	return pack_contains_tmpl<QueryT, Rest...>();
-}
-
-template <template <size_t> class QueryT, typename First, typename... Rest>
-constexpr bool
-pack_contains_tmpl()
-{
-	return pack_contains_forward_tmpl<
-	    QueryT, is_numeric_specialization<First, QueryT>::value, Rest...>();
-}
-
-/*
- * Generic class to contain a template parameter pack
- */
-template <class...>
-struct pack
-{
+	template <template <std::size_t N> class T>
+	static constexpr bool
+	has_tmpl_size_t()
+	{
+		return TmplPackSearcher<T, Ts...>::value();
+	}
 };
 
 /*

@@ -261,6 +261,8 @@ protected:
 
 } // namespace ygg
 
+#ifndef YGG_WBTREE_CPP
 #include "wbtree.cpp"
+#endif
 
 #endif // YGG_WBTREE_HPP

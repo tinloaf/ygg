@@ -272,10 +272,10 @@ private:
 	constexpr static auto
 	compute_wbt_gamma_type()
 	{
-		if constexpr (utilities::pack_contains_tmpl<TreeFlags::WBT_GAMMA_NUMERATOR,
-		                                            Opts...>() &&
-		              utilities::pack_contains_tmpl<
-		                  TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>() &&
+		if constexpr (OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_DENOMINATOR>() &&
+		              OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_NUMERATOR>() &&
 		              utilities::get_value_if_present<
 		                  TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>::value == 1) {
 			return IntegralTypeHolder();
@@ -287,10 +287,10 @@ private:
 	constexpr static auto
 	compute_wbt_delta_type()
 	{
-		if constexpr (utilities::pack_contains_tmpl<TreeFlags::WBT_DELTA_NUMERATOR,
-		                                            Opts...>() &&
-		              utilities::pack_contains_tmpl<
-		                  TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>() &&
+		if constexpr (OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_DENOMINATOR>() &&
+		              OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_NUMERATOR>() &&
 		              utilities::get_value_if_present<
 		                  TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>::value == 1) {
 			return IntegralTypeHolder();
@@ -299,20 +299,20 @@ private:
 		}
 	}
 
+	using OptPack = utilities::Pack<Opts...>;
+
 public:
 	/// @cond INTERNAL
-	static constexpr bool multiple =
-	    utilities::pack_contains<TreeFlags::MULTIPLE, Opts...>();
+
+	static constexpr bool multiple = OptPack::template has<TreeFlags::MULTIPLE>();
 	static constexpr bool order_queries =
-	    utilities::pack_contains<TreeFlags::ORDER_QUERIES, Opts...>();
+	    OptPack::template has<TreeFlags::ORDER_QUERIES>();
 	static constexpr bool constant_time_size =
-	    utilities::pack_contains<TreeFlags::CONSTANT_TIME_SIZE, Opts...>();
+	    OptPack::template has<TreeFlags::CONSTANT_TIME_SIZE>();
 	static constexpr bool compress_color =
-	    utilities::pack_contains<TreeFlags::COMPRESS_COLOR, Opts...>();
-
+	    OptPack::template has<TreeFlags::COMPRESS_COLOR>();
 	static constexpr bool ztree_use_hash =
-	    utilities::pack_contains<TreeFlags::ZTREE_USE_HASH, Opts...>();
-
+	    OptPack::template has<TreeFlags::ZTREE_USE_HASH>();
 	using ztree_rank_type =
 	    typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE, bool,
 	                                            Opts...>::type;
@@ -342,10 +342,10 @@ public:
 	static constexpr WBTDeltaT
 	wbt_delta()
 	{
-		if constexpr (utilities::pack_contains_tmpl<TreeFlags::WBT_DELTA_NUMERATOR,
-		                                            Opts...>() &&
-		              utilities::pack_contains_tmpl<
-		                  TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>() &&
+		if constexpr (OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_DENOMINATOR>() &&
+		              OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_NUMERATOR>() &&
 		              (utilities::get_value_if_present<
 		                   TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>::value !=
 		               0)) {
@@ -363,10 +363,10 @@ public:
 	static constexpr WBTGammaT
 	wbt_gamma()
 	{
-		if constexpr (utilities::pack_contains_tmpl<TreeFlags::WBT_GAMMA_NUMERATOR,
-		                                            Opts...>() &&
-		              utilities::pack_contains_tmpl<
-		                  TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>() &&
+		if constexpr (OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_DENOMINATOR>() &&
+		              OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_NUMERATOR>() &&
 		              (utilities::get_value_if_present<
 		                   TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>::value !=
 		               0)) {
@@ -380,13 +380,13 @@ public:
 	}
 
 	static constexpr bool wbt_single_pass =
-	    utilities::pack_contains<TreeFlags::WBT_SINGLE_PASS, Opts...>();
+	    OptPack::template has<TreeFlags::WBT_SINGLE_PASS>();
 
 	/**********************************************
 	 * Micro-Optimization
 	 **********************************************/
 	static constexpr bool micro_avoid_conditionals =
-	    utilities::pack_contains<TreeFlags::MICRO_AVOID_CONDITIONALS, Opts...>();
+	    OptPack::template has<TreeFlags::MICRO_AVOID_CONDITIONALS>();
 	/// @endcond
 private:
 	TreeOptions(); // Instantiation not allowed
