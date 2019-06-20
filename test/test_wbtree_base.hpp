@@ -1,7 +1,6 @@
 using namespace ygg;
 
 constexpr int WBTREE_TESTSIZE = 5000;
-constexpr int WBTREE_SEED = 4; // chosen by fair xkcd
 
 constexpr size_t WBTREE_CHECK_INTERVAL = 10;
 

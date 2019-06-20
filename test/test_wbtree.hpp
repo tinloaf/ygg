@@ -21,6 +21,7 @@ using MULTI_FLAGS =
 using DEFAULT_FLAGS = TreeOptions<TreeFlags::CONSTANT_TIME_SIZE,
                                   TreeFlags::MICRO_AVOID_CONDITIONALS>;
 
+#define WBTREE_SEED 4
 #include "test_wbtree_base.hpp"
 
 } // namespace wbtree_twopass
@@ -37,6 +38,8 @@ using DEFAULT_FLAGS =
     TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::CONSTANT_TIME_SIZE,
                 TreeFlags::MICRO_AVOID_CONDITIONALS>;
 
+#undef WBTREE_SEED
+#define WBTREE_SEED 5
 #include "test_wbtree_base.hpp"
 
 } // namespace wbtree_onepass

@@ -1,15 +1,14 @@
 #ifndef YGG_TEST_DST_H
 #define YGG_TEST_DST_H
 
+#include "../src/ygg.hpp"
+#include "randomizer.hpp"
+
 #include <algorithm>
+#include <boost/icl/interval_map.hpp>
 #include <gtest/gtest.h>
 #include <random>
 #include <vector>
-
-#include <boost/icl/interval_map.hpp>
-
-#include "../src/ygg.hpp"
-#include "randomizer.hpp"
 
 namespace ygg {
 namespace testing {
@@ -23,9 +22,6 @@ constexpr int DYNSEGTREE_COMPREHENSIVE_TESTSIZE = 500;
 constexpr int DYNSEGTREE_DELETION_TESTSIZE = 100;
 constexpr int DYNSEGTREE_DELETION_ITERATIONS = 10;
 
-// chosen by fair xkcd
-constexpr int DYNSEGTREE_SEED = 4;
-
 using MCombiner = MaxCombiner<int, int>;
 using RMCombiner = RangedMaxCombiner<int, int>;
 using Combiners = CombinerPack<int, int, RMCombiner, MCombiner>;
@@ -36,6 +32,7 @@ using Combiners = CombinerPack<int, int, RMCombiner, MCombiner>;
 
 #define __DST_BASENAME(NAME) RBTree_##NAME
 #define __DST_BASESELECTOR UseRBTree
+#define DYNSEGTREE_SEED 4
 
 #include "test_dynamic_segment_tree_base.hpp"
 
@@ -43,6 +40,8 @@ using Combiners = CombinerPack<int, int, RMCombiner, MCombiner>;
 #define __DST_BASENAME(NAME) WBTree_##NAME
 #undef __DST_BASESELECTOR
 #define __DST_BASESELECTOR UseWBTree
+#undef DYNSEGTREE_SEED
+#define DYNSEGTREE_SEED 5
 
 #include "test_dynamic_segment_tree_base.hpp"
 
@@ -50,8 +49,9 @@ using Combiners = CombinerPack<int, int, RMCombiner, MCombiner>;
 #define __DST_BASENAME(NAME) ZipTree_##NAME
 #undef __DST_BASESELECTOR
 #define __DST_BASESELECTOR UseZipTree
+#undef DYNSEGTREE_SEED
+#define DYNSEGTREE_SEED 6
 
 #include "test_dynamic_segment_tree_base.hpp"
-
 
 #endif
