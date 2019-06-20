@@ -479,7 +479,9 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 			++it;
 		}
 		int combined = agg.get_combined<MCombiner>();
+		int ranged_combined = agg.get_combined<RMCombiner>();
 		ASSERT_EQ(combined, maxval);
+		ASSERT_EQ(ranged_combined, maxval);
 	};
 
 	std::set<size_t> deleted;
