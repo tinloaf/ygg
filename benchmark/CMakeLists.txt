@@ -10,7 +10,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/draup)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/draup/draup.hpp")
-	message( FATAL_ERROR "draup.hpp not found. Did you forget to run 'git submodule init --recursive'?" )
+	message( FATAL_ERROR "draup.hpp not found. Did you forget to run 'git submodule update --init'?" )
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
