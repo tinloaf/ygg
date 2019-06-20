@@ -218,7 +218,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::RBTree(MyClass && other)
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-template <bool on_equality_prefer_left>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
                                                                   Node * start)
@@ -234,24 +233,12 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 
 		if constexpr (Options::multiple) {
 			if constexpr (Options::micro_avoid_conditionals) {
-				if constexpr (on_equality_prefer_left) {
-					cur = utilities::go_right_if(this->cmp(*cur, node), cur);
-				} else {
-					cur = utilities::go_left_if(this->cmp(node, *cur), cur);
-				}
+				cur = utilities::go_right_if(this->cmp(*cur, node), cur);
 			} else {
-				if constexpr (on_equality_prefer_left) {
-					if (this->cmp(*cur, node)) {
-						cur = cur->NB::get_right();
-					} else {
-						cur = cur->NB::get_left();
-					}
+				if (this->cmp(*cur, node)) {
+					cur = cur->NB::get_right();
 				} else {
-					if (this->cmp(node, *cur)) {
-						cur = cur->NB::get_left();
-					} else {
-						cur = cur->NB::get_right();
-					}
+					cur = cur->NB::get_left();
 				}
 			}
 		} else {
@@ -307,12 +294,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 				this->s.reduce(1);
 				return;
 			} else {
-
-				if constexpr (on_equality_prefer_left) {
-					parent->NB::set_left(&node);
-				} else {
-					parent->NB::set_right(&node);
-				}
+				parent->NB::set_left(&node);
 			}
 		}
 
@@ -455,26 +437,9 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node)
 {
+	// TODO merge this
 	this->s.add(1);
-	this->insert_leaf_base<true>(node, this->root);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-void
-RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_left_leaning(
-    Node & node)
-{
-	this->s.add(1);
-	this->insert_leaf_base<true>(node, this->root);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-void
-RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_right_leaning(
-    Node & node)
-{
-	this->s.add(1);
-	this->insert_leaf_base<false>(node, this->root);
+	this->insert_leaf_base(node, this->root);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>

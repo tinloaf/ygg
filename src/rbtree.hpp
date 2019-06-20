@@ -250,10 +250,6 @@ public:
 	// TODO document hinted inserts
 	// TODO should order be preserved on hints?
 
-	// TODO document
-	void insert_left_leaning(Node & node);
-	void insert_right_leaning(Node & node);
-
 	/**
 	 * @brief Removes <node> from the tree
 	 *
@@ -287,7 +283,6 @@ protected:
 	void remove_to_leaf(Node & node);
 	void fixup_after_delete(Node * parent, bool deleted_left);
 
-	template <bool on_equality_prefer_left>
 	void insert_leaf_base(Node & node, Node * start);
 
 	void fixup_after_insert(Node * node);

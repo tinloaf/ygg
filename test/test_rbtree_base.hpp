@@ -166,11 +166,7 @@ TEST(__RBT_BASENAME(RBTreeTest), HintedPostEqualInsertionTest)
 	tree.dbg_verify();
 
 	// should be inserted before pre
-	tree.insert_left_leaning(n_insert_before);
-	tree.dbg_verify();
-
-	// should be inserted between pre and post
-	tree.insert_right_leaning(n_insert_between);
+	tree.insert(n_insert_before);
 	tree.dbg_verify();
 
 	// TODO once hinted insertion is fixed, check that the order is upheld
