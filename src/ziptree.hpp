@@ -5,6 +5,10 @@
 #include "size_holder.hpp"
 #include "tree_iterator.hpp"
 
+#ifdef YGG_STORE_SEQUENCE
+#include "benchmark_sequence.hpp"
+#endif
+
 #include <cmath>
 #include <functional>
 
@@ -509,7 +513,7 @@ public:
 	 */
 	template <class Comparable>
 	void erase(const Comparable & c);
-	
+
 	// TODO add rank-shortened search
 
 	/**
@@ -654,6 +658,12 @@ private:
 	                      NodeNameGetter name_getter) const;
 
 	SizeHolder<Options::constant_time_size> s;
+
+#ifdef YGG_STORE_SEQUENCE
+	typename ygg::utilities::template BenchmarkSequenceStorage<
+	    typename Options::SequenceInterface::KeyT>
+	    bss;
+#endif
 };
 
 } // namespace ygg

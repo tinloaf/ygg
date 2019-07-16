@@ -584,7 +584,6 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
     const Comparable & query, Callbacks * cbs)
 {
 #ifdef YGG_STORE_SEQUENCE
-	// TODO point to the query?
 	this->bss.register_search(reinterpret_cast<const void *>(&query),
 	                          Options::SequenceInterface::get_key(query));
 #endif

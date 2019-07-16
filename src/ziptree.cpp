@@ -57,6 +57,11 @@ void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
     Node & node) noexcept
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_insert(reinterpret_cast<const void *>(&node),
+	                          Options::SequenceInterface::get_key(node));
+#endif
+
 	// TODO set these only where necessary
 	node._zt_parent = nullptr;
 	node._zt_left = nullptr;
@@ -369,6 +374,11 @@ void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::remove(
     Node & n) noexcept
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_delete(reinterpret_cast<const void *>(&n),
+	                          Options::SequenceInterface::get_key(n));
+#endif
+
 	this->s.reduce(1);
 	this->zip(n);
 }
@@ -380,9 +390,15 @@ void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::erase(
     const Comparable & c)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_erase(reinterpret_cast<const void *>(&c),
+	                         Options::SequenceInterface::get_key(c));
+#endif
+
 	auto el = this->find(c);
 	if (el != this->end()) {
-		this->remove(*el);
+		this->s.reduce(1);
+		this->zip(*el);
 	}
 }
 
@@ -696,6 +712,10 @@ typename ZTree<Node, NodeTraits, Options, Tag, Compare,
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::lower_bound(
     const Comparable & query)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_lbound(reinterpret_cast<const void *>(&query),
+	                          Options::SequenceInterface::get_key(query));
+#endif
 	Node * cur = this->root;
 	Node * last_left = nullptr;
 
@@ -723,6 +743,10 @@ typename ZTree<Node, NodeTraits, Options, Tag, Compare,
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::upper_bound(
     const Comparable & query)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_ubound(reinterpret_cast<const void *>(&query),
+	                          Options::SequenceInterface::get_key(query));
+#endif
 	Node * cur = this->root;
 	Node * last_left = nullptr;
 
@@ -778,6 +802,11 @@ typename ZTree<Node, NodeTraits, Options, Tag, Compare,
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::find(
     const Comparable & query)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_search(reinterpret_cast<const void *>(&query),
+	                          Options::SequenceInterface::get_key(query));
+#endif
+
 	Node * cur = this->root;
 	Node * last_left = nullptr;
 
