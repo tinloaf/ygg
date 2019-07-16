@@ -583,6 +583,12 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
     const Comparable & query, Callbacks * cbs)
 {
+#ifdef YGG_STORE_SEQUENCE
+	// TODO point to the query?
+	this->bss.register_search(reinterpret_cast<const void *>(&query),
+	                          Options::SequenceInterface::get_key(query));
+#endif
+
 	Node * cur = this->root;
 	cbs->init_root(cur);
 
@@ -611,6 +617,11 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
     const Comparable & query)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_search(reinterpret_cast<const void *>(&query),
+	                          Options::SequenceInterface::get_key(query));
+#endif
+
 	Node * cur = this->root;
 	Node * last_left = nullptr;
 
@@ -663,6 +674,12 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::lower_bound(
     const Comparable & query)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_lbound(reinterpret_cast<const void *>(&query),
+	                          Options::SequenceInterface::get_key(query));
+#endif
+
+	// TODO avoid conditionals!
 	Node * cur = this->root;
 	Node * last_left = nullptr;
 
@@ -690,6 +707,12 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::upper_bound(
     const Comparable & query)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_ubound(reinterpret_cast<const void *>(&query),
+	                          Options::SequenceInterface::get_key(query));
+#endif
+
+	// TODO avoid conditionals!
 	Node * cur = this->root;
 	Node * last_left = nullptr;
 

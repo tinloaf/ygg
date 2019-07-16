@@ -437,6 +437,11 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_insert(reinterpret_cast<const void *>(&node),
+	                          Options::SequenceInterface::get_key(node));
+#endif
+
 	// TODO merge this
 	this->s.add(1);
 	this->insert_leaf_base(node, this->root);
@@ -447,6 +452,11 @@ void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node,
                                                         Node & hint)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_insert(reinterpret_cast<const void *>(&node),
+	                          Options::SequenceInterface::get_key(node));
+#endif
+
 	/* TODO this code does not work. We need to traverse the path up until
 	 * we have seen at least one smaller-than and one larger-than node.
 	 * Is this really faster? For now, fall back to normal insertion.
@@ -489,6 +499,11 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(
     Node & node,
     RBTree<Node, NodeTraits, Options, Tag, Compare>::iterator<false> hint)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_insert(reinterpret_cast<const void *>(&node),
+	                          Options::SequenceInterface::get_key(node));
+#endif
+
 	this->insert(node);
 	(void)hint;
 	/* TODO see above.*/
@@ -822,9 +837,15 @@ template <class Comparable>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
 {
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_erase(reinterpret_cast<const void *>(&c),
+	                         Options::SequenceInterface::get_key(c));
+#endif
+
 	auto el = this->find(c);
 	if (el != this->end()) {
-		this->remove(*el);
+		this->remove_to_leaf(*el);
+		this->s.reduce(1);
 	}
 }
 
@@ -947,7 +968,11 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::remove(Node & node)
 {
-	// TODO collapse this method
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_delete(reinterpret_cast<const void *>(&node),
+	                          Options::SequenceInterface::get_key(node));
+#endif
+
 	this->remove_to_leaf(node);
 	this->s.reduce(1);
 }

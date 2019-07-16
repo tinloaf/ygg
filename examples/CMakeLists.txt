@@ -46,3 +46,10 @@ set_target_properties(example_dynamic_segment_tree
 set_target_properties(example_dynamic_segment_tree
         PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
         )
+
+add_executable (generate_benchmark_sequence generate_benchmark_sequence.cpp)
+set_target_properties(generate_benchmark_sequence
+        PROPERTIES CXX_STANDARD 17)
+set_target_properties(generate_benchmark_sequence
+        PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
+        )

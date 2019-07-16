@@ -397,7 +397,7 @@ struct PackSearcher
 };
 
 template <template <std::size_t> class T, class... Ts>
-struct TmplPackSearcher
+struct SizeTTmplPackSearcher
 {
 	static constexpr std::false_type check(...);
 
@@ -431,7 +431,7 @@ struct Pack
 	static constexpr bool
 	has_tmpl_size_t()
 	{
-		return TmplPackSearcher<T, Ts...>::value();
+		return SizeTTmplPackSearcher<T, Ts...>::value();
 	}
 };
 

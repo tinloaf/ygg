@@ -11,12 +11,26 @@
 #include <set>
 #include <type_traits>
 
+#ifdef YGG_STORE_SEQUENCE
+#include "benchmark_sequence.hpp"
+#endif
+
 // Only for debugging purposes
 #include <fstream>
 #include <vector>
 
 namespace ygg {
 namespace bst {
+
+#ifdef YGG_STORE_SEQUENCE
+class DummySequenceInterface {
+public:
+	using KeyT = bool; // Set this to whatever your nodes use as key. Anything
+	                   // non-numeric will probably blow up
+	static KeyT
+	    get_key(/* Your node class */) = delete; // You must implement this!
+};
+#endif
 
 template <class Node>
 class DefaultParentContainer {
@@ -446,6 +460,12 @@ protected:
 	void verify_order() const;
 	void verify_size() const;
 	// @endcond
+
+#ifdef YGG_STORE_SEQUENCE
+	typename ygg::utilities::template BenchmarkSequenceStorage<
+	    typename Options::SequenceInterface::KeyT>
+	    bss;
+#endif
 };
 
 } // namespace bst

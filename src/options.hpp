@@ -228,6 +228,15 @@ public:
 	 */
 	class MICRO_AVOID_CONDITIONALS {
 	};
+
+	/******************************************************
+	 * Benchmarking Helpers
+	 ******************************************************/
+	template <class SequenceInterface>
+	class BENCHMARK_SEQUENCE_INTERFACE {
+	public:
+		using type = SequenceInterface;
+	};
 };
 
 /**
@@ -296,6 +305,19 @@ private:
 			return IntegralTypeHolder();
 		} else {
 			return FloatTypeHolder();
+		}
+	}
+
+	constexpr static auto
+	compute_sequence_interface_type()
+	{
+		using T = typename utilities::get_type_if_present<
+		    TreeFlags::BENCHMARK_SEQUENCE_INTERFACE, void, Opts...>::type;
+
+		if constexpr (!std::is_same_v<T, void>) {
+			return utilities::TypeHolder<typename T::type>{};
+		} else {
+			return utilities::TypeHolder<void>{};
 		}
 	}
 
@@ -387,6 +409,12 @@ public:
 	 **********************************************/
 	static constexpr bool micro_avoid_conditionals =
 	    OptPack::template has<TreeFlags::MICRO_AVOID_CONDITIONALS>();
+
+	/**********************************************
+	 * Benchmarking Helpers
+	 **********************************************/
+	using SequenceInterface =
+	    typename decltype(compute_sequence_interface_type())::type;
 	/// @endcond
 private:
 	TreeOptions(); // Instantiation not allowed
