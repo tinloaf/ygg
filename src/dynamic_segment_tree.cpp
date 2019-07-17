@@ -15,8 +15,9 @@ namespace ygg {
 
 namespace dyn_segtree_internal {
 
-template <template <class InnerNodeCRTP> class Base, class OuterNode,
-          class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+template <template <class InnerNodeCRTP, class BaseKeyT> class Base,
+          class OuterNode, class KeyT, class ValueT, class AggValueT,
+          class Combiners, class Tag>
 KeyT
 InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::get_point()
     const noexcept
@@ -24,8 +25,9 @@ InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::get_point()
 	return this->point;
 }
 
-template <template <class InnerNodeCRTP> class Base, class OuterNode,
-          class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+template <template <class InnerNodeCRTP, class BaseKeyT> class Base,
+          class OuterNode, class KeyT, class ValueT, class AggValueT,
+          class Combiners, class Tag>
 bool
 InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::is_start()
     const noexcept
@@ -33,8 +35,9 @@ InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::is_start()
 	return this->start;
 }
 
-template <template <class InnerNodeCRTP> class Base, class OuterNode,
-          class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+template <template <class InnerNodeCRTP, class BaseKeyT> class Base,
+          class OuterNode, class KeyT, class ValueT, class AggValueT,
+          class Combiners, class Tag>
 bool
 InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::is_end()
     const noexcept
@@ -42,8 +45,9 @@ InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::is_end()
 	return !this->start;
 }
 
-template <template <class InnerNodeCRTP> class Base, class OuterNode,
-          class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+template <template <class InnerNodeCRTP, class BaseKeyT> class Base,
+          class OuterNode, class KeyT, class ValueT, class AggValueT,
+          class Combiners, class Tag>
 bool
 InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::is_closed()
     const noexcept
@@ -51,8 +55,9 @@ InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners, Tag>::is_closed()
 	return this->closed;
 }
 
-template <template <class InnerNodeCRTP> class Base, class OuterNode,
-          class KeyT, class ValueT, class AggValueT, class Combiners, class Tag>
+template <template <class InnerNodeCRTP, class BaseKeyT> class Base,
+          class OuterNode, class KeyT, class ValueT, class AggValueT,
+          class Combiners, class Tag>
 const OuterNode *
 InnerNode<Base, OuterNode, KeyT, ValueT, AggValueT, Combiners,
           Tag>::get_interval() const noexcept

@@ -53,3 +53,11 @@ set_target_properties(generate_benchmark_sequence
 set_target_properties(generate_benchmark_sequence
         PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
         )
+
+add_executable (generate_benchmark_sequence_dst generate_benchmark_sequence_dst.cpp)
+set_target_properties(generate_benchmark_sequence
+        PROPERTIES CXX_STANDARD 17)
+set_target_properties(generate_benchmark_sequence
+        PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
+        )
+			

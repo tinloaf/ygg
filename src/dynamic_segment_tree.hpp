@@ -22,6 +22,31 @@ class DynamicSegmentTree;
 
 namespace dyn_segtree_internal {
 
+/* Interface for when modification sequences should be stored for benchmarking
+ * purposes */
+template <class InnerNode, class KeyT_in>
+class InnerSequenceInterface {
+public:
+	using KeyT = KeyT_in;
+
+	static KeyT_in
+	get_key(const InnerNode & n)
+	{
+		return n.get_point();
+	}
+
+	static KeyT_in
+	get_key(KeyT_in query)
+	{
+		return query;
+	}
+
+	static KeyT_in
+	get_key(std::pair<KeyT_in, bool> query)
+	{
+		return std::get<0>(query);
+	}
+};
 /// @cond INTERNAL
 
 // Forwards
@@ -51,12 +76,17 @@ class InnerWBTTag {
  ********************************************/
 struct UseRBTree
 {
+	template <class InnerNode, class KeyT>
+	using Options = TreeOptions<TreeFlags::MULTIPLE,
+	                            TreeFlags::BENCHMARK_SEQUENCE_INTERFACE<
+	                                InnerSequenceInterface<InnerNode, KeyT>>>;
+
 	template <class Tag>
 	struct InnerNodeBaseBuilder
 	{
-		template <class InnerNodeCRTP>
+		template <class InnerNodeCRTP, class KeyT>
 		using Base =
-		    RBTreeNodeBase<InnerNodeCRTP, TreeOptions<TreeFlags::MULTIPLE>, Tag>;
+		    RBTreeNodeBase<InnerNodeCRTP, Options<InnerNodeCRTP, KeyT>, Tag>;
 	};
 
 	template <class CRTP, class Node, class NodeTraits, class InnerNode,
@@ -65,7 +95,7 @@ struct UseRBTree
 	    RBTree<InnerNode,
 	           dyn_segtree_internal::InnerRBNodeTraits<CRTP, InnerNode, Node,
 	                                                   NodeTraits>,
-	           TreeOptions<TreeFlags::MULTIPLE>,
+	           Options<InnerNode, typename InnerNode::KeyT>,
 	           dyn_segtree_internal::InnerRBTTag<Tag>, Compare<InnerNode>>;
 
 	template <class TagType>
@@ -77,14 +107,17 @@ struct UseRBTree
  ********************************************/
 struct UseWBTree
 {
+	template <class InnerNode, class KeyT>
+	using Options = TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS,
+	                            TreeFlags::BENCHMARK_SEQUENCE_INTERFACE<
+	                                InnerSequenceInterface<InnerNode, KeyT>>>;
+
 	template <class Tag>
 	struct InnerNodeBaseBuilder
 	{
-		template <class InnerNodeCRTP>
-		using Base = WBTreeNodeBase<
-		    InnerNodeCRTP,
-		    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS>,
-		    Tag>; // TODO make options passable here
+		template <class InnerNodeCRTP, class KeyT>
+		using Base = WBTreeNodeBase<InnerNodeCRTP, Options<InnerNodeCRTP, KeyT>,
+		                            Tag>; // TODO make options passable here
 	};
 
 	template <class CRTP, class Node, class NodeTraits, class InnerNode,
@@ -93,9 +126,7 @@ struct UseWBTree
 	    WBTree<InnerNode,
 	           dyn_segtree_internal::InnerWBNodeTraits<CRTP, InnerNode, Node,
 	                                                   NodeTraits>,
-	           TreeOptions<TreeFlags::MULTIPLE,
-	                       TreeFlags::WBT_SINGLE_PASS>, // TODO make options
-	                                                    // passable here
+	           Options<InnerNode, typename InnerNode::KeyT>,
 	           dyn_segtree_internal::InnerWBTTag<Tag>, Compare<InnerNode>>;
 
 	template <class TagType>
@@ -107,13 +138,17 @@ struct UseWBTree
  ********************************************/
 struct UseZipTree
 {
+	template <class InnerNode, class KeyT>
+	using Options =
+	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
+	                TreeFlags::BENCHMARK_SEQUENCE_INTERFACE<
+	                    InnerSequenceInterface<InnerNode, KeyT>>>;
 	template <class Tag>
 	struct InnerNodeBaseBuilder
 	{
-		template <class InnerNodeCRTP>
+		template <class InnerNodeCRTP, class KeyT>
 		using Base =
-		    ZTreeNodeBase<InnerNodeCRTP,
-		                  TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, Tag>;
+		    ZTreeNodeBase<InnerNodeCRTP, Options<InnerNodeCRTP, KeyT>, Tag>;
 	};
 
 	template <class CRTP, class Node, class NodeTraits, class InnerNode,
@@ -122,8 +157,7 @@ struct UseZipTree
 	    ZTree<InnerNode,
 	          dyn_segtree_internal::InnerZNodeTraits<
 	              CRTP, InnerNode, typename InnerNode::AggValueT>,
-	          TreeOptions<TreeFlags::ZTREE_RANK_TYPE<uint8_t>>, // TODO make this
-	                                                            // configurable?
+	          Options<InnerNode, typename InnerNode::KeyT>,
 	          dyn_segtree_internal::InnerZTTag<Tag>, Compare<InnerNode>>;
 
 	template <class TagType>
@@ -139,11 +173,12 @@ struct UseZipTree
  * you inserted into a DynamicSegmentTree. You can use get_interval() to
  * retrieve a pointer to the node that you inserted into the DynamicSegmentTree.
  */
-template <template <class InnerNodeCRTP> class Base, class OuterNode,
-          class KeyT_in, class ValueT_in, class AggValueT_in, class Combiners,
-          class Tag>
+template <template <class InnerNodeCRTP, class BaseKeyT> class Base,
+          class OuterNode, class KeyT_in, class ValueT_in, class AggValueT_in,
+          class Combiners, class Tag>
 class InnerNode : public Base<InnerNode<Base, OuterNode, KeyT_in, ValueT_in,
-                                        AggValueT_in, Combiners, Tag>> {
+                                        AggValueT_in, Combiners, Tag>,
+                              KeyT_in> {
 public:
 	/**
 	 * @brief The type of the key (i.e., the interval bounds)
