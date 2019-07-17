@@ -1,11 +1,11 @@
 #ifndef INTERVALTREE_HPP
 #define INTERVALTREE_HPP
 
+#include "rbtree.hpp"
+
 #include <algorithm>
 #include <iostream>
 #include <string>
-
-#include "rbtree.hpp"
 
 namespace ygg {
 namespace intervaltree_internal {
@@ -223,6 +223,10 @@ public:
 
 	// TODO FIXME this is actually very specific?
 	void fixup_maxima(Node & lowest);
+
+	// Iterating the events should still be possible
+	using BaseTree::begin;
+	using BaseTree::end;
 
 private:
 	bool verify_maxima(Node * n) const;
