@@ -19,7 +19,7 @@ public:
 	VerifyException() : std::runtime_error(""){};
 };
 
-void
+inline void
 yggassert(bool condition)
 {
 	if (!condition) {
