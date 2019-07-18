@@ -102,6 +102,7 @@ BenchmarkSequenceStorage<KeyT>::get_filename() const
 		std::ostringstream filename_buf;
 		std::filesystem::path path;
 		while (!found) {
+			filename_buf.str("");
 			filename_buf.clear();
 			filename_buf << hint << std::hex << (this) << "_" << std::dec << i
 			             << ".bin";
@@ -121,6 +122,7 @@ BenchmarkSequenceStorage<KeyT>::get_filename() const
 		bool found = false;
 		size_t i = 0;
 		while (!found) {
+			filename_buf.str("");
 			filename_buf.clear();
 			filename_buf << "tree_" << std::hex << (this) << "_" << std::dec << i
 			             << ".bin";
