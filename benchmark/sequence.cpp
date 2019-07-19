@@ -1,6 +1,6 @@
 #include "../src/benchmark_sequence.hpp"
 #include "../src/ygg.hpp"
-#include "/home/lukas/src/intervaltree/ygg/src/options.hpp"
+#include "../src/options.hpp"
 
 using namespace ygg;
 
