@@ -4,10 +4,14 @@
 #include "../src/ygg.hpp"
 #include "benchmark.h"
 #include "common.hpp"
+#include "random.hpp"
 
 #include <algorithm>
 #include <boost/intrusive/set.hpp>
+#include <cstdlib>
 #include <draup.hpp>
+#include <limits>
+#include <memory>
 #include <random>
 #include <unordered_set>
 #include <vector>
@@ -85,7 +89,7 @@ public:
 		this->SetName(name.c_str());
 	}
 
-	BSTFixture() : rng(std::random_device{}()) {}
+	BSTFixture() : rnd(new UniformDistr(std::random_device{}())) {}
 
 	void
 	SetUp(const ::benchmark::State & state)
@@ -96,18 +100,18 @@ public:
 		size_t fixed_count = static_cast<size_t>(state.range(0));
 		size_t experiment_count = static_cast<size_t>(state.range(1));
 		int seed = static_cast<int>(state.range(2));
-		this->rng = std::mt19937(static_cast<unsigned long>(seed));
-
-		std::uniform_int_distribution<> distr(std::numeric_limits<int>::min(),
-		                                      std::numeric_limits<int>::max());
+		this->rnd.reset(new UniformDistr(seed));
+		this->rng = std::mt19937(seed);
 
 		this->fixed_nodes.clear();
 		std::unordered_set<int> seen_values;
 		for (size_t i = 0; i < fixed_count; ++i) {
-			int val = distr(this->rng);
+			int val = this->rnd->generate(std::numeric_limits<int>::min(),
+			                              std::numeric_limits<int>::max());
 			if (distinct) {
 				while (seen_values.find(val) != seen_values.end()) {
-					val = distr(this->rng);
+					val = this->rnd->generate(std::numeric_limits<int>::min(),
+					                          std::numeric_limits<int>::max());
 				}
 				seen_values.insert(val);
 			}
@@ -136,10 +140,12 @@ public:
 				if (values_from_fixed) {
 					val = fixed_values[i % fixed_count];
 				} else {
-					val = distr(this->rng);
+					val = this->rnd->generate(std::numeric_limits<int>::min(),
+					                          std::numeric_limits<int>::max());
 					if (distinct) {
 						while (seen_values.find(val) != seen_values.end()) {
-							val = distr(this->rng);
+							val = this->rnd->generate(std::numeric_limits<int>::min(),
+							                          std::numeric_limits<int>::max());
 						}
 						seen_values.insert(val);
 					}
@@ -158,10 +164,12 @@ public:
 				if (values_from_fixed) {
 					val = shuffled_values[i % fixed_count];
 				} else {
-					val = distr(this->rng);
+					val = this->rnd->generate(std::numeric_limits<int>::min(),
+					                          std::numeric_limits<int>::max());
 					if (distinct) {
 						while (seen_values.find(val) != seen_values.end()) {
-							val = distr(this->rng);
+							val = this->rnd->generate(std::numeric_limits<int>::min(),
+							                          std::numeric_limits<int>::max());
 						}
 						seen_values.insert(val);
 					}
@@ -198,11 +206,13 @@ public:
 	std::vector<int> experiment_values;
 	std::vector<typename Interface::Node *> experiment_node_pointers;
 
-	std::mt19937 rng;
-
 	typename Interface::Tree t;
 
 	PapiMeasurements papi;
+	std::mt19937 rng;
+
+private:
+	std::unique_ptr<Randomizer> rnd;
 };
 
 /*
