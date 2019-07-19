@@ -6,26 +6,25 @@
 #include "debug.hpp"
 
 namespace ygg {
-
 namespace bst {
 
 template <class Node>
 Node *
-DefaultParentContainer<Node>::get_parent() const
+DefaultParentContainer<Node>::get_parent() const noexcept
 {
 	return this->_bst_parent;
 }
 
 template <class Node>
 Node *&
-DefaultParentContainer<Node>::get_parent()
+DefaultParentContainer<Node>::get_parent() noexcept
 {
 	return this->_bst_parent;
 }
 
 template <class Node>
 void
-DefaultParentContainer<Node>::set_parent(Node * parent)
+DefaultParentContainer<Node>::set_parent(Node * parent) noexcept
 {
 	this->_bst_parent = parent;
 }
@@ -47,7 +46,7 @@ BSTNodeBase<Node, Tag, ParentContainer>::get_depth() const noexcept
 
 template <class Node, class Tag, class ParentContainer>
 Node *
-BSTNodeBase<Node, Tag, ParentContainer>::get_parent() const
+BSTNodeBase<Node, Tag, ParentContainer>::get_parent() const noexcept
 {
 	return this->_bst_parent.get_parent();
 }
@@ -55,56 +54,56 @@ BSTNodeBase<Node, Tag, ParentContainer>::get_parent() const
 template <class Node, class Tag, class ParentContainer>
 template <class InnerPC>
 std::enable_if_t<InnerPC::parent_reference, Node *&>
-BSTNodeBase<Node, Tag, ParentContainer>::get_parent()
+BSTNodeBase<Node, Tag, ParentContainer>::get_parent() const noexcept
 {
 	return this->_bst_parent.get_parent();
 }
 
 template <class Node, class Tag, class ParentContainer>
 Node *&
-BSTNodeBase<Node, Tag, ParentContainer>::get_left()
+BSTNodeBase<Node, Tag, ParentContainer>::get_left() noexcept
 {
 	return this->_bst_children[0];
 }
 
 template <class Node, class Tag, class ParentContainer>
 Node *&
-BSTNodeBase<Node, Tag, ParentContainer>::get_right()
+BSTNodeBase<Node, Tag, ParentContainer>::get_right() noexcept
 {
 	return this->_bst_children[1];
 }
 
 template <class Node, class Tag, class ParentContainer>
 Node * const &
-BSTNodeBase<Node, Tag, ParentContainer>::get_left() const
+BSTNodeBase<Node, Tag, ParentContainer>::get_left() const noexcept
 {
 	return this->_bst_children[0];
 }
 
 template <class Node, class Tag, class ParentContainer>
 Node * const &
-BSTNodeBase<Node, Tag, ParentContainer>::get_right() const
+BSTNodeBase<Node, Tag, ParentContainer>::get_right() const noexcept
 {
 	return this->_bst_children[1];
 }
 
 template <class Node, class Tag, class ParentContainer>
 void
-BSTNodeBase<Node, Tag, ParentContainer>::set_parent(Node * new_parent)
+BSTNodeBase<Node, Tag, ParentContainer>::set_parent(Node * new_parent) noexcept
 {
 	this->_bst_parent.set_parent(new_parent);
 }
 
 template <class Node, class Tag, class ParentContainer>
 void
-BSTNodeBase<Node, Tag, ParentContainer>::set_left(Node * new_left)
+BSTNodeBase<Node, Tag, ParentContainer>::set_left(Node * new_left) noexcept
 {
 	this->_bst_children[0] = new_left;
 }
 
 template <class Node, class Tag, class ParentContainer>
 void
-BSTNodeBase<Node, Tag, ParentContainer>::set_right(Node * new_right)
+BSTNodeBase<Node, Tag, ParentContainer>::set_right(Node * new_right) noexcept
 {
 	this->_bst_children[1] = new_right;
 }
@@ -112,14 +111,14 @@ BSTNodeBase<Node, Tag, ParentContainer>::set_right(Node * new_right)
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 BinarySearchTree<Node, Options, Tag, Compare,
-                 ParentContainer>::BinarySearchTree()
+                 ParentContainer>::BinarySearchTree() noexcept
     : root(nullptr)
 {}
 
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 BinarySearchTree<Node, Options, Tag, Compare,
-                 ParentContainer>::BinarySearchTree(MyClass && other)
+                 ParentContainer>::BinarySearchTree(MyClass && other) noexcept
 {
 	this->root = other.root;
 	other.root = nullptr;
@@ -130,7 +129,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer> &
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::operator=(
-    MyClass && other)
+    MyClass && other) noexcept
 {
 	this->root = other.root;
 	other.root = nullptr;
@@ -140,7 +139,7 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::operator=(
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 void
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::clear()
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::clear() noexcept
 {
 	this->root = nullptr;
 	this->s.set(0);
@@ -150,7 +149,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 Node *
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_uncle(
-    Node * node) const
+    Node * node) const noexcept
 {
 	Node * parent = node->NB::get_parent();
 	Node * grandparent = parent->NB::get_parent();
@@ -368,6 +367,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 size_t
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::size() const
+    noexcept
 {
 	return this->s.get();
 }
@@ -376,6 +376,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 bool
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::empty() const
+    noexcept
 {
 	return this->root == nullptr;
 }
@@ -384,7 +385,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 Node *
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_smallest()
-    const
+    const noexcept
 {
 	Node * smallest = this->root;
 	if (smallest == nullptr) {
@@ -413,7 +414,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 Node *
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_largest()
-    const
+    const noexcept
 {
 	Node * largest = this->root;
 	if (largest == nullptr) {
@@ -432,7 +433,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::iterator_to(
-    const Node & node) const
+    const Node & node) const noexcept
 {
 	return const_iterator<false>(&node);
 }
@@ -442,7 +443,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::iterator_to(
-    Node & node)
+    Node & node) noexcept
 {
 	return iterator<false>(&node);
 }
@@ -452,6 +453,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::cbegin() const
+    noexcept
 {
 	Node * smallest = this->get_smallest();
 	if (smallest == nullptr) { // TODO what the hell?
@@ -466,6 +468,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::cend() const
+    noexcept
 {
 	return const_iterator<false>(nullptr);
 }
@@ -475,6 +478,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::begin() const
+    noexcept
 {
 	return this->cbegin();
 }
@@ -483,7 +487,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::begin()
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::begin() noexcept
 {
 	Node * smallest = this->get_smallest();
 	if (smallest == nullptr) {
@@ -498,6 +502,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::end() const
+    noexcept
 {
 	return this->cend();
 }
@@ -506,7 +511,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::end()
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::end() noexcept
 {
 	return iterator<false>(nullptr);
 }
@@ -516,6 +521,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<true>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::crbegin() const
+    noexcept
 {
 	Node * largest = this->get_largest();
 	if (largest == nullptr) {
@@ -530,6 +536,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<true>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::crend() const
+    noexcept
 {
 	return const_iterator<true>(nullptr);
 }
@@ -539,6 +546,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<true>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::rbegin() const
+    noexcept
 {
 	return this->crbegin();
 }
@@ -548,6 +556,7 @@ template <class Node, class Options, class Tag, class Compare,
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<true>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::rend() const
+    noexcept
 {
 	return this->crend();
 }
@@ -556,7 +565,8 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<true>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::rbegin()
+BinarySearchTree<Node, Options, Tag, Compare,
+                 ParentContainer>::rbegin() noexcept
 {
 	Node * largest = this->get_largest();
 	if (largest == nullptr) {
@@ -570,7 +580,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<true>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::rend()
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::rend() noexcept
 {
 	return iterator<true>(nullptr);
 }
@@ -615,6 +625,10 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
     const Comparable & query)
+#ifndef YGG_STORE_SEQUENCE
+    // Sequence storage involves memory allocation and thus is not noexcept
+    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_search(reinterpret_cast<const void *>(&query),
@@ -661,6 +675,11 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
     const Comparable & query) const
+#ifndef YGG_STORE_SEQUENCE
+    // Sequence storage involves memory allocation and thus is not noexcept
+    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
+
 {
 	return const_iterator<false>(const_cast<decltype(this)>(this)->find(query));
 }
@@ -672,6 +691,10 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::lower_bound(
     const Comparable & query)
+#ifndef YGG_STORE_SEQUENCE
+    // Sequence storage involves memory allocation and thus is not noexcept
+    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_lbound(reinterpret_cast<const void *>(&query),
@@ -705,6 +728,10 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::upper_bound(
     const Comparable & query)
+#ifndef YGG_STORE_SEQUENCE
+    // Sequence storage involves memory allocation and thus is not noexcept
+    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_ubound(reinterpret_cast<const void *>(&query),
@@ -738,6 +765,11 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::upper_bound(
     const Comparable & query) const
+#ifndef YGG_STORE_SEQUENCE
+    // Sequence storage involves memory allocation and thus is not noexcept
+    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
+
 {
 	return const_iterator<false>(const_cast<MyClass *>(this)->upper_bound(query));
 }
@@ -749,6 +781,10 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::lower_bound(
     const Comparable & query) const
+#ifndef YGG_STORE_SEQUENCE
+    // Sequence storage involves memory allocation and thus is not noexcept
+    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
 {
 	return const_iterator<false>(const_cast<MyClass *>(this)->lower_bound(query));
 }
@@ -757,6 +793,7 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 Node *
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_root() const
+    noexcept
 {
 	return this->root;
 }

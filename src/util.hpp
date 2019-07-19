@@ -4,6 +4,7 @@
 
 #include <utility>
 #ifndef YGG_UTIL_HPP
+#define YGG_UTIL_HPP
 
 #include <iterator>
 #include <type_traits>
@@ -346,7 +347,7 @@ class flexible_less {
 public:
 	template <class T1, class T2>
 	constexpr bool
-	operator()(const T1 & lhs, const T2 & rhs) const
+	operator()(const T1 & lhs, const T2 & rhs) const noexcept
 	{
 		return lhs < rhs;
 	}
@@ -513,6 +514,16 @@ public:
 } // namespace utilities
 } // namespace ygg
 
-#define YGG_UTIL_HPP
+// All operations involving the comparison of a tree node and something else
+// are only noexcept if that comparison is noexcept!
+//
+// Sequence storage involves memory allocation and thus is never noexcept
+// While some of the methods using this macro might not be affected by this,
+// we use the same macro for simpler code.
+#ifndef YGG_STORE_SEQUENCE
+#define CMP_NOEXCEPT(OBJ) noexcept(noexcept(this->cmp(*this->root, OBJ)))
+#else
+#define CMP_NOEXCEPT(OBJ)
+#endif
 
 #endif // YGG_UTIL_HPP

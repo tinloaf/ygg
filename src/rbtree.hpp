@@ -31,16 +31,16 @@ class ColorParentStorage;
 template <class Node>
 class ColorParentStorage<Node, true> {
 public:
-	void set_color(Color new_color);
-	void make_black();
-	void make_red();
+	void set_color(Color new_color) noexcept;
+	void make_black() noexcept;
+	void make_red() noexcept;
 
-	Color get_color() const;
-	void set_parent(Node * new_parent);
-	Node * get_parent() const;
+	Color get_color() const noexcept;
+	void set_parent(Node * new_parent) noexcept;
+	Node * get_parent() const noexcept;
 
-	void swap_parent_with(ColorParentStorage<Node, true> & other);
-	void swap_color_with(ColorParentStorage<Node, true> & other);
+	void swap_parent_with(ColorParentStorage<Node, true> & other) noexcept;
+	void swap_color_with(ColorParentStorage<Node, true> & other) noexcept;
 
 	static constexpr bool parent_reference = false;
 
@@ -51,17 +51,17 @@ private:
 template <class Node>
 class ColorParentStorage<Node, false> {
 public:
-	void set_color(Color new_color);
-	void make_black();
-	void make_red();
+	void set_color(Color new_color) noexcept;
+	void make_black() noexcept;
+	void make_red() noexcept;
 
-	Color get_color() const;
-	void set_parent(Node * new_parent);
-	Node *& get_parent();
-	Node * get_parent() const;
+	Color get_color() const noexcept;
+	void set_parent(Node * new_parent) noexcept;
+	Node *& get_parent() noexcept;
+	Node * get_parent() const noexcept;
 
-	void swap_parent_with(ColorParentStorage<Node, false> & other);
-	void swap_color_with(ColorParentStorage<Node, false> & other);
+	void swap_parent_with(ColorParentStorage<Node, false> & other) noexcept;
+	void swap_color_with(ColorParentStorage<Node, false> & other) noexcept;
 
 	static constexpr bool parent_reference = true;
 
@@ -96,13 +96,13 @@ class RBTreeNodeBase
 public:
 	// TODO namespacing!
 
-	void set_color(rbtree_internal::Color new_color);
-	void make_black();
-	void make_red();
-	rbtree_internal::Color get_color() const;
+	void set_color(rbtree_internal::Color new_color) noexcept;
+	void make_black() noexcept;
+	void make_red() noexcept;
+	rbtree_internal::Color get_color() const noexcept;
 
-	void swap_parent_with(Node * other);
-	void swap_color_with(Node * other);
+	void swap_parent_with(Node * other) noexcept;
+	void swap_color_with(Node * other) noexcept;
 
 private:
 	using ActiveOptions = Options;
@@ -122,7 +122,7 @@ public:
 	// TODO document
 	template <class Node, class Tree>
 	static void
-	leaf_inserted(Node & node, Tree & t)
+	leaf_inserted(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -130,7 +130,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	rotated_left(Node & node, Tree & t)
+	rotated_left(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -138,7 +138,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	rotated_right(Node & node, Tree & t)
+	rotated_right(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -146,7 +146,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	delete_leaf(Node & node, Tree & t)
+	delete_leaf(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -154,7 +154,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	deleted_below(Node & node, Tree & t)
+	deleted_below(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -162,7 +162,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	swapped(Node & old_ancestor, Node & old_descendant, Tree & t)
+	swapped(Node & old_ancestor, Node & old_descendant, Tree & t) noexcept
 	{
 		(void)old_ancestor;
 		(void)old_descendant;
@@ -210,7 +210,7 @@ public:
 	/**
 	 * @brief Create a new empty red-black tree.
 	 */
-	RBTree();
+	RBTree() noexcept;
 
 	/**
 	 * @brief Create a new red-black tree from a different red-black tree.
@@ -220,7 +220,7 @@ public:
 	 *
 	 * @param other  The red-black tree that this one is constructed from
 	 */
-	RBTree(MyClass && other);
+	RBTree(MyClass && other) noexcept;
 
 	/*
 	 * Pull in classes from base tree
@@ -244,9 +244,10 @@ public:
 	 *
 	 * @param   Node  The node to be inserted.
 	 */
-	void insert(Node & node);
-	void insert(Node & node, Node & hint);
-	void insert(Node & node, iterator<false> hint);
+	void insert(Node & node) CMP_NOEXCEPT(node);
+	void insert(Node & node, Node & hint) CMP_NOEXCEPT(node);
+	void insert(Node & node, iterator<false> hint) CMP_NOEXCEPT(node);
+
 	// TODO document hinted inserts
 	// TODO should order be preserved on hints?
 
@@ -257,7 +258,7 @@ public:
 	 *
 	 * @param   Node  The node to be removed.
 	 */
-	void remove(Node & node);
+	void remove(Node & node) CMP_NOEXCEPT(node);
 
 	// TODO STL removes *all* elements
 	/**
@@ -267,9 +268,11 @@ public:
 	 *
 	 * @param   c Anything comparable to a node. A node that compares equally will
 	 * be removed
+	 *
+	 * // TODO return whether something was removed?
 	 */
 	template <class Comparable>
-	void erase(const Comparable & c);
+	void erase(const Comparable & c) CMP_NOEXCEPT(c);
 
 	// Mainly debugging methods
 	/// @cond INTERNAL
@@ -280,19 +283,19 @@ public:
 protected:
 	using Path = std::vector<Node *>;
 
-	void remove_to_leaf(Node & node);
-	void fixup_after_delete(Node * parent, bool deleted_left);
+	void remove_to_leaf(Node & node) CMP_NOEXCEPT(node);
+	void fixup_after_delete(Node * parent, bool deleted_left) noexcept;
 
-	void insert_leaf_base(Node & node, Node * start);
+	void insert_leaf_base(Node & node, Node * start) CMP_NOEXCEPT(node);
 
-	void fixup_after_insert(Node * node);
-	void rotate_left(Node * parent);
-	void rotate_right(Node * parent);
+	void fixup_after_insert(Node * node) noexcept;
+	void rotate_left(Node * parent) noexcept;
+	void rotate_right(Node * parent) noexcept;
 
-	void swap_nodes(Node * n1, Node * n2, bool swap_colors = true);
-	void replace_node(Node * to_be_replaced, Node * replace_with);
-	void swap_unrelated_nodes(Node * n1, Node * n2);
-	void swap_neighbors(Node * parent, Node * child);
+	void swap_nodes(Node * n1, Node * n2, bool swap_colors = true) noexcept;
+	void replace_node(Node * to_be_replaced, Node * replace_with) noexcept;
+	void swap_unrelated_nodes(Node * n1, Node * n2) noexcept;
+	void swap_neighbors(Node * parent, Node * child) noexcept;
 
 	void verify_black_root() const;
 	void verify_black_paths(const Node * node, unsigned int * path_length) const;
@@ -301,6 +304,8 @@ protected:
 
 } // namespace ygg
 
+#ifndef YGG_RBTREE_CPP
 #include "rbtree.cpp"
+#endif
 
 #endif // YGG_RBTREE_HPP

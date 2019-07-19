@@ -11,7 +11,7 @@ namespace rbtree_internal {
 
 template <class Node>
 void
-ColorParentStorage<Node, true>::set_color(Color new_color)
+ColorParentStorage<Node, true>::set_color(Color new_color) noexcept
 {
 	// TODO add to avoid_conditionals?
 	if (new_color == Color::RED) {
@@ -25,7 +25,7 @@ ColorParentStorage<Node, true>::set_color(Color new_color)
 
 template <class Node>
 void
-ColorParentStorage<Node, true>::make_red()
+ColorParentStorage<Node, true>::make_red() noexcept
 {
 	this->parent = reinterpret_cast<Node *>(
 	    (reinterpret_cast<size_t>(this->parent) | size_t{1}));
@@ -33,7 +33,7 @@ ColorParentStorage<Node, true>::make_red()
 
 template <class Node>
 void
-ColorParentStorage<Node, true>::make_black()
+ColorParentStorage<Node, true>::make_black() noexcept
 {
 	this->parent = reinterpret_cast<Node *>(
 	    (reinterpret_cast<size_t>(this->parent) & ~(size_t{1})));
@@ -41,7 +41,7 @@ ColorParentStorage<Node, true>::make_black()
 
 template <class Node>
 ygg::rbtree_internal::Color
-ColorParentStorage<Node, true>::get_color() const
+ColorParentStorage<Node, true>::get_color() const noexcept
 {
 	// Hacky hack to avoid branching. Red is defined as 1, black as 0, and
 	// true is 1, false is 0, so…
@@ -58,7 +58,7 @@ ColorParentStorage<Node, true>::get_color() const
 
 template <class Node>
 void
-ColorParentStorage<Node, true>::set_parent(Node * new_parent)
+ColorParentStorage<Node, true>::set_parent(Node * new_parent) noexcept
 {
 	this->parent = reinterpret_cast<Node *>(
 	    reinterpret_cast<size_t>(new_parent) |
@@ -67,7 +67,7 @@ ColorParentStorage<Node, true>::set_parent(Node * new_parent)
 
 template <class Node>
 Node *
-ColorParentStorage<Node, true>::get_parent() const
+ColorParentStorage<Node, true>::get_parent() const noexcept
 {
 	return reinterpret_cast<Node *>(reinterpret_cast<size_t>(this->parent) &
 	                                (~(size_t{1})));
@@ -76,7 +76,7 @@ ColorParentStorage<Node, true>::get_parent() const
 template <class Node>
 void
 ColorParentStorage<Node, true>::swap_color_with(
-    ColorParentStorage<Node, true> & other)
+    ColorParentStorage<Node, true> & other) noexcept
 {
 	// TODO make this more efficient?
 	Color tmp = other.get_color();
@@ -87,7 +87,7 @@ ColorParentStorage<Node, true>::swap_color_with(
 template <class Node>
 void
 ColorParentStorage<Node, true>::swap_parent_with(
-    ColorParentStorage<Node, true> & other)
+    ColorParentStorage<Node, true> & other) noexcept
 {
 	// TODO make this more efficient?
 	Node * tmp = other.get_parent();
@@ -99,49 +99,49 @@ ColorParentStorage<Node, true>::swap_parent_with(
 
 template <class Node>
 void
-ColorParentStorage<Node, false>::set_color(Color new_color)
+ColorParentStorage<Node, false>::set_color(Color new_color) noexcept
 {
 	this->color = new_color;
 }
 
 template <class Node>
 void
-ColorParentStorage<Node, false>::make_black()
+ColorParentStorage<Node, false>::make_black() noexcept
 {
 	this->color = Color::BLACK;
 }
 
 template <class Node>
 void
-ColorParentStorage<Node, false>::make_red()
+ColorParentStorage<Node, false>::make_red() noexcept
 {
 	this->color = Color::RED;
 }
 
 template <class Node>
 ygg::rbtree_internal::Color
-ColorParentStorage<Node, false>::get_color() const
+ColorParentStorage<Node, false>::get_color() const noexcept
 {
 	return this->color;
 }
 
 template <class Node>
 void
-ColorParentStorage<Node, false>::set_parent(Node * new_parent)
+ColorParentStorage<Node, false>::set_parent(Node * new_parent) noexcept
 {
 	this->parent = new_parent;
 }
 
 template <class Node>
 Node *&
-ColorParentStorage<Node, false>::get_parent()
+ColorParentStorage<Node, false>::get_parent() noexcept
 {
 	return this->parent;
 }
 
 template <class Node>
 Node *
-ColorParentStorage<Node, false>::get_parent() const
+ColorParentStorage<Node, false>::get_parent() const noexcept
 {
 	return this->parent;
 }
@@ -149,7 +149,7 @@ ColorParentStorage<Node, false>::get_parent() const
 template <class Node>
 void
 ColorParentStorage<Node, false>::swap_color_with(
-    ColorParentStorage<Node, false> & other)
+    ColorParentStorage<Node, false> & other) noexcept
 {
 	std::swap(this->color, other.color);
 }
@@ -157,7 +157,7 @@ ColorParentStorage<Node, false>::swap_color_with(
 template <class Node>
 void
 ColorParentStorage<Node, false>::swap_parent_with(
-    ColorParentStorage<Node, false> & other)
+    ColorParentStorage<Node, false> & other) noexcept
 {
 	std::swap(this->parent, other.parent);
 }
@@ -165,52 +165,54 @@ ColorParentStorage<Node, false>::swap_parent_with(
 
 template <class Node, class Tag, class Options>
 void
-RBTreeNodeBase<Node, Tag, Options>::set_color(rbtree_internal::Color new_color)
+RBTreeNodeBase<Node, Tag, Options>::set_color(
+    rbtree_internal::Color new_color) noexcept
 {
 	this->_bst_parent.set_color(new_color);
 }
 
 template <class Node, class Tag, class Options>
 void
-RBTreeNodeBase<Node, Tag, Options>::make_red()
+RBTreeNodeBase<Node, Tag, Options>::make_red() noexcept
 {
 	this->_bst_parent.make_red();
 }
 
 template <class Node, class Tag, class Options>
 void
-RBTreeNodeBase<Node, Tag, Options>::make_black()
+RBTreeNodeBase<Node, Tag, Options>::make_black() noexcept
 {
 	this->_bst_parent.make_black();
 }
 
 template <class Node, class Tag, class Options>
 rbtree_internal::Color
-RBTreeNodeBase<Node, Tag, Options>::get_color() const
+RBTreeNodeBase<Node, Tag, Options>::get_color() const noexcept
 {
 	return this->_bst_parent.get_color();
 }
 
 template <class Node, class Tag, class Options>
 void
-RBTreeNodeBase<Node, Tag, Options>::swap_color_with(Node * other)
+RBTreeNodeBase<Node, Tag, Options>::swap_color_with(Node * other) noexcept
 {
 	this->_bst_parent.swap_color_with(other->_bst_parent);
 }
 
 template <class Node, class Tag, class Options>
 void
-RBTreeNodeBase<Node, Tag, Options>::swap_parent_with(Node * other)
+RBTreeNodeBase<Node, Tag, Options>::swap_parent_with(Node * other) noexcept
 {
 	this->_bst_parent.swap_parent_with(other->_bst_parent);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-RBTree<Node, NodeTraits, Options, Tag, Compare>::RBTree()
+RBTree<Node, NodeTraits, Options, Tag, Compare>::RBTree() noexcept
 {}
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-RBTree<Node, NodeTraits, Options, Tag, Compare>::RBTree(MyClass && other)
+RBTree<Node, NodeTraits, Options, Tag, Compare>::RBTree(
+    MyClass && other) noexcept
 {
 	this->root = other.root;
 	other.root = nullptr;
@@ -221,6 +223,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
                                                                   Node * start)
+    CMP_NOEXCEPT(node)
 {
 	node.NB::set_right(nullptr);
 	node.NB::set_left(nullptr);
@@ -307,7 +310,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
+RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(
+    Node * parent) noexcept
 {
 	Node * right_child = parent->NB::get_right();
 	parent->NB::set_right(right_child->NB::get_left());
@@ -337,7 +341,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
+RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(
+    Node * parent) noexcept
 {
 	Node * left_child = parent->NB::get_left();
 	parent->NB::set_left(left_child->NB::get_right());
@@ -368,7 +373,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(Node * node)
+RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(
+    Node * node) noexcept
 {
 	// Does not happen: We only call this if we are not the root.
 	/*
@@ -436,6 +442,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(Node * node)
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node)
+    CMP_NOEXCEPT(node)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_insert(reinterpret_cast<const void *>(&node),
@@ -451,6 +458,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node,
                                                         Node & hint)
+    CMP_NOEXCEPT(node)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_insert(reinterpret_cast<const void *>(&node),
@@ -498,6 +506,7 @@ void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(
     Node & node,
     RBTree<Node, NodeTraits, Options, Tag, Compare>::iterator<false> hint)
+    CMP_NOEXCEPT(node)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_insert(reinterpret_cast<const void *>(&node),
@@ -615,9 +624,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::dbg_verify() const
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
-                                                            Node * n2,
-                                                            bool swap_colors)
+RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(
+    Node * n1, Node * n2, bool swap_colors) noexcept
 {
 	if (n1->NB::get_parent() ==
 	    n2) { // TODO this should never happen, since n2 is always the descendant
@@ -638,7 +646,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::replace_node(
-    Node * to_be_replaced, Node * replace_with)
+    Node * to_be_replaced, Node * replace_with) noexcept
 {
 	Node * parent = to_be_replaced->get_parent();
 	if (parent != nullptr) {
@@ -657,8 +665,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::replace_node(
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_neighbors(Node * parent,
-                                                                Node * child)
+RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_neighbors(
+    Node * parent, Node * child) noexcept
 {
 	child->NB::set_parent(parent->NB::get_parent());
 	parent->NB::set_parent(child);
@@ -705,8 +713,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_neighbors(Node * parent,
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(Node * n1,
-                                                                      Node * n2)
+RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(
+    Node * n1, Node * n2) noexcept
 {
 	std::swap(n1->NB::get_left(), n2->NB::get_left());
 	if (n1->NB::get_left() != nullptr) {
@@ -749,6 +757,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(Node * n1,
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
+    CMP_NOEXCEPT(node)
 {
 	Node * cur = &node;
 	Node * child = &node;
@@ -836,6 +845,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
+    CMP_NOEXCEPT(c)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_erase(reinterpret_cast<const void *>(&c),
@@ -852,7 +862,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
-    Node * parent, bool deleted_left)
+    Node * parent, bool deleted_left) noexcept
 {
 	bool propagating_up = true;
 	Node * sibling;
@@ -967,6 +977,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::remove(Node & node)
+    CMP_NOEXCEPT(node)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_delete(reinterpret_cast<const void *>(&node),

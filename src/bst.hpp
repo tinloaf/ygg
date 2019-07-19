@@ -35,9 +35,9 @@ public:
 template <class Node>
 class DefaultParentContainer {
 public:
-	Node * get_parent() const;
-	Node *& get_parent();
-	void set_parent(Node * parent);
+	Node * get_parent() const noexcept;
+	Node *& get_parent() noexcept;
+	void set_parent(Node * parent) noexcept;
 	static constexpr bool parent_reference = true;
 
 private:
@@ -49,26 +49,26 @@ template <class Node>
 class DefaultFindCallbacks {
 public:
 	void
-	init_root(Node * root)
+	init_root(Node * root) const noexcept
 	{
 		(void)root;
 	};
 	void
-	descend_left(Node * child)
+	descend_left(Node * child) const noexcept
 	{
 		(void)child;
 	};
 	void
-	descend_right(Node * child)
+	descend_right(Node * child) const noexcept
 	{
 		(void)child;
 	};
 	void
-	found(Node * node)
+	found(Node * node) const noexcept
 	{
 		(void)node;
 	};
-	void not_found(){};
+	void not_found() const noexcept {};
 
 	static DefaultFindCallbacks<Node> dummy;
 };
@@ -100,17 +100,18 @@ protected:
 	friend InnerNode * utilities::go_left_if(bool cond, InnerNode * parent);
 
 public:
-	void set_parent(Node * new_parent);
-	Node * get_parent() const;
+	void set_parent(Node * new_parent) noexcept;
+	Node * get_parent() const noexcept;
 	template <class InnerPC = ParentContainer>
-	std::enable_if_t<InnerPC::parent_reference, Node *&> get_parent();
+	std::enable_if_t<InnerPC::parent_reference, Node *&> get_parent() const
+	    noexcept;
 
-	void set_left(Node * new_left);
-	void set_right(Node * new_right);
-	Node *& get_left(); // TODO make these const
-	Node *& get_right();
-	Node * const & get_left() const; // TODO make these const
-	Node * const & get_right() const;
+	void set_left(Node * new_left) noexcept;
+	void set_right(Node * new_right) noexcept;
+	Node *& get_left() noexcept;
+	Node *& get_right() noexcept;
+	Node * const & get_left() const noexcept;
+	Node * const & get_right() const noexcept;
 
 	// Debugging methods TODO remove this
 	size_t get_depth() const noexcept;
@@ -131,7 +132,7 @@ public:
 	/**
 	 * @brief Create a new empty red-black tree.
 	 */
-	BinarySearchTree();
+	BinarySearchTree() noexcept;
 
 	/**
 	 * @brief Create a new red-black tree from a different red-black tree.
@@ -141,7 +142,7 @@ public:
 	 *
 	 * @param other  The red-black tree that this one is constructed from
 	 */
-	BinarySearchTree(MyClass && other);
+	BinarySearchTree(MyClass && other) noexcept;
 
 	/**
 	 * @brief Move-assign an other red-black tree to this one
@@ -151,7 +152,7 @@ public:
 	 *
 	 * @param other  The red-black tree that this one is constructed from
 	 */
-	MyClass & operator=(MyClass && other);
+	MyClass & operator=(MyClass && other) noexcept;
 
 	/******************************************************
 	 ******************************************************
@@ -163,33 +164,33 @@ private:
 	class NodeInterface {
 	public:
 		static Node *
-		get_parent(Node * n)
+		get_parent(Node * n) noexcept
 		{
 			return n->NB::get_parent();
 		}
 		static Node *
-		get_left(Node * n)
+		get_left(Node * n) noexcept
 		{
 			return n->NB::get_left();
 		}
 		static Node *
-		get_right(Node * n)
+		get_right(Node * n) noexcept
 		{
 			return n->NB::get_right();
 		}
 
 		static const Node *
-		get_parent(const Node * n)
+		get_parent(const Node * n) noexcept
 		{
 			return n->NB::get_parent();
 		}
 		static const Node *
-		get_left(const Node * n)
+		get_left(const Node * n) noexcept
 		{
 			return n->NB::get_left();
 		}
 		static const Node *
-		get_right(const Node * n)
+		get_right(const Node * n) noexcept
 		{
 			return n->NB::get_right();
 		}
@@ -206,14 +207,15 @@ public:
 	public:
 		using internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
 		                             reverse>::IteratorBase;
-		iterator(const iterator<reverse> & orig)
+		iterator(const iterator<reverse> & orig) noexcept
 		    : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
 		                             reverse>(orig.n){};
-		iterator()
+		iterator() noexcept
 		    : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
 		                             reverse>(){};
 
-		iterator<reverse> & operator=(const iterator<reverse> & orig) = default;
+		iterator<reverse> &
+		operator=(const iterator<reverse> & orig) noexcept = default;
 
 	private:
 		friend class const_iterator<reverse>;
@@ -226,18 +228,18 @@ public:
 	public:
 		using internal::IteratorBase<const_iterator<reverse>, const Node,
 		                             NodeInterface, reverse>::IteratorBase;
-		const_iterator(const const_iterator<reverse> & orig)
+		const_iterator(const const_iterator<reverse> & orig) noexcept
 		    : internal::IteratorBase<const_iterator<reverse>, const Node,
 		                             NodeInterface, reverse>(orig.n){};
-		const_iterator(const iterator<reverse> & orig)
+		const_iterator(const iterator<reverse> & orig) noexcept
 		    : internal::IteratorBase<const_iterator<reverse>, const Node,
 		                             NodeInterface, reverse>(orig.n){};
-		const_iterator()
+		const_iterator() noexcept
 		    : internal::IteratorBase<const_iterator<reverse>, const Node,
 		                             NodeInterface, reverse>(){};
 
 		const_iterator<reverse> &
-		operator=(const const_iterator<reverse> & orig) = default;
+		operator=(const const_iterator<reverse> & orig) noexcept = default;
 	};
 
 	/******************************************************
@@ -267,12 +269,23 @@ public:
 	 * end() if no such element exists
 	 */
 	template <class Comparable>
-	const_iterator<false> find(const Comparable & query) const;
+	const_iterator<false> find(const Comparable & query) const
+#ifndef YGG_STORE_SEQUENCE
+	    // Sequence storage involves memory allocation and thus is not noexcept
+	    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
+	        ;
 	template <class Comparable>
-	iterator<false> find(const Comparable & query);
+	iterator<false> find(const Comparable & query)
+#ifndef YGG_STORE_SEQUENCE
+	    // Sequence storage involves memory allocation and thus is not noexcept
+	    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
+	        ;
 
 	// TODO document
 	// TODO test
+	// TODO noexcept-expression?
 	template <class Comparable, class Callbacks = DefaultFindCallbacks<Node>>
 	iterator<false> find(const Comparable & query, Callbacks * cbs);
 
@@ -299,9 +312,20 @@ public:
 	 * or end() if no such element exists
 	 */
 	template <class Comparable>
-	const_iterator<false> upper_bound(const Comparable & query) const;
+	const_iterator<false> upper_bound(const Comparable & query) const
+#ifndef YGG_STORE_SEQUENCE
+	    // Sequence storage involves memory allocation and thus is not noexcept
+	    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
+	        ;
+
 	template <class Comparable>
-	iterator<false> upper_bound(const Comparable & query);
+	iterator<false> upper_bound(const Comparable & query)
+#ifndef YGG_STORE_SEQUENCE
+	    // Sequence storage involves memory allocation and thus is not noexcept
+	    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
+	        ;
 
 	/**
 	 * @brief Lower-bounds an element
@@ -325,9 +349,20 @@ public:
 	 * <query>, or end() if no such element exists
 	 */
 	template <class Comparable>
-	const_iterator<false> lower_bound(const Comparable & query) const;
+	const_iterator<false> lower_bound(const Comparable & query) const
+#ifndef YGG_STORE_SEQUENCE
+	    // Sequence storage involves memory allocation and thus is not noexcept
+	    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
+	        ;
+
 	template <class Comparable>
-	iterator<false> lower_bound(const Comparable & query);
+	iterator<false> lower_bound(const Comparable & query)
+#ifndef YGG_STORE_SEQUENCE
+	    // Sequence storage involves memory allocation and thus is not noexcept
+	    noexcept(noexcept(this->cmp(*this->root, query)))
+#endif
+	        ;
 
 	/**
 	 * @brief Debugging Method: Draw the Tree as a .dot file
@@ -344,52 +379,52 @@ public:
 	/**
 	 * Returns an iterator pointing to the smallest element in the tree.
 	 */
-	const_iterator<false> cbegin() const;
+	const_iterator<false> cbegin() const noexcept;
 	/**
 	 * Returns an iterator pointing after the largest element in the tree.
 	 */
-	const_iterator<false> cend() const;
+	const_iterator<false> cend() const noexcept;
 	/**
 	 * Returns an iterator pointing to the smallest element in the tree.
 	 */
-	const_iterator<false> begin() const;
-	iterator<false> begin();
+	const_iterator<false> begin() const noexcept;
+	iterator<false> begin() noexcept;
 
 	/**
 	 * Returns an iterator pointing after the largest element in the tree.
 	 */
-	const_iterator<false> end() const;
-	iterator<false> end();
+	const_iterator<false> end() const noexcept;
+	iterator<false> end() noexcept;
 
 	/**
 	 * Returns an reverse iterator pointing to the largest element in the tree.
 	 */
-	const_iterator<true> crbegin() const;
+	const_iterator<true> crbegin() const noexcept;
 	/**
 	 * Returns an reverse iterator pointing before the smallest element in the
 	 * tree.
 	 */
-	const_iterator<true> crend() const;
+	const_iterator<true> crend() const noexcept;
 	/**
 	 * Returns an reverse iterator pointing to the largest element in the tree.
 	 */
-	const_iterator<true> rbegin() const;
-	iterator<true> rbegin();
+	const_iterator<true> rbegin() const noexcept;
+	iterator<true> rbegin() noexcept;
 
 	/**
 	 * Returns an reverse iterator pointing before the smallest element in the
 	 * tree.
 	 */
-	const_iterator<true> rend() const;
-	iterator<true> rend();
+	const_iterator<true> rend() const noexcept;
+	iterator<true> rend() noexcept;
 
 	/**
 	 * Returns an iterator pointing to the entry held in node.
 	 *
 	 * @param node  The node the iterator should point to.
 	 */
-	const_iterator<false> iterator_to(const Node & node) const;
-	iterator<false> iterator_to(Node & node);
+	const_iterator<false> iterator_to(const Node & node) const noexcept;
+	iterator<false> iterator_to(Node & node) noexcept;
 
 	/**
 	 * Return the number of elements in the tree.
@@ -401,14 +436,14 @@ public:
 	 *
 	 * @return The number of elements in the tree.
 	 */
-	size_t size() const;
+	size_t size() const noexcept;
 
 	/**
 	 * @brief Removes all elements from the tree.
 	 *
 	 * Removes all elements from the tree.
 	 */
-	void clear();
+	void clear() noexcept;
 
 	/**
 	 * @brief Returns whether the tree is empty
@@ -417,14 +452,14 @@ public:
 	 *
 	 * @return true if the tree is empty, false otherwise
 	 */
-	bool empty() const;
+	bool empty() const noexcept;
 
 	// TODO document
 	// TODO do we need them anymore?
-	Node * get_root() const;
-	static Node * get_parent(Node * n);
-	static Node * get_left_child(Node * n);
-	static Node * get_right_child(Node * n);
+	Node * get_root() const noexcept;
+	static Node * get_parent(Node * n) noexcept;
+	static Node * get_left_child(Node * n) noexcept;
+	static Node * get_right_child(Node * n) noexcept;
 
 	// Mainly debugging methods
 	/// @cond INTERNAL
@@ -435,10 +470,9 @@ public:
 protected:
 	Node * root;
 
-	Node * get_smallest() const;
-	Node * get_largest() const;
-
-	Node * get_uncle(Node * node) const;
+	Node * get_smallest() const noexcept;
+	Node * get_largest() const noexcept;
+	Node * get_uncle(Node * node) const noexcept;
 
 	Compare cmp;
 

@@ -74,9 +74,9 @@ private:
 
 					auto stopped_at = std::chrono::high_resolution_clock::now();
 					auto duration = stopped_at - started_at;
-					elapsed_round +=
+					elapsed_round += static_cast<double>(
 					    std::chrono::duration_cast<std::chrono::nanoseconds>(duration)
-					        .count();
+					        .count());
 				}
 			}
 			this->elapsed.push_back(elapsed_round);
@@ -86,14 +86,15 @@ private:
 		/* Compute statistics */
 		double elapsed_sum = std::accumulate(
 		    this->elapsed.begin(), this->elapsed.end(), 0.0, std::plus<double>());
-		double elapsed_avg = elapsed_sum / this->elapsed.size();
+		double elapsed_avg =
+		    elapsed_sum / static_cast<double>(this->elapsed.size());
 		auto var_builder = [&](double acc, double val) {
 			return acc + (val - elapsed_avg) * (val - elapsed_avg);
 		};
 		double elapsed_var =
 		    std::accumulate(this->elapsed.begin(), this->elapsed.end(), 0.0,
 		                    var_builder) /
-		    this->elapsed.size();
+		    static_cast<double>(this->elapsed.size());
 		double elapsed_stddev = sqrt(elapsed_var);
 
 		std::cout << " AVG TIME: " << elapsed_avg << " ns\n";
