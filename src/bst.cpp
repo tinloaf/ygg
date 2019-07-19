@@ -624,11 +624,7 @@ template <class Comparable>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
-    const Comparable & query)
-#ifndef YGG_STORE_SEQUENCE
-    // Sequence storage involves memory allocation and thus is not noexcept
-    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
+    const Comparable & query) CMP_NOEXCEPT(query)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_search(reinterpret_cast<const void *>(&query),
@@ -674,12 +670,7 @@ template <class Comparable>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
-    const Comparable & query) const
-#ifndef YGG_STORE_SEQUENCE
-    // Sequence storage involves memory allocation and thus is not noexcept
-    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
-
+    const Comparable & query) const CMP_NOEXCEPT(query)
 {
 	return const_iterator<false>(const_cast<decltype(this)>(this)->find(query));
 }
@@ -690,11 +681,7 @@ template <class Comparable>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::lower_bound(
-    const Comparable & query)
-#ifndef YGG_STORE_SEQUENCE
-    // Sequence storage involves memory allocation and thus is not noexcept
-    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
+    const Comparable & query) CMP_NOEXCEPT(query)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_lbound(reinterpret_cast<const void *>(&query),
@@ -727,11 +714,7 @@ template <class Comparable>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::upper_bound(
-    const Comparable & query)
-#ifndef YGG_STORE_SEQUENCE
-    // Sequence storage involves memory allocation and thus is not noexcept
-    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
+    const Comparable & query) CMP_NOEXCEPT(query)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_ubound(reinterpret_cast<const void *>(&query),
@@ -764,12 +747,7 @@ template <class Comparable>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::upper_bound(
-    const Comparable & query) const
-#ifndef YGG_STORE_SEQUENCE
-    // Sequence storage involves memory allocation and thus is not noexcept
-    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
-
+    const Comparable & query) const CMP_NOEXCEPT(query)
 {
 	return const_iterator<false>(const_cast<MyClass *>(this)->upper_bound(query));
 }
@@ -780,11 +758,7 @@ template <class Comparable>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::lower_bound(
-    const Comparable & query) const
-#ifndef YGG_STORE_SEQUENCE
-    // Sequence storage involves memory allocation and thus is not noexcept
-    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
+    const Comparable & query) const CMP_NOEXCEPT(query)
 {
 	return const_iterator<false>(const_cast<MyClass *>(this)->lower_bound(query));
 }

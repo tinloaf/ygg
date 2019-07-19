@@ -511,6 +511,28 @@ public:
 	using T::T;
 };
 
+template <class T>
+struct GCCBug52869Workaround
+{
+	static T &
+	get()
+	{
+		/* Yes, this is pretty much the definition of "This is how you get
+		 * segfaults"
+		 *
+		 * Have a look at the CMP_NOEXCEPT macro, where we need a reference to a
+		 * Node, can't use 'this' because of GCC bug 52869, and don't know if
+		 * the Node class is default constructible. Also, we can't have a lambda
+		 * return a Node reference, because of the unevaluated context. Thus,
+		 * this horrible thing here came into existence.
+		 *
+		 * NEVER EVER USE THIS OUTSIDE UNEVALUATED CONTEXTS!
+		 */
+		T * t = nullptr;
+		return *t;
+	}
+};
+
 } // namespace utilities
 } // namespace ygg
 
@@ -521,7 +543,9 @@ public:
 // While some of the methods using this macro might not be affected by this,
 // we use the same macro for simpler code.
 #ifndef YGG_STORE_SEQUENCE
-#define CMP_NOEXCEPT(OBJ) noexcept(noexcept(this->cmp(*this->root, OBJ)))
+#define CMP_NOEXCEPT(OBJ)                                                      \
+	noexcept(noexcept(                                                           \
+	    (Compare{})(::ygg::utilities::GCCBug52869Workaround<Node>::get(), OBJ)))
 #else
 #define CMP_NOEXCEPT(OBJ)
 #endif

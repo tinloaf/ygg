@@ -270,18 +270,9 @@ public:
 	 */
 	template <class Comparable>
 	const_iterator<false> find(const Comparable & query) const
-#ifndef YGG_STORE_SEQUENCE
-	    // Sequence storage involves memory allocation and thus is not noexcept
-	    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
-	        ;
+	    CMP_NOEXCEPT(query);
 	template <class Comparable>
-	iterator<false> find(const Comparable & query)
-#ifndef YGG_STORE_SEQUENCE
-	    // Sequence storage involves memory allocation and thus is not noexcept
-	    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
-	        ;
+	iterator<false> find(const Comparable & query) CMP_NOEXCEPT(query);
 
 	// TODO document
 	// TODO test
@@ -313,19 +304,9 @@ public:
 	 */
 	template <class Comparable>
 	const_iterator<false> upper_bound(const Comparable & query) const
-#ifndef YGG_STORE_SEQUENCE
-	    // Sequence storage involves memory allocation and thus is not noexcept
-	    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
-	        ;
-
+	    CMP_NOEXCEPT(query);
 	template <class Comparable>
-	iterator<false> upper_bound(const Comparable & query)
-#ifndef YGG_STORE_SEQUENCE
-	    // Sequence storage involves memory allocation and thus is not noexcept
-	    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
-	        ;
+	iterator<false> upper_bound(const Comparable & query) CMP_NOEXCEPT(query);
 
 	/**
 	 * @brief Lower-bounds an element
@@ -350,19 +331,9 @@ public:
 	 */
 	template <class Comparable>
 	const_iterator<false> lower_bound(const Comparable & query) const
-#ifndef YGG_STORE_SEQUENCE
-	    // Sequence storage involves memory allocation and thus is not noexcept
-	    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
-	        ;
-
+	    CMP_NOEXCEPT(query);
 	template <class Comparable>
-	iterator<false> lower_bound(const Comparable & query)
-#ifndef YGG_STORE_SEQUENCE
-	    // Sequence storage involves memory allocation and thus is not noexcept
-	    noexcept(noexcept(this->cmp(*this->root, query)))
-#endif
-	        ;
+	iterator<false> lower_bound(const Comparable & query) CMP_NOEXCEPT(query);
 
 	/**
 	 * @brief Debugging Method: Draw the Tree as a .dot file
