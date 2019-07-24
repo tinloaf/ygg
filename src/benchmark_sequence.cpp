@@ -3,7 +3,6 @@
 
 #include "benchmark_sequence.hpp"
 
-#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <type_traits>
@@ -91,6 +90,18 @@ BenchmarkSequenceStorage<KeyT>::Reader::get(size_t count)
 }
 
 template <class KeyT>
+bool
+BenchmarkSequenceStorage<KeyT>::file_exists(const std::string & test_file) const
+{
+	if (auto * file = fopen(test_file.c_str(), "r")) {
+		return true;
+		fclose(file);
+	} else {
+		return false;
+	}
+}
+
+template <class KeyT>
 std::string
 BenchmarkSequenceStorage<KeyT>::get_filename() const
 {
@@ -100,22 +111,24 @@ BenchmarkSequenceStorage<KeyT>::get_filename() const
 		size_t i = 0;
 
 		std::ostringstream filename_buf;
-		std::filesystem::path path;
 		while (!found) {
 			filename_buf.str("");
 			filename_buf.clear();
 			filename_buf << hint << std::hex << (this) << "_" << std::dec << i
 			             << ".bin";
-			path = std::filesystem::path(filename_buf.str());
-			if (!std::filesystem::exists(path)) {
+			if (!this->file_exists(filename_buf.str())) {
 				found = true;
 			}
 		}
 
-		return path.string();
+		return filename_buf.str();
 	} else {
-		auto tmp_path = std::filesystem::temp_directory_path();
-		std::filesystem::path full_path;
+		// This is the way to get a temp directory in POSIX
+		const char * tmpdir = std::getenv("TMPDIR");
+		if (tmpdir == nullptr) {
+			// The system seems to ignore POSIX? Use '/tmp' and hope for the best.
+			tmpdir = "/tmp";
+		}
 
 		std::ostringstream filename_buf;
 
@@ -124,16 +137,21 @@ BenchmarkSequenceStorage<KeyT>::get_filename() const
 		while (!found) {
 			filename_buf.str("");
 			filename_buf.clear();
+			filename_buf << tmpdir;
+#ifdef _WIN32
+			filename_buf << '\\';
+#else
+			filename_buf << '/';
+#endif
+
 			filename_buf << "tree_" << std::hex << (this) << "_" << std::dec << i
 			             << ".bin";
-			full_path = tmp_path / filename_buf.str();
-
-			if (!std::filesystem::exists(full_path)) {
+			if (!this->file_exists(filename_buf.str())) {
 				found = true;
 			}
 		}
 
-		return full_path.string();
+		return filename_buf.str();
 	}
 }
 

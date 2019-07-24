@@ -90,6 +90,7 @@ private:
 	void sync();
 
 	std::string filename;
+	bool file_exists(const std::string & test_file) const;
 	std::string get_filename() const;
 
 	std::vector<Entry> buf;
