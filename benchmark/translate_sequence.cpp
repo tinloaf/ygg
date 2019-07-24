@@ -11,13 +11,14 @@ main(int argc, char ** argv)
 		return -1;
 	}
 
-	using BSS = ygg::utilities::BenchmarkSequenceStorage<int>;
+	using BSS = ygg::utilities::BenchmarkSequenceStorage<unsigned int>;
 	auto reader = BSS::Reader(argv[1]);
 	auto writer = BSS(argv[2]);
 
 	std::unordered_map<const void *, size_t> node_map;
 
-	for (auto * buf = &reader.get(100); buf->size() > 0; buf = &reader.get(100)) {
+	for (auto * buf = &reader.get(10000); buf->size() > 0;
+	     buf = &reader.get(10000)) {
 		std::cout << "Got " << buf->size() << " entries.\n";
 		for (auto & entry : *buf) {
 			const void * id = entry.id;
@@ -66,8 +67,6 @@ main(int argc, char ** argv)
 			default:
 				break;
 			}
-			
-			
 		}
 	}
 }

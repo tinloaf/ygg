@@ -7,8 +7,8 @@
  * Ygg's Red-Black Tree
  */
 using InsertYggRBBSTFixture =
-    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, InsertExperiment, true,
-               false, false, false>;
+    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, InsertExperiment,
+               UseUniform, UseUniform, UseNone, UseNone, false>;
 BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -36,7 +36,8 @@ REGISTER(InsertYggRBBSTFixture, BM_BST_Insertion)
  */
 using InsertYggRBBSTFixtureArith =
     BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
-               InsertExperiment, true, false, false, false>;
+               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
+               false>;
 BENCHMARK_DEFINE_F(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -65,7 +66,8 @@ REGISTER(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
 // Default gamma, delta / twopass
 using InsertYggWBDefGDefDTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-               InsertExperiment, true, false, false, false>;
+               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
+               false>;
 BENCHMARK_DEFINE_F(InsertYggWBDefGDefDTPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -91,7 +93,7 @@ REGISTER(InsertYggWBDefGDefDTPBSTFixture, BM_BST_Insertion)
 // Default gamma, delta / single pass
 using InsertYggWBDefGDefDSPBSTFixture = BSTFixture<
     YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-    InsertExperiment, true, false, false, false>;
+    InsertExperiment, UseUniform, UseUniform, UseNone, UseNone, false>;
 BENCHMARK_DEFINE_F(InsertYggWBDefGDefDSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -117,7 +119,8 @@ REGISTER(InsertYggWBDefGDefDSPBSTFixture, BM_BST_Insertion)
 // Lai and Wood gamma, delta / single pass
 using InsertYggWBLWSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepassLWTreeOptions, WBBSTNamerLWSP>,
-               InsertExperiment, true, false, false, false>;
+               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
+               false>;
 BENCHMARK_DEFINE_F(InsertYggWBLWSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -143,7 +146,8 @@ REGISTER(InsertYggWBLWSPBSTFixture, BM_BST_Insertion)
 // Balance-focussed gamma, delta / single pass
 using InsertYggWBBalSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepassBalTreeOptions, WBBSTNamerBalSP>,
-               InsertExperiment, true, false, false, false>;
+               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
+               false>;
 BENCHMARK_DEFINE_F(InsertYggWBBalSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -169,7 +173,7 @@ REGISTER(InsertYggWBBalSPBSTFixture, BM_BST_Insertion)
 // Balance-focussed gamma, delta / single pass, avoiding conditionals
 using InsertYggWBBalSPArithBSTFixture = BSTFixture<
     YggWBTreeInterface<WBTSinglepassBalArithTreeOptions, WBBSTNamerBalSPArith>,
-    InsertExperiment, true, false, false, false>;
+    InsertExperiment, UseUniform, UseUniform, UseNone, UseNone, false>;
 BENCHMARK_DEFINE_F(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -195,7 +199,8 @@ REGISTER(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 // integral gamma, delta / single pass
 using InsertYggWB3G2DSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>,
-               InsertExperiment, true, false, false, false>;
+               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
+               false>;
 BENCHMARK_DEFINE_F(InsertYggWB3G2DSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -221,7 +226,8 @@ REGISTER(InsertYggWB3G2DSPBSTFixture, BM_BST_Insertion)
 // integral gamma, delta / twopass
 using InsertYggWB3G2DTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions, WBBSTNamer3G2DTP>,
-               InsertExperiment, true, false, false, false>;
+               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
+               false>;
 BENCHMARK_DEFINE_F(InsertYggWB3G2DTPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -248,8 +254,8 @@ REGISTER(InsertYggWB3G2DTPBSTFixture, BM_BST_Insertion)
  * Ygg's Energy-Balanced Tree
  */
 using InsertYggEBSTFixture =
-    BSTFixture<YggEnergyTreeInterface<BasicTreeOptions>, InsertExperiment, true,
-               false, false, false>;
+    BSTFixture<YggEnergyTreeInterface<BasicTreeOptions>, InsertExperiment,
+               UseUniform, UseUniform, UseNone, UseNone, false>;
 BENCHMARK_DEFINE_F(InsertYggEBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -276,8 +282,8 @@ REGISTER(InsertYggEBSTFixture, BM_BST_Insertion)
  * Ygg's Zip Tree
  */
 using InsertYggZBSTFixture =
-    BSTFixture<YggZTreeInterface<BasicTreeOptions>, InsertExperiment, true,
-               false, false, false>;
+    BSTFixture<YggZTreeInterface<BasicTreeOptions>, InsertExperiment,
+               UseUniform, UseUniform, UseNone, UseNone, false>;
 BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -303,7 +309,8 @@ REGISTER(InsertYggZBSTFixture, BM_BST_Insertion)
  * Boost::Intrusive::Set
  */
 using InsertBISetBSTFixture =
-    BSTFixture<BoostSetInterface, InsertExperiment, true, false, false, false>;
+    BSTFixture<BoostSetInterface, InsertExperiment, UseUniform, UseUniform,
+               UseNone, UseNone, false>;
 BENCHMARK_DEFINE_F(InsertBISetBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -329,7 +336,8 @@ REGISTER(InsertBISetBSTFixture, BM_BST_Insertion)
  * std::set
  */
 using InsertStdSetBSTFixture =
-    BSTFixture<StdSetInterface, InsertExperiment, true, false, false, false>;
+    BSTFixture<StdSetInterface, InsertExperiment, UseUniform, UseUniform,
+               UseNone, UseNone, false>;
 BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {

@@ -30,7 +30,16 @@ FOREACH(BINARY ${BINARIES})
 		set_target_properties (${BINARY}_papi PROPERTIES COMPILE_DEFINITIONS "USEPAPI")
 	endif()
 ENDFOREACH()
-										
+
+SET(ZIPF_BINARIES "bench_bst_insert;bench_bst_search")
+FOREACH(BINARY ${ZIPF_BINARIES})
+	add_executable(${BINARY}_zipf ${BINARY}.cpp random.cpp)
+	add_dependencies(${BINARY}_zipf gbenchmark)
+	target_link_libraries(${BINARY}_zipf Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+	set_target_properties (${BINARY}_zipf PROPERTIES COMPILE_DEFINITIONS "USEZIPF")
+ENDFOREACH()
+
+
 add_executable(pathlengths pathlengths.cpp)
 add_executable(wbtree_balance wbtree_balance.cpp)
 add_executable(count_rotations count_rotations.cpp)

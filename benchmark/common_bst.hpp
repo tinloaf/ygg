@@ -20,6 +20,12 @@
 #include <papi.h>
 #endif
 
+#ifdef USEZIPF
+#define DYN_GENERATOR UseZipf
+#else
+#define DYN_GENERATOR UseUniform
+#endif
+
 struct WBBSTNamerDefGDefDTP
 {
 	constexpr static const char * name = "1+sqrt(2),sqrt(2),TP";
@@ -66,11 +72,44 @@ struct RBBSTNamerArith
 	constexpr static const char * name = "RBTree[arith] ";
 };
 
-// TODO various RBTree / Zip Tree variants!
+struct UseNone
+{
+	static constexpr bool enable = false;
+};
 
-template <class Interface, typename Experiment, bool need_nodes,
-          bool need_values, bool need_node_pointers, bool values_from_fixed,
-          bool distinct = false>
+struct UseUniform
+{
+	static constexpr bool enable = true;
+	using Randomizer = UniformDistr;
+	static constexpr int min = std::numeric_limits<int>::min();
+	static constexpr int max = std::numeric_limits<int>::max();
+
+	static Randomizer
+	create(long unsigned int seed)
+	{
+		return UniformDistr(seed);
+	}
+};
+
+struct UseZipf
+{
+	static constexpr bool enable = true;
+	using Randomizer = ZipfDistr;
+	static constexpr int min = std::numeric_limits<int>::min();
+	static constexpr int max = 10000; // TODO is this sane?
+
+	static Randomizer
+	create(long unsigned int seed)
+	{
+		return ZipfDistr(seed, 1.0);
+	}
+};
+
+// TODO various RBTree / Zip Tree var-iants!
+
+template <class Interface, typename Experiment, class MainRandomizer,
+          class need_nodes, class need_values, class need_node_pointers,
+          bool values_from_fixed, bool distinct = false>
 class BSTFixture : public benchmark::Fixture {
 public:
 	static std::string
@@ -89,7 +128,7 @@ public:
 		this->SetName(name.c_str());
 	}
 
-	BSTFixture() : rnd(new UniformDistr(std::random_device{}())) {}
+	BSTFixture() = default;
 
 	void
 	SetUp(const ::benchmark::State & state)
@@ -100,18 +139,17 @@ public:
 		size_t fixed_count = static_cast<size_t>(state.range(0));
 		size_t experiment_count = static_cast<size_t>(state.range(1));
 		int seed = static_cast<int>(state.range(2));
-		this->rnd.reset(new UniformDistr(seed));
 		this->rng = std::mt19937(seed);
+
+		auto main_rnd = MainRandomizer::create(seed);
 
 		this->fixed_nodes.clear();
 		std::unordered_set<int> seen_values;
 		for (size_t i = 0; i < fixed_count; ++i) {
-			int val = this->rnd->generate(std::numeric_limits<int>::min(),
-			                              std::numeric_limits<int>::max());
+			int val = main_rnd.generate(MainRandomizer::min, MainRandomizer::max);
 			if (distinct) {
 				while (seen_values.find(val) != seen_values.end()) {
-					val = this->rnd->generate(std::numeric_limits<int>::min(),
-					                          std::numeric_limits<int>::max());
+					val = main_rnd.generate(MainRandomizer::min, MainRandomizer::max);
 				}
 				seen_values.insert(val);
 			}
@@ -131,21 +169,23 @@ public:
 			std::shuffle(shuffled_values.begin(), shuffled_values.end(), this->rng);
 		}
 
-		if (need_nodes) {
+		if constexpr (need_nodes::enable) {
 			seen_values.clear();
+			auto rnd = need_nodes::create(rng());
+
 			this->experiment_nodes.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
 				int val;
 
 				if (values_from_fixed) {
-					val = fixed_values[i % fixed_count];
+					size_t rand_index =
+						static_cast<size_t>(rnd.generate(0, static_cast<int>(this->fixed_values.size())));
+					val = fixed_values[rand_index];
 				} else {
-					val = this->rnd->generate(std::numeric_limits<int>::min(),
-					                          std::numeric_limits<int>::max());
+					val = rnd.generate(need_nodes::min, need_nodes::max);
 					if (distinct) {
 						while (seen_values.find(val) != seen_values.end()) {
-							val = this->rnd->generate(std::numeric_limits<int>::min(),
-							                          std::numeric_limits<int>::max());
+							val = rnd.generate(need_nodes::min, need_nodes::max);
 						}
 						seen_values.insert(val);
 					}
@@ -155,21 +195,22 @@ public:
 			}
 		}
 
-		if (need_values) {
+		if constexpr (need_values::enable) {
 			seen_values.clear();
+			auto rnd = need_values::create(rng());
+
 			this->experiment_values.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
 				int val;
 
 				if (values_from_fixed) {
-					val = shuffled_values[i % fixed_count];
+					size_t rnd_index = rnd.generate(0, static_cast<int>(this->fixed_values.size()));
+					val = this->fixed_values[rnd_index];
 				} else {
-					val = this->rnd->generate(std::numeric_limits<int>::min(),
-					                          std::numeric_limits<int>::max());
+					val = rnd.generate(need_values::min, need_values::max);
 					if (distinct) {
 						while (seen_values.find(val) != seen_values.end()) {
-							val = this->rnd->generate(std::numeric_limits<int>::min(),
-							                          std::numeric_limits<int>::max());
+							val = rnd.generate(need_values::min, need_values::max);
 						}
 						seen_values.insert(val);
 					}
@@ -179,16 +220,14 @@ public:
 			}
 		}
 
-		if (need_node_pointers) {
+		if constexpr (need_node_pointers::enable) {
+			auto rnd = need_node_pointers::create(rng());
+
 			this->experiment_node_pointers.clear();
-			std::vector<typename Interface::Node *> ptrs;
-			for (typename Interface::Node & n : this->fixed_nodes) {
-				ptrs.push_back(&n);
+			for (size_t i = 0; i < experiment_count; ++i) {
+				size_t rnd_index = rnd.generate(0, static_cast<int>(this->fixed_values.size()));
+				this->experiment_node_pointers.push_back(&this->fixed_nodes[rnd_index]);
 			}
-			std::shuffle(ptrs.begin(), ptrs.end(), this->rng);
-			this->experiment_node_pointers.insert(
-			    this->experiment_node_pointers.begin(), ptrs.begin(),
-			    ptrs.begin() + static_cast<long>(experiment_count));
 		}
 	}
 
@@ -212,7 +251,7 @@ public:
 	std::mt19937 rng;
 
 private:
-	std::unique_ptr<Randomizer> rnd;
+	//	std::unique_ptr<Randomizer> rnd;
 };
 
 /*

@@ -10,7 +10,8 @@
  */
 using SearchYggRBBSTFixtureArith =
     BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
-               SearchExperiment, false, true, false, true>;
+               SearchExperiment, UseUniform, UseNone, DYN_GENERATOR, UseNone,
+               true>;
 BENCHMARK_DEFINE_F(SearchYggRBBSTFixtureArith, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -32,8 +33,8 @@ REGISTER(SearchYggRBBSTFixtureArith, BM_BST_Search)
  * Ygg's Red-Black Tree
  */
 using SearchYggRBBSTFixture =
-    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, SearchExperiment, false,
-               true, false, true>;
+    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, SearchExperiment,
+               UseUniform, UseNone, DYN_GENERATOR, UseNone, true>;
 BENCHMARK_DEFINE_F(SearchYggRBBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -55,8 +56,8 @@ REGISTER(SearchYggRBBSTFixture, BM_BST_Search)
  * Ygg's Zip Tree
  */
 using SearchYggZBSTFixture =
-    BSTFixture<YggZTreeInterface<BasicTreeOptions>, SearchExperiment, false,
-               true, false, true>;
+    BSTFixture<YggZTreeInterface<BasicTreeOptions>, SearchExperiment,
+               UseUniform, UseNone, DYN_GENERATOR, UseNone, true>;
 BENCHMARK_DEFINE_F(SearchYggZBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -76,7 +77,8 @@ REGISTER(SearchYggZBSTFixture, BM_BST_Search)
  * Boost::Intrusive::Set
  */
 using SearchBISetBSTFixture =
-    BSTFixture<BoostSetInterface, SearchExperiment, false, true, false, true>;
+    BSTFixture<BoostSetInterface, SearchExperiment, UseUniform, UseNone,
+               DYN_GENERATOR, UseNone, true>;
 BENCHMARK_DEFINE_F(SearchBISetBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -96,7 +98,8 @@ REGISTER(SearchBISetBSTFixture, BM_BST_Search)
  * std::set
  */
 using SearchStdSetBSTFixture =
-    BSTFixture<StdSetInterface, SearchExperiment, false, true, false, true>;
+    BSTFixture<StdSetInterface, SearchExperiment, UseUniform, UseNone,
+               DYN_GENERATOR, UseNone, true>;
 BENCHMARK_DEFINE_F(SearchStdSetBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
