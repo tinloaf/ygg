@@ -1,7 +1,7 @@
 #include "random.hpp"
 
-#include <random>
 #include <cassert>
+#include <random>
 
 Randomizer::Randomizer(unsigned long seed) : rng(seed) {}
 
@@ -59,8 +59,8 @@ ZipfDistr::generate(int min, int max)
 	assert(max > min);
 	auto val = this->inverse_ghn_on_n(
 	    cdf * this->ghn(static_cast<size_t>((max - min)), this->s), this->s);
-	assert(val < static_cast<unsigned long>(max)m);
-	
+	assert(val < static_cast<unsigned long>(max));
+
 	return static_cast<int>(val);
 }
 
