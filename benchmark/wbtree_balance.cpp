@@ -1,5 +1,6 @@
 #include "../src/options.hpp"
 #include "../src/wbtree.hpp"
+
 #include <algorithm>
 #include <random>
 
@@ -56,6 +57,7 @@ public:
 		this->t = reinterpret_cast<Tree *>(&this->init_t);
 
 		for (size_t i = 0; i < this->reinsertion_count; ++i) {
+			assert(this->node_count > 0);
 			size_t index =
 			    static_cast<unsigned long>(std::abs(distr(rnd))) % this->node_count;
 

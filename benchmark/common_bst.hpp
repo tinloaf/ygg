@@ -139,9 +139,9 @@ public:
 		size_t fixed_count = static_cast<size_t>(state.range(0));
 		size_t experiment_count = static_cast<size_t>(state.range(1));
 		int seed = static_cast<int>(state.range(2));
-		this->rng = std::mt19937(seed);
+		this->rng = std::mt19937(static_cast<unsigned long>(seed));
 
-		auto main_rnd = MainRandomizer::create(seed);
+		auto main_rnd = MainRandomizer::create(static_cast<unsigned long>(seed));
 
 		this->fixed_nodes.clear();
 		this->fixed_values.clear();
@@ -206,8 +206,8 @@ public:
 				int val;
 
 				if (values_from_fixed) {
-					size_t rnd_index =
-					    rnd.generate(0, static_cast<int>(this->fixed_values.size()));
+					size_t rnd_index = static_cast<size_t>(
+					    rnd.generate(0, static_cast<int>(this->fixed_values.size())));
 					val = this->fixed_values[rnd_index];
 				} else {
 					val = rnd.generate(need_values::min, need_values::max);
@@ -228,13 +228,13 @@ public:
 			std::unordered_set<typename Interface::Node *> seen_nodes;
 			this->experiment_node_pointers.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
-				size_t rnd_index =
-				    rnd.generate(0, static_cast<int>(this->fixed_nodes.size()));
+				size_t rnd_index = static_cast<size_t>(
+				    rnd.generate(0, static_cast<int>(this->fixed_nodes.size())));
 				auto node_ptr = &this->fixed_nodes[rnd_index];
 				if (distinct) {
 					while (seen_nodes.find(node_ptr) != seen_nodes.end()) {
-						rnd_index =
-						    rnd.generate(0, static_cast<int>(this->fixed_nodes.size()));
+						rnd_index = static_cast<size_t>(
+						    rnd.generate(0, static_cast<int>(this->fixed_nodes.size())));
 						assert(rnd_index < this->fixed_nodes.size());
 						node_ptr = &this->fixed_nodes[rnd_index];
 					}
@@ -263,9 +263,6 @@ public:
 
 	PapiMeasurements papi;
 	std::mt19937 rng;
-
-private:
-	//	std::unique_ptr<Randomizer> rnd;
 };
 
 /*

@@ -169,6 +169,7 @@ public:
 
 		CountingNodeTraits::reset();
 		for (size_t i = 0; i < this->operation_count; ++i) {
+			assert(this->node_count > 0);
 			size_t index =
 			    static_cast<size_t>(std::abs(distr(rnd))) % this->node_count;
 
@@ -236,6 +237,7 @@ public:
 
 		RBCountingNodeTraits::reset();
 		for (size_t i = 0; i < this->operation_count; ++i) {
+			assert(this->node_count > 0);
 			size_t index =
 			    static_cast<size_t>(std::abs(distr(rnd))) % this->node_count;
 

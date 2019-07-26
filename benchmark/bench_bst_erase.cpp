@@ -231,6 +231,7 @@ BENCHMARK_DEFINE_F(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 	for (auto _ : state) {
+		(void)_;
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			this->t.erase(n->get_value());
