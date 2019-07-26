@@ -66,6 +66,6 @@ UniformDistr::UniformDistr(unsigned long seed) : Randomizer(seed) {}
 int
 UniformDistr::generate(int min, int max)
 {
-	std::uniform_int_distribution<int> distr(min, max);
+	std::uniform_int_distribution<int> distr(min, max - 1);
 	return distr(this->rng);
 }

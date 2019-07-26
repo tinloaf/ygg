@@ -144,6 +144,8 @@ public:
 		auto main_rnd = MainRandomizer::create(seed);
 
 		this->fixed_nodes.clear();
+		this->fixed_values.clear();
+
 		std::unordered_set<int> seen_values;
 		for (size_t i = 0; i < fixed_count; ++i) {
 			int val = main_rnd.generate(MainRandomizer::min, MainRandomizer::max);
@@ -178,8 +180,8 @@ public:
 				int val;
 
 				if (values_from_fixed) {
-					size_t rand_index =
-						static_cast<size_t>(rnd.generate(0, static_cast<int>(this->fixed_values.size())));
+					size_t rand_index = static_cast<size_t>(
+					    rnd.generate(0, static_cast<int>(this->fixed_values.size())));
 					val = fixed_values[rand_index];
 				} else {
 					val = rnd.generate(need_nodes::min, need_nodes::max);
@@ -204,7 +206,8 @@ public:
 				int val;
 
 				if (values_from_fixed) {
-					size_t rnd_index = rnd.generate(0, static_cast<int>(this->fixed_values.size()));
+					size_t rnd_index =
+					    rnd.generate(0, static_cast<int>(this->fixed_values.size()));
 					val = this->fixed_values[rnd_index];
 				} else {
 					val = rnd.generate(need_values::min, need_values::max);
@@ -222,10 +225,21 @@ public:
 
 		if constexpr (need_node_pointers::enable) {
 			auto rnd = need_node_pointers::create(rng());
-
+			std::unordered_set<typename Interface::Node *> seen_nodes;
 			this->experiment_node_pointers.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
-				size_t rnd_index = rnd.generate(0, static_cast<int>(this->fixed_values.size()));
+				size_t rnd_index =
+				    rnd.generate(0, static_cast<int>(this->fixed_nodes.size()));
+				auto node_ptr = &this->fixed_nodes[rnd_index];
+				if (distinct) {
+					while (seen_nodes.find(node_ptr) != seen_nodes.end()) {
+						rnd_index =
+						    rnd.generate(0, static_cast<int>(this->fixed_nodes.size()));
+						assert(rnd_index < this->fixed_nodes.size());
+						node_ptr = &this->fixed_nodes[rnd_index];
+					}
+					seen_nodes.insert(node_ptr);
+				}
 				this->experiment_node_pointers.push_back(&this->fixed_nodes[rnd_index]);
 			}
 		}

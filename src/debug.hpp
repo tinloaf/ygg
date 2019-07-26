@@ -50,7 +50,19 @@ public:
 	}
 };
 
-template <class Node, class NodeNameGetter>
+struct AddressNodeNameGetter
+{
+	template <class Node>
+	std::string
+	get_name(Node * n) const
+	{
+		std::ostringstream os;
+		os << std::hex << n << std::dec;
+		return os.str();
+	}
+};
+
+template <class Node, class NodeNameGetter = AddressNodeNameGetter>
 class TreePrinter {
 public:
 	TreePrinter(Node * root_in, NodeNameGetter nng_in)

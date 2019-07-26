@@ -3,12 +3,15 @@
 
 #include "common_bst.hpp"
 
+#include <sstream>
+#include <type_traits>
+
 /*
  * Ygg's Red-Black Tree
  */
 using DeleteYggRBBSTFixture =
     BSTFixture<YggRBTreeInterface<BasicTreeOptions>, DeleteExperiment,
-               UseUniform, UseNone, UseNone, UseUniform, false>;
+               UseUniform, UseNone, UseNone, UseUniform, true, true>;
 BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -36,8 +39,8 @@ REGISTER(DeleteYggRBBSTFixture, BM_BST_Deletion)
  */
 using DeleteYggRBBSTFixtureArith =
     BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
-               DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform,
-               false>;
+               DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform, true,
+               true>;
 BENCHMARK_DEFINE_F(DeleteYggRBBSTFixtureArith, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -66,8 +69,8 @@ REGISTER(DeleteYggRBBSTFixtureArith, BM_BST_Deletion)
 // Default gamma, delta / twopass
 using DeleteYggWBDefGDefDTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-               DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform,
-               false>;
+               DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform, true,
+               true>;
 BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -93,7 +96,7 @@ REGISTER(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
 // Default gamma, delta / single pass
 using DeleteYggWBDefGDefDSPBSTFixture = BSTFixture<
     YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-    DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform, false>;
+    DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform, true, true>;
 BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -119,8 +122,8 @@ REGISTER(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
 // integral gamma, delta / single pass
 using DeleteYggWB3G2DSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>,
-               DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform,
-               false>;
+               DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform, true,
+               true>;
 BENCHMARK_DEFINE_F(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -146,8 +149,8 @@ REGISTER(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
 // integral gamma, delta / twopass
 using DeleteYggWB3G2DTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions, WBBSTNamer3G2DTP>,
-               DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform,
-               false>;
+               DeleteExperiment, UseUniform, UseNone, UseNone, UseUniform, true,
+               true>;
 BENCHMARK_DEFINE_F(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -175,7 +178,7 @@ REGISTER(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
  */
 using DeleteYggEBSTFixture =
     BSTFixture<YggEnergyTreeInterface<BasicTreeOptions>, DeleteExperiment,
-               UseUniform, UseNone, UseNone, UseUniform, false>;
+               UseUniform, UseNone, UseNone, UseUniform, true, true>;
 BENCHMARK_DEFINE_F(DeleteYggEBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -203,7 +206,7 @@ REGISTER(DeleteYggEBSTFixture, BM_BST_Deletion)
  */
 using DeleteYggZBSTFixture =
     BSTFixture<YggZTreeInterface<BasicTreeOptions>, DeleteExperiment,
-               UseUniform, UseNone, UseNone, UseUniform, false>;
+               UseUniform, UseNone, UseNone, UseUniform, true, true>;
 BENCHMARK_DEFINE_F(DeleteYggZBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -231,7 +234,7 @@ REGISTER(DeleteYggZBSTFixture, BM_BST_Deletion)
  */
 using DeleteBISetBSTFixture =
     BSTFixture<BoostSetInterface, DeleteExperiment, UseUniform, UseNone,
-               UseNone, UseUniform, false>;
+               UseNone, UseUniform, true, true>;
 BENCHMARK_DEFINE_F(DeleteBISetBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -259,7 +262,7 @@ REGISTER(DeleteBISetBSTFixture, BM_BST_Deletion)
  */
 using DeleteStdSetBSTFixture =
     BSTFixture<StdSetInterface, DeleteExperiment, UseUniform, UseNone, UseNone,
-               UseNone, false>;
+               UseNone, true, true>;
 BENCHMARK_DEFINE_F(DeleteStdSetBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
