@@ -1,6 +1,8 @@
 #ifndef MAIN_HPP
 #define MAIN_HPP
 
+#include "common.hpp"
+
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -9,8 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "common.hpp"
-
 #define EXPERIMENT_SIZE 1000
 #define BASE_SIZE 2048
 #define DOUBLINGS 10
@@ -18,6 +18,8 @@
 struct ConfigHolder
 {
 	int64_t experiment_size;
+	double relative_experiment_size;
+	bool use_relative_size = false;
 	int64_t base_size;
 	size_t doublings;
 
@@ -33,7 +35,14 @@ BuildRange(::benchmark::internal::Benchmark * b)
 	for (int64_t seed = CFG.seed_start;
 	     seed < CFG.seed_start + static_cast<int64_t>(CFG.seed_count); ++seed) {
 		for (size_t doubling = 0; doubling < CFG.doublings; ++doubling) {
-			b->Args({CFG.base_size << doubling, CFG.experiment_size, seed});
+			if (CFG.use_relative_size) {
+				b->Args({CFG.base_size << doubling,
+				         static_cast<int64_t>(std::round((CFG.base_size << doubling) *
+				                                         CFG.relative_experiment_size)),
+				         seed});
+			} else {
+				b->Args({CFG.base_size << doubling, CFG.experiment_size, seed});
+			}
 		}
 	}
 }
@@ -108,6 +117,12 @@ main(int argc, char ** argv)
 			CFG.experiment_size = static_cast<int64_t>(atoi(argv[i + 1]));
 			i += 1;
 			remaining_argc -= 2;
+		} else if (strncmp(argv[i], "--relative_experiment_size",
+		                   strlen("--relative_experiment_size")) == 0) {
+			CFG.relative_experiment_size = static_cast<double>(atof(argv[i + 1]));
+			i += 1;
+			remaining_argc -= 2;
+			CFG.use_relative_size = true;
 		} else {
 			remaining_argv[j++] = argv[i];
 		}
