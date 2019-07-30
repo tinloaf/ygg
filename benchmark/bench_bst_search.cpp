@@ -3,6 +3,18 @@
 
 #include "common_bst.hpp"
 
+struct BSTSearchOptions
+{
+	using MainRandomizer = UseUniform;
+	constexpr static bool need_nodes = false;
+	constexpr static bool need_values = true;
+	using ValueRandomizer = DYN_GENERATOR;
+	constexpr static bool need_node_pointers = false;
+	constexpr static bool values_from_fixed = true; // TODO take a percentage?
+	constexpr static bool distinct = false;
+	constexpr static size_t node_value_change_percentage = 0;
+};
+
 // TODO search for values not in the tree?
 
 /*
@@ -10,8 +22,7 @@
  */
 using SearchYggRBBSTFixtureArith =
     BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
-               SearchExperiment, UseUniform, UseNone, DYN_GENERATOR, UseNone,
-               true>;
+               SearchExperiment, BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggRBBSTFixtureArith, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -32,9 +43,8 @@ REGISTER(SearchYggRBBSTFixtureArith, BM_BST_Search)
 /*
  * Ygg's Red-Black Tree
  */
-using SearchYggRBBSTFixture =
-    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, SearchExperiment,
-               UseUniform, UseNone, DYN_GENERATOR, UseNone, true>;
+using SearchYggRBBSTFixture = BSTFixture<YggRBTreeInterface<BasicTreeOptions>,
+                                         SearchExperiment, BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggRBBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -55,9 +65,8 @@ REGISTER(SearchYggRBBSTFixture, BM_BST_Search)
 /*
  * Ygg's Zip Tree
  */
-using SearchYggZBSTFixture =
-    BSTFixture<YggZTreeInterface<BasicTreeOptions>, SearchExperiment,
-               UseUniform, UseNone, DYN_GENERATOR, UseNone, true>;
+using SearchYggZBSTFixture = BSTFixture<YggZTreeInterface<BasicTreeOptions>,
+                                        SearchExperiment, BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggZBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -77,8 +86,7 @@ REGISTER(SearchYggZBSTFixture, BM_BST_Search)
  * Boost::Intrusive::Set
  */
 using SearchBISetBSTFixture =
-    BSTFixture<BoostSetInterface, SearchExperiment, UseUniform, UseNone,
-               DYN_GENERATOR, UseNone, true>;
+    BSTFixture<BoostSetInterface, SearchExperiment, BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchBISetBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -98,8 +106,7 @@ REGISTER(SearchBISetBSTFixture, BM_BST_Search)
  * std::set
  */
 using SearchStdSetBSTFixture =
-    BSTFixture<StdSetInterface, SearchExperiment, UseUniform, UseNone,
-               DYN_GENERATOR, UseNone, true>;
+    BSTFixture<StdSetInterface, SearchExperiment, BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchStdSetBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {

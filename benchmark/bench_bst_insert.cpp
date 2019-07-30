@@ -3,12 +3,24 @@
 
 #include "common_bst.hpp"
 
+struct BSTInsertOptions {
+	using MainRandomizer = UseUniform;
+	constexpr static bool need_nodes = true;
+	using NodeRandomizer = UseUniform;
+	constexpr static bool need_values = false;
+	constexpr static bool need_node_pointers = false;
+	
+	constexpr static bool values_from_fixed = false;
+	constexpr static bool distinct = false;
+	constexpr static size_t node_value_change_percentage = 0;
+};
+
 /*
  * Ygg's Red-Black Tree
  */
 using InsertYggRBBSTFixture =
     BSTFixture<YggRBTreeInterface<BasicTreeOptions>, InsertExperiment,
-               UseUniform, UseUniform, UseNone, UseNone, false>;
+               BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -36,8 +48,7 @@ REGISTER(InsertYggRBBSTFixture, BM_BST_Insertion)
  */
 using InsertYggRBBSTFixtureArith =
     BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
-               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
-               false>;
+               InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -66,8 +77,7 @@ REGISTER(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
 // Default gamma, delta / twopass
 using InsertYggWBDefGDefDTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
-               false>;
+               InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggWBDefGDefDTPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -93,7 +103,7 @@ REGISTER(InsertYggWBDefGDefDTPBSTFixture, BM_BST_Insertion)
 // Default gamma, delta / single pass
 using InsertYggWBDefGDefDSPBSTFixture = BSTFixture<
     YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-    InsertExperiment, UseUniform, UseUniform, UseNone, UseNone, false>;
+    InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggWBDefGDefDSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -119,8 +129,7 @@ REGISTER(InsertYggWBDefGDefDSPBSTFixture, BM_BST_Insertion)
 // Lai and Wood gamma, delta / single pass
 using InsertYggWBLWSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepassLWTreeOptions, WBBSTNamerLWSP>,
-               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
-               false>;
+               InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggWBLWSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -146,8 +155,7 @@ REGISTER(InsertYggWBLWSPBSTFixture, BM_BST_Insertion)
 // Balance-focussed gamma, delta / single pass
 using InsertYggWBBalSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepassBalTreeOptions, WBBSTNamerBalSP>,
-               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
-               false>;
+               InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggWBBalSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -173,7 +181,7 @@ REGISTER(InsertYggWBBalSPBSTFixture, BM_BST_Insertion)
 // Balance-focussed gamma, delta / single pass, avoiding conditionals
 using InsertYggWBBalSPArithBSTFixture = BSTFixture<
     YggWBTreeInterface<WBTSinglepassBalArithTreeOptions, WBBSTNamerBalSPArith>,
-    InsertExperiment, UseUniform, UseUniform, UseNone, UseNone, false>;
+    InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -199,8 +207,7 @@ REGISTER(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 // integral gamma, delta / single pass
 using InsertYggWB3G2DSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>,
-               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
-               false>;
+               InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggWB3G2DSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -226,8 +233,7 @@ REGISTER(InsertYggWB3G2DSPBSTFixture, BM_BST_Insertion)
 // integral gamma, delta / twopass
 using InsertYggWB3G2DTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions, WBBSTNamer3G2DTP>,
-               InsertExperiment, UseUniform, UseUniform, UseNone, UseNone,
-               false>;
+               InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggWB3G2DTPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -255,7 +261,7 @@ REGISTER(InsertYggWB3G2DTPBSTFixture, BM_BST_Insertion)
  */
 using InsertYggEBSTFixture =
     BSTFixture<YggEnergyTreeInterface<BasicTreeOptions>, InsertExperiment,
-               UseUniform, UseUniform, UseNone, UseNone, false>;
+               BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggEBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -283,7 +289,7 @@ REGISTER(InsertYggEBSTFixture, BM_BST_Insertion)
  */
 using InsertYggZBSTFixture =
     BSTFixture<YggZTreeInterface<BasicTreeOptions>, InsertExperiment,
-               UseUniform, UseUniform, UseNone, UseNone, false>;
+               BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -309,8 +315,7 @@ REGISTER(InsertYggZBSTFixture, BM_BST_Insertion)
  * Boost::Intrusive::Set
  */
 using InsertBISetBSTFixture =
-    BSTFixture<BoostSetInterface, InsertExperiment, UseUniform, UseUniform,
-               UseNone, UseNone, false>;
+    BSTFixture<BoostSetInterface, InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertBISetBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -336,8 +341,7 @@ REGISTER(InsertBISetBSTFixture, BM_BST_Insertion)
  * std::set
  */
 using InsertStdSetBSTFixture =
-    BSTFixture<StdSetInterface, InsertExperiment, UseUniform, UseUniform,
-               UseNone, UseNone, false>;
+    BSTFixture<StdSetInterface, InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {

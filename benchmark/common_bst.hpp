@@ -126,10 +126,13 @@ struct UseSkewed
 
 // TODO various RBTree / Zip Tree var-iants!
 
-template <class Interface, typename Experiment, class MainRandomizer,
-          class need_nodes, class need_values, class need_node_pointers,
-          bool values_from_fixed, bool distinct = false,
-          size_t node_value_change_percentage = 0>
+template <class Interface, class Experiment, class Options>
+
+/*
+class MainRandomizer,
+class need_nodes, class need_values, class need_node_pointers,
+bool values_from_fixed, bool distinct = false,
+size_t node_value_change_percentage = 0>*/
 class BSTFixture : public benchmark::Fixture {
 public:
 	using NodeInterface = Interface;
@@ -163,17 +166,20 @@ public:
 		int seed = static_cast<int>(state.range(2));
 		this->rng = std::mt19937(static_cast<unsigned long>(seed));
 
-		auto main_rnd = MainRandomizer::create(static_cast<unsigned long>(seed));
+		auto main_rnd =
+		    Options::MainRandomizer::create(static_cast<unsigned long>(seed));
 
 		this->fixed_nodes.clear();
 		this->fixed_values.clear();
 
 		std::unordered_set<int> seen_values;
 		for (size_t i = 0; i < fixed_count; ++i) {
-			int val = main_rnd.generate(MainRandomizer::min, MainRandomizer::max);
-			if (distinct) {
+			int val = main_rnd.generate(Options::MainRandomizer::min,
+			                            Options::MainRandomizer::max);
+			if (Options::distinct) {
 				while (seen_values.find(val) != seen_values.end()) {
-					val = main_rnd.generate(MainRandomizer::min, MainRandomizer::max);
+					val = main_rnd.generate(Options::MainRandomizer::min,
+					                        Options::MainRandomizer::max);
 				}
 				seen_values.insert(val);
 			}
@@ -186,30 +192,32 @@ public:
 		}
 
 		std::vector<int> shuffled_values;
-		if (values_from_fixed) {
+		if (Options::values_from_fixed) {
 			shuffled_values.insert(shuffled_values.begin(),
 			                       this->fixed_values.begin(),
 			                       this->fixed_values.end());
 			std::shuffle(shuffled_values.begin(), shuffled_values.end(), this->rng);
 		}
 
-		if constexpr (need_nodes::enable) {
+		if constexpr (Options::need_nodes) {
 			seen_values.clear();
-			auto rnd = need_nodes::create(rng());
+			auto rnd = Options::NodeRandomizer::create(rng());
 
 			this->experiment_nodes.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
 				int val;
 
-				if (values_from_fixed) {
+				if (Options::values_from_fixed) {
 					size_t rand_index = static_cast<size_t>(
 					    rnd.generate(0, static_cast<int>(this->fixed_values.size())));
 					val = fixed_values[rand_index];
 				} else {
-					val = rnd.generate(need_nodes::min, need_nodes::max);
-					if (distinct) {
+					val = rnd.generate(Options::NodeRandomizer::min,
+					                   Options::NodeRandomizer::max);
+					if (Options::distinct) {
 						while (seen_values.find(val) != seen_values.end()) {
-							val = rnd.generate(need_nodes::min, need_nodes::max);
+							val = rnd.generate(Options::NodeRandomizer::min,
+							                   Options::NodeRandomizer::max);
 						}
 						seen_values.insert(val);
 					}
@@ -219,15 +227,15 @@ public:
 			}
 		}
 
-		if constexpr (need_node_pointers::enable) {
-			auto rnd = need_node_pointers::create(rng());
+		if constexpr (Options::need_node_pointers) {
+			auto rnd = Options::NodePointerRandomizer::create(rng());
 			std::unordered_set<typename Interface::Node *> seen_nodes;
 			this->experiment_node_pointers.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
 				size_t rnd_index = static_cast<size_t>(
 				    rnd.generate(0, static_cast<int>(this->fixed_nodes.size())));
 				auto node_ptr = &this->fixed_nodes[rnd_index];
-				if (distinct) {
+				if (Options::distinct) {
 					while (seen_nodes.find(node_ptr) != seen_nodes.end()) {
 						rnd_index = static_cast<size_t>(
 						    rnd.generate(0, static_cast<int>(this->fixed_nodes.size())));
@@ -240,25 +248,26 @@ public:
 			}
 		}
 
-		if constexpr (need_values::enable) {
+		if constexpr (Options::need_values) {
 			seen_values.clear();
-			auto rnd = need_values::create(rng());
+			auto rnd = Options::ValueRandomizer::create(rng());
 
 			this->experiment_values.clear();
 			for (size_t i = 0; i < experiment_count; ++i) {
 				int val;
 
-				if (values_from_fixed) {
+				if (Options::values_from_fixed) {
 					size_t rnd_index = static_cast<size_t>(
 					    rnd.generate(0, static_cast<int>(this->fixed_values.size())));
 					val = this->fixed_values[rnd_index];
 				} else {
-					int min = need_values::min;
-					int max = need_values::max;
+					int min = Options::ValueRandomizer::min;
+					int max = Options::ValueRandomizer::max;
 
-					if constexpr (node_value_change_percentage > 0) {
+					if constexpr (Options::node_value_change_percentage > 0) {
 						double node_value_change =
-						    static_cast<double>(node_value_change_percentage) / 100.0;
+						    static_cast<double>(Options::node_value_change_percentage) /
+						    100.0;
 						min = static_cast<int>(std::round(
 						    Interface::get_value(*this->experiment_node_pointers[i]) *
 						    (1 - node_value_change)));
@@ -276,7 +285,7 @@ public:
 					}
 
 					val = rnd.generate(min, max);
-					if (distinct) {
+					if (Options::distinct) {
 						while (seen_values.find(val) != seen_values.end()) {
 							val = rnd.generate(min, max);
 						}

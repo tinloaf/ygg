@@ -8,6 +8,7 @@
 #include <draup.hpp>
 #include <random>
 #include <vector>
+#include <iostream>
 
 #ifdef USEPAPI
 #include <papi.h>
