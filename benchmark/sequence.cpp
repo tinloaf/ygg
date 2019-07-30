@@ -147,7 +147,7 @@ public:
 		unsigned int key;
 
 		void
-		set_key(int k)
+		set_key(unsigned int k)
 		{
 			this->key = k;
 		}
@@ -185,7 +185,7 @@ main(int argc, char ** argv)
 	size_t repetitions = 10;
 
 	if (argc == 4) {
-		repetitions = std::atoi(argv[3]);
+		repetitions = static_cast<size_t>(std::atoi(argv[3]));
 	}
 
 	using DefaultRBBuilder = TreeBuilder<ygg::DefaultOptions, ygg::RBTreeNodeBase,

@@ -72,3 +72,48 @@ UniformDistr::generate(int min, int max)
 	std::uniform_int_distribution<int> distr(min, max - 1);
 	return distr(this->rng);
 }
+
+MaekinenSkewedDistr::MaekinenSkewedDistr(unsigned long seed, size_t n_in,
+                                         size_t change_freq_in,
+                                         size_t partition_count_in,
+                                         double partition_size_in)
+    : Randomizer(seed), n(n_in), change_freq(change_freq_in),
+      partition_count(partition_count_in), partition_size(partition_size_in),
+      counter(0)
+{}
+
+int
+MaekinenSkewedDistr::generate(int min, int max)
+{
+	this->counter++;
+
+	if (this->counter % this->n == 0) {
+		std::uniform_int_distribution<int> distr(min, max - 1);
+		return distr(this->rng);
+	} else {
+		size_t partition_size_absolute =
+		    static_cast<size_t>(std::round((max - min) * this->partition_size));
+		size_t partition_no =
+		    static_cast<size_t>(this->counter / this->change_freq) %
+		    this->partition_count;
+		if (partition_no % 2 == 0) {
+			int left_boundary =
+			    static_cast<int>((1 + partition_no) * partition_size_absolute);
+			int right_boundary = static_cast<int>(static_cast<size_t>(left_boundary) +
+			                                      partition_size_absolute);
+			assert(left_boundary < right_boundary);
+			std::uniform_int_distribution<int> distr(left_boundary,
+			                                         right_boundary - 1);
+			return distr(this->rng);
+		} else {
+			int right_boundary = static_cast<int>(
+			    static_cast<size_t>(max) - (partition_no * partition_size_absolute));
+			int left_boundary = static_cast<int>(static_cast<size_t>(right_boundary) -
+			                                     partition_size_absolute);
+			assert(left_boundary < right_boundary);
+			std::uniform_int_distribution<int> distr(left_boundary,
+			                                         right_boundary - 1);
+			return distr(this->rng);
+		}
+	}
+}

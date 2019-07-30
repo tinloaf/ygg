@@ -36,6 +36,21 @@ private:
 	    inverse_ghn_cache;
 };
 
+class MaekinenSkewedDistr : public Randomizer {
+public:
+	MaekinenSkewedDistr(unsigned long seed, size_t n, size_t change_freq,
+	                    size_t partition_count = 2, double partition_size = 0.1);
+
+	virtual int generate(int min, int max) override;
+
+private:
+	size_t n;
+	size_t change_freq;
+	size_t partition_count;
+	double partition_size;
+	size_t counter;
+};
+
 class UniformDistr : public Randomizer {
 public:
 	UniformDistr(unsigned long seed);

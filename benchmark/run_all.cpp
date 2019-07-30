@@ -4,6 +4,7 @@
 #include "bench_bst_insert.cpp"
 #include "bench_bst_search.cpp"
 #include "bench_bst_erase.cpp"
+#include "bench_bst_move.cpp"
 
 #include "bench_dst_insert.cpp"
 #include "bench_dst_delete.cpp"

@@ -23,7 +23,11 @@
 #ifdef USEZIPF
 #define DYN_GENERATOR UseZipf
 #else
+#ifdef USESKEWED
+#define DYN_GENERATOR UseSkewed
+#else
 #define DYN_GENERATOR UseUniform
+#endif
 #endif
 
 struct WBBSTNamerDefGDefDTP
@@ -105,13 +109,31 @@ struct UseZipf
 	}
 };
 
+struct UseSkewed
+{
+	static constexpr bool enable = true;
+	using Randomizer = MaekinenSkewedDistr;
+	static constexpr int min = std::numeric_limits<int>::min() + 1000;
+	static constexpr int max =
+	    static_cast<int>(std::numeric_limits<int>::max() * 0.8);
+
+	static Randomizer
+	create(long unsigned int seed)
+	{
+		return MaekinenSkewedDistr(seed, 3, 1000);
+	}
+};
+
 // TODO various RBTree / Zip Tree var-iants!
 
 template <class Interface, typename Experiment, class MainRandomizer,
           class need_nodes, class need_values, class need_node_pointers,
-          bool values_from_fixed, bool distinct = false>
+          bool values_from_fixed, bool distinct = false,
+          size_t node_value_change_percentage = 0>
 class BSTFixture : public benchmark::Fixture {
 public:
+	using NodeInterface = Interface;
+
 	static std::string
 	get_name()
 	{
@@ -197,32 +219,6 @@ public:
 			}
 		}
 
-		if constexpr (need_values::enable) {
-			seen_values.clear();
-			auto rnd = need_values::create(rng());
-
-			this->experiment_values.clear();
-			for (size_t i = 0; i < experiment_count; ++i) {
-				int val;
-
-				if (values_from_fixed) {
-					size_t rnd_index = static_cast<size_t>(
-					    rnd.generate(0, static_cast<int>(this->fixed_values.size())));
-					val = this->fixed_values[rnd_index];
-				} else {
-					val = rnd.generate(need_values::min, need_values::max);
-					if (distinct) {
-						while (seen_values.find(val) != seen_values.end()) {
-							val = rnd.generate(need_values::min, need_values::max);
-						}
-						seen_values.insert(val);
-					}
-				}
-
-				this->experiment_values.push_back(val);
-			}
-		}
-
 		if constexpr (need_node_pointers::enable) {
 			auto rnd = need_node_pointers::create(rng());
 			std::unordered_set<typename Interface::Node *> seen_nodes;
@@ -241,6 +237,54 @@ public:
 					seen_nodes.insert(node_ptr);
 				}
 				this->experiment_node_pointers.push_back(&this->fixed_nodes[rnd_index]);
+			}
+		}
+
+		if constexpr (need_values::enable) {
+			seen_values.clear();
+			auto rnd = need_values::create(rng());
+
+			this->experiment_values.clear();
+			for (size_t i = 0; i < experiment_count; ++i) {
+				int val;
+
+				if (values_from_fixed) {
+					size_t rnd_index = static_cast<size_t>(
+					    rnd.generate(0, static_cast<int>(this->fixed_values.size())));
+					val = this->fixed_values[rnd_index];
+				} else {
+					int min = need_values::min;
+					int max = need_values::max;
+
+					if constexpr (node_value_change_percentage > 0) {
+						double node_value_change =
+						    static_cast<double>(node_value_change_percentage) / 100.0;
+						min = static_cast<int>(std::round(
+						    Interface::get_value(*this->experiment_node_pointers[i]) *
+						    (1 - node_value_change)));
+						if (std::numeric_limits<double>::max() / (1 + node_value_change) >
+						    Interface::get_value(*this->experiment_node_pointers[i])) {
+							max = static_cast<int>(std::round(
+							    Interface::get_value(*this->experiment_node_pointers[i]) *
+							    (1 + node_value_change)));
+						}
+
+						if (min > max) {
+							// Negative values
+							std::swap(min, max);
+						}
+					}
+
+					val = rnd.generate(min, max);
+					if (distinct) {
+						while (seen_values.find(val) != seen_values.end()) {
+							val = rnd.generate(min, max);
+						}
+						seen_values.insert(val);
+					}
+				}
+
+				this->experiment_values.push_back(val);
 			}
 		}
 	}
@@ -327,6 +371,18 @@ public:
 		return Namer::name;
 	}
 
+	static int
+	get_value(const Node & n)
+	{
+		return n.get_value();
+	}
+
+	static void
+	set_value(Node & n, int val)
+	{
+		n.set_value(val);
+	}
+
 	static Node
 	create_node(int val)
 	{
@@ -404,6 +460,18 @@ public:
 		return name.str();
 	}
 
+	static int
+	get_value(const Node & n)
+	{
+		return n.get_value();
+	}
+
+	static void
+	set_value(Node & n, int val)
+	{
+		n.set_value(val);
+	}
+
 	static Node
 	create_node(int val)
 	{
@@ -477,6 +545,18 @@ public:
 	get_name()
 	{
 		return "EnergyTree";
+	}
+
+	static int
+	get_value(const Node & n)
+	{
+		return n.get_value();
+	}
+
+	static void
+	set_value(Node & n, int val)
+	{
+		n.set_value(val);
 	}
 
 	static Node
@@ -556,6 +636,12 @@ public:
 		t.insert(n);
 	}
 
+	static int
+	get_value(const Node & n)
+	{
+		return n.get_value();
+	}
+
 	static Node
 	create_node(int val)
 	{
@@ -589,9 +675,9 @@ public:
 	class Node
 	    : public boost::intrusive::set_base_hook<boost::intrusive::link_mode<
 	          boost::intrusive::link_mode_type::normal_link>> {
+	public:
 		int value;
 
-	public:
 		Node(int value_in) : value(value_in) {}
 
 		bool
@@ -607,6 +693,18 @@ public:
 	get_name()
 	{
 		return "boost::intrusive::multiset";
+	}
+
+	static int
+	get_value(const Node & n)
+	{
+		return n.value;
+	}
+
+	static void
+	set_value(Node & n, int val)
+	{
+		n.value = val;
 	}
 
 	static void

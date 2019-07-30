@@ -16,7 +16,7 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(LIBS "${LIBS} Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a")
 
-SET(BINARIES "bench_bst_insert;bench_bst_delete;bench_bst_search;bench_dst_insert;bench_dst_delete;bench_dst_move;run_all;bench_bst_erase")
+SET(BINARIES "bench_bst_insert;bench_bst_move;bench_bst_delete;bench_bst_search;bench_dst_insert;bench_dst_delete;bench_dst_move;run_all;bench_bst_erase")
 
 FOREACH(BINARY ${BINARIES})
 	add_executable(${BINARY} ${BINARY}.cpp random.cpp)
@@ -31,12 +31,20 @@ FOREACH(BINARY ${BINARIES})
 	endif()
 ENDFOREACH()
 
-SET(ZIPF_BINARIES "bench_bst_insert;bench_bst_search")
+SET(ZIPF_BINARIES "bench_bst_move;bench_bst_insert;bench_bst_search")
 FOREACH(BINARY ${ZIPF_BINARIES})
 	add_executable(${BINARY}_zipf ${BINARY}.cpp random.cpp)
 	add_dependencies(${BINARY}_zipf gbenchmark)
 	target_link_libraries(${BINARY}_zipf Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
 	set_target_properties (${BINARY}_zipf PROPERTIES COMPILE_DEFINITIONS "USEZIPF")
+ENDFOREACH()
+
+SET(SKEWED_BINARIES "bench_bst_move;bench_bst_insert;bench_bst_search")
+FOREACH(BINARY ${SKEWED_BINARIES})
+	add_executable(${BINARY}_skewed ${BINARY}.cpp random.cpp)
+	add_dependencies(${BINARY}_skewed gbenchmark)
+	target_link_libraries(${BINARY}_skewed Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+	set_target_properties (${BINARY}_skewed PROPERTIES COMPILE_DEFINITIONS "USESKEWED")
 ENDFOREACH()
 
 
