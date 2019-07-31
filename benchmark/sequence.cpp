@@ -2,6 +2,9 @@
 #include "../src/options.hpp"
 #include "../src/ygg.hpp"
 
+#include <cmath>
+#include <fstream>
+
 using namespace ygg;
 
 #include <chrono>
@@ -11,31 +14,107 @@ using namespace ygg;
 #include <unordered_map>
 
 template <class Tree, class Node>
+class DepthAnalyzer {
+public:
+	DepthAnalyzer(const Tree & t_in) : t(t_in){};
+
+	void
+	compute_path_lengths()
+	{
+		this->node_count = 0;
+		this->path_length_histogram.clear();
+		this->path_lengths.clear();
+
+		for (const auto & n : this->t) {
+			this->node_count++;
+			size_t depth = n.get_depth();
+			if (this->path_length_histogram.size() < depth + 1) {
+				this->path_length_histogram.resize(depth + 1, 0);
+			}
+			this->path_length_histogram[depth]++;
+			this->path_lengths.push_back(depth);
+		}
+
+		std::sort(this->path_lengths.begin(), this->path_lengths.end());
+		this->path_length_sum = std::accumulate(
+		    this->path_lengths.begin(), this->path_lengths.end(), size_t{0});
+		this->max_depth = this->path_lengths.back();
+		if (this->node_count % 2 == 0) {
+			this->median_depth =
+			    static_cast<double>(
+			        (this->path_lengths[this->node_count / 2] +
+			         this->path_lengths[(this->node_count / 2) - 1])) /
+			    2.0;
+		} else {
+			this->median_depth = this->path_lengths[(this->node_count - 1) / 2];
+		}
+	}
+
+	double
+	get_average() const noexcept
+	{
+		return static_cast<double>(this->path_length_sum) /
+		       static_cast<double>(this->node_count);
+	}
+
+	double
+	get_median() const noexcept
+	{
+		return this->median_depth;
+	}
+
+	size_t
+	get_maximum() const noexcept
+	{
+		return this->max_depth;
+	}
+
+private:
+	size_t node_count;
+	std::vector<size_t> path_length_histogram;
+	std::vector<size_t> path_lengths;
+	double median_depth;
+	size_t path_length_sum;
+	size_t max_depth;
+
+	const Tree & t;
+};
+
+template <class Tree, class Node, size_t depth_interval>
 class SequenceBenchmarker {
 private:
-	constexpr static size_t CHUNKSIZE = 10000;
+	constexpr static size_t CHUNKSIZE = 100000;
 	using KeyT = unsigned int;
 
 public:
 	SequenceBenchmarker(std::string filename_in, std::string benchmark_name_in,
-	                    std::string name_in, size_t repetitions_in)
+	                    std::string name_in, size_t repetitions_in,
+	                    std::ostream & out_in)
 	    : reader(filename_in.c_str()), filename(filename_in),
 	      benchmark_name(benchmark_name_in), name(name_in),
-	      repetitions(repetitions_in)
+	      repetitions(repetitions_in), out(out_in)
 	{
 		this->create_nodes();
 		this->run();
+		this->cleanup();
 	};
 
 private:
 	void
+	cleanup()
+	{
+		this->nodes.clear();
+		this->nodes.shrink_to_fit();
+	}
+
+	void
 	run()
 	{
-
 		while (this->repetitions >= 1) {
 			double elapsed_round = 0;
 			this->reader.reset();
 			Tree t;
+			DepthAnalyzer<Tree, Node> da(t);
 
 			std::cerr << this->repetitions << " iterations remaining...\n";
 
@@ -43,7 +122,21 @@ private:
 			     this->reader.get(CHUNKSIZE)) {
 				auto started_at = std::chrono::high_resolution_clock::now();
 
+				size_t i = 0;
+
 				for (auto & entry : buf) {
+					if constexpr (depth_interval > 0) {
+						i++;
+
+						if (i % depth_interval == 0) {
+							da.compute_path_lengths();
+							this->out << this->benchmark_name << "," << this->name << ","
+							          << this->repetitions << "," << i << ","
+							          << da.get_average() << "," << da.get_median() << ","
+							          << da.get_maximum() << "\n";
+						}
+					}
+
 					Node & n = this->nodes[reinterpret_cast<size_t>(entry.id)];
 					// Do Not Optimize!
 					asm volatile("" : : "r,m"(n) : "memory");
@@ -84,8 +177,10 @@ private:
 				}
 			}
 
-			std::cout << this->benchmark_name << "," << this->name << ","
-			          << this->repetitions << "," << elapsed_round << "\n";
+			if constexpr (depth_interval == 0) {
+				this->out << this->benchmark_name << "," << this->name << ","
+				          << this->repetitions << "," << elapsed_round << "\n";
+			}
 
 			this->repetitions--;
 		}
@@ -131,6 +226,7 @@ private:
 	std::string benchmark_name;
 	std::string name;
 	size_t repetitions;
+	std::ostream & out;
 
 	std::vector<Node> nodes;
 };
@@ -178,35 +274,48 @@ operator<(typename Node::ThisIsANodeTag_KeyType lhs, const Node & rhs)
 int
 main(int argc, char ** argv)
 {
-	if (argc < 3) {
+	if (argc < 4) {
 		exit(-1);
 	}
 
 	size_t repetitions = 10;
 
-	if (argc == 4) {
-		repetitions = static_cast<size_t>(std::atoi(argv[3]));
+	std::string output_prefix = argv[3];
+	std::string output_timing = output_prefix + "_timing.csv";
+	std::string output_depths = output_prefix + "_depths.csv";
+
+	std::ofstream out_timing(output_timing);
+	std::ofstream out_depths(output_depths);
+
+	if (argc == 5) {
+		repetitions = static_cast<size_t>(std::atoi(argv[4]));
 	}
 
 	using DefaultRBBuilder = TreeBuilder<ygg::DefaultOptions, ygg::RBTreeNodeBase,
 	                                     ygg::RBTree, ygg::RBDefaultNodeTraits>;
 
-	SequenceBenchmarker<DefaultRBBuilder::Tree, DefaultRBBuilder::Node> rb_sb(
-	    argv[1], argv[2], "DefaultRB", repetitions);
+	SequenceBenchmarker<DefaultRBBuilder::Tree, DefaultRBBuilder::Node, 0> rb_sb(
+	    argv[1], argv[2], "DefaultRB", repetitions, out_timing);
+	SequenceBenchmarker<DefaultRBBuilder::Tree, DefaultRBBuilder::Node, 500>
+	    rb_sb_d(argv[1], argv[2], "DefaultRB", repetitions, out_depths);
 
 	using DefaultWBBuilder = TreeBuilder<ygg::DefaultOptions, ygg::WBTreeNodeBase,
 	                                     ygg::WBTree, ygg::WBDefaultNodeTraits>;
 
-	SequenceBenchmarker<DefaultWBBuilder::Tree, DefaultWBBuilder::Node> def_wb_sb(
-	    argv[1], argv[2], "DefaultWB", repetitions);
+	SequenceBenchmarker<DefaultWBBuilder::Tree, DefaultWBBuilder::Node, 0>
+	    def_wb_sb(argv[1], argv[2], "DefaultWB", repetitions, out_timing);
+	SequenceBenchmarker<DefaultWBBuilder::Tree, DefaultWBBuilder::Node, 500>
+	    def_wb_sb_d(argv[1], argv[2], "DefaultWB", repetitions, out_depths);
 
 	using TDWBBuilder =
 	    TreeBuilder<ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
 	                                 ygg::TreeFlags::WBT_SINGLE_PASS>,
 	                ygg::WBTreeNodeBase, ygg::WBTree, ygg::WBDefaultNodeTraits>;
 
-	SequenceBenchmarker<TDWBBuilder::Tree, TDWBBuilder::Node> td_wb_sb(
-	    argv[1], argv[2], "TopDownWB", repetitions);
+	SequenceBenchmarker<TDWBBuilder::Tree, TDWBBuilder::Node, 0> td_wb_sb(
+	    argv[1], argv[2], "TopDownWB", repetitions, out_timing);
+	SequenceBenchmarker<TDWBBuilder::Tree, TDWBBuilder::Node, 500> td_wb_sb_d(
+	    argv[1], argv[2], "TopDownWB", repetitions, out_depths);
 
 	using WBTSinglepassBalTreeOptions =
 	    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
@@ -217,12 +326,15 @@ main(int argc, char ** argv)
 	                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
 
 	using TDBalWBBuilder =
-	    TreeBuilder<WBTSinglepassBalTreeOptions,
+	    TreeBuilder<WBTSinglepassBalTreeOptions, ygg::WBTreeNodeBase, ygg::WBTree,
+	                ygg::WBDefaultNodeTraits>;
 
-	                ygg::WBTreeNodeBase, ygg::WBTree, ygg::WBDefaultNodeTraits>;
-
-	SequenceBenchmarker<TDBalWBBuilder::Tree, TDBalWBBuilder::Node> td_bal_wb_sb(
-	    argv[1], argv[2], "BalancedTopDownWB", repetitions);
+	SequenceBenchmarker<TDBalWBBuilder::Tree, TDBalWBBuilder::Node, 0>
+	    td_bal_wb_sb(argv[1], argv[2], "BalancedTopDownWB", repetitions,
+	                 out_timing);
+	SequenceBenchmarker<TDBalWBBuilder::Tree, TDBalWBBuilder::Node, 500>
+	    td_bal_wb_sb_d(argv[1], argv[2], "BalancedTopDownWB", repetitions,
+	                   out_depths);
 
 	using WBTSinglepassLWTreeOptions =
 	    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
@@ -236,8 +348,10 @@ main(int argc, char ** argv)
 	    TreeBuilder<WBTSinglepassLWTreeOptions, ygg::WBTreeNodeBase, ygg::WBTree,
 	                ygg::WBDefaultNodeTraits>;
 
-	SequenceBenchmarker<TDLWWBBuilder::Tree, TDLWWBBuilder::Node> td_lw_wb_sb(
-	    argv[1], argv[2], "LWTopDownWB", repetitions);
+	SequenceBenchmarker<TDLWWBBuilder::Tree, TDLWWBBuilder::Node, 0> td_lw_wb_sb(
+	    argv[1], argv[2], "LWTopDownWB", repetitions, out_timing);
+	SequenceBenchmarker<TDLWWBBuilder::Tree, TDLWWBBuilder::Node, 500>
+	    td_lw_wb_sb_d(argv[1], argv[2], "LWTopDownWB", repetitions, out_depths);
 
 	using WBTSinglepass32TreeOptions =
 	    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
@@ -251,8 +365,10 @@ main(int argc, char ** argv)
 	    TreeBuilder<WBTSinglepass32TreeOptions, ygg::WBTreeNodeBase, ygg::WBTree,
 	                ygg::WBDefaultNodeTraits>;
 
-	SequenceBenchmarker<TD32WBBuilder::Tree, TD32WBBuilder::Node> td_32_wb_sb(
-	    argv[1], argv[2], "32TopDownWB", repetitions);
+	SequenceBenchmarker<TD32WBBuilder::Tree, TD32WBBuilder::Node, 0> td_32_wb_sb(
+	    argv[1], argv[2], "32TopDownWB", repetitions, out_timing);
+	SequenceBenchmarker<TD32WBBuilder::Tree, TD32WBBuilder::Node, 500>
+	    td_32_wb_sb_d(argv[1], argv[2], "32TopDownWB", repetitions, out_depths);
 
 	using WBTSinglepassRelaxedTreeOptions =
 	    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
@@ -266,8 +382,12 @@ main(int argc, char ** argv)
 	    TreeBuilder<WBTSinglepassRelaxedTreeOptions, ygg::WBTreeNodeBase,
 	                ygg::WBTree, ygg::WBDefaultNodeTraits>;
 
-	SequenceBenchmarker<TDRelaxedWBBuilder::Tree, TDRelaxedWBBuilder::Node>
-	    td_relaxed_wb_sb(argv[1], argv[2], "RelaxedTopDownWB", repetitions);
+	SequenceBenchmarker<TDRelaxedWBBuilder::Tree, TDRelaxedWBBuilder::Node, 0>
+	    td_relaxed_wb_sb(argv[1], argv[2], "RelaxedTopDownWB", repetitions,
+	                     out_timing);
+	SequenceBenchmarker<TDRelaxedWBBuilder::Tree, TDRelaxedWBBuilder::Node, 500>
+	    td_relaxed_wb_sb_d(argv[1], argv[2], "RelaxedTopDownWB", repetitions,
+	                       out_depths);
 
 	return 0;
 }

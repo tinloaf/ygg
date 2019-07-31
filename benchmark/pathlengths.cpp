@@ -31,8 +31,10 @@ public:
 		          << std::endl;
 		std::cout << "Depth Sum: \t\t" << sum << std::endl;
 		std::cout << "Maximum Depth: \t\t"
-		          << *std::max_element(this->path_lengths.begin(),
-		                               this->path_lengths.end())
+		          << *std::max_element(
+		                 this->path_lengths.begin(),
+		                 this->path_lengths.end()) // TODO shouldn't this just be
+		                                           // the last element?
 		          << std::endl;
 
 		double balanced_depth = std::floor(std::log2(this->count));
@@ -351,7 +353,8 @@ main(int argc, const char ** argv)
 	for (size_t a = 0; a <= additions; ++a) {
 		std::cout << "################### " << a << " / " << additions << "\n";
 		size_t count = base_count + (a * offset);
-		size_t move_count = static_cast<size_t>(static_cast<double>(count) * move_fraction);
+		size_t move_count =
+		    static_cast<size_t>(static_cast<double>(count) * move_fraction);
 
 		do_analysis(all_types(), count, move_count, seed_count, seed_start, os);
 	}
