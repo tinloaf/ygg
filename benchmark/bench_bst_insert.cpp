@@ -3,24 +3,24 @@
 
 #include "common_bst.hpp"
 
-struct BSTInsertOptions {
+struct BSTInsertOptions : public DefaultBenchmarkOptions
+{
 	using MainRandomizer = UseUniform;
 	constexpr static bool need_nodes = true;
 	using NodeRandomizer = UseUniform;
-	constexpr static bool need_values = false;
-	constexpr static bool need_node_pointers = false;
-	
-	constexpr static bool values_from_fixed = false;
-	constexpr static bool distinct = false;
-	constexpr static size_t node_value_change_percentage = 0;
+#ifdef PRESORT
+	constexpr static bool nodes_presort = true;
+	constexpr static double nodes_presort_fraction = 50;
+	constexpr static bool fixed_presort = true;
+	constexpr static double fixed_presort_fraction = 50;
+#endif
 };
 
 /*
  * Ygg's Red-Black Tree
  */
-using InsertYggRBBSTFixture =
-    BSTFixture<YggRBTreeInterface<BasicTreeOptions>, InsertExperiment,
-               BSTInsertOptions>;
+using InsertYggRBBSTFixture = BSTFixture<YggRBTreeInterface<BasicTreeOptions>,
+                                         InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
@@ -287,9 +287,8 @@ REGISTER(InsertYggEBSTFixture, BM_BST_Insertion)
 /*
  * Ygg's Zip Tree
  */
-using InsertYggZBSTFixture =
-    BSTFixture<YggZTreeInterface<BasicTreeOptions>, InsertExperiment,
-               BSTInsertOptions>;
+using InsertYggZBSTFixture = BSTFixture<YggZTreeInterface<BasicTreeOptions>,
+                                        InsertExperiment, BSTInsertOptions>;
 BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {

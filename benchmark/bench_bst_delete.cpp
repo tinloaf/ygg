@@ -6,17 +6,21 @@
 #include <sstream>
 #include <type_traits>
 
-struct BSTDeleteOptions
+struct BSTDeleteOptions : public DefaultBenchmarkOptions
 {
 	using MainRandomizer = UseUniform;
-	constexpr static bool need_nodes = false;
-	constexpr static bool need_values = false;
 	constexpr static bool need_node_pointers = true;
 	using NodePointerRandomizer = UseUniform;
 
 	constexpr static bool distinct = true;
 	constexpr static bool values_from_fixed = true; // TODO this makes no sense!
-	constexpr static size_t node_value_change_percentage = 0;
+
+#ifdef PRESORT
+	constexpr static bool nodes_presort = true;
+	constexpr static double nodes_presort_fraction = 50;
+	constexpr static bool pointers_presort = true;
+	constexpr static double pointers_presort_fraction = 50;
+#endif
 };
 
 /*

@@ -47,6 +47,15 @@ FOREACH(BINARY ${SKEWED_BINARIES})
 	set_target_properties (${BINARY}_skewed PROPERTIES COMPILE_DEFINITIONS "USESKEWED")
 ENDFOREACH()
 
+SET(PRESORTED_BINARIES "bench_bst_move;bench_bst_insert;bench_bst_erase;bench_bst_delete")
+FOREACH(BINARY ${PRESORTED_BINARIES})
+	add_executable(${BINARY}_presorted ${BINARY}.cpp random.cpp)
+	add_dependencies(${BINARY}_presorted gbenchmark)
+	target_link_libraries(${BINARY}_presorted Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
+	set_target_properties (${BINARY}_presorted PROPERTIES COMPILE_DEFINITIONS "PRESORT")
+ENDFOREACH()
+
+
 
 add_executable(pathlengths pathlengths.cpp)
 add_executable(wbtree_balance wbtree_balance.cpp)

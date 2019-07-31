@@ -3,16 +3,12 @@
 
 #include "common_bst.hpp"
 
-struct BSTSearchOptions
+struct BSTSearchOptions : public DefaultBenchmarkOptions
 {
 	using MainRandomizer = UseUniform;
-	constexpr static bool need_nodes = false;
 	constexpr static bool need_values = true;
 	using ValueRandomizer = DYN_GENERATOR;
-	constexpr static bool need_node_pointers = false;
 	constexpr static bool values_from_fixed = true; // TODO take a percentage?
-	constexpr static bool distinct = false;
-	constexpr static size_t node_value_change_percentage = 0;
 };
 
 // TODO search for values not in the tree?

@@ -4,20 +4,23 @@
 #include "common.hpp"
 #include "common_bst.hpp"
 
-struct BSTMoveOptions
+struct BSTMoveOptions : public DefaultBenchmarkOptions
 {
 	using MainRandomizer = UseUniform;
 
-	constexpr static bool need_nodes = false;
 	constexpr static bool need_values = true;
-	constexpr static bool values_from_fixed = false;
 	using ValueRandomizer = UseUniform;
 	constexpr static size_t node_value_change_percentage =
 	    10; // TODO make this global
 	constexpr static bool need_node_pointers = true;
 	using NodePointerRandomizer = DYN_GENERATOR;
 
-	constexpr static bool distinct = false;
+#ifdef PRESORT
+	constexpr static bool nodes_presort = true;
+	constexpr static double nodes_presort_fraction = 50;
+	constexpr static bool pointers_presort = true;
+	constexpr static double pointers_presort_fraction = 50;
+#endif
 };
 
 /*

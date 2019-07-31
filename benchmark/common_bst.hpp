@@ -10,6 +10,7 @@
 #include <boost/intrusive/set.hpp>
 #include <cstdlib>
 #include <draup.hpp>
+#include <functional>
 #include <limits>
 #include <memory>
 #include <random>
@@ -124,15 +125,42 @@ struct UseSkewed
 	}
 };
 
-// TODO various RBTree / Zip Tree var-iants!
+template <class T, class Compare = decltype(std::less<T>{})>
+void
+presort(std::vector<T> & v, size_t shuffle_count, size_t seed,
+        Compare cmp = std::less<T>{})
+{
+	std::mt19937 rng(seed);
+
+	std::sort(v.begin(), v.end(), cmp);
+
+	std::vector<size_t> indices(v.size());
+	std::iota(indices.begin(), indices.end(), size_t{0});
+	std::shuffle(indices.begin(), indices.end(), rng);
+
+	T last_element = std::move(v[indices[shuffle_count - 1]]);
+	for (size_t i = 1; i < shuffle_count; ++i) {
+		v[indices[i]] = std::move(v[indices[i - 1]]);
+	}
+	v[0] = std::move(last_element);
+};
+
+struct DefaultBenchmarkOptions
+{
+	constexpr static bool distinct = false;
+	constexpr static bool fixed_presort = false;
+	constexpr static bool values_from_fixed = false;
+	constexpr static bool need_nodes = false;
+	constexpr static bool nodes_presort = false;
+	constexpr static bool need_node_pointers = false;
+	constexpr static bool pointers_presort = false;
+	constexpr static bool need_values = false;
+	constexpr static bool values_presort = false;
+
+	constexpr static size_t node_value_change_percentage = 0;
+};
 
 template <class Interface, class Experiment, class Options>
-
-/*
-class MainRandomizer,
-class need_nodes, class need_values, class need_node_pointers,
-bool values_from_fixed, bool distinct = false,
-size_t node_value_change_percentage = 0>*/
 class BSTFixture : public benchmark::Fixture {
 public:
 	using NodeInterface = Interface;
@@ -184,9 +212,19 @@ public:
 				seen_values.insert(val);
 			}
 
-			this->fixed_nodes.push_back(Interface::create_node(val));
 			this->fixed_values.push_back(val);
 		}
+
+		if constexpr (Options::fixed_presort) {
+			size_t presort_count =
+			    this->fixed_values.size() * Options::fixed_presort_fraction;
+			presort(this->fixed_values, presort_count, this->rng());
+		}
+
+		for (int val : this->fixed_values) {
+			this->fixed_nodes.push_back(Interface::create_node(val));
+		}
+		// DO NOT MERGE THESE LOOPS
 		for (auto & n : this->fixed_nodes) {
 			Interface::insert(this->t, n);
 		}
@@ -225,6 +263,15 @@ public:
 
 				this->experiment_nodes.push_back(Interface::create_node(val));
 			}
+			if constexpr (Options::nodes_presort) {
+				size_t presort_count =
+				    this->experiment_nodes.size() * Options::nodes_presort_fraction;
+				presort(this->experiment_nodes, presort_count, this->rng(),
+				        [](const typename Interface::Node & lhs,
+				           const typename Interface::Node & rhs) {
+					        return Interface::get_value(lhs) < Interface::get_value(rhs);
+				        });
+			}
 		}
 
 		if constexpr (Options::need_node_pointers) {
@@ -245,6 +292,17 @@ public:
 					seen_nodes.insert(node_ptr);
 				}
 				this->experiment_node_pointers.push_back(&this->fixed_nodes[rnd_index]);
+			}
+
+			if constexpr (Options::pointers_presort) {
+				size_t presort_count = this->experiment_node_pointers.size() *
+				                       Options::pointers_presort_fraction;
+				presort(this->experiment_node_pointers, presort_count, this->rng(),
+				        [](const typename Interface::Node * lhs,
+				           const typename Interface::Node * rhs) {
+					        return Interface::get_value(*lhs) <
+					               Interface::get_value(*rhs);
+				        });
 			}
 		}
 
@@ -294,6 +352,11 @@ public:
 				}
 
 				this->experiment_values.push_back(val);
+			}
+			if constexpr (Options::values_presort) {
+				size_t presort_count =
+				    this->experiment_values.size() * Options::values_presort_fraction;
+				presort(this->fixed_values, presort_count, this->rng());
 			}
 		}
 	}
@@ -754,6 +817,12 @@ public:
 	{
 		// TODO this is very unclean
 		t.insert(std::move(n));
+	}
+
+	static int
+	get_value(const Node & n)
+	{
+		return n.value();
 	}
 
 	static void
