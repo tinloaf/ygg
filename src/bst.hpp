@@ -436,6 +436,7 @@ public:
 	/// @cond INTERNAL
 	bool verify_integrity() const;
 	void dbg_verify() const;
+	void dbg_print_tree() const;
 	/// @endcond
 
 protected:
@@ -450,8 +451,6 @@ protected:
 	SizeHolder<Options::constant_time_size> s;
 
 	/* What follows are debugging tools */
-	void dbg_print_tree() const;
-
 	template <class NodeNameGetter>
 	void dump_to_dot_base(const std::string & filename,
 	                      NodeNameGetter name_getter) const;

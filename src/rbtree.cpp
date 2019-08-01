@@ -448,7 +448,6 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node)
 	this->bss.register_insert(reinterpret_cast<const void *>(&node),
 	                          Options::SequenceInterface::get_key(node));
 #endif
-
 	// TODO merge this
 	this->s.add(1);
 	this->insert_leaf_base(node, this->root);
