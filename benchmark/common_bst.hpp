@@ -326,25 +326,30 @@ public:
 
 					if constexpr (Options::node_value_change_percentage > 0) {
 						double node_value_max_delta =
-						    (max - min) *
-						    static_cast<double>(Options::node_value_change_percentage) /
-						    100.0;
+						    ((max / 2) - (min / 2)) *
+						    (static_cast<double>(Options::node_value_change_percentage) /
+						     100.0);
+						if (std::numeric_limits<double>::max() / ((max / 2) - (min / 2)) <
+						    (static_cast<double>(Options::node_value_change_percentage) /
+						     100.0)) {
+							node_value_max_delta = std::numeric_limits<double>::max() / 2;
+						}
 
-						if (std::numeric_limits<int>::min() + node_value_max_delta / 2 <
+						if (std::numeric_limits<int>::min() + node_value_max_delta <
 						    Interface::get_value(*this->experiment_node_pointers[i])) {
 
 							min = static_cast<int>(std::round(
 							    Interface::get_value(*this->experiment_node_pointers[i]) -
-							    node_value_max_delta / 2));
+							    node_value_max_delta));
 						} else {
 							min = std::numeric_limits<int>::min();
 						}
 
-						if (std::numeric_limits<int>::max() - node_value_max_delta / 2 >
+						if (std::numeric_limits<int>::max() - node_value_max_delta >
 						    Interface::get_value(*this->experiment_node_pointers[i])) {
 							max = static_cast<int>(std::round(
 							    Interface::get_value(*this->experiment_node_pointers[i]) +
-							    node_value_max_delta / 2));
+							    node_value_max_delta));
 						} else {
 							max = std::numeric_limits<int>::max();
 						}
