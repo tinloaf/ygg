@@ -12,10 +12,10 @@ struct BSTEraseOptions : public DefaultBenchmarkOptions
 	constexpr static bool distinct = true;
 
 #ifdef PRESORT
-	constexpr static bool nodes_presort = true;
-	constexpr static double nodes_presort_fraction = 50;
+	constexpr static bool fixed_presort = true;
+	constexpr static double fixed_presort_fraction = 0.5;
 	constexpr static bool pointers_presort = true;
-	constexpr static double pointers_presort_fraction = 50;
+	constexpr static double pointers_presort_fraction = 0.5;
 #endif
 };
 

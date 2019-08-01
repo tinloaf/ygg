@@ -142,7 +142,7 @@ presort(std::vector<T> & v, size_t shuffle_count, size_t seed,
 	for (size_t i = 1; i < shuffle_count; ++i) {
 		v[indices[i]] = std::move(v[indices[i - 1]]);
 	}
-	v[0] = std::move(last_element);
+	v[indices[0]] = std::move(last_element);
 };
 
 struct DefaultBenchmarkOptions
@@ -278,6 +278,7 @@ public:
 			auto rnd = Options::NodePointerRandomizer::create(rng());
 			std::unordered_set<typename Interface::Node *> seen_nodes;
 			this->experiment_node_pointers.clear();
+
 			for (size_t i = 0; i < experiment_count; ++i) {
 				size_t rnd_index = static_cast<size_t>(
 				    rnd.generate(0, static_cast<int>(this->fixed_nodes.size())));

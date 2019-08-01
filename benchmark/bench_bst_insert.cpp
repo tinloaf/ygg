@@ -10,9 +10,9 @@ struct BSTInsertOptions : public DefaultBenchmarkOptions
 	using NodeRandomizer = UseUniform;
 #ifdef PRESORT
 	constexpr static bool nodes_presort = true;
-	constexpr static double nodes_presort_fraction = 50;
+	constexpr static double nodes_presort_fraction = 0.5;
 	constexpr static bool fixed_presort = true;
-	constexpr static double fixed_presort_fraction = 50;
+	constexpr static double fixed_presort_fraction = 0.5;
 #endif
 };
 
