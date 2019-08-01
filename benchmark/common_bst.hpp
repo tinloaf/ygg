@@ -325,22 +325,28 @@ public:
 					int max = Options::ValueRandomizer::max;
 
 					if constexpr (Options::node_value_change_percentage > 0) {
-						double node_value_change =
+						double node_value_max_delta =
+						    (max - min) *
 						    static_cast<double>(Options::node_value_change_percentage) /
 						    100.0;
-						min = static_cast<int>(std::round(
-						    Interface::get_value(*this->experiment_node_pointers[i]) *
-						    (1 - node_value_change)));
-						if (std::numeric_limits<double>::max() / (1 + node_value_change) >
+
+						if (std::numeric_limits<int>::min() + node_value_max_delta / 2 <
 						    Interface::get_value(*this->experiment_node_pointers[i])) {
-							max = static_cast<int>(std::round(
-							    Interface::get_value(*this->experiment_node_pointers[i]) *
-							    (1 + node_value_change)));
+
+							min = static_cast<int>(std::round(
+							    Interface::get_value(*this->experiment_node_pointers[i]) -
+							    node_value_max_delta / 2));
+						} else {
+							min = std::numeric_limits<int>::min();
 						}
 
-						if (min > max) {
-							// Negative values
-							std::swap(min, max);
+						if (std::numeric_limits<int>::max() - node_value_max_delta / 2 >
+						    Interface::get_value(*this->experiment_node_pointers[i])) {
+							max = static_cast<int>(std::round(
+							    Interface::get_value(*this->experiment_node_pointers[i]) +
+							    node_value_max_delta / 2));
+						} else {
+							max = std::numeric_limits<int>::max();
 						}
 					}
 

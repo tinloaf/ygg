@@ -10,8 +10,7 @@ struct BSTMoveOptions : public DefaultBenchmarkOptions
 
 	constexpr static bool need_values = true;
 	using ValueRandomizer = UseUniform;
-	constexpr static size_t node_value_change_percentage =
-	    10; // TODO make this global
+	constexpr static size_t node_value_change_percentage = 5;
 	constexpr static bool need_node_pointers = true;
 	using NodePointerRandomizer = DYN_GENERATOR;
 
