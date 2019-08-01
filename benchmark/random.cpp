@@ -6,15 +6,16 @@
 Randomizer::Randomizer(unsigned long seed) : rng(seed) {}
 
 ZipfDistr::ZipfDistr(unsigned long seed, double s_in)
-    : Randomizer(seed), s(s_in), cdf_dist(0, 1), ghn_cache(),
-      inverse_ghn_cache()
+    : Randomizer(seed), s(s_in), cdf_dist(0, 1)
 {}
 
 double
 ZipfDistr::ghn(size_t n, double m)
 {
-	if (this->ghn_cache.find({n, m}) != this->ghn_cache.end()) {
-		return this->ghn_cache.find({n, m})->second;
+	static GhnCache c;
+
+	if (c.find({n, m}) != c.end()) {
+		return c.find({n, m})->second;
 	}
 
 	double val = 0;
@@ -22,7 +23,7 @@ ZipfDistr::ghn(size_t n, double m)
 		val += 1 / (std::pow(i, m));
 	}
 
-	this->ghn_cache[{n, m}] = val;
+	c[{n, m}] = val;
 
 	return val;
 }
@@ -30,15 +31,17 @@ ZipfDistr::ghn(size_t n, double m)
 size_t
 ZipfDistr::inverse_ghn_on_n(double ghn, double m)
 {
-	if (this->inverse_ghn_cache.find({ghn, m}) != this->inverse_ghn_cache.end()) {
-		return this->inverse_ghn_cache.find({ghn, m})->second;
+	static InverseGhnCache c;
+
+	if (c.find({ghn, m}) != c.end()) {
+		return c.find({ghn, m})->second;
 	}
 
 	double val = 0;
 	for (size_t i = 1;; i++) {
 		val += 1 / (std::pow(i, m));
 		if (val >= ghn) {
-			this->inverse_ghn_cache[{ghn, m}] = i;
+			c[{ghn, m}] = i;
 			return i;
 		}
 	}

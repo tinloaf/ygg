@@ -28,12 +28,11 @@ private:
 	double ghn(size_t n, double m);
 	size_t inverse_ghn_on_n(double ghn, double m);
 
-	std::unordered_map<std::pair<size_t, double>, double,
-	                   ygg::utilities::pair_hash>
-	    ghn_cache;
-	std::unordered_map<std::pair<double, double>, size_t,
-	                   ygg::utilities::pair_hash>
-	    inverse_ghn_cache;
+	using GhnCache = std::unordered_map<std::pair<size_t, double>, double,
+	                                    ygg::utilities::pair_hash>;
+
+	using InverseGhnCache = std::unordered_map<std::pair<double, double>, size_t,
+	                                           ygg::utilities::pair_hash>;
 };
 
 class MaekinenSkewedDistr : public Randomizer {
