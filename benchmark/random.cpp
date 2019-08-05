@@ -62,7 +62,9 @@ ZipfDistr::generate(int min, int max)
 	assert(max > min);
 	auto val = this->inverse_ghn_on_n(
 	    cdf * this->ghn(static_cast<size_t>((max - min)), this->s), this->s);
-	assert(val < static_cast<unsigned long>(max));
+	if (val >= static_cast<unsigned long>(max)) { // TODO This is hacky
+		val = static_cast<unsigned long>(max);
+	}
 
 	return static_cast<int>(val);
 }
