@@ -204,6 +204,32 @@ BENCHMARK_DEFINE_F(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 }
 REGISTER(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 
+// Super-Balance-focussed gamma, delta / single pass, avoiding conditionals
+using InsertYggWBSuperBalSPBSTFixture = BSTFixture<
+    YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions, WBBSTNamerSuperBalSP>,
+    InsertExperiment, BSTInsertOptions>;
+BENCHMARK_DEFINE_F(InsertYggWBSuperBalSPBSTFixture, BM_BST_Insertion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto & n : this->experiment_nodes) {
+			this->t.insert(n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto & n : this->experiment_nodes) {
+			this->t.remove(n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(InsertYggWBSuperBalSPBSTFixture, BM_BST_Insertion)
+
 // integral gamma, delta / single pass
 using InsertYggWB3G2DSPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>,

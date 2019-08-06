@@ -43,6 +43,10 @@ struct WBBSTNamerBalSP
 {
 	constexpr static const char * name = "2,3/2,SP(opt)";
 };
+struct WBBSTNamerSuperBalSP
+{
+	constexpr static const char * name = "3/2,5/4,SP(opt)";
+};
 struct WBBSTNamerBalSPArith
 {
 	constexpr static const char * name = "2,3/2,SP(opt),arith";
@@ -62,12 +66,15 @@ struct WBBSTNamer3G2DTP
 
 struct WBBSTNamerDefGDefDSPOPT
 {
-	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP,opt";
+	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP(opt)";
 };
 struct WBBSTNamer3G2DSPOPT
 {
-	constexpr static const char * name = "3,2,SP,opt";
+	constexpr static const char * name = "3,2,SP(opt)";
 };
+
+
+
 struct RBBSTNamerDefault
 {
 	constexpr static const char * name = "RBTree ";
@@ -909,6 +916,14 @@ using WBTSinglepassBalTreeOptions =
                      ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>>;
+
+using WBTSinglepassSuperBalTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
+                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<2>,
+                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<5>,
+                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<4>>;
+
 using WBTSinglepassBalArithTreeOptions =
     ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
                      ygg::TreeFlags::WBT_DELTA_NUMERATOR<2>,

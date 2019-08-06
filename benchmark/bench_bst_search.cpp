@@ -59,6 +59,144 @@ BENCHMARK_DEFINE_F(SearchYggRBBSTFixture, BM_BST_Search)
 REGISTER(SearchYggRBBSTFixture, BM_BST_Search)
 
 /*
+ * Ygg's weight-balanced tree, default parameters, two-pass
+ */
+using SearchYggWBDefTPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
+               SearchExperiment, BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggWBDefTPBSTFixture, BM_BST_Search)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		// TODO shuffling?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggWBDefTPBSTFixture, BM_BST_Search)
+
+/*
+ * Ygg's weight-balanced tree, default parameters, single-pass
+ */
+using SearchYggWBDefSPBSTFixture = BSTFixture<
+    YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
+    SearchExperiment, BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggWBDefSPBSTFixture, BM_BST_Search)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		// TODO shuffling?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggWBDefSPBSTFixture, BM_BST_Search)
+
+/*
+ * Ygg's weight-balanced tree, Lai / Wood
+ */
+using SearchYggWBLWSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerLWSP>,
+               SearchExperiment, BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggWBLWSPBSTFixture, BM_BST_Search)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		// TODO shuffling?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggWBLWSPBSTFixture, BM_BST_Search)
+
+/*
+ * Ygg's weight-balanced tree, Balanced
+ */
+using SearchYggWBBalSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerBalSP>,
+               SearchExperiment, BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggWBBalSPBSTFixture, BM_BST_Search)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		// TODO shuffling?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggWBBalSPBSTFixture, BM_BST_Search)
+
+/*
+ * Ygg's weight-balanced tree, Super-Balanced
+ */
+using SearchYggWBSuperBalSPBSTFixture = BSTFixture<
+    YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerSuperBalSP>,
+    SearchExperiment, BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggWBSuperBalSPBSTFixture, BM_BST_Search)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		// TODO shuffling?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggWBSuperBalSPBSTFixture, BM_BST_Search)
+
+/*
+ * Ygg's weight-balanced tree, Integral, SP
+ */
+using SearchYggWB32SPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamer3G2DSP>,
+               SearchExperiment, BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggWB32SPBSTFixture, BM_BST_Search)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		// TODO shuffling?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggWB32SPBSTFixture, BM_BST_Search)
+
+/*
  * Ygg's Zip Tree
  */
 using SearchYggZBSTFixture = BSTFixture<YggZTreeInterface<BasicTreeOptions>,

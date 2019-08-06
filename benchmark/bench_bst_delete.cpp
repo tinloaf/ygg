@@ -185,6 +185,84 @@ BENCHMARK_DEFINE_F(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
 }
 REGISTER(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
 
+// Lai / Wood
+using DeleteYggWBLWSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassLWTreeOptions, WBBSTNamerLWSP>,
+               DeleteExperiment, BSTDeleteOptions>;
+BENCHMARK_DEFINE_F(DeleteYggWBLWSPBSTFixture, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggWBLWSPBSTFixture, BM_BST_Deletion)
+
+// Balanced
+using DeleteYggWBBalSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassBalTreeOptions, WBBSTNamerBalSP>,
+               DeleteExperiment, BSTDeleteOptions>;
+BENCHMARK_DEFINE_F(DeleteYggWBBalSPBSTFixture, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggWBBalSPBSTFixture, BM_BST_Deletion)
+
+// Super-Balanced
+using DeleteYggWBSuperBalSPBSTFixture = BSTFixture<
+    YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions, WBBSTNamerSuperBalSP>,
+    DeleteExperiment, BSTDeleteOptions>;
+BENCHMARK_DEFINE_F(DeleteYggWBSuperBalSPBSTFixture, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggWBSuperBalSPBSTFixture, BM_BST_Deletion)
+
 /*
  * Ygg's Energy-Balanced Tree
  */

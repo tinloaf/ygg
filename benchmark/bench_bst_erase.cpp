@@ -181,6 +181,32 @@ BENCHMARK_DEFINE_F(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
 }
 REGISTER(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
 
+// Super-Balance-focussed Gamma, Delta / single pass
+using EraseYggWBSuperBalSPBSTFixture = BSTFixture<
+    YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions, WBBSTNamerSuperBalSP>,
+    EraseExperiment, BSTEraseOptions>;
+BENCHMARK_DEFINE_F(EraseYggWBSuperBalSPBSTFixture, BM_BST_Erasure)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.erase_optimistic(n->get_value());
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(EraseYggWBSuperBalSPBSTFixture, BM_BST_Erasure)
+
 // Balance-focussed Gamma, Delta / single pass, avoiding conditionals
 using EraseYggWBBalSPArithBSTFixture = BSTFixture<
     YggWBTreeInterface<WBTSinglepassBalArithTreeOptions, WBBSTNamerBalSPArith>,
@@ -260,7 +286,7 @@ BENCHMARK_DEFINE_F(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 }
 REGISTER(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 
-// integral gamma, delta / single pass
+// integral gamma, delta / single pass (optimistic)
 using EraseYggWB3G2DSPOPTBSTFixture = BSTFixture<
     YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSPOPT>,
     EraseExperiment, BSTEraseOptions>;

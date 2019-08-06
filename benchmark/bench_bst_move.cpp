@@ -244,6 +244,42 @@ BENCHMARK_DEFINE_F(MoveYggWBBalSPBSTFixture, BM_BST_Move)
 }
 REGISTER(MoveYggWBBalSPBSTFixture, BM_BST_Move)
 
+// Super-Balance-focussed gamma, delta / single pass
+using MoveYggWBSuperBalSPBSTFixture = BSTFixture<
+    YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions, WBBSTNamerSuperBalSP>,
+    MoveExperiment, BSTMoveOptions>;
+BENCHMARK_DEFINE_F(MoveYggWBSuperBalSPBSTFixture, BM_BST_Move)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
+			auto * n = this->experiment_node_pointers[i];
+			auto new_val = this->experiment_values[i];
+
+			this->t.remove(*n);
+			NodeInterface::set_value(*n, new_val);
+			this->t.insert(*n);
+		}
+		this->papi.stop();
+		state.PauseTiming();
+
+		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
+			auto * n = this->experiment_node_pointers[i];
+			auto old_val = this->fixed_values[i];
+
+			this->t.remove(*n);
+			NodeInterface::set_value(*n, old_val);
+			this->t.insert(*n);
+		}
+
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(MoveYggWBSuperBalSPBSTFixture, BM_BST_Move)
+
 // Balance-focussed gamma, delta / single pass, avoiding conditionals
 using MoveYggWBBalSPArithBSTFixture = BSTFixture<
     YggWBTreeInterface<WBTSinglepassBalArithTreeOptions, WBBSTNamerBalSPArith>,
