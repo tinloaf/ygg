@@ -23,65 +23,73 @@
 
 #ifdef USEZIPF
 #define DYN_GENERATOR UseZipf
+#define PREFIX "<ZIPF>"
 #else
 #ifdef USESKEWED
 #define DYN_GENERATOR UseSkewed
+#define PREFIX "<SKEWED>"
 #else
 #define DYN_GENERATOR UseUniform
+
+#ifdef PRESORT
+#define PREFIX "<PRESORT>"
+#else
+#define PREFIX "<UNI>"
+#endif
 #endif
 #endif
 
 struct WBBSTNamerDefGDefDTP
 {
-	constexpr static const char * name = "1+sqrt(2),sqrt(2),TP";
+	constexpr static const char * name = PREFIX "1+sqrt(2),sqrt(2),TP";
 };
 struct WBBSTNamerDefGDefDSP
 {
-	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP";
+	constexpr static const char * name = PREFIX "1+sqrt(2),sqrt(2),SP";
 };
 struct WBBSTNamerBalSP
 {
-	constexpr static const char * name = "2,3/2,SP(opt)";
+	constexpr static const char * name =PREFIX "2,3/2,SP(opt)";
 };
 struct WBBSTNamerSuperBalSP
 {
-	constexpr static const char * name = "3/2,5/4,SP(opt)";
+	constexpr static const char * name =PREFIX "3/2,5/4,SP(opt)";
 };
 struct WBBSTNamerBalSPArith
 {
-	constexpr static const char * name = "2,3/2,SP(opt),arith";
+	constexpr static const char * name =PREFIX "2,3/2,SP(opt),arith";
 };
 struct WBBSTNamerLWSP
 {
-	constexpr static const char * name = "3,4/3,SP(opt)";
+	constexpr static const char * name =PREFIX "3,4/3,SP(opt)";
 };
 struct WBBSTNamer3G2DSP
 {
-	constexpr static const char * name = "3,2,SP";
+	constexpr static const char * name =PREFIX "3,2,SP";
 };
 struct WBBSTNamer3G2DTP
 {
-	constexpr static const char * name = "3,2,TP";
+	constexpr static const char * name =PREFIX "3,2,TP";
 };
 
 struct WBBSTNamerDefGDefDSPOPT
 {
-	constexpr static const char * name = "1+sqrt(2),sqrt(2),SP(opt)";
+	constexpr static const char * name =PREFIX "1+sqrt(2),sqrt(2),SP(opt)";
 };
 struct WBBSTNamer3G2DSPOPT
 {
-	constexpr static const char * name = "3,2,SP(opt)";
+	constexpr static const char * name =PREFIX "3,2,SP(opt)";
 };
 
 
 
 struct RBBSTNamerDefault
 {
-	constexpr static const char * name = "RBTree ";
+	constexpr static const char * name = PREFIX "RBTree";
 };
 struct RBBSTNamerArith
 {
-	constexpr static const char * name = "RBTree[arith] ";
+	constexpr static const char * name = PREFIX "RBTree[arith]";
 };
 
 struct UseNone
