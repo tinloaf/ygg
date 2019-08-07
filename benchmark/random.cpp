@@ -3,7 +3,49 @@
 #include <cassert>
 #include <random>
 
-Randomizer::Randomizer(unsigned long seed) : rng(seed) {}
+Randomizer::Randomizer(unsigned long seed) : rng(seed), stored_seed(seed) {}
+
+unsigned long
+Randomizer::get_seed() const noexcept
+{
+	return this->stored_seed;
+}
+
+const char *
+ZipfDistr::get_name() const noexcept
+{
+	return "Zipf";
+}
+
+const char *
+UniformDistr::get_name() const noexcept
+{
+	return "Uniform";
+}
+
+const char *
+MaekinenSkewedDistr::get_name() const noexcept
+{
+	return "Skewed";
+}
+
+int
+ZipfDistr::get_default_max() const noexcept
+{
+	return 1000000; // TODO parameterize?
+}
+
+int
+UniformDistr::get_default_max() const noexcept
+{
+	return std::numeric_limits<int>::max();
+}
+
+int
+MaekinenSkewedDistr::get_default_max() const noexcept
+{
+	return std::numeric_limits<int>::max();
+}
 
 ZipfDistr::ZipfDistr(unsigned long seed, double s_in)
     : Randomizer(seed), s(s_in), cdf_dist(0, 1)

@@ -969,21 +969,21 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(Node * n1,
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
-bool
+Node *
 WBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
 {
 	auto el = this->find(c);
 	if (el != this->end()) {
 		this->remove(*el);
-		return true;
+		return &(*el);
 	} else {
-		return false;
+		return static_cast<Node *>(nullptr);
 	}
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
-void
+Node *
 WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
     const Comparable & c)
 {
@@ -1074,9 +1074,11 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 			// std::dec
 			// << "\n";
 			this->remove_onepass<false>(*cur);
-			return;
+			return cur;
 		}
 	}
+
+	// TODO check that this never happens? Throw? Or fix up?
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>

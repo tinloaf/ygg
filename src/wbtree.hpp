@@ -200,12 +200,15 @@ public:
 	 *
 	 * @param   c Anything comparable to a node. A node that compares equally will
 	 * be removed
+	 *
+	 * @return A pointer to the node that has been removed, or nullptr if no node
+	 * was removed.
 	 */
 	template <class Comparable>
-	bool erase(const Comparable & c);
+	Node * erase(const Comparable & c);
 	// TODO document
 	template <class Comparable>
-	void erase_optimistic(const Comparable & c);
+	Node * erase_optimistic(const Comparable & c);
 
 	/**
 	 * @brief Removes <node> from the tree

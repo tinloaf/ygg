@@ -1,4 +1,5 @@
 #include "../src/ygg.hpp"
+#include "random.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -10,9 +11,9 @@ template <class Tree, class Node>
 class TreeDepthAnalyzer {
 public:
 	TreeDepthAnalyzer(std::string name_in, size_t count_in, size_t move_count_in,
-	                  size_t seed_in, std::ofstream & os_in)
-	    : name(name_in), count(count_in), move_count(move_count_in),
-	      seed(seed_in), os(os_in){};
+	                  Randomizer * rnd_in, std::ofstream & os_in)
+	    : name(name_in), count(count_in), move_count(move_count_in), rnd(rnd_in),
+	      os(os_in){};
 
 	void
 	run()
@@ -46,8 +47,9 @@ public:
 		}
 		std::cout << "Vertices too Deep: \t" << deeper_than_balanced << std::endl;
 
-		this->os << this->name << "," << this->count << "," << this->move_count
-		         << "," << this->seed << ","
+		this->os << this->name << ","
+		         << "," << this->rnd->get_name() << "," << this->count << ","
+		         << this->move_count << "," << this->rnd->get_seed() << ","
 		         << this->path_lengths[this->path_lengths.size() / 2] << ","
 		         << (static_cast<double>(sum) / static_cast<double>(this->count))
 		         << "," << sum << ","
@@ -60,7 +62,7 @@ private:
 	std::string name;
 	size_t count;
 	size_t move_count;
-	size_t seed;
+	Randomizer * rnd;
 	std::ofstream & os;
 
 	Tree t;
@@ -84,16 +86,17 @@ private:
 	void
 	create_nodes()
 	{
-		std::mt19937 rnd(this->seed);
-		std::uniform_int_distribution<size_t> distr(
-		    0, std::numeric_limits<size_t>::max());
+		// TODO why distinct?
+		std::mt19937 rng(this->rnd->get_seed());
 
 		this->nodes.resize(this->count);
 		std::set<size_t> values_seen;
 		for (unsigned int i = 0; i < this->count; ++i) {
-			size_t val = distr(rnd);
+			size_t val = static_cast<size_t>(
+			    this->rnd->generate(0, this->rnd->get_default_max()));
 			while (values_seen.find(val) != values_seen.end()) {
-				val = distr(rnd);
+				val = static_cast<size_t>(
+				    this->rnd->generate(0, this->rnd->get_default_max()));
 			}
 			values_seen.insert(val);
 
@@ -103,14 +106,16 @@ private:
 
 		std::vector<size_t> move_indices(this->count);
 		std::iota(move_indices.begin(), move_indices.end(), 0);
-		std::shuffle(move_indices.begin(), move_indices.end(), rnd);
+		std::shuffle(move_indices.begin(), move_indices.end(), rng);
 
 		for (size_t i = 0; i < this->move_count; ++i) {
 			this->t.erase(this->nodes[move_indices[i]]); // TODO erase optimistic!
 
-			size_t val = distr(rnd);
+			size_t val = static_cast<size_t>(
+			    this->rnd->generate(0, this->rnd->get_default_max()));
 			while (values_seen.find(val) != values_seen.end()) {
-				val = distr(rnd);
+				val = static_cast<size_t>(
+				    this->rnd->generate(0, this->rnd->get_default_max()));
 			}
 			values_seen.insert(val);
 
@@ -168,12 +173,12 @@ using WBTSinglepassBalTreeOptions =
                      ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
                      ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>>;
 
-using WBTSinglepassMostBalTreeOptions =
+using WBTSinglepassSuperBalTreeOptions =
     ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::WBT_SINGLE_PASS,
                      ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
                      ygg::TreeFlags::WBT_DELTA_DENOMINATOR<2>,
-                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<1>,
-                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
+                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<5>,
+                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<4>>;
 
 class RBTreeNode : public ygg::RBTreeNodeBase<RBTreeNode, BasicTreeOptions> {
 public:
@@ -286,9 +291,9 @@ all_types()
 	        type_container<WBTree<WBTSinglepassBalTreeOptions>>{},
 	        type_container<WBTreeNode<WBTSinglepassBalTreeOptions>>{}),
 	    std::make_tuple(
-	        std::string("WBTree[SP|MostBal]"),
-	        type_container<WBTree<WBTSinglepassMostBalTreeOptions>>{},
-	        type_container<WBTreeNode<WBTSinglepassMostBalTreeOptions>>{})
+	        std::string("WBTree[SP|SuperBal]"),
+	        type_container<WBTree<WBTSinglepassSuperBalTreeOptions>>{},
+	        type_container<WBTreeNode<WBTSinglepassSuperBalTreeOptions>>{})
 
 	);
 }
@@ -322,9 +327,21 @@ template <std::size_t I = 0, typename... Tpl>
 
 	std::cout << "================== " << name << "\n";
 	for (size_t seed = seed_start; seed < seed_start + seed_count; ++seed) {
-		TreeDepthAnalyzer<TreeClass, NodeClass> tda(name, count, move_count, seed,
+		Randomizer * rnd = new UniformDistr(seed);
+		TreeDepthAnalyzer<TreeClass, NodeClass> tda(name, count, move_count, rnd,
 		                                            os);
 		tda.run();
+		delete rnd;
+		rnd = new ZipfDistr(seed, 1.0);
+		TreeDepthAnalyzer<TreeClass, NodeClass> tda_zipf(name, count, move_count,
+		                                                 rnd, os);
+		tda.run();
+		delete rnd;
+		rnd = new MaekinenSkewedDistr(seed, 3, 1000);
+		TreeDepthAnalyzer<TreeClass, NodeClass> tda_skewed(name, count, move_count,
+		                                                   rnd, os);
+		tda.run();
+		delete rnd;
 	}
 
 	do_analysis<I + 1, Tpl...>(tpl, count, move_count, seed_count, seed_start,

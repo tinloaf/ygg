@@ -842,7 +842,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
-bool
+Node *
 RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
     CMP_NOEXCEPT(c)
 {
@@ -855,10 +855,10 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
 	if (el != this->end()) {
 		this->remove_to_leaf(*el);
 		this->s.reduce(1);
-		return true;
+		return &(*el);
 	}
 
-	return false;
+	return static_cast<Node *>(nullptr);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
