@@ -86,19 +86,12 @@ private:
 	void
 	create_nodes()
 	{
-		// TODO why distinct?
 		std::mt19937 rng(this->rnd->get_seed());
 
 		this->nodes.resize(this->count);
-		std::set<size_t> values_seen;
 		for (unsigned int i = 0; i < this->count; ++i) {
 			size_t val = static_cast<size_t>(
 			    this->rnd->generate(0, this->rnd->get_default_max()));
-			while (values_seen.find(val) != values_seen.end()) {
-				val = static_cast<size_t>(
-				    this->rnd->generate(0, this->rnd->get_default_max()));
-			}
-			values_seen.insert(val);
 
 			this->nodes[i].val = val;
 			this->t.insert(this->nodes[i]);
@@ -109,18 +102,14 @@ private:
 		std::shuffle(move_indices.begin(), move_indices.end(), rng);
 
 		for (size_t i = 0; i < this->move_count; ++i) {
-			this->t.erase(this->nodes[move_indices[i]]); // TODO erase optimistic!
+			Node * erased_node =
+			    this->t.erase(this->nodes[move_indices[i]]); // TODO erase optimistic!
 
 			size_t val = static_cast<size_t>(
 			    this->rnd->generate(0, this->rnd->get_default_max()));
-			while (values_seen.find(val) != values_seen.end()) {
-				val = static_cast<size_t>(
-				    this->rnd->generate(0, this->rnd->get_default_max()));
-			}
-			values_seen.insert(val);
 
-			this->nodes[move_indices[i]].val = val;
-			this->t.insert(this->nodes[move_indices[i]]);
+			erased_node->val = val;
+			this->t.insert(*erased_node);
 		}
 	}
 };
@@ -327,21 +316,18 @@ template <std::size_t I = 0, typename... Tpl>
 
 	std::cout << "================== " << name << "\n";
 	for (size_t seed = seed_start; seed < seed_start + seed_count; ++seed) {
-		Randomizer * rnd = new UniformDistr(seed);
-		TreeDepthAnalyzer<TreeClass, NodeClass> tda(name, count, move_count, rnd,
-		                                            os);
+		UniformDistr u_rnd(seed);
+		TreeDepthAnalyzer<TreeClass, NodeClass> tda(
+		    name, count, move_count, dynamic_cast<Randomizer *>(&u_rnd), os);
 		tda.run();
-		delete rnd;
-		rnd = new ZipfDistr(seed, 1.0);
-		TreeDepthAnalyzer<TreeClass, NodeClass> tda_zipf(name, count, move_count,
-		                                                 rnd, os);
-		tda.run();
-		delete rnd;
-		rnd = new MaekinenSkewedDistr(seed, 3, 1000);
-		TreeDepthAnalyzer<TreeClass, NodeClass> tda_skewed(name, count, move_count,
-		                                                   rnd, os);
-		tda.run();
-		delete rnd;
+		ZipfDistr z_rnd(seed, 1.0);
+		TreeDepthAnalyzer<TreeClass, NodeClass> tda_zipf(
+		    name, count, move_count, dynamic_cast<Randomizer *>(&z_rnd), os);
+		tda_zipf.run();
+		MaekinenSkewedDistr s_rnd(seed, 3, 1000);
+		TreeDepthAnalyzer<TreeClass, NodeClass> tda_skewed(
+		    name, count, move_count, dynamic_cast<Randomizer *>(&s_rnd), os);
+		tda_skewed.run();
 	}
 
 	do_analysis<I + 1, Tpl...>(tpl, count, move_count, seed_count, seed_start,
