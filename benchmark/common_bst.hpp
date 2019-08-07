@@ -197,16 +197,21 @@ public:
 	}
 
 	BSTFixture() = default;
-
 	void
-	SetUp(const ::benchmark::State & state)
+	SetUp(const ::benchmark::State & state) {
+		size_t fixed_count = static_cast<size_t>(state.range(0));
+		size_t experiment_count = static_cast<size_t>(state.range(1));
+		int seed = static_cast<int>(state.range(2));
+
+		this->initialize(fixed_count, experiment_count, seed);
+	}
+	
+	void
+	initialize(size_t fixed_count, size_t experiment_count, int seed)
 	{
 		Interface::clear(this->t);
 		this->papi.initialize();
 
-		size_t fixed_count = static_cast<size_t>(state.range(0));
-		size_t experiment_count = static_cast<size_t>(state.range(1));
-		int seed = static_cast<int>(state.range(2));
 		this->rng = std::mt19937(static_cast<unsigned long>(seed));
 
 		auto main_rnd =
