@@ -10,15 +10,15 @@
 #include <iterator>
 #include <numeric>
 
+struct Result
+{
+	double p_value;
+	double cohens_d;
+};
+
 template <class InterfaceA, class InterfaceB, class Experiment, class Options>
 class PairedTester {
 public:
-	struct Result
-	{
-		double p_value;
-		double cohens_d;
-	};
-
 	template <class Executor>
 	Result
 	run(size_t iterations, size_t inner_iterations, size_t base_size,
@@ -51,8 +51,8 @@ public:
 		               [](auto & p) { return p.first - p.second; });
 
 		// Binomial Test
-		size_t A_better_count = std::count_if(deltas.begin(), deltas.end(),
-		                                      [](auto & d) { return d < 0; });
+		size_t A_better_count = static_cast<size_t>(std::count_if(
+		    deltas.begin(), deltas.end(), [](auto & d) { return d < 0; }));
 		double p_val = boost::math::pdf(
 		    boost::math::binomial_distribution<double>(deltas.size(), 0.5),
 		    A_better_count);

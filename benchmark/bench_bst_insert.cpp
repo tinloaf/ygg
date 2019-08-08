@@ -204,7 +204,7 @@ BENCHMARK_DEFINE_F(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 }
 REGISTER(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 
-// Super-Balance-focussed gamma, delta / single pass, avoiding conditionals
+// Super-Balance-focussed gamma, delta / single pass
 using InsertYggWBSuperBalSPBSTFixture = BSTFixture<
     YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions, WBBSTNamerSuperBalSP>,
     InsertExperiment, BSTInsertOptions>;
