@@ -47,9 +47,8 @@ public:
 		}
 		std::cout << "Vertices too Deep: \t" << deeper_than_balanced << std::endl;
 
-		this->os << this->name << ","
-		         << "," << this->rnd->get_name() << "," << this->count << ","
-		         << this->move_count << "," << this->rnd->get_seed() << ","
+		this->os << this->name << "," << this->rnd->get_name() << "," << this->count
+		         << "," << this->move_count << "," << this->rnd->get_seed() << ","
 		         << this->path_lengths[this->path_lengths.size() / 2] << ","
 		         << (static_cast<double>(sum) / static_cast<double>(this->count))
 		         << "," << sum << ","
@@ -350,7 +349,8 @@ main(int argc, const char ** argv)
 	std::ofstream os(file_name, std::ios::trunc);
 
 	// Write header
-	os << "name,size,move_count,seed,median_depth,average_depth,depth_sum,max_"
+	os << "name,randomizer,size,move_count,seed,median_depth,average_depth,depth_"
+	      "sum,max_"
 	      "depth\n";
 
 	for (size_t a = 0; a <= additions; ++a) {
