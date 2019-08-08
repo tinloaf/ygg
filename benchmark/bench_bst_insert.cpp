@@ -5,9 +5,9 @@
 
 struct BSTInsertOptions : public DefaultBenchmarkOptions
 {
-	using MainRandomizer = UseUniform;
+	using MainRandomizer = DYN_GENERATOR;
 	constexpr static bool need_nodes = true;
-	using NodeRandomizer = UseUniform;
+	using NodeRandomizer = DYN_GENERATOR;
 #ifdef PRESORT
 	constexpr static bool nodes_presort = true;
 	constexpr static double nodes_presort_fraction = 0.5;

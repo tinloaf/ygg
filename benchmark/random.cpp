@@ -138,8 +138,8 @@ MaekinenSkewedDistr::generate(int min, int max)
 		std::uniform_int_distribution<int> distr(min, max - 1);
 		return distr(this->rng);
 	} else {
-		size_t partition_size_absolute =
-		    static_cast<size_t>(std::round((max - min) * this->partition_size));
+		size_t partition_size_absolute = static_cast<size_t>(
+		    std::round(max * this->partition_size - min * this->partition_size));
 		size_t partition_no =
 		    static_cast<size_t>(this->counter / this->change_freq) %
 		    this->partition_count;

@@ -5,7 +5,7 @@
 
 struct BSTEraseOptions : public DefaultBenchmarkOptions
 {
-	using MainRandomizer = UseUniform;
+	using MainRandomizer = DYN_GENERATOR;
 	constexpr static bool need_node_pointers = true;
 	using NodePointerRandomizer = UseUniform;
 

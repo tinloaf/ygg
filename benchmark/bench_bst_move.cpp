@@ -6,13 +6,13 @@
 
 struct BSTMoveOptions : public DefaultBenchmarkOptions
 {
-	using MainRandomizer = UseUniform;
+	using MainRandomizer = DYN_GENERATOR;
 
 	constexpr static bool need_values = true;
 	using ValueRandomizer = UseUniform;
 	constexpr static size_t node_value_change_percentage = 5;
 	constexpr static bool need_node_pointers = true;
-	using NodePointerRandomizer = DYN_GENERATOR;
+	using NodePointerRandomizer = UseUniform;
 
 #ifdef PRESORT
 	constexpr static bool nodes_presort = true;
