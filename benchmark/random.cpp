@@ -1,6 +1,8 @@
 #include "random.hpp"
 
 #include <cassert>
+#include <cmath>
+#include <map>
 #include <random>
 
 Randomizer::Randomizer(unsigned long seed) : rng(seed), stored_seed(seed) {}
@@ -47,44 +49,103 @@ MaekinenSkewedDistr::get_default_max() const noexcept
 	return std::numeric_limits<int>::max();
 }
 
-ZipfDistr::ZipfDistr(unsigned long seed, double s_in)
-    : Randomizer(seed), s(s_in), cdf_dist(0, 1)
+ZipfDistr::ZipfSampler &
+ZipfDistr::get_sampler(int min, int max)
+{
+	static std::map<std::pair<size_t, double>, ZipfSampler> samplers;
+
+	std::pair<size_t, double> key{max - min, this->exponent};
+	if (samplers.find(key) == samplers.end()) {
+		samplers.insert(
+		    {key, ZipfSampler(this->exponent, static_cast<size_t>(max - min),
+		                      this->rng)});
+	}
+
+	return samplers.at(key);
+}
+
+ZipfDistr::ZipfDistr(unsigned long seed, double exponent_in)
+    : Randomizer(seed), exponent(exponent_in)
+{}
+
+ZipfDistr::ZipfSampler::ZipfSampler(double exponent_in,
+                                    size_t number_of_elements_in,
+                                    std::mt19937 & rng_in)
+    : exponent(exponent_in), number_of_elements(number_of_elements_in),
+      rng(rng_in), h_integral_x1(h_integral(1.5) - 1.0),
+      h_integral_number_of_elements(static_cast<double>(number_of_elements_in) +
+                                    0.5),
+      s(2.0 - h_integral_inverse(h_integral(2.5) - h(2.0)))
 {}
 
 double
-ZipfDistr::ghn(size_t n, double m)
+ZipfDistr::ZipfSampler::h_integral(double x) const noexcept
 {
-	static GhnCache c;
-
-	if (c.find({n, m}) != c.end()) {
-		return c.find({n, m})->second;
-	}
-
-	double val = 0;
-	for (size_t i = 1; i <= n; i++) {
-		val += 1 / (std::pow(i, m));
-	}
-
-	c[{n, m}] = val;
-
-	return val;
+	double log_x = std::log(x);
+	return this->helper2((1.0 - this->exponent) * log_x) * log_x;
 }
 
-size_t
-ZipfDistr::inverse_ghn_on_n(double ghn, double m)
+double
+ZipfDistr::ZipfSampler::h(double x) const noexcept
 {
-	static InverseGhnCache c;
+	return std::exp(-1 * this->exponent * std::log(x));
+}
 
-	if (c.find({ghn, m}) != c.end()) {
-		return c.find({ghn, m})->second;
+double
+ZipfDistr::ZipfSampler::h_integral_inverse(double x) const noexcept
+{
+	double t = x * (1.0 - this->exponent);
+	if (t < -1.0) { // Numerical issues
+		t = -1.0;
 	}
+	return std::exp(this->helper1(t) * x);
+}
 
-	double val = 0;
-	for (size_t i = 1;; i++) {
-		val += 1 / (std::pow(i, m));
-		if (val >= ghn) {
-			c[{ghn, m}] = i;
-			return i;
+double
+ZipfDistr::ZipfSampler::helper1(double x) const noexcept
+{
+	// Originial implementation uses a tailor expansion for small x
+	if (std::abs(x) > 1e-8) {
+		return std::log1p(x) / x;
+	} else {
+		return 1.0 - x * ((1.0 / 2.0) - x * ((1.0 / 3.0) - x * (1.0 / 4.0)));
+	}
+}
+
+double
+ZipfDistr::ZipfSampler::helper2(double x) const noexcept
+{
+	// Use tailor expansion for small x
+	if (std::abs(x) > 1e-8) {
+		return std::expm1(x) / x;
+	} else {
+		return 1.0 +
+		       x * (1.0 / 2.0) * (1.0 + x * (1.0 / 3.0) * (1.0 + x * (1.0 / 4.0)));
+	}
+}
+
+int
+ZipfDistr::ZipfSampler::generate()
+{
+	std::uniform_real_distribution<double> udistr(0.0, 1.0);
+	while (true) {
+		double u =
+		    this->h_integral_number_of_elements +
+		    udistr(this->rng) * (h_integral_x1 - h_integral_number_of_elements);
+		double x = h_integral_inverse(u);
+		int k = static_cast<int>(x + 0.5);
+
+		// Fix numerical inaccuracies
+		if (k < 1) {
+			k = 1;
+		} else if (static_cast<size_t>(k) > this->number_of_elements) {
+			k = static_cast<int>(
+			    this->number_of_elements); // TODO assert that they are not too many
+		}
+
+		// Accept k based on the right probabilities
+		if (k - x <= s || u >= h_integral(k + 0.5) - h(k)) {
+			return k;
 		}
 	}
 }
@@ -92,23 +153,8 @@ ZipfDistr::inverse_ghn_on_n(double ghn, double m)
 int
 ZipfDistr::generate(int min, int max)
 {
-	/* the CDF for a value of k is ghn(k,s) / ghn( (max - min),s). We draw
-	   uniformly at random from [0,1) and set that as the cumulative density:
-
-	      ghn(k,s) = cdf * ghn( (max-min), s)
-	   => k = inverse_ghn(cdf * ghn((max-min), s), s)
-
-*/
-	double cdf = this->cdf_dist(this->rng);
-
-	assert(max > min);
-	auto val = this->inverse_ghn_on_n(
-	    cdf * this->ghn(static_cast<size_t>((max - min)), this->s), this->s);
-	if (val >= static_cast<unsigned long>(max)) { // TODO This is hacky
-		val = static_cast<unsigned long>(max);
-	}
-
-	return static_cast<int>(val);
+	auto sampler = this->get_sampler(min, max);
+	return sampler.generate();
 }
 
 UniformDistr::UniformDistr(unsigned long seed) : Randomizer(seed) {}

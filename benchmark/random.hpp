@@ -21,9 +21,20 @@ protected:
 	const unsigned long stored_seed;
 };
 
+/*
+ * This is a C++ port of the rejection-based sampler of
+ * https://github.com/apache/commons-math/blob/138f84bfa5d36c8f6e2825640af1ed82daa9dc1d/src/main/java/org/apache/commons/math4/distribution/ZipfDistribution.java
+ *
+ * Which in term is an implementation of
+ *   Wolfgang Hörmann and Gerhard Derflinger
+ *   "Rejection-inversion to generate variates from monotone discrete
+ * distributions." ACM Transactions on Modeling and Computer Simulation
+ * (TOMACS) 6.3 (1996): 169-184.
+ */
+
 class ZipfDistr : public Randomizer {
 public:
-	ZipfDistr(unsigned long seed, double s);
+	ZipfDistr(unsigned long seed, double exponent);
 	virtual ~ZipfDistr() = default;
 
 	virtual int generate(int min, int max) override;
@@ -31,17 +42,35 @@ public:
 	virtual const char * get_name() const noexcept override;
 
 private:
-	double s;
-	std::uniform_real_distribution<double> cdf_dist;
-	// TODO cache values
-	double ghn(size_t n, double m);
-	size_t inverse_ghn_on_n(double ghn, double m);
+	class ZipfSampler {
+	public:
+		ZipfSampler(double exponent, size_t number_of_elements, std::mt19937 & rng);
 
-	using GhnCache = std::unordered_map<std::pair<size_t, double>, double,
-	                                    ygg::utilities::pair_hash>;
+		int generate();
 
-	using InverseGhnCache = std::unordered_map<std::pair<double, double>, size_t,
-	                                           ygg::utilities::pair_hash>;
+	private:
+		const double exponent;
+		const size_t number_of_elements;
+		std::mt19937 & rng;
+
+		/* Computed constants */
+		double h_integral_x1; // h_integral(1.5) - 1
+		double
+		    h_integral_number_of_elements; // h_integral(number_of_elements + 0.5)
+		double s; // 2 - h_integral_inverse(h_integal(2.5) - h(2))
+
+		double h(double x) const noexcept;
+		double h_integral(double x) const noexcept;
+		double h_integral_inverse(double x) const noexcept;
+
+		// log(1+x)/x
+		double helper1(double x) const noexcept;
+		// (exp(x)-1)/x
+		double helper2(double x) const noexcept;
+	};
+
+	ZipfSampler & get_sampler(int min, int max);
+	double exponent;
 };
 
 class MaekinenSkewedDistr : public Randomizer {
