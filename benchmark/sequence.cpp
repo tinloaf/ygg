@@ -114,6 +114,12 @@ private:
 			double elapsed_round = 0;
 			this->reader.reset();
 			Tree t;
+			size_t insert_count = 0;
+			size_t delete_count = 0;
+			size_t erase_count = 0;
+			size_t search_count = 0;
+			size_t bound_count = 0;
+
 			DepthAnalyzer<Tree, Node> da(t);
 
 			std::cerr << this->repetitions << " iterations remaining...\n";
@@ -146,24 +152,30 @@ private:
 					case BSS::Type::INSERT:
 						n.set_key(entry.key);
 						t.insert(n);
+						insert_count++;
 						break;
 					case BSS::Type::ERASE:
 						t.erase(entry.key);
+						erase_count++;
 						break;
 					case BSS::Type::DELETE:
 						t.remove(n);
+						delete_count++;
 						break;
 					case BSS::Type::SEARCH: {
 						auto it = t.find(entry.key);
 						asm volatile("" : : "r,m"(it) : "memory");
+						search_count++;
 					} break;
 					case BSS::Type::LBOUND: {
 						auto it = t.lower_bound(entry.key);
 						asm volatile("" : : "r,m"(it) : "memory");
+						bound_count++;
 					} break;
 					case BSS::Type::UBOUND: {
 						auto it = t.upper_bound(entry.key);
 						asm volatile("" : : "r,m"(it) : "memory");
+						bound_count++;
 					} break;
 					default:
 						break;
@@ -179,7 +191,9 @@ private:
 
 			if constexpr (depth_interval == 0) {
 				this->out << this->benchmark_name << "," << this->name << ","
-				          << this->repetitions << "," << elapsed_round << "\n";
+				          << this->repetitions << "," << elapsed_round << ","
+				          << insert_count << "," << erase_count << "," << delete_count
+				          << "," << search_count << "," << bound_count << "\n";
 			}
 
 			this->repetitions--;
@@ -285,7 +299,11 @@ main(int argc, char ** argv)
 	std::string output_depths = output_prefix + "_depths.csv";
 
 	std::ofstream out_timing(output_timing);
+	out_timing << "name,algorithm,iteration,elapsed,n_insert,n_erase,n_delete,n_"
+	              "search,n_bound\n";
+
 	std::ofstream out_depths(output_depths);
+	out_depths << "name,algorithm,iteration,opcount,average,median,maximum\n";
 
 	if (argc == 5) {
 		repetitions = static_cast<size_t>(std::atoi(argv[4]));
