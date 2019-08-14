@@ -902,3 +902,20 @@ TEST(__WBT_BASENAME(WBTreeTest), ComprehensiveMultipleTest)
 		ASSERT_EQ(&(*it), &(persistent_nodes[i]));
 	}
 }
+
+TEST(__WBT_BASENAME(WBTreeTest), TestRotationBug1)
+{
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+
+	Node nodes[3];
+
+	nodes[0] = Node(static_cast<int>(0));
+	nodes[1] = Node(static_cast<int>(1));
+	nodes[2] = Node(static_cast<int>(2));
+
+	tree.insert(nodes[1]);
+	tree.insert(nodes[0]);
+	tree.insert(nodes[2]);
+
+	tree.erase_optimistic(nodes[0]);
+}

@@ -44,6 +44,32 @@ using DEFAULT_FLAGS =
 
 } // namespace wbtree_onepass
 
+namespace wbtree_smalldelta {
+
+#undef __WBT_BASENAME
+#define __WBT_BASENAME(NAME) SD_##NAME
+#undef __WBT_NAMESPACE
+#define __WBT_NAMESPACE wbtree_smalldelta
+using MULTI_FLAGS = TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::MULTIPLE,
+                                TreeFlags::CONSTANT_TIME_SIZE,
+                                ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+                                ygg::TreeFlags::WBT_DELTA_DENOMINATOR<2>,
+                                ygg::TreeFlags::WBT_GAMMA_NUMERATOR<5>,
+                                ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<4>>;
+
+using DEFAULT_FLAGS =
+    TreeOptions<TreeFlags::WBT_SINGLE_PASS, TreeFlags::CONSTANT_TIME_SIZE,
+                ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+                ygg::TreeFlags::WBT_DELTA_DENOMINATOR<2>,
+                ygg::TreeFlags::WBT_GAMMA_NUMERATOR<5>,
+                ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<4>>;
+
+#undef WBTREE_SEED
+#define WBTREE_SEED 5
+#include "test_wbtree_base.hpp"
+
+} // namespace wbtree_smalldelta
+
 } // namespace testing
 } // namespace ygg
 

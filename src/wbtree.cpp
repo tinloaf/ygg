@@ -1012,7 +1012,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 				if (n_lr != nullptr) {
 					s_lr = n_lr->_wbt_size;
 				}
-				size_t s_ll = (s_l + 1) - s_lr; // s_l already has the -1
+				size_t s_ll = s_l - s_lr;
 
 				if (static_cast<typename Options::WBTGammaT>(s_lr) >
 				    static_cast<typename Options::WBTGammaT>(s_ll) *
@@ -1033,9 +1033,9 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 		} else if (this->cmp(c, *cur)) {
 			// descend left
 			cur->NB::_wbt_size -= 1;
-			Node * n_l = cur->NB::get_left(); // Since we're optimistic, we know
-			                                  // that n_l is not nullptr
-			size_t s_l = n_l->NB::_wbt_size - 1;
+			Node * n_l = cur->NB::get_left();    // Since we're optimistic, we know
+			                                     // that n_l is not nullptr
+			size_t s_l = n_l->NB::_wbt_size - 1; // -1 because we're deleting from it
 			size_t s_r = s_cur - s_l;
 			// Step 1: Check balance
 			if (static_cast<typename Options::WBTDeltaT>(s_l) * Options::wbt_delta() <
@@ -1049,7 +1049,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
 				if (n_rr != nullptr) {
 					s_rr += n_rr->_wbt_size;
 				}
-				size_t s_rl = (s_r + 1) - s_rr;
+				size_t s_rl = s_r - s_rr;
 
 				if (static_cast<typename Options::WBTGammaT>(s_rl) >
 				    Options::wbt_gamma() *
