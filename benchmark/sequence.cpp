@@ -388,23 +388,23 @@ main(int argc, char ** argv)
 	SequenceBenchmarker<TD32WBBuilder::Tree, TD32WBBuilder::Node, 500>
 	    td_32_wb_sb_d(argv[1], argv[2], "32TopDownWB", repetitions, out_depths);
 
-	using WBTSinglepassRelaxedTreeOptions =
+	using WBTSinglepassMostBalTreeOptions =
 	    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
 	                     ygg::TreeFlags::WBT_SINGLE_PASS,
-	                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<4>,
-	                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
-	                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<4>,
-	                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<3>>;
+	                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
+	                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<2>,
+	                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<5>,
+	                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<4>>;
 
 	using TDRelaxedWBBuilder =
-	    TreeBuilder<WBTSinglepassRelaxedTreeOptions, ygg::WBTreeNodeBase,
+	    TreeBuilder<WBTSinglepassMostBalTreeOptions, ygg::WBTreeNodeBase,
 	                ygg::WBTree, ygg::WBDefaultNodeTraits>;
 
 	SequenceBenchmarker<TDRelaxedWBBuilder::Tree, TDRelaxedWBBuilder::Node, 0>
-	    td_relaxed_wb_sb(argv[1], argv[2], "RelaxedTopDownWB", repetitions,
+	    td_relaxed_wb_sb(argv[1], argv[2], "MostBalTopDownWB", repetitions,
 	                     out_timing);
 	SequenceBenchmarker<TDRelaxedWBBuilder::Tree, TDRelaxedWBBuilder::Node, 500>
-	    td_relaxed_wb_sb_d(argv[1], argv[2], "RelaxedTopDownWB", repetitions,
+	    td_relaxed_wb_sb_d(argv[1], argv[2], "MostBalTopDownWB", repetitions,
 	                       out_depths);
 
 	return 0;
