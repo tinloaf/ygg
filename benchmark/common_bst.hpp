@@ -49,39 +49,37 @@ struct WBBSTNamerDefGDefDSP
 };
 struct WBBSTNamerBalSP
 {
-	constexpr static const char * name =PREFIX "2,3/2,SP(opt)";
+	constexpr static const char * name = PREFIX "2,3/2,SP(opt)";
 };
 struct WBBSTNamerSuperBalSP
 {
-	constexpr static const char * name =PREFIX "3/2,5/4,SP(opt)";
+	constexpr static const char * name = PREFIX "3/2,5/4,SP(opt)";
 };
 struct WBBSTNamerBalSPArith
 {
-	constexpr static const char * name =PREFIX "2,3/2,SP(opt),arith";
+	constexpr static const char * name = PREFIX "2,3/2,SP(opt),arith";
 };
 struct WBBSTNamerLWSP
 {
-	constexpr static const char * name =PREFIX "3,4/3,SP(opt)";
+	constexpr static const char * name = PREFIX "3,4/3,SP(opt)";
 };
 struct WBBSTNamer3G2DSP
 {
-	constexpr static const char * name =PREFIX "3,2,SP";
+	constexpr static const char * name = PREFIX "3,2,SP";
 };
 struct WBBSTNamer3G2DTP
 {
-	constexpr static const char * name =PREFIX "3,2,TP";
+	constexpr static const char * name = PREFIX "3,2,TP";
 };
 
 struct WBBSTNamerDefGDefDSPOPT
 {
-	constexpr static const char * name =PREFIX "1+sqrt(2),sqrt(2),SP(opt)";
+	constexpr static const char * name = PREFIX "1+sqrt(2),sqrt(2),SP(opt)";
 };
 struct WBBSTNamer3G2DSPOPT
 {
-	constexpr static const char * name =PREFIX "3,2,SP(opt)";
+	constexpr static const char * name = PREFIX "3,2,SP(opt)";
 };
-
-
 
 struct RBBSTNamerDefault
 {
@@ -162,12 +160,15 @@ presort(std::vector<T> & v, size_t shuffle_count, size_t seed,
 
 struct DefaultBenchmarkOptions
 {
-	constexpr static bool distinct = false;
+	constexpr static bool distinct = false; // sets everything to be distinct
+
 	constexpr static bool fixed_presort = false;
 	constexpr static bool values_from_fixed = false;
 	constexpr static bool need_nodes = false;
 	constexpr static bool nodes_presort = false;
 	constexpr static bool need_node_pointers = false;
+	constexpr static bool node_pointers_distinct = false;
+
 	constexpr static bool pointers_presort = false;
 	constexpr static bool need_values = false;
 	constexpr static bool values_presort = false;
@@ -198,14 +199,15 @@ public:
 
 	BSTFixture() = default;
 	void
-	SetUp(const ::benchmark::State & state) {
+	SetUp(const ::benchmark::State & state)
+	{
 		size_t fixed_count = static_cast<size_t>(state.range(0));
 		size_t experiment_count = static_cast<size_t>(state.range(1));
 		int seed = static_cast<int>(state.range(2));
 
 		this->initialize(fixed_count, experiment_count, seed);
 	}
-	
+
 	void
 	initialize(size_t fixed_count, size_t experiment_count, int seed)
 	{
@@ -303,7 +305,7 @@ public:
 				size_t rnd_index = static_cast<size_t>(
 				    rnd.generate(0, static_cast<int>(this->fixed_nodes.size())));
 				auto node_ptr = &this->fixed_nodes[rnd_index];
-				if (Options::distinct) {
+				if (Options::distinct || Options::node_pointers_distinct) {
 					while (seen_nodes.find(node_ptr) != seen_nodes.end()) {
 						rnd_index = static_cast<size_t>(
 						    rnd.generate(0, static_cast<int>(this->fixed_nodes.size())));
