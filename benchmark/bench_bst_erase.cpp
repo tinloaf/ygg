@@ -13,7 +13,7 @@ struct BSTEraseOptions : public DefaultBenchmarkOptions
 	constexpr static bool distinct = false; // Distinctness in values and the Zipf
 	                                        // generator don't work together
 	constexpr static bool node_pointers_distinct =
-	    false; // But we can only delete every node once.
+	    true; // But we can only delete every node once.
 
 #ifdef PRESORT
 	constexpr static bool fixed_presort = true;

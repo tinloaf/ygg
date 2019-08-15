@@ -298,23 +298,23 @@ public:
 
 		if constexpr (Options::need_node_pointers) {
 			auto rnd = Options::NodePointerRandomizer::create(rng());
-			std::unordered_set<typename Interface::Node *> seen_nodes;
+			std::unordered_set<size_t> seen_indices;
 			this->experiment_node_pointers.clear();
 
 			for (size_t i = 0; i < experiment_count; ++i) {
 				size_t rnd_index = static_cast<size_t>(
 				    rnd.generate(0, static_cast<int>(this->fixed_nodes.size())));
-				auto node_ptr = &this->fixed_nodes[rnd_index];
 				if (Options::distinct || Options::node_pointers_distinct) {
-					while (seen_nodes.find(node_ptr) != seen_nodes.end()) {
+					while (seen_indices.find(rnd_index) != seen_indices.end()) {
 						rnd_index = static_cast<size_t>(
 						    rnd.generate(0, static_cast<int>(this->fixed_nodes.size())));
 						assert(rnd_index < this->fixed_nodes.size());
-						node_ptr = &this->fixed_nodes[rnd_index];
 					}
-					seen_nodes.insert(node_ptr);
+
+					seen_indices.insert(rnd_index);
 				}
-				this->experiment_node_pointers.push_back(&this->fixed_nodes[rnd_index]);
+				auto node_ptr = &this->fixed_nodes[rnd_index];
+				this->experiment_node_pointers.push_back(node_ptr);
 			}
 
 			if constexpr (Options::pointers_presort) {
