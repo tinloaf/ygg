@@ -512,7 +512,7 @@ public:
 	 * be removed
 	 */
 	template <class Comparable>
-	void erase(const Comparable & c);
+	Node * erase(const Comparable & c);
 
 	// TODO add rank-shortened search
 

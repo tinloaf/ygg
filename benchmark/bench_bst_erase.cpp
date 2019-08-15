@@ -9,7 +9,9 @@ struct BSTEraseOptions : public DefaultBenchmarkOptions
 	constexpr static bool need_node_pointers = true;
 	using NodePointerRandomizer = UseUniform;
 
-	constexpr static bool distinct = true;
+	//	constexpr static bool distinct = true;
+	constexpr static bool distinct =
+	    false; // Distinctness and the Zipf generator don't work together
 
 #ifdef PRESORT
 	constexpr static bool fixed_presort = true;
@@ -27,17 +29,23 @@ using EraseYggRBBSTFixture = BSTFixture<YggRBTreeInterface<BasicTreeOptions>,
 BENCHMARK_DEFINE_F(EraseYggRBBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -55,17 +63,23 @@ using EraseYggRBBSTFixtureArith =
 BENCHMARK_DEFINE_F(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -84,17 +98,23 @@ using EraseYggWBDefGDefDTPBSTFixture =
 BENCHMARK_DEFINE_F(EraseYggWBDefGDefDTPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -110,17 +130,23 @@ using EraseYggWBDefGDefDSPBSTFixture = BSTFixture<
 BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -136,17 +162,23 @@ using EraseYggWBLWSPBSTFixture =
 BENCHMARK_DEFINE_F(EraseYggWBLWSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase_optimistic(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -162,17 +194,23 @@ using EraseYggWBBalSPBSTFixture =
 BENCHMARK_DEFINE_F(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase_optimistic(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -188,17 +226,23 @@ using EraseYggWBSuperBalSPBSTFixture = BSTFixture<
 BENCHMARK_DEFINE_F(EraseYggWBSuperBalSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase_optimistic(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -214,17 +258,23 @@ using EraseYggWBBalSPArithBSTFixture = BSTFixture<
 BENCHMARK_DEFINE_F(EraseYggWBBalSPArithBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase_optimistic(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -240,17 +290,23 @@ using EraseYggWBDefGDefDSPOPTBSTFixture = BSTFixture<
 BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPOPTBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase_optimistic(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -266,18 +322,23 @@ using EraseYggWB3G2DSPBSTFixture =
 BENCHMARK_DEFINE_F(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
-		(void)_;
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -293,17 +354,23 @@ using EraseYggWB3G2DSPOPTBSTFixture = BSTFixture<
 BENCHMARK_DEFINE_F(EraseYggWB3G2DSPOPTBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase_optimistic(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -319,17 +386,23 @@ using EraseYggWB3G2DTPBSTFixture =
 BENCHMARK_DEFINE_F(EraseYggWB3G2DTPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -348,17 +421,23 @@ UseUniform, UseNone, UseNone, UseUniform, false>;
 BENCHMARK_DEFINE_F(EraseYggEBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+  std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+      erased_nodes;
+  erased_nodes.reserve(this->experiment_node_pointers.size());
+
   for (auto _ : state) {
     this->papi.start();
     for (auto n : this->experiment_node_pointers) {
-      this->t.erase(n->get_value());
+      erased_nodes.push_back(this->t.erase(n->get_value()));
     }
     this->papi.stop();
 
     state.PauseTiming();
-    for (auto n : this->experiment_node_pointers) {
+    for (auto n : erased_nodes) {
+      //		for (auto n : this->experiment_node_pointers) {
       this->t.insert(*n);
     }
+    erased_nodes.clear();
     // TODO shuffling here?
     state.ResumeTiming();
   }
@@ -376,17 +455,23 @@ using EraseYggZBSTFixture = BSTFixture<YggZTreeInterface<BasicTreeOptions>,
 BENCHMARK_DEFINE_F(EraseYggZBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			this->t.erase(n->get_value());
+			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
 
 		state.PauseTiming();
-		for (auto n : this->experiment_node_pointers) {
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
+		erased_nodes.clear();
 		// TODO shuffling here?
 		state.ResumeTiming();
 	}
@@ -404,6 +489,7 @@ using EraseBISetBSTFixture =
 UseUniform, false>; BENCHMARK_DEFINE_F(EraseBISetBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
+TODO Rebuild for the new erased_node system
   for (auto _ : state) {
     this->papi.start();
     for (auto n : this->experiment_node_pointers) {

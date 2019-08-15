@@ -386,7 +386,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::remove(
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 template <class Comparable>
-void
+Node *
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::erase(
     const Comparable & c)
 {
@@ -399,7 +399,9 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::erase(
 	if (el != this->end()) {
 		this->s.reduce(1);
 		this->zip(*el);
+		return &(*el);
 	}
+	return static_cast<Node *>(nullptr);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
