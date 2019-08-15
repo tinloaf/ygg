@@ -1,5 +1,6 @@
 #include "../src/options.hpp"
 #include "../src/ygg.hpp"
+
 #include <algorithm>
 #include <random>
 
@@ -291,6 +292,10 @@ main(int argc, char ** argv)
 	    TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS,
 	    TreeFlags::WBT_DELTA_NUMERATOR<2>, TreeFlags::WBT_DELTA_DENOMINATOR<1>,
 	    TreeFlags::WBT_GAMMA_NUMERATOR<3>, TreeFlags::WBT_GAMMA_DENOMINATOR<2>>;
+	using SPMostBalOptions = TreeOptions<
+	    TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS,
+	    TreeFlags::WBT_DELTA_NUMERATOR<3>, TreeFlags::WBT_DELTA_DENOMINATOR<2>,
+	    TreeFlags::WBT_GAMMA_NUMERATOR<5>, TreeFlags::WBT_GAMMA_DENOMINATOR<4>>;
 	using SPLWOptions =
 	    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
 	                     ygg::TreeFlags::WBT_SINGLE_PASS,
@@ -331,6 +336,13 @@ main(int argc, char ** argv)
 
 		RotationCounter<SPBalOptions> rcBal("WBTree[2|3/2|SP]", node_count, opcount,
 		                                    outfile);
+		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
+			std::cout << "Seed: " << seed << "\n";
+			rcBal.run(static_cast<int>(seed));
+		}
+
+		RotationCounter<SPMostBalOptions> rcMostBal("WBTree[3/2|5/4|SP]",
+		                                            node_count, opcount, outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
 			rcBal.run(static_cast<int>(seed));
