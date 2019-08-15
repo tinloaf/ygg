@@ -345,7 +345,7 @@ main(int argc, char ** argv)
 		                                            node_count, opcount, outfile);
 		for (size_t seed = 42; seed < 42 + seed_count; ++seed) {
 			std::cout << "Seed: " << seed << "\n";
-			rcBal.run(static_cast<int>(seed));
+			rcMostBal.run(static_cast<int>(seed));
 		}
 
 		RotationCounter<SPLWOptions> rcLW("WBTree[3|4/3|SP]", node_count, opcount,
