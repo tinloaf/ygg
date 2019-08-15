@@ -57,36 +57,38 @@ REGISTER(EraseYggRBBSTFixture, BM_BST_Erasure)
 /*
  * Ygg's Red-Black Tree, avoiding conditional branches
  */
+/*
 using EraseYggRBBSTFixtureArith =
     BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
                EraseExperiment, BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
 (benchmark::State & state)
 {
-	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
-	    erased_nodes;
-	erased_nodes.reserve(this->experiment_node_pointers.size());
+  std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+      erased_nodes;
+  erased_nodes.reserve(this->experiment_node_pointers.size());
 
-	for (auto _ : state) {
-		this->papi.start();
-		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
-		}
-		this->papi.stop();
+  for (auto _ : state) {
+    this->papi.start();
+    for (auto n : this->experiment_node_pointers) {
+      erased_nodes.push_back(this->t.erase(n->get_value()));
+    }
+    this->papi.stop();
 
-		state.PauseTiming();
-		for (auto n : erased_nodes) {
-			//		for (auto n : this->experiment_node_pointers) {
-			this->t.insert(*n);
-		}
-		erased_nodes.clear();
-		// TODO shuffling here?
-		state.ResumeTiming();
-	}
+    state.PauseTiming();
+    for (auto n : erased_nodes) {
+      //		for (auto n : this->experiment_node_pointers) {
+      this->t.insert(*n);
+    }
+    erased_nodes.clear();
+    // TODO shuffling here?
+    state.ResumeTiming();
+  }
 
-	this->papi.report_and_reset(state);
+  this->papi.report_and_reset(state);
 }
 REGISTER(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
+*/
 
 /*
  * Ygg's Weight-Balanced Trees
@@ -105,7 +107,7 @@ BENCHMARK_DEFINE_F(EraseYggWBDefGDefDTPBSTFixture, BM_BST_Erasure)
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
+			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
 
@@ -137,7 +139,7 @@ BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPBSTFixture, BM_BST_Erasure)
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
+			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
 
@@ -169,7 +171,7 @@ BENCHMARK_DEFINE_F(EraseYggWBLWSPBSTFixture, BM_BST_Erasure)
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
+			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
 
@@ -201,7 +203,7 @@ BENCHMARK_DEFINE_F(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
+			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
 
@@ -233,7 +235,7 @@ BENCHMARK_DEFINE_F(EraseYggWBSuperBalSPBSTFixture, BM_BST_Erasure)
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
+			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
 
@@ -265,7 +267,7 @@ BENCHMARK_DEFINE_F(EraseYggWBBalSPArithBSTFixture, BM_BST_Erasure)
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
+			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
 
@@ -297,7 +299,7 @@ BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPOPTBSTFixture, BM_BST_Erasure)
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
+			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
 
@@ -329,7 +331,7 @@ BENCHMARK_DEFINE_F(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 	for (auto _ : state) {
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
+			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
 
@@ -347,38 +349,7 @@ BENCHMARK_DEFINE_F(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 }
 REGISTER(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 
-// integral gamma, delta / single pass (optimistic)
-using EraseYggWB3G2DSPOPTBSTFixture = BSTFixture<
-    YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSPOPT>,
-    EraseExperiment, BSTEraseOptions>;
-BENCHMARK_DEFINE_F(EraseYggWB3G2DSPOPTBSTFixture, BM_BST_Erasure)
-(benchmark::State & state)
-{
-	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
-	    erased_nodes;
-	erased_nodes.reserve(this->experiment_node_pointers.size());
-
-	for (auto _ : state) {
-		this->papi.start();
-		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
-		}
-		this->papi.stop();
-
-		state.PauseTiming();
-		for (auto n : erased_nodes) {
-			//		for (auto n : this->experiment_node_pointers) {
-			this->t.insert(*n);
-		}
-		erased_nodes.clear();
-		// TODO shuffling here?
-		state.ResumeTiming();
-	}
-
-	this->papi.report_and_reset(state);
-}
-REGISTER(EraseYggWB3G2DSPOPTBSTFixture, BM_BST_Erasure)
-
+/*
 // integral gamma, delta / twopass
 using EraseYggWB3G2DTPBSTFixture =
     BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions, WBBSTNamer3G2DTP>,
@@ -386,30 +357,31 @@ using EraseYggWB3G2DTPBSTFixture =
 BENCHMARK_DEFINE_F(EraseYggWB3G2DTPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
-	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
-	    erased_nodes;
-	erased_nodes.reserve(this->experiment_node_pointers.size());
+  std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+      erased_nodes;
+  erased_nodes.reserve(this->experiment_node_pointers.size());
 
-	for (auto _ : state) {
-		this->papi.start();
-		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
-		}
-		this->papi.stop();
+  for (auto _ : state) {
+    this->papi.start();
+    for (auto n : this->experiment_node_pointers) {
+      erased_nodes.push_back(this->t.erase(n->get_value()));
+    }
+    this->papi.stop();
 
-		state.PauseTiming();
-		for (auto n : erased_nodes) {
-			//		for (auto n : this->experiment_node_pointers) {
-			this->t.insert(*n);
-		}
-		erased_nodes.clear();
-		// TODO shuffling here?
-		state.ResumeTiming();
-	}
+    state.PauseTiming();
+    for (auto n : erased_nodes) {
+      //		for (auto n : this->experiment_node_pointers) {
+      this->t.insert(*n);
+    }
+    erased_nodes.clear();
+    // TODO shuffling here?
+    state.ResumeTiming();
+  }
 
-	this->papi.report_and_reset(state);
+  this->papi.report_and_reset(state);
 }
 REGISTER(EraseYggWB3G2DTPBSTFixture, BM_BST_Erasure)
+*/
 
 /*
  * Ygg's Energy-Balanced Tree
@@ -450,35 +422,37 @@ REGISTER(EraseYggEBSTFixture, BM_BST_Erasure);
 /*
  * Ygg's Zip Tree
  */
+/*
 using EraseYggZBSTFixture = BSTFixture<YggZTreeInterface<BasicTreeOptions>,
                                        EraseExperiment, BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggZBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
-	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
-	    erased_nodes;
-	erased_nodes.reserve(this->experiment_node_pointers.size());
+  std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+      erased_nodes;
+  erased_nodes.reserve(this->experiment_node_pointers.size());
 
-	for (auto _ : state) {
-		this->papi.start();
-		for (auto n : this->experiment_node_pointers) {
-			erased_nodes.push_back(this->t.erase(n->get_value()));
-		}
-		this->papi.stop();
+  for (auto _ : state) {
+    this->papi.start();
+    for (auto n : this->experiment_node_pointers) {
+      erased_nodes.push_back(this->t.erase(n->get_value()));
+    }
+    this->papi.stop();
 
-		state.PauseTiming();
-		for (auto n : erased_nodes) {
-			//		for (auto n : this->experiment_node_pointers) {
-			this->t.insert(*n);
-		}
-		erased_nodes.clear();
-		// TODO shuffling here?
-		state.ResumeTiming();
-	}
+    state.PauseTiming();
+    for (auto n : erased_nodes) {
+      //		for (auto n : this->experiment_node_pointers) {
+      this->t.insert(*n);
+    }
+    erased_nodes.clear();
+    // TODO shuffling here?
+    state.ResumeTiming();
+  }
 
-	this->papi.report_and_reset(state);
+  this->papi.report_and_reset(state);
 }
 REGISTER(EraseYggZBSTFixture, BM_BST_Erasure)
+*/
 
 /*
  * Boost::Intrusive::Set
