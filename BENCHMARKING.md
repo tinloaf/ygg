@@ -30,7 +30,13 @@ After building, there are several types of benchmarks available in the folder `/
 
 Timing Benchmarks
 -----------------
-The benchmarks to analyze the execution time of operations on the various binary search trees all start with `bench_bst_`. Equivalently, the binaries starting with `bench_dst_` benchmark operations on the dynamic segment tree. If the binary ends in `_papi`, it collects PAPI statistics instead of timing (see below). If the binary ends in `_zipf`, a Zipf distribution is used instead of a uniform distribution for experiment values.
+The benchmarks to analyze the execution time of operations on the various binary search trees all start with `bench_bst_`. Equivalently, the binaries starting with `bench_dst_` benchmark operations on the dynamic segment tree. If the binary ends in `_papi`, it collects PAPI statistics instead of timing (see below). 
+
+There are four different ways the keys for the benchmarked trees can be generated:
+	* A uniform distribution. This is the default.
+	* A Zipf distribution. This is the case in the binaries ending in `_zipf`.
+	* A skewed distribution as suggested by Mäkinen [1]. This is the case in the binaries ending in `_skewed`.
+	* A partially presorted set of keys. This is the case in the binaries ending in `_presorted`.
 
 The timing benchmarks output lines of this form:
 
@@ -74,3 +80,8 @@ CPU scaling interferes with time measurements. For best results, please run
 `cpufreq-set -g performance -c <Core-Nr>`
 
 for each of your CPU-Cores.
+
+
+References
+==========
+[1] Erkki Mäkinen. On top-down splaying. BIT Numerical Mathematics, 27(3):330–339, Sep 1987. doi:10.1007/BF01933728.
