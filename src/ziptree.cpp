@@ -9,6 +9,138 @@
 
 namespace ygg {
 
+namespace ztree_internal {
+// @cond INTERNAL
+
+template <class Tree>
+struct dbg_verify_size_helper<Tree, true>
+{
+	void
+	operator()(const Tree & t, size_t node_count)
+	{
+		assert(t.size() == node_count);
+		// Usage in assertion is not enough for GCC to realize that the variable is
+		// being used.
+		(void)t;
+		(void)node_count;
+	}
+};
+
+template <class Tree>
+struct dbg_verify_size_helper<Tree, false>
+{
+	void
+	operator()(const Tree & t, size_t node_count)
+	{
+		(void)t;
+		(void)node_count;
+	}
+};
+
+template <class Node, class Options>
+ZTreeRankGenerator<Node, Options, true, false>::ZTreeRankGenerator(){};
+
+template <class Node, class Options>
+void
+ZTreeRankGenerator<Node, Options, true, false>::update_rank(
+    Node & node) noexcept
+{
+	(void)node;
+}
+
+template <class Node, class Options>
+int
+ZTreeRankGenerator<Node, Options, true, false>::get_rank(
+    const Node & node) noexcept
+{
+	// TODO ffsl? ffs?
+	if constexpr (Options::ztree_universalize) {
+		// TODO this is not strictly a universal family
+		size_t universalized =
+		    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
+		    Options::ztree_universalize_modul;
+		return __builtin_ffsl(static_cast<long int>(universalized));
+	} else {
+		return __builtin_ffsl(static_cast<long int>(std::hash<Node>{}(node)));
+	}
+}
+
+template <class Node, class Options>
+ZTreeRankGenerator<Node, Options, true, true>::ZTreeRankGenerator(){};
+
+template <class Node, class Options>
+void
+ZTreeRankGenerator<Node, Options, true, true>::update_rank(Node & node) noexcept
+{
+	// TODO ffsl? ffs?
+	// TODO if constrexpr when switching to C++17
+	if (Options::ztree_universalize) {
+		// TODO this is not strictly a universal family
+		size_t universalized =
+		    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
+		    Options::ztree_universalize_modul;
+		node._zt_rank.rank = static_cast<decltype(node._zt_rank.rank)>(
+		    __builtin_ffsl(static_cast<long int>(universalized)));
+	} else {
+		node._zt_rank.rank = static_cast<decltype(node._zt_rank.rank)>(
+		    __builtin_ffsl(static_cast<long int>(std::hash<Node>{}(node))));
+	}
+}
+
+template <class Node, class Options>
+size_t
+ZTreeRankGenerator<Node, Options, true, true>::get_rank(
+    const Node & node) noexcept
+{
+	return static_cast<size_t>(node._zt_rank.rank);
+}
+
+template <class Node, class Options>
+ZTreeRankGenerator<Node, Options, false, true>::ZTreeRankGenerator()
+{
+	auto rand_val = std::rand();
+	this->rank = 0;
+	while (rand_val == RAND_MAX) {
+		this->rank = static_cast<decltype(this->rank)>(
+		    (this->rank + static_cast<decltype(this->rank)>(std::log2(RAND_MAX))));
+		rand_val = std::rand();
+	}
+	this->rank = static_cast<decltype(this->rank)>(
+	    __builtin_ffsl(static_cast<long int>(rand_val)));
+};
+
+template <class Node, class Options>
+template <class URBG>
+ZTreeRankGenerator<Node, Options, false, true>::ZTreeRankGenerator(URBG && g)
+{
+	auto rand_val = g();
+	this->rank = 0;
+	while (rand_val == g.max()) {
+		this->rank += static_cast<size_t>(std::log2(g.max()));
+		rand_val = g();
+	}
+	this->rank = __builtin_ffsl(static_cast<long int>(rand_val));
+}
+
+template <class Node, class Options>
+void
+ZTreeRankGenerator<Node, Options, false, true>::update_rank(
+    Node & node) noexcept
+{
+	(void)node;
+}
+
+template <class Node, class Options>
+size_t
+ZTreeRankGenerator<Node, Options, false, true>::get_rank(
+    const Node & node) noexcept
+{
+	return static_cast<size_t>(node._zt_rank.rank);
+}
+
+// @endcond
+} // namespace ztree_internal
+
 template <class Node, class Options, class Tag>
 size_t
 ZTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
@@ -33,7 +165,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::ZTree() noexcept
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::ZTree(
-    MyClass && other)
+    MyClass && other) noexcept
 {
 	this->root = other.root;
 	other.root = nullptr;
@@ -44,7 +176,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter> &
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::operator=(
-    MyClass && other)
+    MyClass && other) noexcept
 {
 	this->root = other.root;
 	other.root = nullptr;
@@ -157,6 +289,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 Node *
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::get_root() const
+    noexcept
 {
 	return this->root;
 }
@@ -371,8 +504,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 void
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::remove(
-    Node & n) noexcept
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::remove(Node & n)
+    CMP_NOEXCEPT(n)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_delete(reinterpret_cast<const void *>(&n),
@@ -388,7 +521,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 template <class Comparable>
 Node *
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::erase(
-    const Comparable & c)
+    const Comparable & c) CMP_NOEXCEPT(c)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_erase(reinterpret_cast<const void *>(&c),
@@ -712,7 +845,7 @@ template <class Comparable>
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template iterator<false>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::lower_bound(
-    const Comparable & query)
+    const Comparable & query) CMP_NOEXCEPT(query)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_lbound(reinterpret_cast<const void *>(&query),
@@ -788,7 +921,7 @@ template <class Comparable>
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<false>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::lower_bound(
-    const Comparable & query) const
+    const Comparable & query) const CMP_NOEXCEPT(query)
 {
 	return const_iterator<false>(
 	    const_cast<ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter> *>(
@@ -802,7 +935,7 @@ template <class Comparable>
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template iterator<false>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::find(
-    const Comparable & query)
+    const Comparable & query) CMP_NOEXCEPT(query)
 {
 #ifdef YGG_STORE_SEQUENCE
 	this->bss.register_search(reinterpret_cast<const void *>(&query),
@@ -834,7 +967,7 @@ template <class Comparable>
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<false>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::find(
-    const Comparable & query) const
+    const Comparable & query) const CMP_NOEXCEPT(query)
 {
 	return const_iterator<false>(const_cast<decltype(this)>(this)->find(query));
 }
@@ -843,6 +976,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 Node *
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::get_smallest() const
+    noexcept
 {
 	Node * smallest = this->root;
 	if (smallest == nullptr) {
@@ -860,6 +994,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 Node *
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::get_largest() const
+    noexcept
 {
 	Node * largest = this->root;
 	if (largest == nullptr) {
@@ -878,7 +1013,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<false>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::iterator_to(
-    const Node & node) const
+    const Node & node) const noexcept
 {
 	return const_iterator<false>(&node);
 }
@@ -888,7 +1023,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template iterator<false>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::iterator_to(
-    Node & node)
+    Node & node) noexcept
 {
 	return iterator<false>(&node);
 }
@@ -898,6 +1033,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<false>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::cbegin() const
+    noexcept
 {
 	Node * smallest = this->get_smallest();
 	if (smallest == nullptr) {
@@ -912,6 +1048,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<false>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::cend() const
+    noexcept
 {
 	return const_iterator<false>(nullptr);
 }
@@ -921,6 +1058,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<false>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::begin() const
+    noexcept
 {
 	return this->cbegin();
 }
@@ -929,7 +1067,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::begin()
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::begin() noexcept
 {
 	Node * smallest = this->get_smallest();
 	if (smallest == nullptr) {
@@ -943,7 +1081,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::end() const
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::end() const noexcept
 {
 	return this->cend();
 }
@@ -952,7 +1090,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::end()
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::end() noexcept
 {
 	return iterator<false>(nullptr);
 }
@@ -962,6 +1100,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<true>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::crbegin() const
+    noexcept
 {
 	Node * largest = this->get_largest();
 	if (largest == nullptr) {
@@ -976,6 +1115,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<true>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::crend() const
+    noexcept
 {
 	return const_iterator<true>(nullptr);
 }
@@ -985,6 +1125,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<true>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rbegin() const
+    noexcept
 {
 	return this->crbegin();
 }
@@ -994,6 +1135,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template const_iterator<true>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rend() const
+    noexcept
 {
 	return this->crend();
 }
@@ -1002,7 +1144,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template iterator<true>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rbegin()
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rbegin() noexcept
 {
 	Node * largest = this->get_largest();
 	if (largest == nullptr) {
@@ -1016,7 +1158,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 typename ZTree<Node, NodeTraits, Options, Tag, Compare,
                RankGetter>::template iterator<true>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rend()
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rend() noexcept
 {
 	return iterator<true>(nullptr);
 }
@@ -1025,6 +1167,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 size_t
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::size() const
+    noexcept
 {
 	return this->s.get();
 }
@@ -1033,6 +1176,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 bool
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::empty() const
+    noexcept
 {
 	return (this->root == nullptr);
 }
@@ -1040,7 +1184,7 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::empty() const
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 void
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::clear()
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::clear() noexcept
 {
 	this->root = nullptr;
 	this->s.set(0);
