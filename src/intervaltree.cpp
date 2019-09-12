@@ -452,7 +452,7 @@ template <class Comparable>
 const Node * IntervalTree<Node, NodeTraits, Options, Tag>::QueryResult<
     Comparable>::const_iterator::operator->() const
 {
-	return this->cur;
+	return this->n;
 }
 
 template <class Node, class NodeTraits, class Options, class Tag>
