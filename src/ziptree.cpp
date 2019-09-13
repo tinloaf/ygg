@@ -38,7 +38,8 @@ struct dbg_verify_size_helper<Tree, false>
 };
 
 template <class Node, class Options>
-ZTreeRankGenerator<Node, Options, true, false>::ZTreeRankGenerator(){};
+ZTreeRankGenerator<Node, Options, true, false>::ZTreeRankGenerator()
+{}
 
 template <class Node, class Options>
 void
@@ -66,7 +67,8 @@ ZTreeRankGenerator<Node, Options, true, false>::get_rank(
 }
 
 template <class Node, class Options>
-ZTreeRankGenerator<Node, Options, true, true>::ZTreeRankGenerator(){};
+ZTreeRankGenerator<Node, Options, true, true>::ZTreeRankGenerator()
+{}
 
 template <class Node, class Options>
 void
@@ -107,7 +109,7 @@ ZTreeRankGenerator<Node, Options, false, true>::ZTreeRankGenerator()
 	}
 	this->rank = static_cast<decltype(this->rank)>(
 	    __builtin_ffsl(static_cast<long int>(rand_val)));
-};
+}
 
 template <class Node, class Options>
 template <class URBG>
