@@ -53,9 +53,10 @@ public:
 		// Binomial Test
 		size_t A_better_count = static_cast<size_t>(std::count_if(
 		    deltas.begin(), deltas.end(), [](auto & d) { return d < 0; }));
-		double p_val = boost::math::pdf(
-		    boost::math::binomial_distribution<double>(deltas.size(), 0.5),
-		    A_better_count);
+		double p_val =
+		    boost::math::pdf(boost::math::binomial_distribution<double>(
+		                         static_cast<double>(deltas.size()), 0.5),
+		                     A_better_count);
 
 		// Cohen's D
 		double delta_mean = std::accumulate(deltas.begin(), deltas.end(), 0.0) /
@@ -79,8 +80,9 @@ public:
 		variance_a /= static_cast<double>(this->results.size() - 1);
 		variance_b /= static_cast<double>(this->results.size() - 1);
 		double pooled_stddev =
-		    std::sqrt(((this->results.size() - 1) * (variance_a + variance_b)) /
-		              (2 * this->results.size() - 2));
+		    std::sqrt((static_cast<double>(this->results.size() - 1) *
+		               (variance_a + variance_b)) /
+		              (2 * static_cast<double>(this->results.size()) - 2));
 		double cohen_d = delta_mean / pooled_stddev;
 
 		return {p_val, cohen_d};
@@ -137,12 +139,12 @@ int
 InitializeStreams()
 {
 	return 0;
-};
+}
 
 Benchmark::Benchmark(char const *) {}
 Benchmark::~Benchmark() {}
 
-}; // namespace internal
-}; // namespace benchmark
+} // namespace internal
+} // namespace benchmark
 
 #endif

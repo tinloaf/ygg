@@ -156,7 +156,7 @@ presort(std::vector<T> & v, size_t shuffle_count, size_t seed,
 		v[indices[i - 1]] = std::move(v[indices[i]]);
 	}
 	v[indices[shuffle_count - 1]] = std::move(first_element);
-};
+}
 
 struct DefaultBenchmarkOptions
 {
@@ -239,7 +239,8 @@ public:
 
 		if constexpr (Options::fixed_presort) {
 			size_t presort_count = static_cast<size_t>(std::floor(
-			    this->fixed_values.size() * Options::fixed_presort_fraction));
+			    static_cast<double>(static_cast<double>(this->fixed_values.size()) *
+			                        Options::fixed_presort_fraction)));
 			presort(this->fixed_values, presort_count, this->rng());
 		}
 
@@ -286,8 +287,9 @@ public:
 				this->experiment_nodes.push_back(Interface::create_node(val));
 			}
 			if constexpr (Options::nodes_presort) {
-				size_t presort_count = static_cast<size_t>(std::floor(
-				    this->experiment_nodes.size() * Options::nodes_presort_fraction));
+				size_t presort_count = static_cast<size_t>(
+				    std::floor(static_cast<double>(this->experiment_nodes.size()) *
+				               Options::nodes_presort_fraction));
 				presort(this->experiment_nodes, presort_count, this->rng(),
 				        [](const typename Interface::Node & lhs,
 				           const typename Interface::Node & rhs) {
@@ -318,9 +320,9 @@ public:
 			}
 
 			if constexpr (Options::pointers_presort) {
-				size_t presort_count = static_cast<size_t>(
-				    std::floor(this->experiment_node_pointers.size() *
-				               Options::pointers_presort_fraction));
+				size_t presort_count = static_cast<size_t>(std::floor(
+				    static_cast<double>(this->experiment_node_pointers.size()) *
+				    Options::pointers_presort_fraction));
 				presort(this->experiment_node_pointers, presort_count, this->rng(),
 				        [](const typename Interface::Node * lhs,
 				           const typename Interface::Node * rhs) {

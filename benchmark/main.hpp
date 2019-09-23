@@ -37,8 +37,9 @@ BuildRange(::benchmark::internal::Benchmark * b)
 		for (size_t doubling = 0; doubling < CFG.doublings; ++doubling) {
 			if (CFG.use_relative_size) {
 				b->Args({CFG.base_size << doubling,
-				         static_cast<int64_t>(std::round((CFG.base_size << doubling) *
-				                                         CFG.relative_experiment_size)),
+				         static_cast<int64_t>(
+				             std::round(static_cast<double>(CFG.base_size << doubling) *
+				                        CFG.relative_experiment_size)),
 				         seed});
 			} else {
 				b->Args({CFG.base_size << doubling, CFG.experiment_size, seed});
@@ -119,7 +120,7 @@ main(int argc, char ** argv)
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--relative_experiment_size",
 		                   strlen("--relative_experiment_size")) == 0) {
-			CFG.relative_experiment_size = static_cast<double>(atof(argv[i + 1]));
+			CFG.relative_experiment_size = atof(argv[i + 1]);
 			i += 1;
 			remaining_argc -= 2;
 			CFG.use_relative_size = true;

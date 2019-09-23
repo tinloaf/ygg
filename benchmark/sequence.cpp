@@ -46,7 +46,8 @@ public:
 			         this->path_lengths[(this->node_count / 2) - 1])) /
 			    2.0;
 		} else {
-			this->median_depth = this->path_lengths[(this->node_count - 1) / 2];
+			this->median_depth =
+			    static_cast<double>(this->path_lengths[(this->node_count - 1) / 2]);
 		}
 	}
 

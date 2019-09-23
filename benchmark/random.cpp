@@ -187,8 +187,7 @@ MaekinenSkewedDistr::generate(int min, int max)
 		size_t partition_size_absolute = static_cast<size_t>(
 		    std::round(max * this->partition_size - min * this->partition_size));
 		size_t partition_no =
-		    static_cast<size_t>(this->counter / this->change_freq) %
-		    this->partition_count;
+		    (this->counter / this->change_freq) % this->partition_count;
 		if (partition_no % 2 == 0) {
 			int left_boundary =
 			    static_cast<int>((1 + partition_no) * partition_size_absolute);
