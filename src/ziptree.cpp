@@ -161,7 +161,6 @@ ZTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::ZTree() noexcept
-    : root(nullptr), cmp()
 {}
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
@@ -197,9 +196,9 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
 #endif
 
 	// TODO set these only where necessary
-	node._zt_parent = nullptr;
-	node._zt_left = nullptr;
-	node._zt_right = nullptr;
+	node.NB::set_parent(nullptr);
+	node.NB::set_left(nullptr);
+	node.NB::set_right(nullptr);
 
 	// First, search for insertion position.
 	auto node_rank = RankGetter::get_rank(node);
@@ -229,13 +228,15 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
 			// Check if we must descend left
 
 			bool goes_after = this->cmp(*current, node);
-			if (!goes_after && __builtin_expect((current->_zt_left != nullptr), 1) &&
-			    (RankGetter::get_rank(*current->_zt_left) >= node_rank)) {
-				current = current->_zt_left;
+			if (!goes_after &&
+			    __builtin_expect((current->NB::get_left() != nullptr), 1) &&
+			    (RankGetter::get_rank(*current->NB::get_left()) >= node_rank)) {
+				current = current->NB::get_left();
 			} else if (goes_after &&
-			           __builtin_expect((current->_zt_right != nullptr), 1) &&
-			           (RankGetter::get_rank(*current->_zt_right) >= node_rank)) {
-				current = current->_zt_right;
+			           __builtin_expect((current->NB::get_right() != nullptr), 1) &&
+			           (RankGetter::get_rank(*current->NB::get_right()) >=
+			            node_rank)) {
+				current = current->NB::get_right();
 			} else {
 				// we're done!
 				break;
@@ -245,19 +246,19 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::insert(
 		// Place node below parent
 		Node * old_node = nullptr;
 
-		node._zt_parent = current;
+		node.NB::set_parent(current);
 		if (!this->cmp(*current, node)) {
 			// Place left
-			if (current->_zt_left != nullptr) {
-				old_node = current->_zt_left;
+			if (current->NB::get_left() != nullptr) {
+				old_node = current->NB::get_left();
 			}
-			current->_zt_left = &node;
+			current->NB::set_left(&node);
 		} else {
 			// Place right
-			if (current->_zt_right != nullptr) {
-				old_node = current->_zt_right;
+			if (current->NB::get_right() != nullptr) {
+				old_node = current->NB::get_right();
 			}
-			current->_zt_right = &node;
+			current->NB::set_right(&node);
 		}
 
 		if (old_node != nullptr) {
@@ -285,15 +286,6 @@ ZTree<Node, NodeTraits, Options, Tag, Compare,
 	for (unsigned int rank = 1; rank < rank_count.size(); ++rank) {
 		std::cout << "Rank " << rank << "\t: " << rank_count[rank] << std::endl;
 	}
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-Node *
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::get_root() const
-    noexcept
-{
-	return this->root;
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
@@ -355,12 +347,12 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 
 		// Start the right spine
 		traits.unzip_to_right(cur);
-		right_head->_zt_right = cur;
+		right_head->NB::set_right(cur);
 
-		cur->_zt_parent = right_head;
+		cur->NB::set_parent(right_head);
 		right_head = cur;
 
-		cur = cur->_zt_left;
+		cur = cur->NB::get_left();
 
 		while (cur != nullptr) {
 			//
@@ -372,22 +364,22 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 
 				// Right spine has been started, add to the left
 				traits.unzip_to_right(cur);
-				right_head->_zt_left = cur;
+				right_head->NB::set_left(cur);
 
-				cur->_zt_parent = right_head;
+				cur->NB::set_parent(right_head);
 				right_head = cur;
 
-				cur = cur->_zt_left;
+				cur = cur->NB::get_left();
 			} else {
 
 				// Start the left spine
 				traits.unzip_to_left(cur);
-				left_head->_zt_left = cur;
+				left_head->NB::set_left(cur);
 
-				cur->_zt_parent = left_head;
+				cur->NB::set_parent(left_head);
 				left_head = cur;
 
-				cur = cur->_zt_right;
+				cur = cur->NB::get_right();
 
 				while (cur != nullptr) {
 					//
@@ -397,22 +389,22 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 						// Add to the right spine
 
 						traits.unzip_to_right(cur);
-						right_head->_zt_left = cur;
+						right_head->NB::set_left(cur);
 
-						cur->_zt_parent = right_head;
+						cur->NB::set_parent(right_head);
 						right_head = cur;
 
-						cur = cur->_zt_left;
+						cur = cur->NB::get_left();
 					} else {
 						// Add to the left spine
 
 						traits.unzip_to_left(cur);
-						left_head->_zt_right = cur;
+						left_head->NB::set_right(cur);
 
-						cur->_zt_parent = left_head;
+						cur->NB::set_parent(left_head);
 						left_head = cur;
 
-						cur = cur->_zt_right;
+						cur = cur->NB::get_right();
 					}
 				}
 				break;
@@ -424,12 +416,12 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 
 		// Start the left spine
 		traits.unzip_to_left(cur);
-		left_head->_zt_left = cur;
+		left_head->NB::set_left(cur);
 
-		cur->_zt_parent = left_head;
+		cur->NB::set_parent(left_head);
 		left_head = cur;
 
-		cur = cur->_zt_right;
+		cur = cur->NB::get_right();
 
 		while (cur != nullptr) {
 			//
@@ -440,12 +432,12 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 
 				// Start the right spine
 				traits.unzip_to_right(cur);
-				right_head->_zt_right = cur;
+				right_head->NB::set_right(cur);
 
-				cur->_zt_parent = right_head;
+				cur->NB::set_parent(right_head);
 				right_head = cur;
 
-				cur = cur->_zt_left;
+				cur = cur->NB::get_left();
 
 				while (cur != nullptr) {
 					//
@@ -455,21 +447,21 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 						// Add to the right spine
 
 						traits.unzip_to_right(cur);
-						right_head->_zt_left = cur;
+						right_head->NB::set_left(cur);
 
-						cur->_zt_parent = right_head;
+						cur->NB::set_parent(right_head);
 						right_head = cur;
 
-						cur = cur->_zt_left;
+						cur = cur->NB::get_left();
 					} else {
 						// Add to the left spine
 						traits.unzip_to_left(cur);
-						left_head->_zt_right = cur;
+						left_head->NB::set_right(cur);
 
-						cur->_zt_parent = left_head;
+						cur->NB::set_parent(left_head);
 						left_head = cur;
 
-						cur = cur->_zt_right;
+						cur = cur->NB::get_right();
 					}
 				}
 				break;
@@ -477,27 +469,27 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::unzip(
 			} else {
 				// Add to the left spine
 				traits.unzip_to_left(cur);
-				left_head->_zt_right = cur;
+				left_head->NB::set_right(cur);
 
-				cur->_zt_parent = left_head;
+				cur->NB::set_parent(left_head);
 				left_head = cur;
 
-				cur = cur->_zt_right;
+				cur = cur->NB::get_right();
 			}
 		}
 	}
 
 	// End of the spines
 	if (left_head != &newn) {
-		left_head->_zt_right = nullptr;
+		left_head->NB::set_right(nullptr);
 	} else {
-		left_head->_zt_left = nullptr;
+		left_head->NB::set_left(nullptr);
 	}
 
 	if (right_head != &newn) {
-		right_head->_zt_left = nullptr;
+		right_head->NB::set_left(nullptr);
 	} else {
-		right_head->_zt_right = nullptr;
+		right_head->NB::set_right(nullptr);
 	}
 
 	traits.unzip_done(&newn, left_head, right_head);
@@ -547,11 +539,11 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 {
 	NodeTraits traits;
 
-	Node * left_head = old_root._zt_left;
-	Node * right_head = old_root._zt_right;
+	Node * left_head = old_root.NB::get_left();
+	Node * right_head = old_root.NB::get_right();
 	Node * new_head = nullptr;
 
-	Node * cur = old_root._zt_parent;
+	Node * cur = old_root.NB::get_parent();
 
 	bool last_from_left;
 
@@ -572,11 +564,11 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 			if (cur == nullptr) {
 				this->root = nullptr;
 			} else {
-				if (cur->_zt_left == &old_root) {
-					cur->_zt_left = nullptr;
+				if (cur->NB::get_left() == &old_root) {
+					cur->NB::set_left(nullptr);
 				} else {
-					assert(cur->_zt_right == &old_root);
-					cur->_zt_right = nullptr;
+					assert(cur->NB::get_right() == &old_root);
+					cur->NB::set_right(nullptr);
 				}
 			}
 			return;
@@ -591,18 +583,18 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 
 		if (cur == nullptr) {
 			this->root = left_head;
-			left_head->_zt_parent = nullptr;
+			left_head->NB::set_parent(nullptr);
 		} else {
-			if (cur->_zt_left == &old_root) {
-				cur->_zt_left = left_head;
+			if (cur->NB::get_left() == &old_root) {
+				cur->NB::set_left(left_head);
 			} else {
-				assert(cur->_zt_right == &old_root);
-				cur->_zt_right = left_head;
+				assert(cur->NB::get_right() == &old_root);
+				cur->NB::set_right(left_head);
 			}
-			left_head->_zt_parent = cur;
+			left_head->NB::set_parent(cur);
 		}
 		cur = left_head;
-		left_head = left_head->_zt_right;
+		left_head = left_head->NB::get_right();
 	} else {
 		traits.init_zipping(&old_root);
 
@@ -614,19 +606,19 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 
 		if (cur == nullptr) {
 			this->root = right_head;
-			right_head->_zt_parent = nullptr;
+			right_head->NB::set_parent(nullptr);
 		} else {
-			if (cur->_zt_left == &old_root) {
-				cur->_zt_left = right_head;
+			if (cur->NB::get_left() == &old_root) {
+				cur->NB::set_left(right_head);
 			} else {
-				assert(cur->_zt_right == &old_root);
-				cur->_zt_right = right_head;
+				assert(cur->NB::get_right() == &old_root);
+				cur->NB::get_right() = right_head;
 			}
 
-			right_head->_zt_parent = cur;
+			right_head->NB::set_parent(cur);
 		}
 		cur = right_head;
-		right_head = right_head->_zt_left;
+		right_head = right_head->NB::get_left();
 	}
 
 	// TODO this leads to a left-leaning behavior. Correct this?
@@ -640,12 +632,12 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 				// just pass on
 			} else {
 				// last was from the right, we can just use its left child.
-				cur->_zt_left = left_head;
-				left_head->_zt_parent = cur;
+				cur->NB::set_left(left_head);
+				left_head->NB::set_parent(cur);
 			}
 
 			cur = left_head;
-			left_head = left_head->_zt_right;
+			left_head = left_head->NB::get_right();
 			last_from_left = true;
 		} else {
 			// use right
@@ -655,11 +647,11 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 				// just pass on
 			} else {
 				// last was from the left, we can just use its right child.
-				cur->_zt_right = right_head;
-				right_head->_zt_parent = cur;
+				cur->NB::set_right(right_head);
+				right_head->NB::set_parent(cur);
 			}
 			cur = right_head;
-			right_head = right_head->_zt_left;
+			right_head = right_head->NB::get_left();
 			last_from_left = false;
 		}
 	}
@@ -670,8 +662,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 		// Right head is nullptr, re-hang left tree
 		if (!last_from_left) {
 			traits.before_zip_tree_from_left(left_head);
-			cur->_zt_left = left_head;
-			left_head->_zt_parent = cur;
+			cur->NB::set_left(left_head);
+			left_head->NB::set_parent(cur);
 			cur = left_head;
 		} else {
 			traits.zipping_ended_left_without_tree(cur);
@@ -679,8 +671,8 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
 	} else if (right_head != nullptr) {
 		if (last_from_left) {
 			traits.before_zip_tree_from_right(right_head);
-			cur->_zt_right = right_head;
-			right_head->_zt_parent = cur;
+			cur->NB::set_right(right_head);
+			right_head->NB::set_parent(cur);
 			cur = right_head;
 		} else {
 			traits.zipping_ended_right_without_tree(cur);
@@ -743,13 +735,13 @@ ZTree<Node, NodeTraits, Options, Tag, Compare,
 		return;
 	}
 
-	if (sub_root->_zt_parent == nullptr) {
+	if (sub_root->NB::get_parent() == nullptr) {
 		assert(this->root == sub_root);
 	} else {
 		assert(this->root != sub_root);
 	}
 
-	assert(sub_root->_zt_parent != sub_root);
+	assert(sub_root->NB::get_parent() != sub_root);
 
 	if (lower_bound_node != nullptr) {
 		assert(this->cmp(*lower_bound_node, *sub_root));
@@ -758,23 +750,23 @@ ZTree<Node, NodeTraits, Options, Tag, Compare,
 		assert(!this->cmp(*upper_bound_node, *sub_root));
 	}
 
-	if (sub_root->_zt_right != nullptr) {
-		assert(RankGetter::get_rank(*sub_root->_zt_right) <=
+	if (sub_root->NB::get_right() != nullptr) {
+		assert(RankGetter::get_rank(*sub_root->NB::get_right()) <=
 		       RankGetter::get_rank(*sub_root));
-		assert(this->cmp(*sub_root, *sub_root->_zt_right));
-		assert(sub_root->_zt_right->_zt_parent == sub_root);
+		assert(this->cmp(*sub_root, *sub_root->NB::get_right()));
+		assert(sub_root->NB::get_right()->NB::get_parent() == sub_root);
 
-		this->dbg_verify_consistency(sub_root->_zt_right, sub_root,
+		this->dbg_verify_consistency(sub_root->NB::get_right(), sub_root,
 		                             upper_bound_node);
 	}
 
-	if (sub_root->_zt_left != nullptr) {
-		assert(RankGetter::get_rank(*sub_root->_zt_left) <=
+	if (sub_root->NB::get_left() != nullptr) {
+		assert(RankGetter::get_rank(*sub_root->NB::get_left()) <=
 		       RankGetter::get_rank(*sub_root));
-		assert(!this->cmp(*sub_root, *sub_root->_zt_left));
-		assert(sub_root->_zt_left->_zt_parent == sub_root);
+		assert(!this->cmp(*sub_root, *sub_root->NB::get_left()));
+		assert(sub_root->NB::get_left()->NB::get_parent() == sub_root);
 
-		this->dbg_verify_consistency(sub_root->_zt_left, lower_bound_node,
+		this->dbg_verify_consistency(sub_root->NB::get_left(), lower_bound_node,
 		                             sub_root);
 	}
 }
@@ -825,371 +817,20 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::output_node_base(
 	out << "  " << std::hex << node << std::dec << "[ label=\"" << node_label
 	    << "\"]\n";
 
-	if (node->NB::_zt_parent != nullptr) {
+	if (node->NB::get_parent() != nullptr) {
 		std::string label;
-		if (node->NB::_zt_parent->NB::_zt_left == node) {
+		if (node->NB::get_parent()->NB::get_left() == node) {
 			label = std::string("L");
 		} else {
 			label = std::string("R");
 		}
 
-		out << "  " << std::hex << node->NB::_zt_parent << std::dec << " -> "
+		out << "  " << std::hex << node->NB::get_parent() << std::dec << " -> "
 		    << std::hex << node << std::dec << "[ label=\"" << label << "\"]\n";
 	}
 
-	this->output_node_base(node->NB::_zt_left, out, name_getter);
-	this->output_node_base(node->NB::_zt_right, out, name_getter);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-template <class Comparable>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::lower_bound(
-    const Comparable & query) CMP_NOEXCEPT(query)
-{
-#ifdef YGG_STORE_SEQUENCE
-	this->bss.register_lbound(reinterpret_cast<const void *>(&query),
-	                          Options::SequenceInterface::get_key(query));
-#endif
-	Node * cur = this->root;
-	Node * last_left = nullptr;
-
-	while (cur != nullptr) {
-		if (this->cmp(*cur, query)) {
-			cur = cur->NB::_zt_right;
-		} else {
-			last_left = cur;
-			cur = cur->NB::_zt_left;
-		}
-	}
-
-	if (last_left != nullptr) {
-		return iterator<false>(last_left);
-	} else {
-		return this->end();
-	}
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-template <class Comparable>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::upper_bound(
-    const Comparable & query)
-{
-#ifdef YGG_STORE_SEQUENCE
-	this->bss.register_ubound(reinterpret_cast<const void *>(&query),
-	                          Options::SequenceInterface::get_key(query));
-#endif
-	Node * cur = this->root;
-	Node * last_left = nullptr;
-
-	while (cur != nullptr) {
-		if (this->cmp(query, *cur)) {
-			last_left = cur;
-			cur = cur->_zt_left;
-		} else {
-			cur = cur->_zt_right;
-		}
-	}
-
-	if (last_left != nullptr) {
-		return iterator<false>(last_left);
-	} else {
-		return this->end();
-	}
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-template <class Comparable>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::upper_bound(
-    const Comparable & query) const
-{
-	return const_iterator<false>(
-	    const_cast<ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter> *>(
-	        this)
-	        ->upper_bound(query));
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-template <class Comparable>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::lower_bound(
-    const Comparable & query) const CMP_NOEXCEPT(query)
-{
-	return const_iterator<false>(
-	    const_cast<ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter> *>(
-	        this)
-	        ->lower_bound(query));
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-template <class Comparable>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::find(
-    const Comparable & query) CMP_NOEXCEPT(query)
-{
-#ifdef YGG_STORE_SEQUENCE
-	this->bss.register_search(reinterpret_cast<const void *>(&query),
-	                          Options::SequenceInterface::get_key(query));
-#endif
-
-	Node * cur = this->root;
-	Node * last_left = nullptr;
-
-	while (cur != nullptr) {
-		if (this->cmp(*cur, query)) {
-			cur = cur->NB::_zt_right;
-		} else {
-			last_left = cur;
-			cur = cur->NB::_zt_left;
-		}
-	}
-
-	if ((last_left != nullptr) && (!this->cmp(query, *last_left))) {
-		return iterator<false>(last_left);
-	} else {
-		return this->end();
-	}
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-template <class Comparable>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::find(
-    const Comparable & query) const CMP_NOEXCEPT(query)
-{
-	return const_iterator<false>(const_cast<decltype(this)>(this)->find(query));
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-Node *
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::get_smallest() const
-    noexcept
-{
-	Node * smallest = this->root;
-	if (smallest == nullptr) {
-		return nullptr;
-	}
-
-	while (smallest->NB::_zt_left != nullptr) {
-		smallest = smallest->NB::_zt_left;
-	}
-
-	return smallest;
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-Node *
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::get_largest() const
-    noexcept
-{
-	Node * largest = this->root;
-	if (largest == nullptr) {
-		return nullptr;
-	}
-
-	while (largest->NB::_zt_right != nullptr) {
-		largest = largest->NB::_zt_right;
-	}
-
-	return largest;
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::iterator_to(
-    const Node & node) const noexcept
-{
-	return const_iterator<false>(&node);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::iterator_to(
-    Node & node) noexcept
-{
-	return iterator<false>(&node);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::cbegin() const
-    noexcept
-{
-	Node * smallest = this->get_smallest();
-	if (smallest == nullptr) {
-		return const_iterator<false>(nullptr);
-	}
-
-	return const_iterator<false>(smallest);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::cend() const
-    noexcept
-{
-	return const_iterator<false>(nullptr);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::begin() const
-    noexcept
-{
-	return this->cbegin();
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::begin() noexcept
-{
-	Node * smallest = this->get_smallest();
-	if (smallest == nullptr) {
-		return iterator<false>(nullptr);
-	}
-
-	return iterator<false>(smallest);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::end() const noexcept
-{
-	return this->cend();
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template iterator<false>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::end() noexcept
-{
-	return iterator<false>(nullptr);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<true>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::crbegin() const
-    noexcept
-{
-	Node * largest = this->get_largest();
-	if (largest == nullptr) {
-		return const_iterator<true>(nullptr);
-	}
-
-	return const_iterator<true>(largest);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<true>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::crend() const
-    noexcept
-{
-	return const_iterator<true>(nullptr);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<true>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rbegin() const
-    noexcept
-{
-	return this->crbegin();
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template const_iterator<true>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rend() const
-    noexcept
-{
-	return this->crend();
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template iterator<true>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rbegin() noexcept
-{
-	Node * largest = this->get_largest();
-	if (largest == nullptr) {
-		return iterator<true>(nullptr);
-	}
-
-	return iterator<true>(largest);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-typename ZTree<Node, NodeTraits, Options, Tag, Compare,
-               RankGetter>::template iterator<true>
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::rend() noexcept
-{
-	return iterator<true>(nullptr);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-size_t
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::size() const
-    noexcept
-{
-	return this->s.get();
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-bool
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::empty() const
-    noexcept
-{
-	return (this->root == nullptr);
-}
-
-template <class Node, class NodeTraits, class Options, class Tag, class Compare,
-          class RankGetter>
-void
-ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::clear() noexcept
-{
-	this->root = nullptr;
-	this->s.set(0);
+	this->output_node_base(node->NB::get_left(), out, name_getter);
+	this->output_node_base(node->NB::get_right(), out, name_getter);
 }
 
 } // namespace ygg

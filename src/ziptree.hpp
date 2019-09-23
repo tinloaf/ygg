@@ -5,6 +5,7 @@
 #include "size_holder.hpp"
 #include "tree_iterator.hpp"
 #include "util.hpp"
+#include "bst.hpp"
 
 #ifdef YGG_STORE_SEQUENCE
 #include "benchmark_sequence.hpp"
@@ -94,30 +95,8 @@ class ZTreeRankGenerator<Node, Options, false, false> {
  * be inserted into. See ZTree for details.
  */
 template <class Node, class Options, class Tag>
-class ZTreeNodeBase {
+class ZTreeNodeBase : public bst::BSTNodeBase<Node, Tag> {
 public:
-	Node * _zt_parent = nullptr;
-	Node * _zt_left = nullptr;
-	Node * _zt_right = nullptr;
-
-	Node *
-	get_parent() const noexcept
-	{
-		return this->_zt_parent;
-	}
-
-	Node *
-	get_left() const noexcept
-	{
-		return this->_zt_left;
-	}
-
-	Node *
-	get_right() const noexcept
-	{
-		return this->_zt_right;
-	}
-
 	// Debugging methods
 	size_t get_depth() const noexcept;
 
@@ -182,8 +161,6 @@ public:
 	// clang-format on
 };
 
-// TODO NodeTraits
-
 /**
  * @brief The Zip Tree
  *
@@ -214,7 +191,7 @@ template <
     class Tag = int, class Compare = ygg::utilities::flexible_less,
     class RankGetter = ztree_internal::ZTreeRankGenerator<
         Node, Options, Options::ztree_use_hash, Options::ztree_store_rank>>
-class ZTree {
+class ZTree : public bst::BinarySearchTree<Node, Options, Tag, Compare> {
 public:
 	using NB = ZTreeNodeBase<Node, Options, Tag>;
 	using MyClass = ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>;
@@ -247,90 +224,6 @@ public:
 	 */
 	MyClass & operator=(MyClass && other) noexcept;
 
-private:
-	// Class to tell the abstract search tree iterator how to handle
-	// our nodes
-	class NodeInterface {
-	public:
-		static Node *
-		get_parent(Node * n) noexcept
-		{
-			return n->NB::_zt_parent;
-		}
-		static Node *
-		get_left(Node * n) noexcept
-		{
-			return n->NB::_zt_left;
-		}
-		static Node *
-		get_right(Node * n) noexcept
-		{
-			return n->NB::_zt_right;
-		}
-
-		static const Node *
-		get_parent(const Node * n) noexcept
-		{
-			return n->NB::_zt_parent;
-		}
-		static const Node *
-		get_left(const Node * n) noexcept
-		{
-			return n->NB::_zt_left;
-		}
-		static const Node *
-		get_right(const Node * n) noexcept
-		{
-			return n->NB::_zt_right;
-		}
-	};
-
-public:
-	// forward, for friendship
-	template <bool reverse>
-	class const_iterator;
-
-	template <bool reverse>
-	class iterator : public internal::IteratorBase<iterator<reverse>, Node,
-	                                               NodeInterface, reverse> {
-	public:
-		using internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
-		                             reverse>::IteratorBase;
-		iterator(const iterator<reverse> & orig) noexcept
-		    : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
-		                             reverse>(orig.n){};
-		iterator<reverse> &
-		operator=(const iterator<reverse> & orig) noexcept = default;
-
-		iterator() noexcept
-		    : internal::IteratorBase<iterator<reverse>, Node, NodeInterface,
-		                             reverse>(){};
-
-	private:
-		friend class const_iterator<reverse>;
-	};
-
-	template <bool reverse>
-	class const_iterator
-	    : public internal::IteratorBase<const_iterator<reverse>, const Node,
-	                                    NodeInterface, reverse> {
-	public:
-		using internal::IteratorBase<const_iterator<reverse>, const Node,
-		                             NodeInterface, reverse>::IteratorBase;
-		const_iterator(const const_iterator<reverse> & orig) noexcept
-		    : internal::IteratorBase<const_iterator<reverse>, const Node,
-		                             NodeInterface, reverse>(orig.n){};
-		const_iterator(const iterator<reverse> & orig) noexcept
-		    : internal::IteratorBase<const_iterator<reverse>, const Node,
-		                             NodeInterface, reverse>(orig.n){};
-		const_iterator<reverse> &
-		operator=(const const_iterator<reverse> & orig) noexcept = default;
-
-		const_iterator() noexcept
-		    : internal::IteratorBase<const_iterator<reverse>, const Node,
-		                             NodeInterface, reverse>(){};
-	};
-
 	/**
 	 * @brief Inserts <node> into the tree
 	 *
@@ -347,56 +240,6 @@ public:
 	 */
 	void insert(Node & node) noexcept;
 	void insert(Node & node, Node & hint) noexcept;
-
-	/**
-	 * @brief Upper-bounds an element
-	 *
-	 * Returns an iterator to the smallest element to which <query> compares as
-	 * "less", i.e. the smallest element that is considered go strictly after
-	 * <query>.
-	 *
-	 * Note that <query> does not have to be a Node, but can be anything that can
-	 * be compared to a Node, i.e., for which
-	 *    Compare()(const Node &, const Comparable &)
-	 * and
-	 *    Compare()(const Comparable &, const Node &)
-	 * are defined and implemented. In the case of using the default
-	 * ygg::utilities::flexible_less as Compare, that means you have to implement
-	 * operator<() for both types.
-	 *
-	 * @param query An object comparable to Node that should be upper-bounded
-	 * @returns An iterator to the first element comparing "greater" to <query>,
-	 * or end() if no such element exists
-	 */
-	template <class Comparable>
-	const_iterator<false> upper_bound(const Comparable & query) const;
-	template <class Comparable>
-	iterator<false> upper_bound(const Comparable & query);
-
-	/**
-	 * @brief Lower-bounds an element
-	 *
-	 * Returns an iterator to the first element that is not less that <query>,
-	 * i.e., that does not have to go before <query>.
-	 *
-	 * Note that <query> does not have to be a Node, but can be anything that can
-	 * be compared to a Node, i.e., for which
-	 *    Compare()(const Node &, const Comparable &)
-	 * and
-	 *    Compare()(const Comparable &, const Node &)
-	 * are defined and implemented. In the case of using the default
-	 * ygg::utilities::flexible_less as Compare, that means you have to implement
-	 * operator<() for both types.
-	 *
-	 * @param query An object comparable to Node that should be lower-bounded
-	 * @returns An iterator to the first element comparing greater-or-equally to
-	 * <query>, or end() if no such element exists
-	 */
-	template <class Comparable>
-	const_iterator<false> lower_bound(const Comparable & query) const
-	    CMP_NOEXCEPT(query);
-	template <class Comparable>
-	iterator<false> lower_bound(const Comparable & query) CMP_NOEXCEPT(query);
 
 	/**
 	 * @brief Removes <node> from the tree
@@ -420,83 +263,6 @@ public:
 	template <class Comparable>
 	Node * erase(const Comparable & c) CMP_NOEXCEPT(c);
 
-	// TODO add rank-shortened search
-
-	/**
-	 * @brief Finds an element in the tree
-	 *
-	 * Returns an iterator to the first element that compares equally to <query>.
-	 * Note that <query> does not have to be a Node, but can be anything that can
-	 * be compared to a Node, i.e., for which
-	 *    Compare()(const Node &, const Comparable &)
-	 * and
-	 *    Compare()(const Comparable &, const Node &)
-	 * are defined and implemented. In the case of using the default
-	 * ygg::utilities::flexible_less as Compare, that means you have to implement
-	 * operator<() for both types.
-	 *
-	 * @param query An object comparing equally to the element that should be
-	 * found.
-	 * @returns An iterator to the first element comparing equally to <query>, or
-	 * end() if no such element exists
-	 */
-	template <class Comparable>
-	const_iterator<false> find(const Comparable & query) const
-	    CMP_NOEXCEPT(query);
-	template <class Comparable>
-	iterator<false> find(const Comparable & query) CMP_NOEXCEPT(query);
-
-	// Iteration
-	/**
-	 * Returns an iterator pointing to the smallest element in the tree.
-	 */
-	const_iterator<false> cbegin() const noexcept;
-	/**
-	 * Returns an iterator pointing after the largest element in the tree.
-	 */
-	const_iterator<false> cend() const noexcept;
-	/**
-	 * Returns an iterator pointing to the smallest element in the tree.
-	 */
-	const_iterator<false> begin() const noexcept;
-	iterator<false> begin() noexcept;
-
-	/**
-	 * Returns an iterator pointing after the largest element in the tree.
-	 */
-	const_iterator<false> end() const noexcept;
-	iterator<false> end() noexcept;
-
-	/**
-	 * Returns an reverse iterator pointing to the largest element in the tree.
-	 */
-	const_iterator<true> crbegin() const noexcept;
-	/**
-	 * Returns an reverse iterator pointing before the smallest element in the
-	 * tree.
-	 */
-	const_iterator<true> crend() const noexcept;
-	/**
-	 * Returns an reverse iterator pointing to the largest element in the tree.
-	 */
-	const_iterator<true> rbegin() const noexcept;
-	iterator<true> rbegin() noexcept;
-
-	/**
-	 * Returns an reverse iterator pointing before the smallest element in the
-	 * tree.
-	 */
-	const_iterator<true> rend() const noexcept;
-	iterator<true> rend() noexcept;
-
-	/**
-	 * Returns an iterator pointing to the entry held in node.
-	 *
-	 * @param node  The node the iterator should point to.
-	 */
-	const_iterator<false> iterator_to(const Node & node) const noexcept;
-	iterator<false> iterator_to(Node & node) noexcept;
-
 	// Debugging methods
 	void dbg_verify() const;
 	void dbg_print_rank_stats() const;
@@ -511,45 +277,9 @@ public:
 	 */
 	void dump_to_dot(const std::string & filename) const;
 
-	/**
-	 * Return the number of elements in the tree.
-	 *
-	 * This method runs in O(1).
-	 *
-	 * @warning This method is only available if CONSTANT_TIME_SIZE is set as
-	 * option!
-	 *
-	 * @return The number of elements in the tree.
-	 */
-	size_t size() const noexcept;
-
-	/**
-	 * @brief Returns whether the tree is empty
-	 *
-	 * This method runs in O(1).
-	 *
-	 * @return true if the tree is empty, false otherwise
-	 */
-	bool empty() const noexcept;
-
-	Node * get_root() const noexcept;
-
-	/**
-	 * @brief Removes all elements from the tree.
-	 *
-	 * Removes all elements from the tree.
-	 */
-	void clear() noexcept;
-
 private:
-	Node * root;
-	Compare cmp;
-
 	void unzip(Node & oldn, Node & newn) noexcept;
 	void zip(Node & old_root) noexcept;
-
-	Node * get_smallest() const noexcept;
-	Node * get_largest() const noexcept;
 
 	// Debugging methods
 	void dbg_verify_consistency(Node * sub_root, Node * lower_bound,
@@ -563,8 +293,6 @@ private:
 	template <class NodeNameGetter>
 	void output_node_base(const Node * node, std::ofstream & out,
 	                      NodeNameGetter name_getter) const;
-
-	SizeHolder<Options::constant_time_size> s;
 
 #ifdef YGG_STORE_SEQUENCE
 	typename ygg::utilities::template BenchmarkSequenceStorage<
