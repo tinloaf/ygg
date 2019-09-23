@@ -11,17 +11,18 @@ namespace ygg {
 
 template <class Node, class Tag, class Options>
 void
-WBTreeNodeBase<Node, Tag, Options>::swap_parent_with(Node * other)
+WBTreeNodeBase<Node, Tag, Options>::swap_parent_with(Node * other) noexcept
 {
 	std::swap(this->_bst_parent, other->_bst_parent);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-WBTree<Node, NodeTraits, Options, Tag, Compare>::WBTree()
+WBTree<Node, NodeTraits, Options, Tag, Compare>::WBTree() noexcept
 {}
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-WBTree<Node, NodeTraits, Options, Tag, Compare>::WBTree(MyClass && other)
+WBTree<Node, NodeTraits, Options, Tag, Compare>::WBTree(
+    MyClass && other) noexcept
 {
 	this->root = other.root;
 	other.root = nullptr;
@@ -32,7 +33,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool on_equality_prefer_left>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_onepass(
-    Node & node)
+    Node & node) CMP_NOEXCEPT(node)
 {
 	//	std::cout << "\n============= Inserting ============\n";
 
@@ -423,7 +424,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool on_equality_prefer_left>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
-    Node & node, Node * start)
+    Node & node, Node * start) CMP_NOEXCEPT(node)
 {
 	node.NB::set_right(nullptr);
 	node.NB::set_left(nullptr);
@@ -494,7 +495,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base_twopass(
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
+WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(
+    Node * parent) noexcept
 {
 	Node * right_child = parent->NB::get_right();
 
@@ -533,7 +535,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_left(Node * parent)
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
+WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(
+    Node * parent) noexcept
 {
 	// TODO adapt rotate_right to arithmetics
 	Node * left_child = parent->NB::get_left();
@@ -574,7 +577,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::rotate_right(Node * parent)
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
-    Node * node)
+    Node * node) CMP_NOEXCEPT(*node)
 {
 	if (node->NB::get_parent() == nullptr) {
 		return;
@@ -607,8 +610,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
-					// TODO FIXME this is quick&dirty - properly implement double
-					// rotation!
 					this->rotate_right(node->NB::get_right());
 					this->rotate_left(node);
 
@@ -644,8 +645,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 				        Options::wbt_gamma()) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
-					// TODO FIXME this is quick&dirty - properly implement double
-					// rotation!
 					this->rotate_left(node->NB::get_left());
 					this->rotate_right(node);
 
@@ -688,6 +687,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert_twopass(
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node)
+    CMP_NOEXCEPT(node)
 {
 	this->s.add(1);
 	if constexpr (Options::wbt_single_pass) {
@@ -700,7 +700,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node)
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_left_leaning(
-    Node & node)
+    Node & node) CMP_NOEXCEPT(node)
 {
 	this->s.add(1);
 	this->insert_leaf_base_twopass<true>(node, this->root);
@@ -709,7 +709,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_left_leaning(
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::insert_right_leaning(
-    Node & node)
+    Node & node) CMP_NOEXCEPT(node)
 {
 	this->s.add(1);
 	this->insert_leaf_base_twopass<false>(node, this->root);
@@ -834,7 +834,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::verify_integrity() const
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_nodes(Node * n1,
-                                                            Node * n2)
+                                                            Node * n2) noexcept
 {
 	if (n1->NB::get_parent() == n2) { // TODO this should never happen, since n2
 		                                // is always the descendant
@@ -875,8 +875,8 @@ Compare> void WBTree<Node, NodeTraits, Options, Tag, Compare>::replace_node(
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_neighbors(Node * parent,
-                                                                Node * child)
+WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_neighbors(
+    Node * parent, Node * child) noexcept
 {
 	// std::cout << "Swap neighbors!\n";
 	child->NB::set_parent(parent->NB::get_parent());
@@ -924,8 +924,8 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_neighbors(Node * parent,
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
-WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(Node * n1,
-                                                                      Node * n2)
+WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(
+    Node * n1, Node * n2) noexcept
 {
 	// std::cout << "Swap unrelated!\n";
 
@@ -971,6 +971,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
 Node *
 WBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
+    CMP_NOEXCEPT(c)
 {
 	auto el = this->find(c);
 	if (el != this->end()) {
@@ -985,7 +986,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
 Node *
 WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(
-    const Comparable & c)
+    const Comparable & c) CMP_NOEXCEPT(c)
 {
 	Node * cur = this->root;
 
@@ -1085,6 +1086,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool fix_upward>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
+    CMP_NOEXCEPT(node)
 {
 	/* Basic idea: perform fixup for the part below node as we go down. Then fix
 	 * upwards of node.
@@ -1154,7 +1156,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		}
 
 		// We descend to the left, as decided ealier.
-		// TODO FIXME decrement the size here or later during fixup?
 		cur = n_l;
 		s_cur = s_left;
 
@@ -1245,7 +1246,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		}
 
 		// We descend to the right, as decided ealier.
-		// TODO FIXME decrement the size here or later during fixup?
 		cur = n_r;
 		s_cur = s_right;
 
@@ -1311,6 +1311,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool call_fixup>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_leaf(Node * node)
+    CMP_NOEXCEPT(*node)
 {
 	Node * parent = node->NB::get_parent();
 	NodeTraits::delete_leaf(*node, *this);
@@ -1340,7 +1341,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool call_fixup>
 bool
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_swap_and_remove_right(
-    Node * node, Node * replacement)
+    Node * node, Node * replacement) CMP_NOEXCEPT(*node)
 {
 	// std::cout << " ----- SRR " << std::hex << node << " <> " << replacement
 	// << std::dec << "\n";
@@ -1388,7 +1389,7 @@ template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool call_fixup>
 bool
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_swap_and_remove_left(
-    Node * node, Node * replacement)
+    Node * node, Node * replacement) CMP_NOEXCEPT(*node)
 {
 	bool deleted_from_right;
 	Node * parent;
@@ -1434,6 +1435,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_swap_and_remove_left(
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
+    CMP_NOEXCEPT(node)
 {
 	Node * cur = &node;
 
@@ -1536,7 +1538,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
-    Node * parent, bool deleted_right)
+    Node * parent, bool deleted_right) CMP_NOEXCEPT(*parent)
 {
 	if (parent == nullptr) { // TODO can this happen?
 		return;
@@ -1586,8 +1588,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 					// the right-left subtree is heavy enough to just take it
 					// double rotation!
 
-					// TODO FIXME this is quick&dirty - properly implement double
-					// rotation!
 					this->rotate_right(node->NB::get_right());
 					this->rotate_left(node);
 
@@ -1625,8 +1625,6 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 				        Options::wbt_gamma()) {
 					// left-right subtree is large enough to only take that subtree -
 					// double rotation!
-					// TODO FIXME this is quick&dirty - properly implement double
-					// rotation!
 					this->rotate_left(node->NB::get_left());
 					this->rotate_right(node);
 
@@ -1657,6 +1655,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 WBTree<Node, NodeTraits, Options, Tag, Compare>::remove(Node & node)
+    CMP_NOEXCEPT(node)
 {
 	this->s.reduce(1);
 

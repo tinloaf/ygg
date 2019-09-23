@@ -415,6 +415,7 @@ public:
 	 *
 	 * @param   c Anything comparable to a node. A node that compares equally will
 	 * be removed
+	 * @return A pointer to the node that was removed, if any, otherwise nullptr.
 	 */
 	template <class Comparable>
 	Node * erase(const Comparable & c) CMP_NOEXCEPT(c);

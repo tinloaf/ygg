@@ -36,7 +36,7 @@ template <class Node, class Options = DefaultOptions, class Tag = int>
 class WBTreeNodeBase : public bst::BSTNodeBase<Node, Tag> {
 public:
 	// TODO namespacing!
-	void swap_parent_with(Node * other);
+	void swap_parent_with(Node * other) noexcept;
 	size_t _wbt_size;
 };
 
@@ -53,7 +53,7 @@ public:
 	// TODO document
 	template <class Node, class Tree>
 	static void
-	leaf_inserted(Node & node, Tree & t)
+	leaf_inserted(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -61,7 +61,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	rotated_left(Node & node, Tree & t)
+	rotated_left(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -69,7 +69,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	rotated_right(Node & node, Tree & t)
+	rotated_right(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -77,7 +77,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	delete_leaf(Node & node, Tree & t)
+	delete_leaf(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -85,7 +85,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	splice_out_left_knee(Node & node, Tree & t)
+	splice_out_left_knee(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -93,7 +93,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	splice_out_right_knee(Node & node, Tree & t)
+	splice_out_right_knee(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -101,7 +101,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	deleted_below(Node & node, Tree & t)
+	deleted_below(Node & node, Tree & t) noexcept
 	{
 		(void)node;
 		(void)t;
@@ -109,7 +109,7 @@ public:
 
 	template <class Node, class Tree>
 	static void
-	swapped(Node & old_ancestor, Node & old_descendant, Tree & t)
+	swapped(Node & old_ancestor, Node & old_descendant, Tree & t) noexcept
 	{
 		(void)old_ancestor;
 		(void)old_descendant;
@@ -151,7 +151,7 @@ public:
 	/**
 	 * @brief Create a new empty weight balanced tree.
 	 */
-	WBTree();
+	WBTree() noexcept;
 
 	/**
 	 * @brief Create a new weight balanced tree from a different weight balanced
@@ -162,7 +162,7 @@ public:
 	 *
 	 * @param other  The weight balanced tree that this one is constructed from
 	 */
-	WBTree(MyClass && other);
+	WBTree(MyClass && other) noexcept;
 
 	/*
 	 * Pull in classes from base tree
@@ -186,11 +186,11 @@ public:
 	 *
 	 * @param   Node  The node to be inserted.
 	 */
-	void insert(Node & node);
+	void insert(Node & node) CMP_NOEXCEPT(node);
 
 	// TODO document
-	void insert_left_leaning(Node & node);
-	void insert_right_leaning(Node & node);
+	void insert_left_leaning(Node & node) CMP_NOEXCEPT(node);
+	void insert_right_leaning(Node & node) CMP_NOEXCEPT(node);
 
 	// TODO STL removes *all* elements
 	/**
@@ -205,10 +205,10 @@ public:
 	 * was removed.
 	 */
 	template <class Comparable>
-	Node * erase(const Comparable & c);
+	Node * erase(const Comparable & c) CMP_NOEXCEPT(c);
 	// TODO document
 	template <class Comparable>
-	Node * erase_optimistic(const Comparable & c);
+	Node * erase_optimistic(const Comparable & c) CMP_NOEXCEPT(c);
 
 	/**
 	 * @brief Removes <node> from the tree
@@ -217,7 +217,7 @@ public:
 	 *
 	 * @param   Node  The node to be removed.
 	 */
-	void remove(Node & node);
+	void remove(Node & node) CMP_NOEXCEPT(node);
 
 	// Mainly debugging methods
 	/// @cond INTERNAL
@@ -233,31 +233,34 @@ public:
 
 protected:
 	template <bool fix_upward>
-	void remove_onepass(Node & node);
-	void remove_to_leaf(Node & node);
-	void fixup_after_delete(Node * parent, bool deleted_left);
+	void remove_onepass(Node & node) CMP_NOEXCEPT(node);
+	void remove_to_leaf(Node & node) CMP_NOEXCEPT(node);
+	void fixup_after_delete(Node * parent, bool deleted_left)
+	    CMP_NOEXCEPT(*parent);
 
 	template <bool call_fixup>
-	bool remove_swap_and_remove_left(Node * node, Node * replacement);
+	bool remove_swap_and_remove_left(Node * node, Node * replacement)
+	    CMP_NOEXCEPT(*node);
 	template <bool call_fixup>
-	bool remove_swap_and_remove_right(Node * node, Node * replacement);
+	bool remove_swap_and_remove_right(Node * node, Node * replacement)
+	    CMP_NOEXCEPT(*node);
 	template <bool call_fixup>
-	void remove_leaf(Node * node);
+	void remove_leaf(Node * node) CMP_NOEXCEPT(*node);
 
 	template <bool on_equality_prefer_left>
-	void insert_leaf_base_twopass(Node & node, Node * start);
-	void fixup_after_insert_twopass(Node * node);
+	void insert_leaf_base_twopass(Node & node, Node * start) CMP_NOEXCEPT(node);
+	void fixup_after_insert_twopass(Node * node) CMP_NOEXCEPT(*node);
 
 	template <bool on_equality_prefer_left>
-	void insert_leaf_onepass(Node & node);
+	void insert_leaf_onepass(Node & node) CMP_NOEXCEPT(node);
 
-	void rotate_left(Node * parent);
-	void rotate_right(Node * parent);
+	void rotate_left(Node * parent) noexcept;
+	void rotate_right(Node * parent) noexcept;
 
-	void swap_nodes(Node * n1, Node * n2);
-	void replace_node(Node * to_be_replaced, Node * replace_with);
-	void swap_unrelated_nodes(Node * n1, Node * n2);
-	void swap_neighbors(Node * parent, Node * child);
+	void swap_nodes(Node * n1, Node * n2) noexcept;
+	void replace_node(Node * to_be_replaced, Node * replace_with) noexcept;
+	void swap_unrelated_nodes(Node * n1, Node * n2) noexcept;
+	void swap_neighbors(Node * parent, Node * child) noexcept;
 
 	void verify_sizes() const;
 };
