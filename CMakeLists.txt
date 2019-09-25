@@ -16,10 +16,31 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 #===============================================
+#==== Set up clang-tidy, if available
+#===============================================
+if(DEFINED ENV{CLANG_TIDY})
+	set(CLANG_TIDY_EXE $ENV{CLANG_TIDY})
+else()
+	if(DEFINED ENV{TIDY})
+		find_program(
+			CLANG_TIDY_EXE
+			NAMES "clang-tidy"
+			DOC "Path to clang-tidy executable"
+			)
+	endif()
+endif()
+
+if(NOT CLANG_TIDY_EXE)
+  message(STATUS "clang-tidy not found.")
+else()
+  message(STATUS "using clang-tidy: ${CLANG_TIDY_EXE}")
+  set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_EXE} -checks=boost-*,bugprone-*,cert-*,cppcoreguidelines-*,misc-*,modernize-*,performance-*,portability-*,clang-analyzer-*,-clang-analyzer-alpha.*,-modernize-use-trailing-return-type)
+endif()
+
+#===============================================
 #==== Build type: Release
 #===============================================
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -ffast-math -march=native -flto")
-
 
 #===============================================
 #==== Build type: Debug
@@ -30,7 +51,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wuseless-cast -Wlogical-op -Wduplicated-branches -Wduplicated-cond")
   endif()
 endif()
-
 
 #===============================================
 #==== Build type: valgrind
