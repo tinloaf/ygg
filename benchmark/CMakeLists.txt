@@ -62,4 +62,7 @@ add_executable(wbtree_balance wbtree_balance.cpp)
 add_executable(count_rotations count_rotations.cpp)
 add_executable(translate_sequence translate_sequence.cpp)
 add_executable(sequence sequence.cpp)
+
 add_executable(paired paired.cpp random.cpp)
+add_dependencies(paired gbenchmark)
+target_link_libraries(paired Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
