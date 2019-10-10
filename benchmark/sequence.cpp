@@ -339,10 +339,10 @@ main(int argc, char ** argv)
 	using WBTSinglepassBalTreeOptions =
 	    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
 	                     ygg::TreeFlags::WBT_SINGLE_PASS,
-	                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<5>,
-	                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<2>,
-	                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<2>,
-	                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>;
+	                     ygg::TreeFlags::WBT_DELTA_NUMERATOR<2>,
+	                     ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
+	                     ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
+	                     ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>>;
 
 	using TDBalWBBuilder =
 	    TreeBuilder<WBTSinglepassBalTreeOptions, ygg::WBTreeNodeBase, ygg::WBTree,
