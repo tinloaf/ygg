@@ -76,7 +76,7 @@ main(int argc, char ** argv)
 	CFG.seed_start = 4;
 	CFG.seed_count = 2;
 
-	std::string filter_re = "";
+	std::vector<std::string> filters;
 
 	remaining_argv[0] = argv[0];
 	size_t j = 1;
@@ -109,8 +109,9 @@ main(int argc, char ** argv)
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--filter", strlen("--filter")) == 0) {
-			std::cout << "Setting filter: " << argv[i + 1] << "\n" << std::flush;
-			filter_re = std::string(argv[i + 1]);
+			std::cout << "Adding filter: " << argv[i + 1] << "\n" << std::flush;
+			auto filter_str = std::string(argv[i + 1]);
+			filters.push_back(filter_str);
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--experiment_size",
@@ -140,11 +141,14 @@ main(int argc, char ** argv)
 		auto name = plugin::get_name();
 
 		bool skip = false;
-		if (filter_re.compare("") != 0) {
-			std::regex re(filter_re, std::regex_constants::ECMAScript |
-			                             std::regex_constants::icase);
-			if (!std::regex_match(name, re)) {
-				skip = true;
+		if (!filters.empty()) {
+			skip = true;
+			for (const auto & filter_str : filters) {
+				std::regex re(filter_str, std::regex_constants::ECMAScript |
+				                              std::regex_constants::icase);
+				if (std::regex_match(name, re)) {
+					skip = false;
+				}
 			}
 		}
 
