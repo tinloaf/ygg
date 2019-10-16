@@ -57,7 +57,7 @@ The benchmark name contains the following information:
 	
 The two other colums list the wall time elapsed, the CPU time elapsed, and the number of times that the Google Benchmark framework executed the benchmark.
 
-Several parameters can be controlled via command-line switches:
+Several parameters can be controlled via command-line switches. The binaries accept all parameters usually acceptey by Google Benchmark [2] - see the respective documentation especially on how to control output format. Additional command-line parameters are:
 
 	* --base_size: The smallest size of the initially generated tree
 	* --doublings: The number of times the base_size is doubled. 
@@ -85,3 +85,4 @@ for each of your CPU-Cores.
 References
 ==========
 [1] Erkki Mäkinen. On top-down splaying. BIT Numerical Mathematics, 27(3):330–339, Sep 1987. doi:10.1007/BF01933728.
+[2] https://github.com/google/benchmark
