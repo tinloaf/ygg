@@ -7,8 +7,10 @@
  * Red-Black DST
  */
 using InsertRBDSTFixture =
-	DSTFixture<RBDSTInterface<BasicDSTTreeOptions>, InsertExperiment, true, false, false, false>;
-BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)(benchmark::State & state)
+    DSTFixture<RBDSTInterface<BasicDSTTreeOptions>, InsertExperiment, true,
+               false, false, false>;
+BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)
+(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();
@@ -33,8 +35,10 @@ REGISTER(InsertRBDSTFixture, BM_DST_Insertion)
  * Zip DST
  */
 using InsertZDSTFixture =
-	DSTFixture<ZDSTInterface<BasicDSTTreeOptions>, InsertExperiment, true, false, false, false>;
-BENCHMARK_DEFINE_F(InsertZDSTFixture, BM_DST_Insertion)(benchmark::State & state)
+    DSTFixture<ZDSTInterface<BasicDSTTreeOptions>, InsertExperiment, true,
+               false, false, false>;
+BENCHMARK_DEFINE_F(InsertZDSTFixture, BM_DST_Insertion)
+(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();

@@ -30,19 +30,19 @@ public:
 	using KeyT = KeyT_in;
 
 	static KeyT_in
-	get_key(const InnerNode & n)
+	get_key(const InnerNode & n) noexcept
 	{
 		return n.get_point();
 	}
 
 	static KeyT_in
-	get_key(KeyT_in query)
+	get_key(const KeyT_in query) noexcept
 	{
 		return query;
 	}
 
 	static KeyT_in
-	get_key(std::pair<KeyT_in, bool> query)
+	get_key(const std::pair<KeyT_in, bool> & query) noexcept
 	{
 		return std::get<0>(query);
 	}
@@ -74,12 +74,14 @@ class InnerWBTTag {
 /********************************************
  * Base Class Definitions for RBTree
  ********************************************/
+template <class... AdditionalOptions>
 struct UseRBTree
 {
 	template <class InnerNode, class KeyT>
 	using Options = TreeOptions<TreeFlags::MULTIPLE,
 	                            TreeFlags::BENCHMARK_SEQUENCE_INTERFACE<
-	                                InnerSequenceInterface<InnerNode, KeyT>>>;
+	                                InnerSequenceInterface<InnerNode, KeyT>>,
+	                            AdditionalOptions...>;
 
 	template <class Tag>
 	struct InnerNodeBaseBuilder
@@ -105,12 +107,14 @@ struct UseRBTree
 /********************************************
  * Base Class Definitions for WBTree
  ********************************************/
+template <class... AdditionalOptions>
 struct UseWBTree
 {
 	template <class InnerNode, class KeyT>
 	using Options = TreeOptions<TreeFlags::MULTIPLE, TreeFlags::WBT_SINGLE_PASS,
 	                            TreeFlags::BENCHMARK_SEQUENCE_INTERFACE<
-	                                InnerSequenceInterface<InnerNode, KeyT>>>;
+	                                InnerSequenceInterface<InnerNode, KeyT>>,
+	                            AdditionalOptions...>;
 
 	template <class Tag>
 	struct InnerNodeBaseBuilder
@@ -136,13 +140,15 @@ struct UseWBTree
 /********************************************
  * Base Class Definitions for Zip Tree
  ********************************************/
+template <class... AdditionalOptions>
 struct UseZipTree
 {
 	template <class InnerNode, class KeyT>
 	using Options =
 	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
 	                TreeFlags::BENCHMARK_SEQUENCE_INTERFACE<
-	                    InnerSequenceInterface<InnerNode, KeyT>>>;
+	                    InnerSequenceInterface<InnerNode, KeyT>>,
+	                AdditionalOptions...>;
 	template <class Tag>
 	struct InnerNodeBaseBuilder
 	{
@@ -163,7 +169,6 @@ struct UseZipTree
 	template <class TagType>
 	using Tag = InnerZTTag<TagType>;
 };
-
 /// @endcond
 
 /**
@@ -238,7 +243,7 @@ public:
 	size_t lca_tag = 0;
 
 private:
-	// TODO instead of storing all of these, and use interval traits and container
+	// TODO instead of storing all of these use interval traits and container
 	// pointer?
 	KeyT point;
 	bool start;
@@ -284,15 +289,17 @@ public:
 	/*
 	 * Callbacks for Zipping
 	 */
-	void init_zipping(InnerNode * to_be_deleted) noexcept;
+	void init_zipping(const InnerNode * to_be_deleted) noexcept;
 	void before_zip_from_left(InnerNode * left_head) noexcept;
 	void before_zip_from_right(InnerNode * right_head) noexcept;
-	void before_zip_tree_from_left(InnerNode * left_head) noexcept;
-	void zipping_ended_left_without_tree(InnerNode * prev_left_head) noexcept;
-	void zipping_ended_right_without_tree(InnerNode * prev_right_head) noexcept;
-	void before_zip_tree_from_right(InnerNode * right_head) noexcept;
-	void zipping_done(InnerNode * head, InnerNode * tail) noexcept;
-	void delete_without_zipping(InnerNode * to_be_deleted) noexcept;
+	void before_zip_tree_from_left(InnerNode * left_head) const noexcept;
+	void before_zip_tree_from_right(InnerNode * right_head) const noexcept;
+	void zipping_ended_left_without_tree(InnerNode * prev_left_head) const
+	    noexcept;
+	void zipping_ended_right_without_tree(InnerNode * prev_right_head) const
+	    noexcept;
+	void zipping_done(InnerNode * head, InnerNode * tail) const noexcept;
+	void delete_without_zipping(const InnerNode * to_be_deleted) const noexcept;
 
 	/*
 	 * Data for Unzipping
@@ -313,18 +320,20 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 class InnerRBNodeTraits : public RBDefaultNodeTraits {
 public:
 	template <class RBTreeBase>
-	static void leaf_inserted(InnerNode & node, RBTreeBase & t);
+	static void leaf_inserted(const InnerNode & node,
+	                          const RBTreeBase & t) noexcept;
 	template <class RBTreeBase>
-	static void rotated_left(InnerNode & node, RBTreeBase & t);
+	static void rotated_left(InnerNode & node, const RBTreeBase & t) noexcept;
 	template <class RBTreeBase>
-	static void rotated_right(InnerNode & node, RBTreeBase & t);
+	static void rotated_right(InnerNode & node, const RBTreeBase & t) noexcept;
 	template <class RBTreeBase>
-	static void delete_leaf(InnerNode & node, RBTreeBase & t);
+	static void delete_leaf(const InnerNode & node,
+	                        const RBTreeBase & t) noexcept;
 	template <class RBTreeBase>
-	static void swapped(InnerNode & n1, InnerNode & n2, RBTreeBase & t);
+	static void swapped(InnerNode & n1, InnerNode & n2, RBTreeBase & t) noexcept;
 
 private:
-	static InnerNode * get_partner(const InnerNode & n);
+	static InnerNode * get_partner(const InnerNode & n) noexcept;
 };
 
 /*
@@ -336,9 +345,13 @@ class InnerWBNodeTraits
     : public InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits> {
 public:
 	template <class WBTreeBase>
-	static void splice_out_left_knee(InnerNode & node, WBTreeBase & t);
+	static void splice_out_left_knee(
+	    InnerNode & node,
+	    const WBTreeBase & t) noexcept; // TODO if aggregate-addition is noexcept
 	template <class WBTreeBase>
-	static void splice_out_right_knee(InnerNode & node, WBTreeBase & t);
+	static void
+	splice_out_right_knee(InnerNode & node,
+	                      const WBTreeBase & t) noexcept; // TODO see above
 };
 
 template <class InnerNode>
@@ -347,243 +360,36 @@ public:
 	using PointDescription =
 	    std::pair<const typename InnerNode::KeyT, const int_fast8_t>;
 
-	bool
-	operator()(const InnerNode & lhs, const InnerNode & rhs) const
-	{
-		//    std::cout << "Comparing points: " << lhs.get_point() << " vs " <<
-		//    rhs.get_point() << "\n";
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs.get_point() != rhs.get_point()) {
-#pragma GCC diagnostic pop
-			return lhs.get_point() < rhs.get_point();
-		} else {
-			/*
-			 * At the same point, the order is: open ends, closed starts, closed ends,
-			 * open starts
-			 */
-			int_fast8_t lhs_priority;
-			if (lhs.is_closed()) {
-				if (lhs.is_start()) {
-					lhs_priority = -1;
-				} else {
-					lhs_priority = 1;
-				}
-			} else {
-				if (lhs.is_start()) {
-					lhs_priority = 2;
-				} else {
-					lhs_priority = -2;
-				}
-			}
-
-			int_fast8_t rhs_priority;
-			if (rhs.is_closed()) {
-				if (rhs.is_start()) {
-					rhs_priority = -1;
-				} else {
-					rhs_priority = 1;
-				}
-			} else {
-				if (rhs.is_start()) {
-					rhs_priority = 2;
-				} else {
-					rhs_priority = -2;
-				}
-			}
-
-			return lhs_priority < rhs_priority;
-		}
-	}
-
-	bool
-	operator()(const typename InnerNode::KeyT & lhs, const InnerNode & rhs) const
-	{
-		//    std::cout << "A Comparing points: " << lhs << " vs " <<
-		//    rhs.get_point() << "\n";
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs != rhs.get_point()) {
-			return lhs < rhs.get_point();
-		}
-#pragma GCC diagnostic pop
-
-		// only open starts are strictly larger than the key
-		return (rhs.is_start() && !rhs.is_closed());
-	}
-
-	bool
-	operator()(const InnerNode & lhs, const typename InnerNode::KeyT & rhs) const
-	{
-		//    std::cout << "B Comparing points: " << lhs.get_point() << " vs " <<
-		//    rhs << "\n";
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs.get_point() != rhs) {
-			return lhs.get_point() < rhs;
-		}
-#pragma GCC diagnostic pop
-
-		// only open ends must strictly go before the key
-		return (!lhs.is_start() && !lhs.is_closed());
-	}
-
-	bool
-	operator()(const PointDescription & lhs, const InnerNode & rhs) const
-	{
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs.first != rhs.get_point()) {
-			return lhs.first < rhs.get_point();
-		}
-#pragma GCC diagnostic pop
-
-		if (lhs.second > 0) {
-			// the query is left-open, i.e., it should not to before anything
-			return false;
-		} else if (lhs.second < 0) {
-			// the query is right-open. It should go before everything but open end
-			// nodes
-			return rhs.is_start() || rhs.is_closed();
-		} else {
-			// The query is closed.
-			// only open starts are strictly larger than the key
-			return (rhs.is_start() && !rhs.is_closed());
-		}
-	}
-
-	bool
-	operator()(const InnerNode & lhs, const PointDescription & rhs) const
-	{
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-		if (lhs.get_point() != rhs.first) {
-			return lhs.get_point() < rhs.first;
-		}
-#pragma GCC diagnostic pop
-
-		if (rhs.second > 0) {
-			// the query is left-open, i.e., everything but left-open is before it
-			return !(lhs.is_start() && !lhs.is_closed());
-		} else if (rhs.second > 0) {
-			// the query is right-open, i.e., nothing must ever strictly go before it
-			return false;
-		} else {
-			// the query is closed
-			// only open ends must strictly go before the key
-			return (!lhs.is_start() && !lhs.is_closed());
-		}
-	}
+	bool operator()(const InnerNode & lhs, const InnerNode & rhs) const noexcept;
+	bool operator()(const typename InnerNode::KeyT & lhs,
+	                const InnerNode & rhs) const noexcept;
+	bool operator()(const InnerNode & lhs,
+	                const typename InnerNode::KeyT & rhs) const noexcept;
+	bool operator()(const PointDescription & lhs, const InnerNode & rhs) const
+	    noexcept;
+	bool operator()(const InnerNode & lhs, const PointDescription & rhs) const
+	    noexcept;
 };
 
-// TODO Debug
+/*
+ * Debugging helpers
+ */
 template <class InnerNode, class... Combiners>
 class ASCIIInnerNodeNameGetter {
 public:
-	ASCIIInnerNodeNameGetter(){};
-
-	std::string
-	get_name(InnerNode * node) const
-	{
-		std::vector<std::string> combiner_txts{
-		    Combiners::get_name() + std::string(": ") +
-		    node->combiners.template get_combiner<Combiners>().get_dbg_value() +
-		    std::string(" ")...};
-
-		std::ostringstream res;
-		res << std::string("{") << std::to_string(node->get_point())
-		    << std::string("}") << std::string("[");
-
-		if (node->is_start()) {
-			res << "_";
-		}
-		res << std::to_string(node->get_interval()->start.get_point());
-		if (node->is_start()) {
-			res << "_";
-		}
-
-		res << std::string(", ");
-		if (node->is_end()) {
-			res << "_";
-		}
-		res << std::to_string(node->get_interval()->end.get_point());
-		if (node->is_end()) {
-			res << "_";
-		}
-
-		res << std::string(") ") << std::string("@") << std::hex << node << std::dec
-		    << std::string("  ╭:") << std::to_string(node->agg_left)
-		    << std::string("  ╮:") << std::to_string(node->agg_right)
-		    << std::string("  {");
-
-		bool first = true;
-		for (auto & cmb_str : combiner_txts) {
-			if (!first) {
-				res << ", ";
-			}
-			first = false;
-			res << cmb_str;
-		}
-
-		res << std::string("}");
-
-		return res.str();
-	}
+	std::string get_name(InnerNode * node) const;
 };
 
 template <class InnerNode, class... Combiners>
 class DOTInnerNodeNameGetter {
 public:
-	DOTInnerNodeNameGetter(){};
-
-	std::string
-	get_name(InnerNode * node) const
-	{
-		std::stringstream name;
-
-		std::string combiner_str{
-		    Combiners::get_name() + std::string(": ") +
-		    std::to_string(node->combiners.template get<Combiners>()) +
-		    std::string(" ")...};
-
-		if (node->start) {
-			if (node->closed) {
-				name << "[";
-			} else {
-				name << "(";
-			}
-		}
-		name << node->point;
-		if (!node->start) {
-			if (node->closed) {
-				name << "]";
-			} else {
-				name << ")";
-			}
-		}
-
-		name << " @" << node->val;
-		name << "\\n {->" << node->partner->point << "} \\n<";
-		name << combiner_str << ">";
-
-		return name.str();
-	}
+	std::string get_name(InnerNode * node) const;
 };
 
 template <class InnerNode>
 class DOTInnerEdgeNameGetter {
 public:
-	DOTInnerEdgeNameGetter(){};
-
-	std::string
-	get_name(InnerNode * node, bool left) const
-	{
-		if (left) {
-			return std::to_string(node->agg_left);
-		} else {
-			return std::to_string(node->agg_right);
-		}
-	}
+	std::string get_name(InnerNode * node, bool left) const;
 };
 
 /// @endcond
@@ -596,9 +402,14 @@ public:
  * Use this class as the TreeSelector template parameter of the
  * DynamicSegmentTree to chose a red-black tree (an RBTree) as underlying tree
  * for the DynamicSegmentTree.
+ *
+ * @tparam AdditionalOptions Pass additional TreeFlags to the underlying
+ *         red-black tree.
  */
-class UseRBTree : public dyn_segtree_internal::UseRBTree {
+template <class... AdditionalOptions>
+class UseRBTree : public dyn_segtree_internal::UseRBTree<AdditionalOptions...> {
 };
+using UseDefaultRBTree = UseRBTree<>;
 
 /**
  * @brief Class used to select the Zip Tree tree as underlying tree for the
@@ -607,9 +418,15 @@ class UseRBTree : public dyn_segtree_internal::UseRBTree {
  * Use this class as the TreeSelector template parameter of the
  * DynamicSegmentTree to chose a ZipTree (an ZTree) as underlying tree for the
  * DynamicSegmentTree.
+ *
+ * @tparam AdditionalOptions Pass additional TreeFlags to the underlying
+ *         zip tree.
  */
-class UseZipTree : public dyn_segtree_internal::UseZipTree {
+template <class... AdditionalOptions>
+class UseZipTree
+    : public dyn_segtree_internal::UseZipTree<AdditionalOptions...> {
 };
+using UseDefaultZipTree = UseZipTree<>;
 
 /**
  * @brief Class used to select the weight balanced tree as underlying tree for
@@ -618,9 +435,14 @@ class UseZipTree : public dyn_segtree_internal::UseZipTree {
  * Use this class as the TreeSelector template parameter of the
  * DynamicSegmentTree to chose a weight balanced tree (see WBTree) as underlying
  * tree for the DynamicSegmentTree.
+ *
+ * @tparam AdditionalOptions Pass additional TreeFlags to the underlying
+ *         red-black tree.
  */
-class UseWBTree : public dyn_segtree_internal::UseWBTree {
+template <class... AdditionalOptions>
+class UseWBTree : public dyn_segtree_internal::UseWBTree<AdditionalOptions...> {
 };
+using UseDefaultWBTree = UseWBTree<>;
 
 /**
  * @brief A combiner that allows to retrieve the maximum value over any range
@@ -638,8 +460,6 @@ public:
 	using ValueT = ValueType;
 	using KeyT = KeyType;
 	using MyType = MaxCombiner<KeyT, ValueT>;
-
-	MaxCombiner() = default;
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
@@ -661,8 +481,8 @@ public:
 	 * left edge going out of this node
 	 * @return FIXME ignored for now
 	 */
-	bool collect_left(KeyT my_point, const MyType * left_child_combiner,
-	                  ValueType edge_val);
+	bool collect_left(const KeyT my_point, const MyType * left_child_combiner,
+	                  const ValueType edge_val);
 	/**
 	 * @brief Combines this MaxCombiner with a value, possibly of a child node
 	 *
@@ -682,8 +502,9 @@ public:
 	 * right edge going out of this node
 	 * @return FIXME ignored for now
 	 */
-	bool collect_right(KeyT my_point, const MyType * right_child_combiner,
-	                   ValueType edge_val);
+	// TODO make all keys / values references?
+	bool collect_right(const KeyT my_point, const MyType * right_child_combiner,
+	                   const ValueType edge_val);
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
@@ -698,7 +519,7 @@ public:
 	 * traversed
 	 * @return FIXME ignored for now
 	 */
-	bool traverse_left_edge_up(KeyT new_point, ValueT edge_val);
+	bool traverse_left_edge_up(const KeyT new_point, const ValueT edge_val);
 	/**
 	 * @brief Aggregates a value into the max value stored in this combiner
 	 *
@@ -711,7 +532,7 @@ public:
 	 * traversed
 	 * @return FIXME ignored for now
 	 */
-	bool traverse_right_edge_up(KeyT new_point, ValueT edge_val);
+	bool traverse_right_edge_up(const KeyT new_point, const ValueT edge_val);
 
 	// bool aggregate_with(ValueT a);
 
@@ -1081,14 +902,15 @@ using EmptyCombinerPack = CombinerPack<KeyT, AggValueT>;
  * @tparam AggValueType		The typo of an aggregate of multiple
  * ValueT_in's. See DOCTODO for details.
  * @tparam TreeSelector               Specifies which balanced binary tree
- * implementation to use for the underlying tree. Must be one of UseRBTree (to
- * use the red-black tree) or UseZipTree (to use the zip tree). You need to
- * specify the same selector at the DynamicSegmentTree!
+ * implementation to use for the underlying tree. Must be one of UseRBTree<...>
+ * (to use the red-black tree), UseZipTree<...> (to use the zip tree) or
+ * UseWBTree<...> (to use the weight-balanced tree). You need to specify the
+ * same selector at the DynamicSegmentTree!
  * @tparam Tag 						The tag used to identify
  * the tree that this node should be inserted into. See RBTree for details.
  */
 template <class KeyType, class ValueType, class AggValueType, class Combiners,
-          class TreeSelector = UseRBTree, class Tag = int>
+          class TreeSelector = UseDefaultRBTree, class Tag = int>
 class DynSegTreeNodeBase {
 	// TODO why is all of this public?
 public:
@@ -1229,9 +1051,10 @@ public:
  * @tparam Options			Options for this tree. See DOCTODO for
  * details.
  * @tparam TreeSelector               Specifies which balanced binary tree
- * implementation to use for the underlying tree. Must be one of UseRBTree (to
- * use the red-black tree) or UseZipTree (to use the zip tree). You need to
- * specify the same selector at the DynSegTreeNodeBase!
+ * implementation to use for the underlying tree. Must be one of UseRBTree<...>
+ * (to use the red-black tree), UseZipTree<...> (to use the zip tree) or
+ * UseWBTree<...> (to use the weight-balanced tree). You need to specify the
+ * same selector at the DynSegTreeNodeBase!
  * @tparam Tag					The tag of this tree. Allows to
  * insert the same node in multiple dynamic segment trees. See DOCTODO for
  * details.
@@ -1240,7 +1063,7 @@ public:
 
 // TODO constant-time size
 template <class Node, class NodeTraits, class Combiners,
-          class Options = DefaultOptions, class TreeSelector = UseRBTree,
+          class Options = DefaultOptions, class TreeSelector = UseDefaultRBTree,
           class Tag = int>
 class DynamicSegmentTree {
 	// TODO add a static assert that checks that the types in all combiners are

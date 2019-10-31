@@ -1,12 +1,11 @@
+#include "../src/ygg.hpp"
+#include "randomizer.hpp"
+
 #include <algorithm>
+#include <boost/icl/interval_map.hpp>
 #include <gtest/gtest.h>
 #include <random>
 #include <vector>
-
-#include <boost/icl/interval_map.hpp>
-
-#include "../src/ygg.hpp"
-#include "randomizer.hpp"
 
 namespace ygg {
 namespace testing {
@@ -401,7 +400,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 		indices.push_back(i);
 
 		/*		std::cout << "Persistent: " << lower << " -> " << upper << ": " << i
-				<< "\n";*/
+		    << "\n";*/
 	}
 
 	__DST_BASENAME(Node) transient_nodes[DYNSEGTREE_COMPREHENSIVE_TESTSIZE];
@@ -411,8 +410,8 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
-		transient_nodes[i] = __DST_BASENAME(Node)((int)lower, (int)upper,
-		                                          (int)(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
+		transient_nodes[i] = __DST_BASENAME(Node)(
+		    (int)lower, (int)upper, (int)(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
 	}
 
 	std::shuffle(indices.begin(), indices.end(),
@@ -453,7 +452,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 			if (deleted_indices.find(i) != deleted_indices.end()) {
 				continue;
 			}
-			
+
 			auto node = transient_nodes[i];
 			reference += std::make_pair(
 			    interval<int>::right_open(node.lower, node.upper), node.value);
@@ -466,8 +465,9 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 			int lower = it->first.lower();
 			int upper = it->first.upper();
 			int val = it->second;
-			/*			std::cout << "Reference: " << lower << " -> " << upper << " @ " << val
-						<< "\n";*/
+			/*			std::cout << "Reference: " << lower << " -> " << upper << " @ " <<
+			   val
+			      << "\n";*/
 
 			for (int i = lower; i < upper; ++i) {
 				int result = agg.query((int)i);
@@ -485,11 +485,11 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 	};
 
 	std::set<size_t> deleted;
-	
+
 	for (auto index : indices) {
 		//		auto & to_remove = transient_nodes[index];
 		/*		std::cout << "========= Removing " << to_remove.lower << " -> "
-				<< to_remove.upper << " @ " << to_remove.value << ".\n";*/
+		    << to_remove.upper << " @ " << to_remove.value << ".\n";*/
 		agg.remove(transient_nodes[index]);
 		deleted.insert(index);
 

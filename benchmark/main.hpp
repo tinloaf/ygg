@@ -153,6 +153,10 @@ main(int argc, char ** argv)
 		}
 
 		if (!skip) {
+			if constexpr (plugin::has_node_interface) {
+				std::cout << "Node size for experiment " << name << " is "
+				          << sizeof(typename plugin::NodeInterface::Node) << " B.\n";
+			}
 			auto * bench = new plugin();
 			bench->set_name(name);
 			/*

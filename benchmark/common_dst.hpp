@@ -1,15 +1,14 @@
 #ifndef BENCH_COMMON_DST_HPP
 #define BENCH_COMMON_DST_HPP
 
+#include "../src/ygg.hpp"
 #include "benchmark.h"
+#include "common.hpp"
+
 #include <algorithm>
 #include <draup.hpp>
 #include <random>
 #include <vector>
-
-#include "../src/ygg.hpp"
-
-#include "common.hpp"
 
 // TODO various RBTree / Zip Tree variants!
 // TODO make values optional
@@ -18,6 +17,8 @@ template <class Interface, typename Experiment, bool need_nodes,
           bool need_values, bool need_indices, bool values_from_fixed>
 class DSTFixture : public benchmark::Fixture {
 public:
+	constexpr static bool has_node_interface = false;
+
 	DSTFixture() : rng(std::random_device{}()) {}
 
 	static std::string
@@ -155,8 +156,9 @@ using CombinerPack = ygg::EmptyCombinerPack<int, double>;
  * Red-Black DST Interface
  */
 template <class MyTreeOptions>
-class RBDSTNode : public ygg::DynSegTreeNodeBase<int, double, double,
-                                                 CombinerPack, ygg::UseRBTree> {
+class RBDSTNode
+    : public ygg::DynSegTreeNodeBase<int, double, double, CombinerPack,
+                                     ygg::UseDefaultRBTree> {
 public:
 	int lower;
 	int upper;
@@ -190,9 +192,9 @@ template <class MyTreeOptions>
 class RBDSTInterface {
 public:
 	using Node = RBDSTNode<MyTreeOptions>;
-	using Tree =
-	    ygg::DynamicSegmentTree<Node, RBDSTNodeTraits<MyTreeOptions>,
-	                            CombinerPack, MyTreeOptions, ygg::UseRBTree>;
+	using Tree = ygg::DynamicSegmentTree<Node, RBDSTNodeTraits<MyTreeOptions>,
+	                                     CombinerPack, MyTreeOptions,
+	                                     ygg::UseDefaultRBTree>;
 
 	static std::string
 	get_name()
@@ -228,8 +230,9 @@ public:
  * Weight-Balanced DST Interface
  */
 template <class MyTreeOptions>
-class WBDSTNode : public ygg::DynSegTreeNodeBase<int, double, double,
-                                                 CombinerPack, ygg::UseWBTree> {
+class WBDSTNode
+    : public ygg::DynSegTreeNodeBase<int, double, double, CombinerPack,
+                                     ygg::UseDefaultWBTree> {
 public:
 	int lower;
 	int upper;
@@ -263,9 +266,9 @@ template <class MyTreeOptions>
 class WBDSTInterface {
 public:
 	using Node = WBDSTNode<MyTreeOptions>;
-	using Tree =
-	    ygg::DynamicSegmentTree<Node, WBDSTNodeTraits<MyTreeOptions>,
-	                            CombinerPack, MyTreeOptions, ygg::UseWBTree>;
+	using Tree = ygg::DynamicSegmentTree<Node, WBDSTNodeTraits<MyTreeOptions>,
+	                                     CombinerPack, MyTreeOptions,
+	                                     ygg::UseDefaultWBTree>;
 
 	static std::string
 	get_name()
@@ -301,8 +304,9 @@ public:
  * Zipping DST Interface
  */
 template <class MyTreeOptions>
-class ZDSTNode : public ygg::DynSegTreeNodeBase<int, double, double,
-                                                CombinerPack, ygg::UseZipTree> {
+class ZDSTNode
+    : public ygg::DynSegTreeNodeBase<int, double, double, CombinerPack,
+                                     ygg::UseDefaultZipTree> {
 public:
 	int lower;
 	int upper;
@@ -338,7 +342,7 @@ public:
 	using Node = ZDSTNode<MyTreeOptions>;
 	using Tree =
 	    ygg::DynamicSegmentTree<Node, ZDSTNodeTraits<MyTreeOptions>, CombinerPack,
-	                            MyTreeOptions, ygg::UseZipTree>;
+	                            MyTreeOptions, ygg::UseDefaultZipTree>;
 
 	static std::string
 	get_name()

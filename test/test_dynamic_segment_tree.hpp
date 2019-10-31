@@ -31,7 +31,7 @@ using Combiners = CombinerPack<int, int, RMCombiner, MCombiner>;
 } // namespace ygg
 
 #define __DST_BASENAME(NAME) RBTree_##NAME
-#define __DST_BASESELECTOR UseRBTree
+#define __DST_BASESELECTOR UseDefaultRBTree
 #define DYNSEGTREE_SEED 4
 
 #include "test_dynamic_segment_tree_base.hpp"
@@ -39,7 +39,7 @@ using Combiners = CombinerPack<int, int, RMCombiner, MCombiner>;
 #undef __DST_BASENAME
 #define __DST_BASENAME(NAME) WBTree_##NAME
 #undef __DST_BASESELECTOR
-#define __DST_BASESELECTOR UseWBTree
+#define __DST_BASESELECTOR UseDefaultWBTree
 #undef DYNSEGTREE_SEED
 #define DYNSEGTREE_SEED 5
 
@@ -48,7 +48,7 @@ using Combiners = CombinerPack<int, int, RMCombiner, MCombiner>;
 #undef __DST_BASENAME
 #define __DST_BASENAME(NAME) ZipTree_##NAME
 #undef __DST_BASESELECTOR
-#define __DST_BASESELECTOR UseZipTree
+#define __DST_BASESELECTOR UseDefaultZipTree
 #undef DYNSEGTREE_SEED
 #define DYNSEGTREE_SEED 6
 

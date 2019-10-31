@@ -75,7 +75,7 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 template <class WBTreeBase>
 void
 InnerWBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::splice_out_left_knee(
-    InnerNode & node, WBTreeBase & t)
+    InnerNode & node, const WBTreeBase & t) noexcept
 {
 	// the path-sum to the right of the left knee should equal to it's
 	// mirror equivalent, i.e., the path-sum to the right of the next-but-one
@@ -94,9 +94,8 @@ InnerWBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::splice_out_left_knee(
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 template <class WBTreeBase>
 void
-InnerWBNodeTraits<InnerTree, InnerNode, Node,
-                  NodeTraits>::splice_out_right_knee(InnerNode & node,
-                                                     WBTreeBase & t)
+InnerWBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::
+    splice_out_right_knee(InnerNode & node, const WBTreeBase & t) noexcept
 {
 	// the path-sum to the left of the right knee should equal to it's
 	// mirror equivalent, i.e., the path-sum to the right of the previous-but-one
@@ -132,7 +131,7 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 template <class RBTreeBase>
 void
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::leaf_inserted(
-    InnerNode & node, RBTreeBase & t)
+    const InnerNode & node, const RBTreeBase & t) noexcept
 {
 	(void)node;
 	(void)t;
@@ -142,7 +141,9 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 template <class RBTreeBase>
 void
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::delete_leaf(
-    InnerNode & node, RBTreeBase & t)
+    const InnerNode & node,
+    const RBTreeBase &
+        t) noexcept // TODO actually, only noexcept if the aggregation below is
 {
 	(void)t;
 
@@ -161,7 +162,7 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 template <class RBTreeBase>
 void
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_left(
-    InnerNode & node, RBTreeBase & t)
+    InnerNode & node, const RBTreeBase & t) noexcept
 {
 	(void)t;
 
@@ -181,7 +182,7 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 template <class RBTreeBase>
 void
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_right(
-    InnerNode & node, RBTreeBase & t)
+    InnerNode & node, const RBTreeBase & t) noexcept
 {
 	(void)t;
 
@@ -200,7 +201,7 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::rotated_right(
 template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 InnerNode *
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::get_partner(
-    const InnerNode & n)
+    const InnerNode & n) noexcept
 {
 	if (n.start) {
 		return &(n.container->end);
@@ -213,7 +214,8 @@ template <class InnerTree, class InnerNode, class Node, class NodeTraits>
 template <class RBTreeBase>
 void
 InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(
-    InnerNode & old_ancestor, InnerNode & old_descendant, RBTreeBase & t)
+    InnerNode & old_ancestor, InnerNode & old_descendant,
+    RBTreeBase & t) noexcept
 {
 	InnerTree * it = static_cast<InnerTree *>(&t);
 
@@ -284,16 +286,16 @@ InnerRBNodeTraits<InnerTree, InnerNode, Node, NodeTraits>::swapped(
 template <class InnerTree, class InnerNode, class AggValueT>
 void
 InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::init_zipping(
-    InnerNode * to_be_deleted) noexcept
+    const InnerNode * to_be_deleted) noexcept
 {
-	left_accumulated = to_be_deleted->agg_left;
-	right_accumulated = to_be_deleted->agg_right;
+	this->left_accumulated = to_be_deleted->agg_left;
+	this->right_accumulated = to_be_deleted->agg_right;
 }
 
 template <class InnerTree, class InnerNode, class AggValueT>
 void
 InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::delete_without_zipping(
-    InnerNode * to_be_deleted) noexcept
+    const InnerNode * to_be_deleted) const noexcept
 {
 	if (to_be_deleted->get_parent() != nullptr) {
 		InnerNode * parent = to_be_deleted->get_parent();
@@ -311,7 +313,7 @@ InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::before_zip_from_left(
     InnerNode * left_head) noexcept
 {
 	left_head->agg_left += left_accumulated;
-	left_accumulated += left_head->agg_right;
+	this->left_accumulated += left_head->agg_right;
 	left_head->agg_right = AggValueT();
 }
 
@@ -321,48 +323,48 @@ InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::before_zip_from_right(
     InnerNode * right_head) noexcept
 {
 	right_head->agg_right += right_accumulated;
-	right_accumulated += right_head->agg_left;
+	this->right_accumulated += right_head->agg_left;
 	right_head->agg_left = AggValueT();
 }
 
 template <class InnerTree, class InnerNode, class AggValueT>
 void
 InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::
-    zipping_ended_left_without_tree(InnerNode * prev_left_head) noexcept
+    zipping_ended_left_without_tree(InnerNode * prev_left_head) const noexcept
 {
-	prev_left_head->agg_right = left_accumulated;
+	prev_left_head->agg_right = this->left_accumulated;
 }
 
 template <class InnerTree, class InnerNode, class AggValueT>
 void
 InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::
-    zipping_ended_right_without_tree(InnerNode * prev_right_head) noexcept
+    zipping_ended_right_without_tree(InnerNode * prev_right_head) const noexcept
 {
-	prev_right_head->agg_left = right_accumulated;
+	prev_right_head->agg_left = this->right_accumulated;
 }
 
 template <class InnerTree, class InnerNode, class AggValueT>
 void
 InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::before_zip_tree_from_left(
-    InnerNode * left_head) noexcept
+    InnerNode * left_head) const noexcept
 {
-	left_head->agg_left += left_accumulated;
-	left_head->agg_right += left_accumulated;
+	left_head->agg_left += this->left_accumulated;
+	left_head->agg_right += this->left_accumulated;
 }
 
 template <class InnerTree, class InnerNode, class AggValueT>
 void
 InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::before_zip_tree_from_right(
-    InnerNode * right_head) noexcept
+    InnerNode * right_head) const noexcept
 {
-	right_head->agg_left += right_accumulated;
-	right_head->agg_right += right_accumulated;
+	right_head->agg_left += this->right_accumulated;
+	right_head->agg_right += this->right_accumulated;
 }
 
 template <class InnerTree, class InnerNode, class AggValueT>
 void
 InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::zipping_done(
-    InnerNode * head, InnerNode * tail) noexcept
+    InnerNode * head, InnerNode * tail) const noexcept
 {
 	while (tail != head) {
 		// TODO only iterate up if there are any combiners that must be rebuilt!
@@ -379,12 +381,12 @@ void
 InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::init_unzipping(
     InnerNode * to_be_inserted) noexcept
 {
-	unzip_left_last = to_be_inserted;
-	unzip_right_last = to_be_inserted;
-	unzip_left_first = true;
-	unzip_right_first = true;
-	left_accumulated = AggValueT();
-	right_accumulated = AggValueT();
+	this->unzip_left_last = to_be_inserted;
+	this->unzip_right_last = to_be_inserted;
+	this->unzip_left_first = true;
+	this->unzip_right_first = true;
+	this->left_accumulated = AggValueT();
+	this->right_accumulated = AggValueT();
 }
 
 template <class InnerTree, class InnerNode, class AggValueT>
@@ -393,14 +395,14 @@ InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::unzip_to_left(
     InnerNode * n) noexcept
 {
 	if (unzip_left_first) {
-		unzip_left_last->agg_left = left_accumulated;
-		unzip_left_first = false;
+		this->unzip_left_last->agg_left = left_accumulated;
+		this->unzip_left_first = false;
 	} else {
-		unzip_left_last->agg_right = left_accumulated;
+		this->unzip_left_last->agg_right = left_accumulated;
 	}
-	left_accumulated = n->agg_right;
-	right_accumulated += n->agg_right;
-	unzip_left_last = n;
+	this->left_accumulated = n->agg_right;
+	this->right_accumulated += n->agg_right;
+	this->unzip_left_last = n;
 }
 
 template <class InnerTree, class InnerNode, class AggValueT>
@@ -430,14 +432,14 @@ InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::unzip_done(
 	 * have been added up in left_accumulated / right_accumulated,
 	 * we can set instead of add. */
 	if (left_spine_end == unzip_root) {
-		left_spine_end->agg_left = left_accumulated;
+		left_spine_end->agg_left = this->left_accumulated;
 	} else {
-		left_spine_end->agg_right = left_accumulated;
+		left_spine_end->agg_right = this->left_accumulated;
 	}
 	if (right_spine_end == unzip_root) {
-		right_spine_end->agg_right = right_accumulated;
+		right_spine_end->agg_right = this->right_accumulated;
 	} else {
-		right_spine_end->agg_left = right_accumulated;
+		right_spine_end->agg_left = this->right_accumulated;
 	}
 
 	/* Rebuild left spine */
@@ -504,6 +506,241 @@ InnerZNodeTraits<InnerTree, InnerNode, AggValueT>::unzip_done(
 /***************************************************
  * End of node traits
  ***************************************************/
+
+template <class InnerNode>
+bool
+Compare<InnerNode>::operator()(const InnerNode & lhs,
+                               const InnerNode & rhs) const noexcept
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	if (lhs.get_point() != rhs.get_point()) {
+#pragma GCC diagnostic pop
+		return lhs.get_point() < rhs.get_point();
+	} else {
+		/*
+		 * At the same point, the order is: open ends, closed starts, closed ends,
+		 * open starts
+		 */
+		int_fast8_t lhs_priority;
+		if (lhs.is_closed()) {
+			if (lhs.is_start()) {
+				lhs_priority = -1;
+			} else {
+				lhs_priority = 1;
+			}
+		} else {
+			if (lhs.is_start()) {
+				lhs_priority = 2;
+			} else {
+				lhs_priority = -2;
+			}
+		}
+
+		int_fast8_t rhs_priority;
+		if (rhs.is_closed()) {
+			if (rhs.is_start()) {
+				rhs_priority = -1;
+			} else {
+				rhs_priority = 1;
+			}
+		} else {
+			if (rhs.is_start()) {
+				rhs_priority = 2;
+			} else {
+				rhs_priority = -2;
+			}
+		}
+
+		return lhs_priority < rhs_priority;
+	}
+}
+
+template <class InnerNode>
+bool
+Compare<InnerNode>::operator()(const typename InnerNode::KeyT & lhs,
+                               const InnerNode & rhs) const noexcept
+{
+	//    std::cout << "A Comparing points: " << lhs << " vs " <<
+	//    rhs.get_point() << "\n";
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	if (lhs != rhs.get_point()) {
+		return lhs < rhs.get_point();
+	}
+#pragma GCC diagnostic pop
+
+	// only open starts are strictly larger than the key
+	return (rhs.is_start() && !rhs.is_closed());
+}
+
+template <class InnerNode>
+bool
+Compare<InnerNode>::operator()(const InnerNode & lhs,
+                               const typename InnerNode::KeyT & rhs) const
+    noexcept
+{
+	//    std::cout << "B Comparing points: " << lhs.get_point() << " vs " <<
+	//    rhs << "\n";
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	if (lhs.get_point() != rhs) {
+		return lhs.get_point() < rhs;
+	}
+#pragma GCC diagnostic pop
+
+	// only open ends must strictly go before the key
+	return (!lhs.is_start() && !lhs.is_closed());
+}
+
+template <class InnerNode>
+bool
+Compare<InnerNode>::operator()(const PointDescription & lhs,
+                               const InnerNode & rhs) const noexcept
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	if (lhs.first != rhs.get_point()) {
+		return lhs.first < rhs.get_point();
+	}
+#pragma GCC diagnostic pop
+
+	if (lhs.second > 0) {
+		// the query is left-open, i.e., it should not to before anything
+		return false;
+	} else if (lhs.second < 0) {
+		// the query is right-open. It should go before everything but open end
+		// nodes
+		return rhs.is_start() || rhs.is_closed();
+	} else {
+		// The query is closed.
+		// only open starts are strictly larger than the key
+		return (rhs.is_start() && !rhs.is_closed());
+	}
+}
+
+template <class InnerNode>
+bool
+Compare<InnerNode>::operator()(const InnerNode & lhs,
+                               const PointDescription & rhs) const noexcept
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	if (lhs.get_point() != rhs.first) {
+		return lhs.get_point() < rhs.first;
+	}
+#pragma GCC diagnostic pop
+
+	if (rhs.second > 0) {
+		// the query is left-open, i.e., everything but left-open is before it
+		return !(lhs.is_start() && !lhs.is_closed());
+	} else if (rhs.second > 0) {
+		// the query is right-open, i.e., nothing must ever strictly go before it
+		return false;
+	} else {
+		// the query is closed
+		// only open ends must strictly go before the key
+		return (!lhs.is_start() && !lhs.is_closed());
+	}
+}
+
+/*
+ * Debugging methods
+ */
+template <class InnerNode, class... Combiners>
+std::string
+ASCIIInnerNodeNameGetter<InnerNode, Combiners...>::get_name(
+    InnerNode * node) const
+{
+	std::vector<std::string> combiner_txts{
+	    Combiners::get_name() + std::string(": ") +
+	    node->combiners.template get_combiner<Combiners>().get_dbg_value() +
+	    std::string(" ")...};
+
+	std::ostringstream res;
+	res << std::string("{") << std::to_string(node->get_point())
+	    << std::string("}") << std::string("[");
+
+	if (node->is_start()) {
+		res << "_";
+	}
+	res << std::to_string(node->get_interval()->start.get_point());
+	if (node->is_start()) {
+		res << "_";
+	}
+
+	res << std::string(", ");
+	if (node->is_end()) {
+		res << "_";
+	}
+	res << std::to_string(node->get_interval()->end.get_point());
+	if (node->is_end()) {
+		res << "_";
+	}
+
+	res << std::string(") ") << std::string("@") << std::hex << node << std::dec
+	    << std::string("  ╭:") << std::to_string(node->agg_left)
+	    << std::string("  ╮:") << std::to_string(node->agg_right)
+	    << std::string("  {");
+
+	bool first = true;
+	for (auto & cmb_str : combiner_txts) {
+		if (!first) {
+			res << ", ";
+		}
+		first = false;
+		res << cmb_str;
+	}
+
+	res << std::string("}");
+
+	return res.str();
+}
+
+template <class InnerNode, class... Combiners>
+std::string
+DOTInnerNodeNameGetter<InnerNode, Combiners...>::get_name(
+    InnerNode * node) const
+{
+	std::stringstream name;
+
+	std::string combiner_str{
+	    Combiners::get_name() + std::string(": ") +
+	    std::to_string(node->combiners.template get<Combiners>()) +
+	    std::string(" ")...};
+
+	if (node->start) {
+		if (node->closed) {
+			name << "[";
+		} else {
+			name << "(";
+		}
+	}
+	name << node->point;
+	if (!node->start) {
+		if (node->closed) {
+			name << "]";
+		} else {
+			name << ")";
+		}
+	}
+
+	name << " @" << node->val;
+	name << "\\n {->" << node->partner->point << "} \\n<";
+	name << combiner_str << ">";
+
+	return name.str();
+}
+
+template <class InnerNode>
+std::string DOTInnerEdgeNameGetter<InnerNode>::get_name(InnerNode *node, bool left) const
+{
+		if (left) {
+			return std::to_string(node->agg_left);
+		} else {
+			return std::to_string(node->agg_right);
+		}
+}
 
 } // namespace dyn_segtree_internal
 
@@ -1383,9 +1620,9 @@ RangedMaxCombiner<KeyT, ValueT>::traverse_right_edge_up(KeyT new_point,
 template <class KeyT, class ValueT>
 bool
 RangedMaxCombiner<KeyT, ValueT>::collect_left(
-    KeyT my_point, const MyType * left_child_combiner, ValueT edge_val)
+    const KeyT my_point, const MyType * left_child_combiner, const ValueT edge_val)
 {
-	auto new_candidate_value = child_value(left_child_combiner) + edge_val;
+	const auto new_candidate_value = child_value(left_child_combiner) + edge_val;
 
 	// In case that neither border is valid, this object has not been initialized
 	// with a Value yet: We therefore take the offered value and set our first
@@ -1455,9 +1692,9 @@ RangedMaxCombiner<KeyT, ValueT>::collect_left(
 template <class KeyT, class ValueT>
 bool
 RangedMaxCombiner<KeyT, ValueT>::collect_right(
-    KeyT my_point, const MyType * right_child_combiner, ValueT edge_val)
+    const KeyT my_point, const MyType * right_child_combiner, const ValueT edge_val)
 {
-	auto new_candidate_value = child_value(right_child_combiner) + edge_val;
+	const auto new_candidate_value = child_value(right_child_combiner) + edge_val;
 
 	if ((new_candidate_value > this->val) ||
 	    (!this->right_border_valid && !this->left_border_valid)) {
@@ -1679,8 +1916,8 @@ RangedMaxCombiner<KeyT, ValueT>::is_right_border_valid() const noexcept
 
 template <class KeyT, class ValueT>
 bool
-MaxCombiner<KeyT, ValueT>::traverse_left_edge_up(KeyT new_point,
-                                                 ValueT edge_val)
+MaxCombiner<KeyT, ValueT>::traverse_left_edge_up(const KeyT new_point,
+                                                 const ValueT edge_val)
 {
 	(void)new_point;
 	this->val += edge_val;
@@ -1689,8 +1926,8 @@ MaxCombiner<KeyT, ValueT>::traverse_left_edge_up(KeyT new_point,
 
 template <class KeyT, class ValueT>
 bool
-MaxCombiner<KeyT, ValueT>::traverse_right_edge_up(KeyT new_point,
-                                                  ValueT edge_val)
+MaxCombiner<KeyT, ValueT>::traverse_right_edge_up(const KeyT new_point,
+                                                  const ValueT edge_val)
 {
 	(void)new_point;
 	this->val += edge_val;
@@ -1699,9 +1936,9 @@ MaxCombiner<KeyT, ValueT>::traverse_right_edge_up(KeyT new_point,
 
 template <class KeyT, class ValueT>
 bool
-MaxCombiner<KeyT, ValueT>::collect_left(KeyT my_point,
+MaxCombiner<KeyT, ValueT>::collect_left(const KeyT my_point,
                                         const MyType * left_child_combiner,
-                                        ValueT edge_val)
+                                        const ValueT edge_val)
 {
 	(void)my_point;
 	this->val = std::max(this->val, child_value(left_child_combiner) + edge_val);

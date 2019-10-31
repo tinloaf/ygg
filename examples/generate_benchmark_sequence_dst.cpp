@@ -8,7 +8,7 @@ using namespace ygg;
 using MCombiner = RangedMaxCombiner<double, int>;
 using Combiners = CombinerPack<double, int, MCombiner>;
 
-using TreeSelector = UseZipTree;
+using TreeSelector = UseDefaultZipTree;
 
 class Interval
     : public DynSegTreeNodeBase<double, int, int, Combiners, TreeSelector> {
