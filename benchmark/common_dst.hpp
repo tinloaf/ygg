@@ -229,21 +229,21 @@ public:
 /*
  * Weight-Balanced DST Interface
  */
-template <class MyTreeOptions>
+template <class MyTreeOptions, class... UnderlyingOptions>
 class WBDSTNode
     : public ygg::DynSegTreeNodeBase<int, double, double, CombinerPack,
-                                     ygg::UseDefaultWBTree> {
+                                     ygg::UseWBTree<UnderlyingOptions...>> {
 public:
 	int lower;
 	int upper;
 	double value;
 };
 
-template <class MyTreeOptions>
-class WBDSTNodeTraits
-    : public ygg::DynSegTreeNodeTraits<WBDSTNode<MyTreeOptions>> {
+template <class MyTreeOptions, class... UnderlyingOptions>
+class WBDSTNodeTraits : public ygg::DynSegTreeNodeTraits<
+                            WBDSTNode<MyTreeOptions, UnderlyingOptions...>> {
 public:
-	using Node = WBDSTNode<MyTreeOptions>;
+	using Node = WBDSTNode<MyTreeOptions, UnderlyingOptions...>;
 
 	static int
 	get_lower(const Node & n)
@@ -262,13 +262,13 @@ public:
 	}
 };
 
-template <class MyTreeOptions>
+template <class MyTreeOptions, class... UnderlyingOptions>
 class WBDSTInterface {
 public:
-	using Node = WBDSTNode<MyTreeOptions>;
-	using Tree = ygg::DynamicSegmentTree<Node, WBDSTNodeTraits<MyTreeOptions>,
-	                                     CombinerPack, MyTreeOptions,
-	                                     ygg::UseDefaultWBTree>;
+	using Node = WBDSTNode<MyTreeOptions, UnderlyingOptions...>;
+	using Tree = ygg::DynamicSegmentTree<
+	    Node, WBDSTNodeTraits<MyTreeOptions, UnderlyingOptions...>, CombinerPack,
+	    MyTreeOptions, ygg::UseWBTree<UnderlyingOptions...>>;
 
 	static std::string
 	get_name()
