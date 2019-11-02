@@ -273,7 +273,9 @@ public:
 	static std::string
 	get_name()
 	{
-		return "WBTree";
+		using DummyOptions = ygg::TreeOptions<UnderlyingOptions...>;
+		return std::string("WBTree[") + DummyOptions::wbt_delta_str() +
+		       std::string(",") + DummyOptions::wbt_gamma_str() + std::string("]");
 	}
 
 	static void

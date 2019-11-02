@@ -380,6 +380,34 @@ public:
 		}
 	}
 
+	static std::string
+	wbt_delta_str()
+	{
+		if constexpr (OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_DENOMINATOR>() &&
+		              OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_NUMERATOR>() &&
+		              (utilities::get_value_if_present<
+		                   TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>::value !=
+		               0)) {
+			if (utilities::get_value_if_present<TreeFlags::WBT_DELTA_DENOMINATOR,
+			                                    Opts...>::value != 1) {
+				return std::to_string(utilities::get_value_if_present<
+				                      TreeFlags::WBT_DELTA_NUMERATOR, Opts...>::value) +
+				       std::string("/") +
+				       std::to_string(
+				           utilities::get_value_if_present<
+				               TreeFlags::WBT_DELTA_DENOMINATOR, Opts...>::value);
+			} else {
+				return std::to_string(
+				    utilities::get_value_if_present<TreeFlags::WBT_DELTA_NUMERATOR,
+				                                    Opts...>::value);
+			}
+		} else {
+			return std::string("1+sqrt(2)");
+		}
+	}
+
 	using WBTGammaT =
 	    typename decltype(TreeOptions<Opts...>::compute_wbt_gamma_type())::type;
 	static constexpr WBTGammaT
@@ -398,6 +426,34 @@ public:
 			                                        Opts...>::value);
 		} else {
 			return wbt_gamma_default;
+		}
+	}
+
+	static std::string
+	wbt_gamma_str()
+	{
+		if constexpr (OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_DENOMINATOR>() &&
+		              OptPack::template has_tmpl_size_t<
+		                  TreeFlags::WBT_DELTA_NUMERATOR>() &&
+		              (utilities::get_value_if_present<
+		                   TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>::value !=
+		               0)) {
+			if (utilities::get_value_if_present<TreeFlags::WBT_GAMMA_DENOMINATOR,
+			                                    Opts...>::value != 1) {
+				return std::to_string(utilities::get_value_if_present<
+				                      TreeFlags::WBT_GAMMA_NUMERATOR, Opts...>::value) +
+				       std::string("/") +
+				       std::to_string(
+				           utilities::get_value_if_present<
+				               TreeFlags::WBT_GAMMA_DENOMINATOR, Opts...>::value);
+			} else {
+				return std::to_string(
+				    utilities::get_value_if_present<TreeFlags::WBT_GAMMA_NUMERATOR,
+				                                    Opts...>::value);
+			}
+		} else {
+			return std::string("sqrt(2)");
 		}
 	}
 

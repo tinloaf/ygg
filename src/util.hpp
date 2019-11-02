@@ -1,7 +1,3 @@
-//
-// Created by Lukas Barth on 09.08.17.
-//
-
 #include <utility>
 #ifndef YGG_UTIL_HPP
 #define YGG_UTIL_HPP
