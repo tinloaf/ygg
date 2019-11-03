@@ -59,46 +59,44 @@ REGISTER(EraseYggRBBSTFixture, BM_BST_Erasure)
 /*
  * Ygg's Red-Black Tree, avoiding conditional branches
  */
-/*
 using EraseYggRBBSTFixtureArith =
-    BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
-               EraseExperiment, BSTEraseOptions>;
+    BSTFixture<YggRBTreeInterface<ArithTreeOptions>, EraseExperiment,
+               BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
 (benchmark::State & state)
 {
-  std::vector<typename decltype(this->experiment_node_pointers)::value_type>
-      erased_nodes;
-  erased_nodes.reserve(this->experiment_node_pointers.size());
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
 
-  for (auto _ : state) {
-    this->papi.start();
-    for (auto n : this->experiment_node_pointers) {
-      erased_nodes.push_back(this->t.erase(n->get_value()));
-    }
-    this->papi.stop();
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			erased_nodes.push_back(this->t.erase(n->get_value()));
+		}
+		this->papi.stop();
 
-    state.PauseTiming();
-    for (auto n : erased_nodes) {
-      //		for (auto n : this->experiment_node_pointers) {
-      this->t.insert(*n);
-    }
-    erased_nodes.clear();
-    // TODO shuffling here?
-    state.ResumeTiming();
-  }
+		state.PauseTiming();
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		erased_nodes.clear();
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
 
-  this->papi.report_and_reset(state);
+	this->papi.report_and_reset(state);
 }
 REGISTER(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
-*/
 
 /*
  * Ygg's Weight-Balanced Trees
  */
 // Default gamma, delta / twopass
 using EraseYggWBDefGDefDTPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-               EraseExperiment, BSTEraseOptions>;
+    BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions>, EraseExperiment,
+               BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggWBDefGDefDTPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
@@ -128,9 +126,9 @@ BENCHMARK_DEFINE_F(EraseYggWBDefGDefDTPBSTFixture, BM_BST_Erasure)
 REGISTER(EraseYggWBDefGDefDTPBSTFixture, BM_BST_Erasure)
 
 // Default gamma, delta / single pass
-using EraseYggWBDefGDefDSPBSTFixture = BSTFixture<
-    YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-    EraseExperiment, BSTEraseOptions>;
+using EraseYggWBDefGDefDSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions>, EraseExperiment,
+               BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
@@ -161,8 +159,8 @@ REGISTER(EraseYggWBDefGDefDSPBSTFixture, BM_BST_Erasure)
 
 // Lai and Wood Gamma, Delta / single pass
 using EraseYggWBLWSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassLWTreeOptions, WBBSTNamerLWSP>,
-               EraseExperiment, BSTEraseOptions>;
+    BSTFixture<YggWBTreeInterface<WBTSinglepassLWTreeOptions>, EraseExperiment,
+               BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggWBLWSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
@@ -193,8 +191,8 @@ REGISTER(EraseYggWBLWSPBSTFixture, BM_BST_Erasure)
 
 // Balance-focussed Gamma, Delta / single pass
 using EraseYggWBBalSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassBalTreeOptions, WBBSTNamerBalSP>,
-               EraseExperiment, BSTEraseOptions>;
+    BSTFixture<YggWBTreeInterface<WBTSinglepassBalTreeOptions>, EraseExperiment,
+               BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
@@ -224,9 +222,9 @@ BENCHMARK_DEFINE_F(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
 REGISTER(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
 
 // Super-Balance-focussed Gamma, Delta / single pass
-using EraseYggWBSuperBalSPBSTFixture = BSTFixture<
-    YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions, WBBSTNamerSuperBalSP>,
-    EraseExperiment, BSTEraseOptions>;
+using EraseYggWBSuperBalSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions>,
+               EraseExperiment, BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggWBSuperBalSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
@@ -256,9 +254,9 @@ BENCHMARK_DEFINE_F(EraseYggWBSuperBalSPBSTFixture, BM_BST_Erasure)
 REGISTER(EraseYggWBSuperBalSPBSTFixture, BM_BST_Erasure)
 
 // Balance-focussed Gamma, Delta / single pass, avoiding conditionals
-using EraseYggWBBalSPArithBSTFixture = BSTFixture<
-    YggWBTreeInterface<WBTSinglepassBalArithTreeOptions, WBBSTNamerBalSPArith>,
-    EraseExperiment, BSTEraseOptions>;
+using EraseYggWBBalSPArithBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassBalArithTreeOptions>,
+               EraseExperiment, BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggWBBalSPArithBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
@@ -288,9 +286,9 @@ BENCHMARK_DEFINE_F(EraseYggWBBalSPArithBSTFixture, BM_BST_Erasure)
 REGISTER(EraseYggWBBalSPArithBSTFixture, BM_BST_Erasure)
 
 // Default gamma, delta / single pass, optimistic
-using EraseYggWBDefGDefDSPOPTBSTFixture = BSTFixture<
-    YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSPOPT>,
-    EraseExperiment, BSTEraseOptions>;
+using EraseYggWBDefGDefDSPOPTBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions>, EraseExperiment,
+               BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPOPTBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
@@ -321,8 +319,8 @@ REGISTER(EraseYggWBDefGDefDSPOPTBSTFixture, BM_BST_Erasure)
 
 // integral gamma, delta / single pass
 using EraseYggWB3G2DSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>,
-               EraseExperiment, BSTEraseOptions>;
+    BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions>, EraseExperiment,
+               BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
@@ -354,7 +352,7 @@ REGISTER(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 /*
 // integral gamma, delta / twopass
 using EraseYggWB3G2DTPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions, WBBSTNamer3G2DTP>,
+    BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions>,
                EraseExperiment, BSTEraseOptions>;
 BENCHMARK_DEFINE_F(EraseYggWB3G2DTPBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)

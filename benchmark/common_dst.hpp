@@ -274,8 +274,16 @@ public:
 	get_name()
 	{
 		using DummyOptions = ygg::TreeOptions<UnderlyingOptions...>;
+		std::string sp_tp;
+		if constexpr (DummyOptions::wbt_single_pass) {
+			sp_tp = "SP";
+		} else {
+			sp_tp = "TP";
+		}
+
 		return std::string("WBTree[") + DummyOptions::wbt_delta_str() +
-		       std::string(",") + DummyOptions::wbt_gamma_str() + std::string("]");
+		       std::string(",") + DummyOptions::wbt_gamma_str() + std::string(",") +
+		       sp_tp + std::string("]");
 	}
 
 	static void

@@ -17,8 +17,8 @@ struct BSTSearchOptions : public DefaultBenchmarkOptions
  * Ygg's Red-Black Tree, using arithmetics instead of conditionals
  */
 using SearchYggRBBSTFixtureArith =
-    BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
-               SearchExperiment, BSTSearchOptions>;
+    BSTFixture<YggRBTreeInterface<ArithTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggRBBSTFixtureArith, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -62,8 +62,8 @@ REGISTER(SearchYggRBBSTFixture, BM_BST_Search)
  * Ygg's weight-balanced tree, default parameters, two-pass
  */
 using SearchYggWBDefTPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-               SearchExperiment, BSTSearchOptions>;
+    BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggWBDefTPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -84,9 +84,9 @@ REGISTER(SearchYggWBDefTPBSTFixture, BM_BST_Search)
 /*
  * Ygg's weight-balanced tree, default parameters, single-pass
  */
-using SearchYggWBDefSPBSTFixture = BSTFixture<
-    YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-    SearchExperiment, BSTSearchOptions>;
+using SearchYggWBDefSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggWBDefSPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -108,8 +108,8 @@ REGISTER(SearchYggWBDefSPBSTFixture, BM_BST_Search)
  * Ygg's weight-balanced tree, Lai / Wood
  */
 using SearchYggWBLWSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerLWSP>,
-               SearchExperiment, BSTSearchOptions>;
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggWBLWSPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -131,8 +131,8 @@ REGISTER(SearchYggWBLWSPBSTFixture, BM_BST_Search)
  * Ygg's weight-balanced tree, Balanced
  */
 using SearchYggWBBalSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerBalSP>,
-               SearchExperiment, BSTSearchOptions>;
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggWBBalSPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -153,9 +153,9 @@ REGISTER(SearchYggWBBalSPBSTFixture, BM_BST_Search)
 /*
  * Ygg's weight-balanced tree, Super-Balanced
  */
-using SearchYggWBSuperBalSPBSTFixture = BSTFixture<
-    YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerSuperBalSP>,
-    SearchExperiment, BSTSearchOptions>;
+using SearchYggWBSuperBalSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggWBSuperBalSPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
@@ -177,8 +177,8 @@ REGISTER(SearchYggWBSuperBalSPBSTFixture, BM_BST_Search)
  * Ygg's weight-balanced tree, Integral, SP
  */
 using SearchYggWB32SPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamer3G2DSP>,
-               SearchExperiment, BSTSearchOptions>;
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggWB32SPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {

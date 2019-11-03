@@ -39,57 +39,6 @@
 #endif
 #endif
 
-struct WBBSTNamerDefGDefDTP
-{
-	constexpr static const char * name = PREFIX "1+sqrt(2),sqrt(2),TP";
-};
-struct WBBSTNamerDefGDefDSP
-{
-	constexpr static const char * name = PREFIX "1+sqrt(2),sqrt(2),SP";
-};
-struct WBBSTNamerBalSP
-{
-	constexpr static const char * name = PREFIX "2,3/2,SP(opt)";
-};
-struct WBBSTNamerSuperBalSP
-{
-	constexpr static const char * name = PREFIX "3/2,5/4,SP(opt)";
-};
-struct WBBSTNamerBalSPArith
-{
-	constexpr static const char * name = PREFIX "2,3/2,SP(opt),arith";
-};
-struct WBBSTNamerLWSP
-{
-	constexpr static const char * name = PREFIX "3,4/3,SP(opt)";
-};
-struct WBBSTNamer3G2DSP
-{
-	constexpr static const char * name = PREFIX "3,2,SP";
-};
-struct WBBSTNamer3G2DTP
-{
-	constexpr static const char * name = PREFIX "3,2,TP";
-};
-
-struct WBBSTNamerDefGDefDSPOPT
-{
-	constexpr static const char * name = PREFIX "1+sqrt(2),sqrt(2),SP(opt)";
-};
-struct WBBSTNamer3G2DSPOPT
-{
-	constexpr static const char * name = PREFIX "3,2,SP(opt)";
-};
-
-struct RBBSTNamerDefault
-{
-	constexpr static const char * name = PREFIX "RBTree";
-};
-struct RBBSTNamerArith
-{
-	constexpr static const char * name = PREFIX "RBTree[arith]";
-};
-
 struct UseNone
 {
 	static constexpr bool enable = false;
@@ -463,7 +412,7 @@ operator<(int lhs, const RBNode<T> & rhs)
 	return lhs < rhs.get_value();
 }
 
-template <class MyTreeOptions, class Namer = RBBSTNamerDefault>
+template <class MyTreeOptions>
 class YggRBTreeInterface {
 public:
 	using Node = RBNode<MyTreeOptions>;
@@ -478,7 +427,11 @@ public:
 	static std::string
 	get_name()
 	{
-		return Namer::name;
+		std::string avc = "";
+		if constexpr (MyTreeOptions::micro_avoid_conditionals) {
+			avc = "avc";
+		}
+		return std::string("RBTree[") + avc + std::string("]");
 	}
 
 	static int
@@ -550,7 +503,7 @@ operator<(int lhs, const WBNode<T> & rhs)
 	return lhs < rhs.get_value();
 }
 
-template <class MyTreeOptions, class BenchmarkNamer>
+template <class MyTreeOptions>
 class YggWBTreeInterface {
 public:
 	using Node = WBNode<MyTreeOptions>;
@@ -565,9 +518,16 @@ public:
 	static std::string
 	get_name()
 	{
-		std::ostringstream name;
-		name << "WBTree[" << BenchmarkNamer::name << "] ";
-		return name.str();
+		std::string sp_tp;
+		if constexpr (MyTreeOptions::wbt_single_pass) {
+			sp_tp = "SP";
+		} else {
+			sp_tp = "TP";
+		}
+
+		return std::string("WBTree[") + MyTreeOptions::wbt_delta_str() +
+		       std::string(",") + MyTreeOptions::wbt_gamma_str() +
+		       std::string(",") + sp_tp + std::string("]");
 	}
 
 	static int

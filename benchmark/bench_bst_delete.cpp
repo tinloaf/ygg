@@ -54,8 +54,8 @@ REGISTER(DeleteYggRBBSTFixture, BM_BST_Deletion)
  * Ygg's Red-Black Tree, avoiding conditional branches
  */
 using DeleteYggRBBSTFixtureArith =
-    BSTFixture<YggRBTreeInterface<ArithTreeOptions, RBBSTNamerArith>,
-               DeleteExperiment, BSTDeleteOptions>;
+    BSTFixture<YggRBTreeInterface<ArithTreeOptions>, DeleteExperiment,
+               BSTDeleteOptions>;
 BENCHMARK_DEFINE_F(DeleteYggRBBSTFixtureArith, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -83,8 +83,8 @@ REGISTER(DeleteYggRBBSTFixtureArith, BM_BST_Deletion)
  */
 // Default gamma, delta / twopass
 using DeleteYggWBDefGDefDTPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-               DeleteExperiment, BSTDeleteOptions>;
+    BSTFixture<YggWBTreeInterface<WBTTwopassTreeOptions>, DeleteExperiment,
+               BSTDeleteOptions>;
 BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -108,9 +108,9 @@ BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
 REGISTER(DeleteYggWBDefGDefDTPBSTFixture, BM_BST_Deletion)
 
 // Default gamma, delta / single pass
-using DeleteYggWBDefGDefDSPBSTFixture = BSTFixture<
-    YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-    DeleteExperiment, BSTDeleteOptions>;
+using DeleteYggWBDefGDefDSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassTreeOptions>, DeleteExperiment,
+               BSTDeleteOptions>;
 BENCHMARK_DEFINE_F(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -135,8 +135,8 @@ REGISTER(DeleteYggWBDefGDefDSPBSTFixture, BM_BST_Deletion)
 
 // integral gamma, delta / single pass
 using DeleteYggWB3G2DSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>,
-               DeleteExperiment, BSTDeleteOptions>;
+    BSTFixture<YggWBTreeInterface<WBTSinglepass32TreeOptions>, DeleteExperiment,
+               BSTDeleteOptions>;
 BENCHMARK_DEFINE_F(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -161,8 +161,8 @@ REGISTER(DeleteYggWB3G2DSPBSTFixture, BM_BST_Deletion)
 
 // integral gamma, delta / twopass
 using DeleteYggWB3G2DTPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions, WBBSTNamer3G2DTP>,
-               DeleteExperiment, BSTDeleteOptions>;
+    BSTFixture<YggWBTreeInterface<WBTTwopass32TreeOptions>, DeleteExperiment,
+               BSTDeleteOptions>;
 BENCHMARK_DEFINE_F(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -187,8 +187,8 @@ REGISTER(DeleteYggWB3G2DTPBSTFixture, BM_BST_Deletion)
 
 // Lai / Wood
 using DeleteYggWBLWSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassLWTreeOptions, WBBSTNamerLWSP>,
-               DeleteExperiment, BSTDeleteOptions>;
+    BSTFixture<YggWBTreeInterface<WBTSinglepassLWTreeOptions>, DeleteExperiment,
+               BSTDeleteOptions>;
 BENCHMARK_DEFINE_F(DeleteYggWBLWSPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {
@@ -213,7 +213,7 @@ REGISTER(DeleteYggWBLWSPBSTFixture, BM_BST_Deletion)
 
 // Balanced
 using DeleteYggWBBalSPBSTFixture =
-    BSTFixture<YggWBTreeInterface<WBTSinglepassBalTreeOptions, WBBSTNamerBalSP>,
+    BSTFixture<YggWBTreeInterface<WBTSinglepassBalTreeOptions>,
                DeleteExperiment, BSTDeleteOptions>;
 BENCHMARK_DEFINE_F(DeleteYggWBBalSPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
@@ -238,9 +238,9 @@ BENCHMARK_DEFINE_F(DeleteYggWBBalSPBSTFixture, BM_BST_Deletion)
 REGISTER(DeleteYggWBBalSPBSTFixture, BM_BST_Deletion)
 
 // Super-Balanced
-using DeleteYggWBSuperBalSPBSTFixture = BSTFixture<
-    YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions, WBBSTNamerSuperBalSP>,
-    DeleteExperiment, BSTDeleteOptions>;
+using DeleteYggWBSuperBalSPBSTFixture =
+    BSTFixture<YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions>,
+               DeleteExperiment, BSTDeleteOptions>;
 BENCHMARK_DEFINE_F(DeleteYggWBSuperBalSPBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
 {

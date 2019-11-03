@@ -183,36 +183,31 @@ main(int argc, const char ** argv)
 
 	run_all<InsertExecutor, BSTInsertOptions, InsertExperiment,
 	        YggRBTreeInterface<BasicTreeOptions>,
-	        YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-	        YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-	        YggWBTreeInterface<WBTSinglepassLWTreeOptions, WBBSTNamerLWSP>,
-	        YggWBTreeInterface<WBTSinglepassBalTreeOptions, WBBSTNamerBalSP>,
-	        YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions,
-	                           WBBSTNamerSuperBalSP>,
-	        YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>
-
+	        YggWBTreeInterface<WBTTwopassTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassLWTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassBalTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepass32TreeOptions>
 	        >{}("Insert", out);
 
 	run_all<EraseExecutor, BSTEraseOptions, EraseExperiment,
 	        YggRBTreeInterface<BasicTreeOptions>,
-	        YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-	        YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-	        YggWBTreeInterface<WBTSinglepassLWTreeOptions, WBBSTNamerLWSP>,
-	        YggWBTreeInterface<WBTSinglepassBalTreeOptions, WBBSTNamerBalSP>,
-	        YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions,
-	                           WBBSTNamerSuperBalSP>,
-	        YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>
-
+	        YggWBTreeInterface<WBTTwopassTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassLWTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassBalTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepass32TreeOptions>
 	        >{}("Erase", out);
+
 	run_all<MoveExecutor, BSTMoveOptions, MoveExperiment,
 	        YggRBTreeInterface<BasicTreeOptions>,
-	        YggWBTreeInterface<WBTTwopassTreeOptions, WBBSTNamerDefGDefDTP>,
-	        YggWBTreeInterface<WBTSinglepassTreeOptions, WBBSTNamerDefGDefDSP>,
-	        YggWBTreeInterface<WBTSinglepassLWTreeOptions, WBBSTNamerLWSP>,
-	        YggWBTreeInterface<WBTSinglepassBalTreeOptions, WBBSTNamerBalSP>,
-	        YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions,
-	                           WBBSTNamerSuperBalSP>,
-	        YggWBTreeInterface<WBTSinglepass32TreeOptions, WBBSTNamer3G2DSP>
-
+	        YggWBTreeInterface<WBTTwopassTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassLWTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassBalTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepassSuperBalTreeOptions>,
+	        YggWBTreeInterface<WBTSinglepass32TreeOptions>
 	        >{}("Move", out);
 }
