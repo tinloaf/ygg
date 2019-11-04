@@ -56,7 +56,7 @@ endif()
 #==== Build type: valgrind
 #===============================================
 
-set(CMAKE_C_FLAGS_VALGRIND "${CMAKE_C_FLAGS} -O2 -march=native -ffast-math -g -flto" CACHE STRING
+set(CMAKE_C_FLAGS_VALGRIND "${CMAKE_C_FLAGS} -O2 -march=native -ffast-math -g -flto -mno-avx512f -mno-avx512pf -mno-avx512er -mno-avx512cd -mno-avx512vl -mno-avx512bw -mno-avx512dq -mno-avx512ifma -mno-avx512vbmi" CACHE STRING
         "Flags used by the C++ compiler during valgrind builds."
         FORCE)
 set(CMAKE_CXX_FLAGS_VALGRIND "${CMAKE_C_FLAGS_VALGRIND}" CACHE STRING
