@@ -52,6 +52,7 @@ public:
 		std::uniform_real_distribution<double> val_distr(0, 20);
 
 		this->fixed_nodes.clear();
+		this->fixed_values.clear();
 
 		for (size_t i = 0; i < fixed_count; ++i) {
 			int p1 = point_distr(this->rng);
