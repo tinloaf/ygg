@@ -35,10 +35,10 @@ REGISTER(InsertRBDSTFixture, BM_DST_Insertion)
  * Zip DST
  */
 using InsertZDSTFixture = DSTFixture<
-    ZDSTInterface<BasicDSTTreeOptions, ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
-                  ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
-                      3445358421>,
-                  ygg::TreeFlags::ZTREE_USE_HASH>,
+    ZDSTInterface<
+        BasicDSTTreeOptions, ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
+        ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
+        ygg::TreeFlags::ZTREE_USE_HASH>,
     InsertExperiment, true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertZDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
