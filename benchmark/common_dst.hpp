@@ -314,21 +314,21 @@ public:
 /*
  * Zipping DST Interface
  */
-template <class MyTreeOptions>
+template <class MyTreeOptions, class... UnderlyingOptions>
 class ZDSTNode
     : public ygg::DynSegTreeNodeBase<int, double, double, CombinerPack,
-                                     ygg::UseDefaultZipTree> {
+                                     ygg::UseZipTree<UnderlyingOptions...>> {
 public:
 	int lower;
 	int upper;
 	double value;
 };
 
-template <class MyTreeOptions>
-class ZDSTNodeTraits
-    : public ygg::DynSegTreeNodeTraits<ZDSTNode<MyTreeOptions>> {
+template <class MyTreeOptions, class... UnderlyingOptions>
+class ZDSTNodeTraits : public ygg::DynSegTreeNodeTraits<
+                           ZDSTNode<MyTreeOptions, UnderlyingOptions...>> {
 public:
-	using Node = ZDSTNode<MyTreeOptions>;
+	using Node = ZDSTNode<MyTreeOptions, UnderlyingOptions...>;
 
 	static int
 	get_lower(const Node & n)
@@ -347,18 +347,32 @@ public:
 	}
 };
 
-template <class MyTreeOptions>
+template <class MyTreeOptions, class... UnderlyingOptions>
 class ZDSTInterface {
 public:
-	using Node = ZDSTNode<MyTreeOptions>;
-	using Tree =
-	    ygg::DynamicSegmentTree<Node, ZDSTNodeTraits<MyTreeOptions>, CombinerPack,
-	                            MyTreeOptions, ygg::UseDefaultZipTree>;
+	using Node = ZDSTNode<MyTreeOptions, UnderlyingOptions...>;
+	using Tree = ygg::DynamicSegmentTree<
+	    Node, ZDSTNodeTraits<MyTreeOptions, UnderlyingOptions...>, CombinerPack,
+	    MyTreeOptions, ygg::UseZipTree<UnderlyingOptions...>>;
 
 	static std::string
 	get_name()
 	{
-		return "ZipTree";
+		std::string randomness = "R"; // "Truly" random
+		using DummyOptions = ygg::TreeOptions<UnderlyingOptions...>;
+		if (DummyOptions::ztree_use_hash) {
+			randomness = "H"; // Hash
+		}
+
+		std::string universalize = "";
+		if (DummyOptions::ztree_universalize_lincong) {
+			universalize = ",UL";
+		}
+		if (DummyOptions::ztree_universalize_multiply) {
+			universalize = ",UM";
+		}
+
+		return "ZipTree[" + randomness + universalize + "]";
 	}
 
 	static void

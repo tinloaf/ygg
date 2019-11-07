@@ -103,12 +103,17 @@ public:
 	 *
 	 *   h = (x * <coefficient>) % <modul>
 	 *
-	 * This parameter sets the coefficeint.
+	 * This parameter sets the coefficient.
 	 *
-	 * @warning Universal hashing is only activated if you also set
-	 * ZTREE_RANK_HASH_UNIVERSALIZE_MODUL.
+	 * If you do not set the modul via ZTREE_RANK_HASH_UNIVERSALIZE_MODUL,
+	 * this results in no modulo arithmetic being done (mathematically equivalent
+	 * to setting ZTREE_RANK_HASH_UNIVERSALIZE_MODUL to
+	 * std::numeric_limits<size_t>::max()). If you set
+	 * ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT to a random odd number, this
+	 * results in 2/m-almost-universality of the random values, but yields less
+	 * costly math operations.
 	 *
-	 * @tparam coefficient_in The desired coefficient. Randomize this!
+	 * @tparam coefficient_in The desired coefficient.
 	 */
 	template <size_t coefficient_in>
 	class ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT {
@@ -126,13 +131,20 @@ public:
 	 *
 	 *   h = (x * <coefficient>) % <modul>
 	 *
-	 * This parameter sets the modul.
+	 * This parameter sets the modul. Note that setting the modul to
+	 * std::numeric_limits<size_t>::max() is not useful.
+	 *
+	 * If you do not set the modul, but you set
+	 * ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT, this results in no modulo
+	 * arithmetic being done (mathematically equivalent to setting
+	 * ZTREE_RANK_HASH_UNIVERSALIZE_MODUL to std::numeric_limits<size_t>::max()).
+	 * Doing this results in 2/m-almost-universality of the random values, but
+	 * yields less costly math operations.
 	 *
 	 * @warning Universal hashing is only activated if you also set
 	 * ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT.
 	 *
-	 * @tparam coefficient_in The desired modul. Randomize this! You might want to
-	 * chose a prime.
+	 * @tparam coefficient_in The desired modul. You might want to chose a prime.
 	 */
 	template <size_t modul_in>
 	class ZTREE_RANK_HASH_UNIVERSALIZE_MODUL {
@@ -339,9 +351,16 @@ public:
 	    typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE, bool,
 	                                            Opts...>::type;
 
-	static constexpr bool ztree_universalize =
+	static constexpr bool ztree_universalize_lincong =
 	    (utilities::get_value_if_present<
 	         TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL, Opts...>::found &&
+	     utilities::get_value_if_present<
+	         TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT,
+	         Opts...>::found);
+
+	static constexpr bool ztree_universalize_multiply =
+	    ((!utilities::get_value_if_present<
+	         TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL, Opts...>::found) &&
 	     utilities::get_value_if_present<
 	         TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT,
 	         Opts...>::found);

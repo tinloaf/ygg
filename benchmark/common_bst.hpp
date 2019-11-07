@@ -697,7 +697,20 @@ public:
 	static std::string
 	get_name()
 	{
-		return "ZipTree";
+		std::string randomness = "R"; // "Truly" random
+		if (MyTreeOptions::ztree_use_hash) {
+			randomness = "H"; // Hash
+		}
+
+		std::string universalize = "";
+		if (MyTreeOptions::ztree_universalize_lincong) {
+			universalize = ",UL";
+		}
+		if (MyTreeOptions::ztree_universalize_multiply) {
+			universalize = ",UM";
+		}
+
+		return "ZipTree[" + randomness + universalize + "]";
 	}
 
 	static void

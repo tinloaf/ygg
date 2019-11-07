@@ -82,8 +82,11 @@ REGISTER(MoveWBDSTFixture, BM_DST_Move)
 /*
  * Zip DST
  */
-using MoveZDSTFixture = DSTFixture<ZDSTInterface<BasicDSTTreeOptions>,
-                                   MoveExperiment, false, true, true, false>;
+using MoveZDSTFixture = DSTFixture<
+    ZDSTInterface<BasicDSTTreeOptions ygg::TreeFlags::
+                      ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
+                  ygg::TreeFlags::ZTREE_USE_HASH>,
+    MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveZDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	for (auto _ : state) {

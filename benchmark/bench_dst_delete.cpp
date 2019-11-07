@@ -34,9 +34,11 @@ REGISTER(DeleteRBDSTFixture, BM_DST_Deletion)
 /*
  * Zip DST
  */
-using DeleteZDSTFixture =
-    DSTFixture<ZDSTInterface<BasicDSTTreeOptions>, DeleteExperiment, false,
-               false, true, false>;
+using DeleteZDSTFixture = DSTFixture<
+    ZDSTInterface<BasicDSTTreeOptions ygg::TreeFlags::
+                      ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
+                  ygg::TreeFlags::ZTREE_USE_HASH>,
+    DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteZDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 {
 	for (auto _ : state) {
