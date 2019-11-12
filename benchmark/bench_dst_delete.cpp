@@ -32,15 +32,16 @@ BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)
 REGISTER(DeleteRBDSTFixture, BM_DST_Deletion)
 
 /*
- * Zip DST
+ * Zip DST with hashing
  */
-using DeleteZDSTFixture = DSTFixture<
+using DeleteZHDSTFixture = DSTFixture<
     ZDSTInterface<
         BasicDSTTreeOptions,
         ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
         ygg::TreeFlags::ZTREE_USE_HASH>,
     DeleteExperiment, false, false, true, false>;
-BENCHMARK_DEFINE_F(DeleteZDSTFixture, BM_DST_Deletion)(benchmark::State & state)
+BENCHMARK_DEFINE_F(DeleteZHDSTFixture, BM_DST_Deletion)
+(benchmark::State & state)
 {
 	for (auto _ : state) {
 		this->papi.start();
@@ -59,7 +60,36 @@ BENCHMARK_DEFINE_F(DeleteZDSTFixture, BM_DST_Deletion)(benchmark::State & state)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteZDSTFixture, BM_DST_Deletion)
+REGISTER(DeleteZHDSTFixture, BM_DST_Deletion)
+
+/*
+ * Zip DST with truly random ranks
+ */
+using DeleteZRDSTFixture =
+    DSTFixture<ZDSTInterface<BasicDSTTreeOptions,
+                             ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>>,
+               DeleteExperiment, false, false, true, false>;
+BENCHMARK_DEFINE_F(DeleteZRDSTFixture, BM_DST_Deletion)
+(benchmark::State & state)
+{
+	for (auto _ : state) {
+		this->papi.start();
+		for (auto i : this->experiment_indices) {
+			this->t.remove(this->fixed_nodes[i]);
+		}
+		this->papi.stop();
+
+		state.PauseTiming();
+		for (auto i : this->experiment_indices) {
+			this->t.insert(this->fixed_nodes[i]);
+		}
+		// TODO shuffling here?
+		state.ResumeTiming();
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteZRDSTFixture, BM_DST_Deletion)
 
 /*
  * WB-DST with 3/2
