@@ -348,7 +348,7 @@ public:
 	static constexpr bool ztree_use_hash =
 	    OptPack::template has<TreeFlags::ZTREE_USE_HASH>();
 	using ztree_rank_type =
-	    typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE, bool,
+	    typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE, void,
 	                                            Opts...>::type;
 
 	static constexpr bool ztree_universalize_lincong =
@@ -366,7 +366,7 @@ public:
 	         Opts...>::found);
 
 	static constexpr bool ztree_store_rank =
-	    !std::is_same<ztree_rank_type, bool>::value;
+	    !std::is_same<ztree_rank_type, void>::value;
 
 	static constexpr size_t ztree_universalize_modul =
 	    utilities::get_value_if_present_else_default<
