@@ -983,6 +983,18 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+template <bool reverse>
+Node *
+WBTree<Node, NodeTraits, Options, Tag, Compare>::erase(
+    const iterator<reverse> & it) CMP_NOEXCEPT(*it)
+{
+	Node * n = &(*it);
+	this->remove(*it);
+
+	return n;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
 Node *
 WBTree<Node, NodeTraits, Options, Tag, Compare>::erase_optimistic(

@@ -862,6 +862,23 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
+template <bool reverse>
+Node *
+RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(
+    const iterator<reverse> & it) CMP_NOEXCEPT(*it)
+{
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_erase(reinterpret_cast<const void *>(&(*it)),
+	                         Options::SequenceInterface::get_key(*it));
+#endif
+
+	Node * n = &(*it);
+	this->remove(*it);
+
+	return n;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 void
 RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_delete(
     Node * parent, bool deleted_left) noexcept

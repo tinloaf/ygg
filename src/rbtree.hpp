@@ -275,6 +275,9 @@ public:
 	template <class Comparable>
 	Node * erase(const Comparable & c) CMP_NOEXCEPT(c);
 
+	template <bool reverse>
+	Node * erase(const iterator<reverse> & it) CMP_NOEXCEPT(*it);
+
 	// Mainly debugging methods
 	/// @cond INTERNAL
 	void dbg_verify() const;

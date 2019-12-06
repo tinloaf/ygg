@@ -524,6 +524,28 @@ TEST(__WBT_BASENAME(WBTreeTest), TrivialErasureTest)
 	ASSERT_TRUE(tree.empty());
 }
 
+TEST(__WBT_BASENAME(WBTreeTest), IteratorErasureTest)
+{
+	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();
+
+	Node n1;
+	n1.data = 0;
+	tree.insert(n1);
+
+	Node n2;
+	n2.data = 1;
+	tree.insert(n2);
+
+	ASSERT_FALSE(tree.empty());
+	tree.dbg_verify();
+
+	auto it = tree.begin();
+	Node * removed_node = tree.erase(it);
+	ASSERT_EQ(removed_node, &n1);
+
+	ASSERT_EQ(tree.find(0), tree.end());
+}
+
 TEST(__WBT_BASENAME(WBTreeTest), TrivialOptimisticErasureTest)
 {
 	auto tree = WBTree<Node, NodeTraits, DEFAULT_FLAGS>();

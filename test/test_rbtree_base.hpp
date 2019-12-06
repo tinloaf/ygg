@@ -154,35 +154,35 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionTest)
 /* Hinted is broken
 TEST(__RBT_BASENAME(RBTreeTest), HintedPostEqualInsertionTest)
 {
-	auto tree = RBTree<EqualityNode, EqualityNodeTraits, __RBT_MULTIPLE>();
+  auto tree = RBTree<EqualityNode, EqualityNodeTraits, __RBT_MULTIPLE>();
 
-	EqualityNode n_insert_before(1, 0);
-	EqualityNode n_pre(1, 1);
-	EqualityNode n_insert_between(1, 2);
-	EqualityNode n_post(2, 3);
+  EqualityNode n_insert_before(1, 0);
+  EqualityNode n_pre(1, 1);
+  EqualityNode n_insert_between(1, 2);
+  EqualityNode n_post(2, 3);
 
-	tree.insert(n_pre);
-	tree.insert(n_post);
+  tree.insert(n_pre);
+  tree.insert(n_post);
 
-	tree.dbg_verify();
+  tree.dbg_verify();
 
-	// should be inserted before pre
-	tree.insert(n_insert_before);
-	tree.dbg_verify();
+  // should be inserted before pre
+  tree.insert(n_insert_before);
+  tree.dbg_verify();
 
-	// TODO once hinted insertion is fixed, check that the order is upheld
-	// if not using the _*_leaning versions, but the hinted version
+  // TODO once hinted insertion is fixed, check that the order is upheld
+  // if not using the _*_leaning versions, but the hinted version
 
-	auto it = tree.begin();
-	ASSERT_EQ(it->sub_data, 0);
-	it++;
-	ASSERT_EQ(it->sub_data, 1);
-	it++;
-	ASSERT_EQ(it->sub_data, 2);
-	it++;
-	ASSERT_EQ(it->sub_data, 3);
-	it++;
-	ASSERT_EQ(it, tree.end());
+  auto it = tree.begin();
+  ASSERT_EQ(it->sub_data, 0);
+  it++;
+  ASSERT_EQ(it->sub_data, 1);
+  it++;
+  ASSERT_EQ(it->sub_data, 2);
+  it++;
+  ASSERT_EQ(it->sub_data, 3);
+  it++;
+  ASSERT_EQ(it, tree.end());
 }
 */
 
@@ -443,6 +443,28 @@ TEST(__RBT_BASENAME(RBTreeTest), TrivialDeletionTest)
 
 	tree.dbg_verify();
 	ASSERT_TRUE(tree.empty());
+}
+
+TEST(__RBT_BASENAME(RBTreeTest), EraseIteratorTest)
+{
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+
+	Node n1;
+	n1.data = 0;
+	tree.insert(n1);
+
+	Node n2;
+	n2.data = 1;
+	tree.insert(n2);
+
+	ASSERT_FALSE(tree.empty());
+	tree.dbg_verify();
+
+	auto it = tree.begin();
+	Node * removed_node = tree.erase(it);
+	ASSERT_EQ(removed_node, &n1);
+
+	ASSERT_EQ(tree.find(0), tree.end());
 }
 
 TEST(__RBT_BASENAME(RBTreeTest), TrivialErasureTest)

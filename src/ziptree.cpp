@@ -545,6 +545,24 @@ ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::erase(
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,
           class RankGetter>
+template <bool reverse>
+Node *
+ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::erase(
+    const iterator<reverse> & it) CMP_NOEXCEPT(*it)
+{
+#ifdef YGG_STORE_SEQUENCE
+	this->bss.register_erase(reinterpret_cast<const void *>(&(*it)),
+	                         Options::SequenceInterface::get_key(*it));
+#endif
+
+	Node * n = &(*it);
+	this->remove(*it);
+
+	return n;
+}
+
+template <class Node, class NodeTraits, class Options, class Tag, class Compare,
+          class RankGetter>
 void
 ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>::zip(
     Node & old_root) noexcept

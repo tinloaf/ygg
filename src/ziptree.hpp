@@ -1,11 +1,11 @@
 #ifndef YGG_ZIPTREE_H
 #define YGG_ZIPTREE_H
 
+#include "bst.hpp"
 #include "options.hpp"
 #include "size_holder.hpp"
 #include "tree_iterator.hpp"
 #include "util.hpp"
-#include "bst.hpp"
 
 #ifdef YGG_STORE_SEQUENCE
 #include "benchmark_sequence.hpp"
@@ -194,6 +194,7 @@ template <
 class ZTree : public bst::BinarySearchTree<Node, Options, Tag, Compare> {
 public:
 	using NB = ZTreeNodeBase<Node, Options, Tag>;
+	using TB = bst::BinarySearchTree<Node, Options, Tag, Compare>;
 	using MyClass = ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>;
 
 	/**
@@ -223,6 +224,14 @@ public:
 	 * @param other  The Zip Tree that this one is constructed from
 	 */
 	MyClass & operator=(MyClass && other) noexcept;
+
+	/*
+	 * Pull in classes from base tree
+	 */
+	template <bool reverse>
+	using iterator = typename TB::template iterator<reverse>;
+	template <bool reverse>
+	using const_iterator = typename TB::template const_iterator<reverse>;
 
 	/**
 	 * @brief Inserts <node> into the tree
@@ -262,6 +271,9 @@ public:
 	 */
 	template <class Comparable>
 	Node * erase(const Comparable & c) CMP_NOEXCEPT(c);
+
+	template <bool reverse>
+	Node * erase(const iterator<reverse> & it) CMP_NOEXCEPT(*it);
 
 	// Debugging methods
 	void dbg_verify() const;

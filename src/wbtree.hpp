@@ -206,6 +206,10 @@ public:
 	 */
 	template <class Comparable>
 	Node * erase(const Comparable & c) CMP_NOEXCEPT(c);
+
+	template <bool reverse>
+	Node * erase(const iterator<reverse> & it) CMP_NOEXCEPT(*it);
+
 	// TODO document
 	template <class Comparable>
 	Node * erase_optimistic(const Comparable & c) CMP_NOEXCEPT(c);
