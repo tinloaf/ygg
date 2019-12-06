@@ -3,6 +3,7 @@
 
 // Just to make this file compileable for clangd
 #include "energy.hpp"
+
 #include "debug.hpp"
 
 #include <cassert>
@@ -801,7 +802,8 @@ template <class Comparable>
 typename EnergyTree<Node, Options, Tag, Compare>::template const_iterator<false>
 EnergyTree<Node, Options, Tag, Compare>::find(const Comparable & query) const
 {
-	return const_iterator<false>(const_cast<decltype(this)>(this)->find(query));
+	return const_iterator<false>(
+	    const_cast<std::remove_const_t<decltype(this)>>(this)->find(query));
 }
 
 template <class Node, class Options, class Tag, class Compare>

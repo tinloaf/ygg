@@ -672,7 +672,8 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
     const Comparable & query) const CMP_NOEXCEPT(query)
 {
-	return const_iterator<false>(const_cast<decltype(this)>(this)->find(query));
+	return const_iterator<false>(
+	    const_cast<std::remove_const_t<decltype(this)>>(this)->find(query));
 }
 
 template <class Node, class Options, class Tag, class Compare,
