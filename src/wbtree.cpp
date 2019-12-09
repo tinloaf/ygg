@@ -969,14 +969,45 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::swap_unrelated_nodes(
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
-Node *
+ygg::utilities::select_type_t<size_t, Node *, Options::stl_erase>
 WBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
     CMP_NOEXCEPT(c)
 {
-	auto el = this->find(c);
+	// If we allow multisets and want to be STL-conform, we must find the *first*
+	// node carrying c, so that we can iteratively delete all of them
+	auto el = this->template find<Comparable,
+	                              (Options::stl_erase && Options::multiple)>(c);
+
 	if (el != this->end()) {
-		this->remove(*el);
-		return &(*el);
+		if constexpr (Options::stl_erase) {
+			size_t count = 1;
+
+			auto next = el + 1;
+			this->remove(*el);
+			if (Options::multiple) {
+				el = next;
+
+				// el points to the first element comparing equal to c.
+				// For all elements after it, we must only check if they are larger
+				while (__builtin_expect((el != this->end()) && (!this->cmp(c, *el)),
+				                        false)) {
+					count++;
+					next = el + 1;
+					this->remove(*el);
+					el = next;
+				}
+			} else {
+				(void)next;
+			}
+			return count;
+		} else {
+			this->remove(*el);
+			return &(*el);
+		}
+	}
+
+	if constexpr (Options::stl_erase) {
+		return 0;
 	} else {
 		return static_cast<Node *>(nullptr);
 	}
@@ -984,14 +1015,23 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool reverse>
-Node *
+ygg::utilities::select_type_t<
+    const typename WBTree<Node, NodeTraits, Options, Tag,
+                          Compare>::template iterator<reverse>,
+    Node *, Options::stl_erase>
 WBTree<Node, NodeTraits, Options, Tag, Compare>::erase(
     const iterator<reverse> & it) CMP_NOEXCEPT(*it)
 {
-	Node * n = &(*it);
-	this->remove(*it);
+	if constexpr (!Options::stl_erase) {
+		Node * n = &(*it);
+		this->remove(*it);
 
-	return n;
+		return n;
+	} else {
+		auto ret = it + 1;
+		this->remove(*it);
+		return ret;
+	}
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>

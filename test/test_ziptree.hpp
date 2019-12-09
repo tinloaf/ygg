@@ -1,41 +1,46 @@
 #ifndef TEST_ZIPTREE_HPP
 #define TEST_ZIPTREE_HPP
 
+#include "../src/ziptree.hpp"
+#include "randomizer.hpp"
+
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <random>
 #include <vector>
 
-#include "../src/ziptree.hpp"
-#include "randomizer.hpp"
-
 namespace ygg {
 namespace testing {
 namespace ziptree {
 
+struct DummyOpt;
 using namespace ygg;
 
 constexpr size_t ZIPTREE_TESTSIZE = 5000;
 constexpr size_t ZIPTREE_SEED = 4;
 
+template <class AddOpt = DummyOpt>
 using ExplicitRankOptions =
     ygg::TreeOptions<TreeFlags::MULTIPLE, TreeFlags::CONSTANT_TIME_SIZE,
-                     TreeFlags::ZTREE_RANK_TYPE<int>>;
+                     TreeFlags::ZTREE_RANK_TYPE<int>, AddOpt>;
+template <class AddOpt = DummyOpt>
 using ImplicitRankOptions =
     ygg::TreeOptions<TreeFlags::MULTIPLE, TreeFlags::CONSTANT_TIME_SIZE,
                      TreeFlags::ZTREE_USE_HASH,
-                     TreeFlags::ZTREE_RANK_TYPE<size_t>>;
+                     TreeFlags::ZTREE_RANK_TYPE<size_t>, AddOpt>;
 
-class Node : public ZTreeNodeBase<Node, ExplicitRankOptions> {
+template <class AddOpt = DummyOpt>
+class NodeBase
+    : public ZTreeNodeBase<NodeBase<AddOpt>, ExplicitRankOptions<AddOpt>> {
 public:
 	int data;
 	int rank;
 
-	Node() : data(0), rank(0){};
-	Node(int data_in, int rank_in) : data(data_in), rank(rank_in){};
+	NodeBase() : data(0), rank(0){};
+	NodeBase(int data_in, int rank_in) : data(data_in), rank(rank_in){};
 
 	bool
-	operator<(const Node & other) const
+	operator<(const NodeBase<AddOpt> & other) const
 	{
 		return this->data < other.data;
 	}
@@ -53,10 +58,11 @@ public:
 	}
 };
 
-class NodeTraits : public ZTreeDefaultNodeTraits<Node> {
+template <class AddOpt = DummyOpt>
+class NodeTraits : public ZTreeDefaultNodeTraits<NodeBase<AddOpt>> {
 public:
 	static std::string
-	get_id(const Node * node)
+	get_id(const NodeBase<AddOpt> * node)
 	{
 		return std::to_string(node->get_data()) + std::string("@") +
 		       std::to_string(node->get_rank());
@@ -65,23 +71,29 @@ public:
 
 class DataRankGetter {
 public:
+	template <class AddOpt>
 	static size_t
-	get_rank(const Node & n)
+	get_rank(const NodeBase<AddOpt> & n)
 	{
 		return (size_t)n.get_rank();
 	}
 };
 
-class HashRankNode : public ZTreeNodeBase<HashRankNode, ImplicitRankOptions> {
+template <class AddOpt = DummyOpt>
+class HashRankNodeBase : public ZTreeNodeBase<HashRankNodeBase<AddOpt>,
+                                              ImplicitRankOptions<AddOpt>> {
 public:
 	int data;
 
-	HashRankNode() : data(0) { this->update_rank(); };
-	HashRankNode(int data_in) : data(data_in) { this->update_rank(); };
-	HashRankNode(const Node & other) : data(other.data) { this->update_rank(); };
+	HashRankNodeBase() : data(0) { this->update_rank(); };
+	HashRankNodeBase(int data_in) : data(data_in) { this->update_rank(); };
+	HashRankNodeBase(const HashRankNodeBase<AddOpt> & other) : data(other.data)
+	{
+		this->update_rank();
+	};
 
 	bool
-	operator<(const HashRankNode & other) const
+	operator<(const HashRankNodeBase<AddOpt> & other) const
 	{
 		return this->data < other.data;
 	}
@@ -92,48 +104,59 @@ public:
 		return this->data;
 	}
 
-	HashRankNode &
-	operator=(const HashRankNode & other)
+	HashRankNodeBase<AddOpt> &
+	operator=(const HashRankNodeBase<AddOpt> & other)
 	{
 		this->data = other.data;
 		return *this;
 	}
 
 	void
-	set_from(const HashRankNode & other)
+	set_from(const HashRankNodeBase<AddOpt> & other)
 	{
 		*this = other;
 		this->update_rank();
 	}
 };
 
-class HashRankNodeTraits : public ZTreeDefaultNodeTraits<HashRankNode> {
+template <class AddOpt = DummyOpt>
+class HashRankNodeTraits
+    : public ZTreeDefaultNodeTraits<HashRankNodeBase<AddOpt>> {
 public:
 	static std::string
-	get_id(const HashRankNode * node)
+	get_id(const HashRankNodeBase<AddOpt> * node)
 	{
 		return std::to_string(node->get_data());
 	}
 };
 
 // Make comparable to int
+template <class AddOpt>
 bool
-operator<(const ygg::testing::ziptree::Node & lhs, const int rhs)
+operator<(const ygg::testing::ziptree::NodeBase<AddOpt> & lhs, const int rhs)
 {
 	return lhs.data < rhs;
 }
+
+template <class AddOpt>
 bool
-operator<(const int lhs, const ygg::testing::ziptree::Node & rhs)
+operator<(const int lhs, const ygg::testing::ziptree::NodeBase<AddOpt> & rhs)
 {
 	return lhs < rhs.data;
 }
+
+template <class AddOpt>
 bool
-operator<(const ygg::testing::ziptree::HashRankNode & lhs, const int rhs)
+operator<(const ygg::testing::ziptree::HashRankNodeBase<AddOpt> & lhs,
+          const int rhs)
 {
 	return lhs.data < rhs;
 }
+
+template <class AddOpt>
 bool
-operator<(const int lhs, const ygg::testing::ziptree::HashRankNode & rhs)
+operator<(const int lhs,
+          const ygg::testing::ziptree::HashRankNodeBase<AddOpt> & rhs)
 {
 	return lhs < rhs.data;
 }
@@ -143,11 +166,12 @@ operator<(const int lhs, const ygg::testing::ziptree::HashRankNode & rhs)
 } // namespace ygg
 
 namespace std {
-template <>
-struct hash<ygg::testing::ziptree::HashRankNode>
+template <class AddOpt>
+struct hash<ygg::testing::ziptree::HashRankNodeBase<AddOpt>>
 {
 	size_t
-	operator()(const ygg::testing::ziptree::HashRankNode & n) const noexcept
+	operator()(const ygg::testing::ziptree::HashRankNodeBase<AddOpt> & n) const
+	    noexcept
 	{
 		return hash<int>{}(n.get_data());
 	}
@@ -159,11 +183,20 @@ namespace ygg {
 namespace testing {
 namespace ziptree {
 
-using ExplicitRankTree =
-    ZTree<Node, NodeTraits, ExplicitRankOptions, int,
-          ygg::utilities::flexible_less, DataRankGetter>;
-using ImplicitRankTree =
-    ZTree<HashRankNode, HashRankNodeTraits, ImplicitRankOptions>;
+using Node = NodeBase<>;
+using HashRankNode = HashRankNodeBase<>;
+
+template <class AddOpt = DummyOpt>
+using ExplicitRankTreeBase =
+    ZTree<NodeBase<AddOpt>, NodeTraits<AddOpt>, ExplicitRankOptions<AddOpt>,
+          int, ygg::utilities::flexible_less, DataRankGetter>;
+using ExplicitRankTree = ExplicitRankTreeBase<>;
+
+template <class AddOpt = DummyOpt>
+using ImplicitRankTreeBase =
+    ZTree<HashRankNodeBase<AddOpt>, HashRankNodeTraits<AddOpt>,
+          ImplicitRankOptions<AddOpt>>;
+using ImplicitRankTree = ImplicitRankTreeBase<>;
 
 TEST(ZipTreeTest, TrivialInsertionTest)
 {
@@ -385,7 +418,7 @@ TEST(ZipTreeTest, InsertionAndDeletionTest)
 		} else {
 			tree.erase(nodes[index].data);
 			itree.erase(inodes[index].data);
-		}			
+		}
 
 		i--;
 		ASSERT_EQ(i, tree.size());
@@ -399,6 +432,81 @@ TEST(ZipTreeTest, InsertionAndDeletionTest)
 	ASSERT_TRUE(it == tree.end());
 	auto iit = itree.begin();
 	ASSERT_TRUE(iit == itree.end());
+}
+
+TEST(ZipTreeTest, EraseIteratorTest)
+{
+	ExplicitRankTree tree;
+
+	Node n1;
+	n1.data = 0;
+	tree.insert(n1);
+
+	Node n2;
+	n2.data = 1;
+	tree.insert(n2);
+
+	ASSERT_FALSE(tree.empty());
+	tree.dbg_verify();
+
+	auto it = tree.begin();
+	Node * removed_node = tree.erase(it);
+	ASSERT_EQ(removed_node, &n1);
+
+	ASSERT_EQ(tree.find(0), tree.end());
+}
+
+TEST(ZipTreeTest, EraseIteratorSTLReturnTest)
+{
+	using MyNode = NodeBase<TreeFlags::STL_ERASE>;
+	auto tree = ExplicitRankTreeBase<TreeFlags::STL_ERASE>();
+
+	MyNode n1;
+	n1.data = 0;
+	tree.insert(n1);
+
+	MyNode n2;
+	n2.data = 1;
+	tree.insert(n2);
+
+	ASSERT_FALSE(tree.empty());
+	tree.dbg_verify();
+
+	auto it = tree.begin();
+	auto next_it = tree.erase(it);
+	ASSERT_EQ(next_it, tree.begin());
+
+	ASSERT_EQ(tree.find(0), tree.end());
+}
+
+TEST(ZipTreeTest, EraseIteratorSTLAllTest)
+{
+	using MyNode = NodeBase<TreeFlags::STL_ERASE>;
+	auto tree = ExplicitRankTreeBase<TreeFlags::STL_ERASE>();
+
+	std::vector<MyNode> zero_nodes(10);
+	for (auto & node : zero_nodes) {
+		node.data = 0;
+	}
+	std::vector<MyNode> one_nodes(10);
+	for (auto & node : one_nodes) {
+		node.data = 1;
+	}
+	std::vector<MyNode> two_nodes(10);
+	for (auto & node : two_nodes) {
+		node.data = 2;
+	}
+
+	for (unsigned int i = 0; i < 10; ++i) {
+		tree.insert(zero_nodes[i]);
+		tree.insert(one_nodes[i]);
+		tree.insert(two_nodes[i]);
+	}
+
+	size_t erased_count = tree.erase(1);
+	ASSERT_EQ(erased_count, 10);
+	ASSERT_EQ(tree.find(1), tree.end());
+	ASSERT_EQ(tree.size(), 20);
 }
 
 TEST(ZipTreeTest, ComprehensiveTest)
