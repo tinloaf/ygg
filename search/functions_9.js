@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['operator_3d',['operator=',['../classygg_1_1ZTree.html#a9030fb4cd2672dfc5e68f63ca6cf744b',1,'ygg::ZTree::operator=(MyClass &amp;&amp;other)'],['../classygg_1_1ZTree.html#a4cc2d4df960f179398d97eb4d2f5ee3c',1,'ygg::ZTree::operator=(const MyClass &amp;other)'],['../classygg_1_1bst_1_1BinarySearchTree.html#a7694c32a8b70a2174cd3335e60032871',1,'ygg::bst::BinarySearchTree::operator=()']]]
+  ['query',['query',['../classygg_1_1IntervalTree.html#a35987b6733f09eaf8fc3e805ed17d1ba',1,'ygg::IntervalTree::query()'],['../classygg_1_1DynamicSegmentTree.html#a507ab9befaed854e5ad05dfb4e0759d9',1,'ygg::DynamicSegmentTree::query()']]]
 ];

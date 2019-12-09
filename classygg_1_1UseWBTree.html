@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Yggdrasill: ygg::UseWBTree Class Reference</title>
+<title>Yggdrasill: ygg::UseWBTree&lt; AdditionalOptions &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -64,7 +64,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">ygg::UseWBTree Class Reference</div>  </div>
+<div class="title">ygg::UseWBTree&lt; AdditionalOptions &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -73,16 +73,25 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="dynamic__segment__tree_8hpp_source.html">dynamic_segment_tree.hpp</a>&gt;</code></p>
 <div class="dynheader">
-Inheritance diagram for ygg::UseWBTree:</div>
+Inheritance diagram for ygg::UseWBTree&lt; AdditionalOptions &gt;:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classygg_1_1UseWBTree.png" usemap="#ygg::UseWBTree_map" alt=""/>
-  <map id="ygg::UseWBTree_map" name="ygg::UseWBTree_map">
+  <img src="classygg_1_1UseWBTree.png" usemap="#ygg::UseWBTree_3C_20AdditionalOptions_20_3E_map" alt=""/>
+  <map id="ygg::UseWBTree_3C_20AdditionalOptions_20_3E_map" name="ygg::UseWBTree_3C_20AdditionalOptions_20_3E_map">
 </map>
  </div></div>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Class used to select the weight balanced tree as underlying tree for the <a class="el" href="classygg_1_1DynamicSegmentTree.html" title="The Dynamic Segment Tree class. ">DynamicSegmentTree</a>. </p>
-<p>Use this class as the TreeSelector template parameter of the <a class="el" href="classygg_1_1DynamicSegmentTree.html" title="The Dynamic Segment Tree class. ">DynamicSegmentTree</a> to chose a weight balanced tree (see <a class="el" href="classygg_1_1WBTree.html" title="The Weight Balanced Tree. ">WBTree</a>) as underlying tree for the <a class="el" href="classygg_1_1DynamicSegmentTree.html" title="The Dynamic Segment Tree class. ">DynamicSegmentTree</a>. </p>
+<div class="textblock"><h3>template&lt;class... AdditionalOptions&gt;<br />
+class ygg::UseWBTree&lt; AdditionalOptions &gt;</h3>
+
+<p>Class used to select the weight balanced tree as underlying tree for the <a class="el" href="classygg_1_1DynamicSegmentTree.html" title="The Dynamic Segment Tree class. ">DynamicSegmentTree</a>. </p>
+<p>Use this class as the TreeSelector template parameter of the <a class="el" href="classygg_1_1DynamicSegmentTree.html" title="The Dynamic Segment Tree class. ">DynamicSegmentTree</a> to chose a weight balanced tree (see <a class="el" href="classygg_1_1WBTree.html" title="The Weight Balanced Tree. ">WBTree</a>) as underlying tree for the <a class="el" href="classygg_1_1DynamicSegmentTree.html" title="The Dynamic Segment Tree class. ">DynamicSegmentTree</a>.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">AdditionalOptions</td><td>Pass additional TreeFlags to the underlying red-black tree. </td></tr>
+  </table>
+  </dd>
+</dl>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/lukas/src/intervaltree/ygg/src/<a class="el" href="dynamic__segment__tree_8hpp_source.html">dynamic_segment_tree.hpp</a></li>
 </ul>

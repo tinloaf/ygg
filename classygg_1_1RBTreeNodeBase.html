@@ -66,6 +66,7 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classygg_1_1RBTreeNodeBase-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ygg::RBTreeNodeBase&lt; Node, Options, Tag &gt; Class Template Reference</div>  </div>
@@ -89,57 +90,69 @@ Inheritance diagram for ygg::RBTreeNodeBase&lt; Node, Options, Tag &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab2c8f66986391378aeb63e75be478b07"><td class="memItemLeft" align="right" valign="top"><a id="ab2c8f66986391378aeb63e75be478b07"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_color</b> (rbtree_internal::Color new_color)</td></tr>
-<tr class="separator:ab2c8f66986391378aeb63e75be478b07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16bb64bcf4472625451d4b908abbe0d4"><td class="memItemLeft" align="right" valign="top"><a id="a16bb64bcf4472625451d4b908abbe0d4"></a>
-rbtree_internal::Color&#160;</td><td class="memItemRight" valign="bottom"><b>get_color</b> () const</td></tr>
-<tr class="separator:a16bb64bcf4472625451d4b908abbe0d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b0642c273ba007943478ef003423e82"><td class="memItemLeft" align="right" valign="top"><a id="a3b0642c273ba007943478ef003423e82"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>swap_parent_with</b> (Node *other)</td></tr>
-<tr class="separator:a3b0642c273ba007943478ef003423e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a169bfdd18d1fb0a5004710ba0714e009"><td class="memItemLeft" align="right" valign="top"><a id="a169bfdd18d1fb0a5004710ba0714e009"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>swap_color_with</b> (Node *other)</td></tr>
-<tr class="separator:a169bfdd18d1fb0a5004710ba0714e009"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f4c9fdc8cdb430268a215ef58edc04f"><td class="memItemLeft" align="right" valign="top"><a id="a6f4c9fdc8cdb430268a215ef58edc04f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_parent</b> (Node *new_parent)</td></tr>
-<tr class="separator:a6f4c9fdc8cdb430268a215ef58edc04f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af65da33061fbfdd93a6d88a04521814c"><td class="memItemLeft" align="right" valign="top"><a id="af65da33061fbfdd93a6d88a04521814c"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> () const</td></tr>
-<tr class="separator:af65da33061fbfdd93a6d88a04521814c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39a5bafb5ca8144fe9be1d1230669a82"><td class="memItemLeft" align="right" valign="top"><a id="a39a5bafb5ca8144fe9be1d1230669a82"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_left</b> (Node *new_left)</td></tr>
-<tr class="separator:a39a5bafb5ca8144fe9be1d1230669a82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1319cd6783fc831a777cd404e60d25fc"><td class="memItemLeft" align="right" valign="top"><a id="a1319cd6783fc831a777cd404e60d25fc"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_right</b> (Node *new_right)</td></tr>
-<tr class="separator:a1319cd6783fc831a777cd404e60d25fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bfcae32f6a5b8242e9d8160e3e2df8e"><td class="memItemLeft" align="right" valign="top"><a id="a6bfcae32f6a5b8242e9d8160e3e2df8e"></a>
-Node *&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_left</b> ()</td></tr>
-<tr class="separator:a6bfcae32f6a5b8242e9d8160e3e2df8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f0e3c2f0558160a884c299540cfe5dc"><td class="memItemLeft" align="right" valign="top"><a id="a9f0e3c2f0558160a884c299540cfe5dc"></a>
-Node *const &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_left</b> () const</td></tr>
-<tr class="separator:a9f0e3c2f0558160a884c299540cfe5dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea42c79c7a757304670808292b12e135"><td class="memItemLeft" align="right" valign="top"><a id="aea42c79c7a757304670808292b12e135"></a>
-Node *&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_right</b> ()</td></tr>
-<tr class="separator:aea42c79c7a757304670808292b12e135"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47a6b06ffce780d8b53b9b70fbd1508b"><td class="memItemLeft" align="right" valign="top"><a id="a47a6b06ffce780d8b53b9b70fbd1508b"></a>
-Node *const &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_right</b> () const</td></tr>
-<tr class="separator:a47a6b06ffce780d8b53b9b70fbd1508b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6642119eb6e2c2dea44d6989c273f54"><td class="memItemLeft" align="right" valign="top"><a id="af6642119eb6e2c2dea44d6989c273f54"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_color</b> (rbtree_internal::Color new_color) noexcept</td></tr>
+<tr class="separator:af6642119eb6e2c2dea44d6989c273f54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5368ab79aa89944352ca96b46fa2aeed"><td class="memItemLeft" align="right" valign="top"><a id="a5368ab79aa89944352ca96b46fa2aeed"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>make_black</b> () noexcept</td></tr>
+<tr class="separator:a5368ab79aa89944352ca96b46fa2aeed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0df33e5da181d4fbbf0a945297f1c613"><td class="memItemLeft" align="right" valign="top"><a id="a0df33e5da181d4fbbf0a945297f1c613"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>make_red</b> () noexcept</td></tr>
+<tr class="separator:a0df33e5da181d4fbbf0a945297f1c613"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63bd63dde81abe6fc027146b63037561"><td class="memItemLeft" align="right" valign="top"><a id="a63bd63dde81abe6fc027146b63037561"></a>
+rbtree_internal::Color&#160;</td><td class="memItemRight" valign="bottom"><b>get_color</b> () const noexcept</td></tr>
+<tr class="separator:a63bd63dde81abe6fc027146b63037561"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a816f734990fcf6876dca419435ed425f"><td class="memItemLeft" align="right" valign="top"><a id="a816f734990fcf6876dca419435ed425f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>swap_parent_with</b> (Node *other) noexcept</td></tr>
+<tr class="separator:a816f734990fcf6876dca419435ed425f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29ca434c83bd83218614987a23e3354c"><td class="memItemLeft" align="right" valign="top"><a id="a29ca434c83bd83218614987a23e3354c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>swap_color_with</b> (Node *other) noexcept</td></tr>
+<tr class="separator:a29ca434c83bd83218614987a23e3354c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a505c017205dd8afc5f109b30056cc255"><td class="memItemLeft" align="right" valign="top"><a id="a505c017205dd8afc5f109b30056cc255"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_parent</b> (Node *new_parent) noexcept</td></tr>
+<tr class="separator:a505c017205dd8afc5f109b30056cc255"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54b3ec99c0e962101d43dcaac67684be"><td class="memItemLeft" align="right" valign="top"><a id="a54b3ec99c0e962101d43dcaac67684be"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> () const noexcept</td></tr>
+<tr class="separator:a54b3ec99c0e962101d43dcaac67684be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8be9ed537d0b3ec1c2fb1e004a2c7aa"><td class="memItemLeft" align="right" valign="top"><a id="af8be9ed537d0b3ec1c2fb1e004a2c7aa"></a>
+std::enable_if_t&lt; InnerPC::parent_reference, Node *&amp;&gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> () const noexcept</td></tr>
+<tr class="separator:af8be9ed537d0b3ec1c2fb1e004a2c7aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28a0d6fce9a16c4816fa19e695945252"><td class="memItemLeft" align="right" valign="top"><a id="a28a0d6fce9a16c4816fa19e695945252"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_left</b> (Node *new_left) noexcept</td></tr>
+<tr class="separator:a28a0d6fce9a16c4816fa19e695945252"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6f5261450fec264af3e5ee013c5aa50"><td class="memItemLeft" align="right" valign="top"><a id="ab6f5261450fec264af3e5ee013c5aa50"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_right</b> (Node *new_right) noexcept</td></tr>
+<tr class="separator:ab6f5261450fec264af3e5ee013c5aa50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33d8090e1d56ad6874f32808a1313a4d"><td class="memItemLeft" align="right" valign="top"><a id="a33d8090e1d56ad6874f32808a1313a4d"></a>
+Node *&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_left</b> () noexcept</td></tr>
+<tr class="separator:a33d8090e1d56ad6874f32808a1313a4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94e29bf06d4e2e4fb36d6eb6482f591d"><td class="memItemLeft" align="right" valign="top"><a id="a94e29bf06d4e2e4fb36d6eb6482f591d"></a>
+Node *const &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_left</b> () const noexcept</td></tr>
+<tr class="separator:a94e29bf06d4e2e4fb36d6eb6482f591d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8563f60a4c59c49bb7835011013697ce"><td class="memItemLeft" align="right" valign="top"><a id="a8563f60a4c59c49bb7835011013697ce"></a>
+Node *&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_right</b> () noexcept</td></tr>
+<tr class="separator:a8563f60a4c59c49bb7835011013697ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2391fd528e294b789001a3f982a7fc97"><td class="memItemLeft" align="right" valign="top"><a id="a2391fd528e294b789001a3f982a7fc97"></a>
+Node *const &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_right</b> () const noexcept</td></tr>
+<tr class="separator:a2391fd528e294b789001a3f982a7fc97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afdeab35d187dc389fd7cf61e56bc7348"><td class="memItemLeft" align="right" valign="top"><a id="afdeab35d187dc389fd7cf61e56bc7348"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>get_depth</b> () const noexcept</td></tr>
 <tr class="separator:afdeab35d187dc389fd7cf61e56bc7348"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a9a97feb9486b5aadea3de76c6fdbdb6f"><td class="memItemLeft" align="right" valign="top"><a id="a9a97feb9486b5aadea3de76c6fdbdb6f"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>_bst_left</b></td></tr>
-<tr class="separator:a9a97feb9486b5aadea3de76c6fdbdb6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3f308cd34ca9afc5c85576b9e165047"><td class="memItemLeft" align="right" valign="top"><a id="ad3f308cd34ca9afc5c85576b9e165047"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>_bst_right</b></td></tr>
-<tr class="separator:ad3f308cd34ca9afc5c85576b9e165047"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04361756e52b41d2c3722e3a7944005f"><td class="memItemLeft" align="right" valign="top"><a id="a04361756e52b41d2c3722e3a7944005f"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>_bst_children</b> [2]</td></tr>
+<tr class="separator:a04361756e52b41d2c3722e3a7944005f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe99bbe28b440472a73425c23896d947"><td class="memItemLeft" align="right" valign="top"><a id="afe99bbe28b440472a73425c23896d947"></a>
 rbtree_internal::ColorParentStorage&lt; Node, Options::compress_color &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_bst_parent</b></td></tr>
 <tr class="separator:afe99bbe28b440472a73425c23896d947"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a774073b2d22e92509298f9e31c6a4412"><td class="memItemLeft" align="right" valign="top"><a id="a774073b2d22e92509298f9e31c6a4412"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>rbtree_internal::ColorParentStorage&lt; Node, Options::compress_color &gt;</b></td></tr>
+<tr class="separator:a774073b2d22e92509298f9e31c6a4412"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class Node, class Options = DefaultOptions, class Tag = int&gt;<br />

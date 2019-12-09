@@ -65,8 +65,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classygg_1_1ZTreeNodeBase-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -78,33 +78,48 @@ $(function() {
  <a href="classygg_1_1ZTreeNodeBase.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ziptree_8hpp_source.html">ziptree.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for ygg::ZTreeNodeBase&lt; Node, Options, Tag &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classygg_1_1ZTreeNodeBase.png" usemap="#ygg::ZTreeNodeBase_3C_20Node_2C_20Options_2C_20Tag_20_3E_map" alt=""/>
+  <map id="ygg::ZTreeNodeBase_3C_20Node_2C_20Options_2C_20Tag_20_3E_map" name="ygg::ZTreeNodeBase_3C_20Node_2C_20Options_2C_20Tag_20_3E_map">
+<area href="classygg_1_1bst_1_1BSTNodeBase.html" alt="ygg::bst::BSTNodeBase&lt; Node, Tag &gt;" shape="rect" coords="0,0,268,24"/>
+</map>
+ </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae77300dd74b00b1e36568b933b73713e"><td class="memItemLeft" align="right" valign="top"><a id="ae77300dd74b00b1e36568b933b73713e"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> () const noexcept</td></tr>
-<tr class="separator:ae77300dd74b00b1e36568b933b73713e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab71192d84ea3bae36fe475cc5dc61c89"><td class="memItemLeft" align="right" valign="top"><a id="ab71192d84ea3bae36fe475cc5dc61c89"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_left</b> () const noexcept</td></tr>
-<tr class="separator:ab71192d84ea3bae36fe475cc5dc61c89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77e7b398c658977cf103ed802d7463bf"><td class="memItemLeft" align="right" valign="top"><a id="a77e7b398c658977cf103ed802d7463bf"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_right</b> () const noexcept</td></tr>
-<tr class="separator:a77e7b398c658977cf103ed802d7463bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02c2b57646134cd7b17d9aae87d59eed"><td class="memItemLeft" align="right" valign="top"><a id="a02c2b57646134cd7b17d9aae87d59eed"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>get_depth</b> () const noexcept</td></tr>
 <tr class="separator:a02c2b57646134cd7b17d9aae87d59eed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:abc67bfbb9a8a9804693601ef9fdf5f1b"><td class="memItemLeft" align="right" valign="top"><a id="abc67bfbb9a8a9804693601ef9fdf5f1b"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>_zt_parent</b> = nullptr</td></tr>
-<tr class="separator:abc67bfbb9a8a9804693601ef9fdf5f1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa314fed7b75e5efb8615701649a2efcb"><td class="memItemLeft" align="right" valign="top"><a id="aa314fed7b75e5efb8615701649a2efcb"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>_zt_left</b> = nullptr</td></tr>
-<tr class="separator:aa314fed7b75e5efb8615701649a2efcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34e074f1f9cf4a5cb01bc682f64ebf16"><td class="memItemLeft" align="right" valign="top"><a id="a34e074f1f9cf4a5cb01bc682f64ebf16"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>_zt_right</b> = nullptr</td></tr>
-<tr class="separator:a34e074f1f9cf4a5cb01bc682f64ebf16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a505c017205dd8afc5f109b30056cc255"><td class="memItemLeft" align="right" valign="top"><a id="a505c017205dd8afc5f109b30056cc255"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_parent</b> (Node *new_parent) noexcept</td></tr>
+<tr class="separator:a505c017205dd8afc5f109b30056cc255"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54b3ec99c0e962101d43dcaac67684be"><td class="memItemLeft" align="right" valign="top"><a id="a54b3ec99c0e962101d43dcaac67684be"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> () const noexcept</td></tr>
+<tr class="separator:a54b3ec99c0e962101d43dcaac67684be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8be9ed537d0b3ec1c2fb1e004a2c7aa"><td class="memItemLeft" align="right" valign="top"><a id="af8be9ed537d0b3ec1c2fb1e004a2c7aa"></a>
+std::enable_if_t&lt; InnerPC::parent_reference, Node *&amp;&gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> () const noexcept</td></tr>
+<tr class="separator:af8be9ed537d0b3ec1c2fb1e004a2c7aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28a0d6fce9a16c4816fa19e695945252"><td class="memItemLeft" align="right" valign="top"><a id="a28a0d6fce9a16c4816fa19e695945252"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_left</b> (Node *new_left) noexcept</td></tr>
+<tr class="separator:a28a0d6fce9a16c4816fa19e695945252"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6f5261450fec264af3e5ee013c5aa50"><td class="memItemLeft" align="right" valign="top"><a id="ab6f5261450fec264af3e5ee013c5aa50"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_right</b> (Node *new_right) noexcept</td></tr>
+<tr class="separator:ab6f5261450fec264af3e5ee013c5aa50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33d8090e1d56ad6874f32808a1313a4d"><td class="memItemLeft" align="right" valign="top"><a id="a33d8090e1d56ad6874f32808a1313a4d"></a>
+Node *&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_left</b> () noexcept</td></tr>
+<tr class="separator:a33d8090e1d56ad6874f32808a1313a4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94e29bf06d4e2e4fb36d6eb6482f591d"><td class="memItemLeft" align="right" valign="top"><a id="a94e29bf06d4e2e4fb36d6eb6482f591d"></a>
+Node *const &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_left</b> () const noexcept</td></tr>
+<tr class="separator:a94e29bf06d4e2e4fb36d6eb6482f591d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8563f60a4c59c49bb7835011013697ce"><td class="memItemLeft" align="right" valign="top"><a id="a8563f60a4c59c49bb7835011013697ce"></a>
+Node *&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_right</b> () noexcept</td></tr>
+<tr class="separator:a8563f60a4c59c49bb7835011013697ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2391fd528e294b789001a3f982a7fc97"><td class="memItemLeft" align="right" valign="top"><a id="a2391fd528e294b789001a3f982a7fc97"></a>
+Node *const &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_right</b> () const noexcept</td></tr>
+<tr class="separator:a2391fd528e294b789001a3f982a7fc97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -112,12 +127,21 @@ Protected Member Functions</h2></td></tr>
 <tr class="memdesc:a3bd770811de3b995b45635d72643e894"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the stored rank in this node.  <a href="#a3bd770811de3b995b45635d72643e894">More...</a><br /></td></tr>
 <tr class="separator:a3bd770811de3b995b45635d72643e894"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a04361756e52b41d2c3722e3a7944005f"><td class="memItemLeft" align="right" valign="top"><a id="a04361756e52b41d2c3722e3a7944005f"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>_bst_children</b> [2]</td></tr>
+<tr class="separator:a04361756e52b41d2c3722e3a7944005f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe99bbe28b440472a73425c23896d947"><td class="memItemLeft" align="right" valign="top"><a id="afe99bbe28b440472a73425c23896d947"></a>
+DefaultParentContainer&lt; Node &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_bst_parent</b></td></tr>
+<tr class="separator:afe99bbe28b440472a73425c23896d947"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:ada424b9e8ff3fd453ef93069b0582732"><td class="memTemplParams" colspan="2"><a id="ada424b9e8ff3fd453ef93069b0582732"></a>
+<tr class="memitem:a11b7cd4263183a9c2bcf2e124200bc9a"><td class="memTemplParams" colspan="2"><a id="a11b7cd4263183a9c2bcf2e124200bc9a"></a>
 template&lt;class , class , bool , bool &gt; </td></tr>
-<tr class="memitem:ada424b9e8ff3fd453ef93069b0582732"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><b>ztree_internal::ZTreeRankFromHash</b></td></tr>
-<tr class="separator:ada424b9e8ff3fd453ef93069b0582732"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11b7cd4263183a9c2bcf2e124200bc9a"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><b>ztree_internal::ZTreeRankGenerator</b></td></tr>
+<tr class="separator:a11b7cd4263183a9c2bcf2e124200bc9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class Node, class Options, class Tag&gt;<br />
@@ -140,7 +164,7 @@ class ygg::ZTreeNodeBase&lt; Node, Options, Tag &gt;</h3>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class Options , class Tag &gt; </div>
+template&lt;class Node, class Options, class Tag&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">

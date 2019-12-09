@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Yggdrasill: ygg::bst::DefaultParentContainer&lt; Node &gt; Class Template Reference</title>
+<title>Yggdrasill: ygg::dyn_segtree_internal::InnerSequenceInterface&lt; InnerNode, KeyT_in &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -59,39 +59,39 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>ygg</b></li><li class="navelem"><b>bst</b></li><li class="navelem"><a class="el" href="classygg_1_1bst_1_1DefaultParentContainer.html">DefaultParentContainer</a></li>  </ul>
+<li class="navelem"><b>ygg</b></li><li class="navelem"><b>dyn_segtree_internal</b></li><li class="navelem"><a class="el" href="classygg_1_1dyn__segtree__internal_1_1InnerSequenceInterface.html">InnerSequenceInterface</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
-<a href="classygg_1_1bst_1_1DefaultParentContainer-members.html">List of all members</a>  </div>
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="classygg_1_1dyn__segtree__internal_1_1InnerSequenceInterface-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">ygg::bst::DefaultParentContainer&lt; Node &gt; Class Template Reference</div>  </div>
+<div class="title">ygg::dyn_segtree_internal::InnerSequenceInterface&lt; InnerNode, KeyT_in &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a8ec1277290f33b8ea7f63d85c2f5126f"><td class="memItemLeft" align="right" valign="top"><a id="a8ec1277290f33b8ea7f63d85c2f5126f"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> () const noexcept</td></tr>
-<tr class="separator:a8ec1277290f33b8ea7f63d85c2f5126f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e2b325155a210171973eded2adcfdbe"><td class="memItemLeft" align="right" valign="top"><a id="a5e2b325155a210171973eded2adcfdbe"></a>
-Node *&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> () noexcept</td></tr>
-<tr class="separator:a5e2b325155a210171973eded2adcfdbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20a02b3ff76ee2282b2df36d361b3ab3"><td class="memItemLeft" align="right" valign="top"><a id="a20a02b3ff76ee2282b2df36d361b3ab3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_parent</b> (Node *parent) noexcept</td></tr>
-<tr class="separator:a20a02b3ff76ee2282b2df36d361b3ab3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a0afe1ef86b61b834a78a6b8b9c1d3c23"><td class="memItemLeft" align="right" valign="top"><a id="a0afe1ef86b61b834a78a6b8b9c1d3c23"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>KeyT</b> = KeyT_in</td></tr>
+<tr class="separator:a0afe1ef86b61b834a78a6b8b9c1d3c23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
-Static Public Attributes</h2></td></tr>
-<tr class="memitem:a9fb4706f4b0228985dae6a93cc238c34"><td class="memItemLeft" align="right" valign="top"><a id="a9fb4706f4b0228985dae6a93cc238c34"></a>
-static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>parent_reference</b> = true</td></tr>
-<tr class="separator:a9fb4706f4b0228985dae6a93cc238c34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a920563058cbd34b53907ea8661c71955"><td class="memItemLeft" align="right" valign="top"><a id="a920563058cbd34b53907ea8661c71955"></a>
+static KeyT_in&#160;</td><td class="memItemRight" valign="bottom"><b>get_key</b> (const <a class="el" href="classygg_1_1dyn__segtree__internal_1_1InnerNode.html">InnerNode</a> &amp;n) noexcept</td></tr>
+<tr class="separator:a920563058cbd34b53907ea8661c71955"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a403095bf3371b9ed72aacabcb28ca44a"><td class="memItemLeft" align="right" valign="top"><a id="a403095bf3371b9ed72aacabcb28ca44a"></a>
+static KeyT_in&#160;</td><td class="memItemRight" valign="bottom"><b>get_key</b> (const KeyT_in query) noexcept</td></tr>
+<tr class="separator:a403095bf3371b9ed72aacabcb28ca44a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10ff976175f54ac95b6f562dbe6d316a"><td class="memItemLeft" align="right" valign="top"><a id="a10ff976175f54ac95b6f562dbe6d316a"></a>
+static KeyT_in&#160;</td><td class="memItemRight" valign="bottom"><b>get_key</b> (const std::pair&lt; KeyT_in, bool &gt; &amp;query) noexcept</td></tr>
+<tr class="separator:a10ff976175f54ac95b6f562dbe6d316a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/lukas/src/intervaltree/ygg/src/<a class="el" href="bst_8hpp_source.html">bst.hpp</a></li>
+<li>/home/lukas/src/intervaltree/ygg/src/<a class="el" href="dynamic__segment__tree_8hpp_source.html">dynamic_segment_tree.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

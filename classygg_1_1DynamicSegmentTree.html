@@ -195,7 +195,7 @@ std::stringstream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>db
 <tr class="separator:ac7ea1367e9eb5befefff7ce9152ce2cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class Node, class NodeTraits, class Combiners, class Options = DefaultOptions, class TreeSelector = UseRBTree, class Tag = int&gt;<br />
+<div class="textblock"><h3>template&lt;class Node, class NodeTraits, class Combiners, class Options = DefaultOptions, class TreeSelector = UseDefaultRBTree, class Tag = int&gt;<br />
 class ygg::DynamicSegmentTree&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;</h3>
 
 <p>The Dynamic Segment Tree class. </p>
@@ -213,7 +213,7 @@ class ygg::DynamicSegmentTree&lt; Node, NodeTraits, Combiners, Options, TreeSele
     <tr><td class="paramname">Node</td><td>The node class in your tree, must be derived from <a class="el" href="classygg_1_1DynSegTreeNodeBase.html" title="Base class (template) to supply your node class with metainformation. ">DynSegTreeNodeBase</a> </td></tr>
     <tr><td class="paramname">NodeTraits</td><td>The node traits for your node class, must be derived from <a class="el" href="classygg_1_1DynSegTreeNodeTraits.html" title="You must derive your own traits class from this class template, telling the DynamicSegmentTree how to...">DynSegTreeNodeTraits</a> </td></tr>
     <tr><td class="paramname">Options</td><td>Options for this tree. See DOCTODO for details. </td></tr>
-    <tr><td class="paramname">TreeSelector</td><td>Specifies which balanced binary tree implementation to use for the underlying tree. Must be one of <a class="el" href="classygg_1_1UseRBTree.html" title="Class used to select the red-black tree as underlying tree for the DynamicSegmentTree. ">UseRBTree</a> (to use the red-black tree) or <a class="el" href="classygg_1_1UseZipTree.html" title="Class used to select the Zip Tree tree as underlying tree for the DynamicSegmentTree. ">UseZipTree</a> (to use the zip tree). You need to specify the same selector at the DynSegTreeNodeBase! </td></tr>
+    <tr><td class="paramname">TreeSelector</td><td>Specifies which balanced binary tree implementation to use for the underlying tree. Must be one of UseRBTree&lt;...&gt; (to use the red-black tree), UseZipTree&lt;...&gt; (to use the zip tree) or UseWBTree&lt;...&gt; (to use the weight-balanced tree). You need to specify the same selector at the DynSegTreeNodeBase! </td></tr>
     <tr><td class="paramname">Tag</td><td>The tag of this tree. Allows to insert the same node in multiple dynamic segment trees. See DOCTODO for details. </td></tr>
   </table>
   </dd>
@@ -225,7 +225,7 @@ class ygg::DynamicSegmentTree&lt; Node, NodeTraits, Combiners, Options, TreeSele
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::begin </td>
@@ -245,7 +245,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::cbegin </td>
@@ -265,7 +265,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::cend </td>
@@ -285,7 +285,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::clear </td>
@@ -308,7 +308,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;true&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::crbegin </td>
@@ -328,7 +328,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;true&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::crend </td>
@@ -348,7 +348,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::empty </td>
@@ -371,7 +371,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::end </td>
@@ -391,7 +391,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::insert </td>
@@ -420,7 +420,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::lower_bound_event </td>
@@ -448,7 +448,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -486,7 +486,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;true&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::rbegin </td>
@@ -506,7 +506,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::remove </td>
@@ -535,7 +535,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;true&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::rend </td>
@@ -555,7 +555,7 @@ template&lt;class Node , class NodeTraits , class Combiners , class Options  = D
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseRBTree, class Tag  = int&gt; </div>
+template&lt;class Node , class NodeTraits , class Combiners , class Options  = DefaultOptions, class TreeSelector  = UseDefaultRBTree, class Tag  = int&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1DynamicSegmentTree.html">ygg::DynamicSegmentTree</a>&lt; Node, NodeTraits, Combiners, Options, TreeSelector, Tag &gt;::upper_bound_event </td>

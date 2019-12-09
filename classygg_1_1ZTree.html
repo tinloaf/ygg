@@ -64,9 +64,11 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classygg_1_1ZTree-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ygg::ZTree&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt; Class Template Reference</div>  </div>
@@ -77,22 +79,35 @@ $(function() {
  <a href="classygg_1_1ZTree.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ziptree_8hpp_source.html">ziptree.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for ygg::ZTree&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classygg_1_1ZTree.png" usemap="#ygg::ZTree_3C_20Node_2C_20NodeTraits_2C_20Options_2C_20Tag_2C_20Compare_2C_20RankGetter_20_3E_map" alt=""/>
+  <map id="ygg::ZTree_3C_20Node_2C_20NodeTraits_2C_20Options_2C_20Tag_2C_20Compare_2C_20RankGetter_20_3E_map" name="ygg::ZTree_3C_20Node_2C_20NodeTraits_2C_20Options_2C_20Tag_2C_20Compare_2C_20RankGetter_20_3E_map">
+<area href="classygg_1_1bst_1_1BinarySearchTree.html" alt="ygg::bst::BinarySearchTree&lt; Node, Options, Tag, Compare &gt;" shape="rect" coords="0,0,411,24"/>
+</map>
+ </div></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree_1_1iterator.html">iterator</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:a68002a10ed606edf5fd5208d80cae78d"><td class="memItemLeft" align="right" valign="top"><a id="a68002a10ed606edf5fd5208d80cae78d"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>NB</b> = <a class="el" href="classygg_1_1ZTreeNodeBase.html">ZTreeNodeBase</a>&lt; Node, Options, Tag &gt;</td></tr>
 <tr class="separator:a68002a10ed606edf5fd5208d80cae78d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4109c6f90d530c8706b8d32277d62e4f"><td class="memItemLeft" align="right" valign="top"><a id="a4109c6f90d530c8706b8d32277d62e4f"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>TB</b> = <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare &gt;</td></tr>
+<tr class="separator:a4109c6f90d530c8706b8d32277d62e4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ba909227343d4b42c409445f65edd4d"><td class="memItemLeft" align="right" valign="top"><a id="a5ba909227343d4b42c409445f65edd4d"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>MyClass</b> = <a class="el" href="classygg_1_1ZTree.html">ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;</td></tr>
 <tr class="separator:a5ba909227343d4b42c409445f65edd4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9dd8dae1040744c79e0873af6be0382"><td class="memTemplParams" colspan="2"><a id="ae9dd8dae1040744c79e0873af6be0382"></a>
+template&lt;bool reverse&gt; </td></tr>
+<tr class="memitem:ae9dd8dae1040744c79e0873af6be0382"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>iterator</b> = typename TB::template iterator&lt; reverse &gt;</td></tr>
+<tr class="separator:ae9dd8dae1040744c79e0873af6be0382"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ce8be8ecc6f3736629090c6a410c0ae"><td class="memTemplParams" colspan="2"><a id="a9ce8be8ecc6f3736629090c6a410c0ae"></a>
+template&lt;bool reverse&gt; </td></tr>
+<tr class="memitem:a9ce8be8ecc6f3736629090c6a410c0ae"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>const_iterator</b> = typename TB::template const_iterator&lt; reverse &gt;</td></tr>
+<tr class="separator:a9ce8be8ecc6f3736629090c6a410c0ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -100,81 +115,29 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a25fefa2b8b8e1571686760de65acdc2c">ZTree</a> () noexcept</td></tr>
 <tr class="memdesc:a25fefa2b8b8e1571686760de65acdc2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new empty Zip Tree. <br /></td></tr>
 <tr class="separator:a25fefa2b8b8e1571686760de65acdc2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9aa58dc78af2b04af5a4f00c439b908"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#aa9aa58dc78af2b04af5a4f00c439b908">ZTree</a> (<a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:aa9aa58dc78af2b04af5a4f00c439b908"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new Zip Tree from a different Zip Tree.  <a href="#aa9aa58dc78af2b04af5a4f00c439b908">More...</a><br /></td></tr>
-<tr class="separator:aa9aa58dc78af2b04af5a4f00c439b908"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9030fb4cd2672dfc5e68f63ca6cf744b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a9030fb4cd2672dfc5e68f63ca6cf744b">operator=</a> (<a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:a9030fb4cd2672dfc5e68f63ca6cf744b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move-assign an other Zip Tree to this one.  <a href="#a9030fb4cd2672dfc5e68f63ca6cf744b">More...</a><br /></td></tr>
-<tr class="separator:a9030fb4cd2672dfc5e68f63ca6cf744b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4cc2d4df960f179398d97eb4d2f5ee3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a4cc2d4df960f179398d97eb4d2f5ee3c">operator=</a> (const <a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;other)</td></tr>
-<tr class="memdesc:a4cc2d4df960f179398d97eb4d2f5ee3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy an other tree into this one.  <a href="#a4cc2d4df960f179398d97eb4d2f5ee3c">More...</a><br /></td></tr>
-<tr class="separator:a4cc2d4df960f179398d97eb4d2f5ee3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada33e2a8d78b91bc10e3177313389116"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#ada33e2a8d78b91bc10e3177313389116">ZTree</a> (<a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memdesc:ada33e2a8d78b91bc10e3177313389116"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new Zip Tree from a different Zip Tree.  <a href="#ada33e2a8d78b91bc10e3177313389116">More...</a><br /></td></tr>
+<tr class="separator:ada33e2a8d78b91bc10e3177313389116"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab61f3d51983c049048c3b8abd973d9b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#ab61f3d51983c049048c3b8abd973d9b5">operator=</a> (<a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&amp;other) noexcept</td></tr>
+<tr class="memdesc:ab61f3d51983c049048c3b8abd973d9b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move-assign an other Zip Tree to this one.  <a href="#ab61f3d51983c049048c3b8abd973d9b5">More...</a><br /></td></tr>
+<tr class="separator:ab61f3d51983c049048c3b8abd973d9b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c9d11401e7ab570db3311190aeb7b6f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a3c9d11401e7ab570db3311190aeb7b6f">insert</a> (Node &amp;node) noexcept</td></tr>
 <tr class="memdesc:a3c9d11401e7ab570db3311190aeb7b6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts &lt;node&gt; into the tree.  <a href="#a3c9d11401e7ab570db3311190aeb7b6f">More...</a><br /></td></tr>
 <tr class="separator:a3c9d11401e7ab570db3311190aeb7b6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e303867e43c8c6f257b591a3cef698d"><td class="memItemLeft" align="right" valign="top"><a id="a9e303867e43c8c6f257b591a3cef698d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>insert</b> (Node &amp;node, Node &amp;hint) noexcept</td></tr>
 <tr class="separator:a9e303867e43c8c6f257b591a3cef698d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acdbc8ab365970492de38097319c31157"><td class="memTemplParams" colspan="2">template&lt;class Comparable &gt; </td></tr>
-<tr class="memitem:acdbc8ab365970492de38097319c31157"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; false &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#acdbc8ab365970492de38097319c31157">upper_bound</a> (const Comparable &amp;query) const</td></tr>
-<tr class="memdesc:acdbc8ab365970492de38097319c31157"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upper-bounds an element.  <a href="#acdbc8ab365970492de38097319c31157">More...</a><br /></td></tr>
-<tr class="separator:acdbc8ab365970492de38097319c31157"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14e415e8c1ba52c4f34b0439f9e34205"><td class="memTemplParams" colspan="2"><a id="a14e415e8c1ba52c4f34b0439f9e34205"></a>
-template&lt;class Comparable &gt; </td></tr>
-<tr class="memitem:a14e415e8c1ba52c4f34b0439f9e34205"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1iterator.html">iterator</a>&lt; false &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>upper_bound</b> (const Comparable &amp;query)</td></tr>
-<tr class="separator:a14e415e8c1ba52c4f34b0439f9e34205"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb37298489e974b2f3a689316133ccac"><td class="memTemplParams" colspan="2">template&lt;class Comparable &gt; </td></tr>
-<tr class="memitem:aeb37298489e974b2f3a689316133ccac"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; false &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#aeb37298489e974b2f3a689316133ccac">lower_bound</a> (const Comparable &amp;query) const</td></tr>
-<tr class="memdesc:aeb37298489e974b2f3a689316133ccac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lower-bounds an element.  <a href="#aeb37298489e974b2f3a689316133ccac">More...</a><br /></td></tr>
-<tr class="separator:aeb37298489e974b2f3a689316133ccac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07f861564d02b90b2d22d497795ba94f"><td class="memTemplParams" colspan="2"><a id="a07f861564d02b90b2d22d497795ba94f"></a>
-template&lt;class Comparable &gt; </td></tr>
-<tr class="memitem:a07f861564d02b90b2d22d497795ba94f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1iterator.html">iterator</a>&lt; false &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>lower_bound</b> (const Comparable &amp;query)</td></tr>
-<tr class="separator:a07f861564d02b90b2d22d497795ba94f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80882f561d1f2c90dcc874dc90ef08fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a80882f561d1f2c90dcc874dc90ef08fb">remove</a> (Node &amp;node) noexcept</td></tr>
-<tr class="memdesc:a80882f561d1f2c90dcc874dc90ef08fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes &lt;node&gt; from the tree.  <a href="#a80882f561d1f2c90dcc874dc90ef08fb">More...</a><br /></td></tr>
-<tr class="separator:a80882f561d1f2c90dcc874dc90ef08fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa31d0b049f3de3bc51a32e7b19b5649"><td class="memTemplParams" colspan="2">template&lt;class Comparable &gt; </td></tr>
-<tr class="memitem:afa31d0b049f3de3bc51a32e7b19b5649"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; false &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#afa31d0b049f3de3bc51a32e7b19b5649">find</a> (const Comparable &amp;query) const</td></tr>
-<tr class="memdesc:afa31d0b049f3de3bc51a32e7b19b5649"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds an element in the tree.  <a href="#afa31d0b049f3de3bc51a32e7b19b5649">More...</a><br /></td></tr>
-<tr class="separator:afa31d0b049f3de3bc51a32e7b19b5649"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35db13271125dd526bf820ad1db0854d"><td class="memTemplParams" colspan="2"><a id="a35db13271125dd526bf820ad1db0854d"></a>
-template&lt;class Comparable &gt; </td></tr>
-<tr class="memitem:a35db13271125dd526bf820ad1db0854d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1iterator.html">iterator</a>&lt; false &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>find</b> (const Comparable &amp;query)</td></tr>
-<tr class="separator:a35db13271125dd526bf820ad1db0854d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acfe4cbd496f00b179380ebbf65e27333"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#acfe4cbd496f00b179380ebbf65e27333">cbegin</a> () const</td></tr>
-<tr class="separator:acfe4cbd496f00b179380ebbf65e27333"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02586888f373e90b8f743d647f773a03"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a02586888f373e90b8f743d647f773a03">cend</a> () const</td></tr>
-<tr class="separator:a02586888f373e90b8f743d647f773a03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af18a53d58fa18d04066fb7416693469f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#af18a53d58fa18d04066fb7416693469f">begin</a> () const</td></tr>
-<tr class="separator:af18a53d58fa18d04066fb7416693469f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2883d3966c991f404124fe326a403dc0"><td class="memItemLeft" align="right" valign="top"><a id="a2883d3966c991f404124fe326a403dc0"></a>
-<a class="el" href="classygg_1_1ZTree_1_1iterator.html">iterator</a>&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> ()</td></tr>
-<tr class="separator:a2883d3966c991f404124fe326a403dc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ad8b33a8d130cd0139eff3070b88135"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a7ad8b33a8d130cd0139eff3070b88135">end</a> () const</td></tr>
-<tr class="separator:a7ad8b33a8d130cd0139eff3070b88135"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0ff4042784a16908dcfa51addb6d1a4"><td class="memItemLeft" align="right" valign="top"><a id="ad0ff4042784a16908dcfa51addb6d1a4"></a>
-<a class="el" href="classygg_1_1ZTree_1_1iterator.html">iterator</a>&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> ()</td></tr>
-<tr class="separator:ad0ff4042784a16908dcfa51addb6d1a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84c7e3f2f697fbaed4da37eac7ca6aa4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a84c7e3f2f697fbaed4da37eac7ca6aa4">crbegin</a> () const</td></tr>
-<tr class="separator:a84c7e3f2f697fbaed4da37eac7ca6aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18e092ba5ed7ba3ba372ddd7e7448557"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a18e092ba5ed7ba3ba372ddd7e7448557">crend</a> () const</td></tr>
-<tr class="separator:a18e092ba5ed7ba3ba372ddd7e7448557"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23119af9adc1bd5bcc44077fcdcfb84a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a23119af9adc1bd5bcc44077fcdcfb84a">rbegin</a> () const</td></tr>
-<tr class="separator:a23119af9adc1bd5bcc44077fcdcfb84a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95af9d5ca5097f52a6aa5c0f3d545346"><td class="memItemLeft" align="right" valign="top"><a id="a95af9d5ca5097f52a6aa5c0f3d545346"></a>
-<a class="el" href="classygg_1_1ZTree_1_1iterator.html">iterator</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rbegin</b> ()</td></tr>
-<tr class="separator:a95af9d5ca5097f52a6aa5c0f3d545346"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1eda82c6f2cf3242175ec24882e0aa83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a1eda82c6f2cf3242175ec24882e0aa83">rend</a> () const</td></tr>
-<tr class="separator:a1eda82c6f2cf3242175ec24882e0aa83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fe1c8fa0e68e9bc6961cf8dc5d19b24"><td class="memItemLeft" align="right" valign="top"><a id="a5fe1c8fa0e68e9bc6961cf8dc5d19b24"></a>
-<a class="el" href="classygg_1_1ZTree_1_1iterator.html">iterator</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rend</b> ()</td></tr>
-<tr class="separator:a5fe1c8fa0e68e9bc6961cf8dc5d19b24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56aa7e12e0aa720681ad9a1d01e8c7f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a56aa7e12e0aa720681ad9a1d01e8c7f1">iterator_to</a> (const Node &amp;node) const</td></tr>
-<tr class="separator:a56aa7e12e0aa720681ad9a1d01e8c7f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a368eefb314ff24757a9fd670fe306b2a"><td class="memItemLeft" align="right" valign="top"><a id="a368eefb314ff24757a9fd670fe306b2a"></a>
-<a class="el" href="classygg_1_1ZTree_1_1iterator.html">iterator</a>&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>iterator_to</b> (Node &amp;node)</td></tr>
-<tr class="separator:a368eefb314ff24757a9fd670fe306b2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a132fe29e53d194190e89202dd6c2356e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a132fe29e53d194190e89202dd6c2356e">remove</a> (Node &amp;node) CMP_NOEXCEPT(node)</td></tr>
+<tr class="memdesc:a132fe29e53d194190e89202dd6c2356e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes &lt;node&gt; from the tree.  <a href="#a132fe29e53d194190e89202dd6c2356e">More...</a><br /></td></tr>
+<tr class="separator:a132fe29e53d194190e89202dd6c2356e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a114c57e2d67511d052892fa829f80d50"><td class="memTemplParams" colspan="2">template&lt;class Comparable &gt; </td></tr>
+<tr class="memitem:a114c57e2d67511d052892fa829f80d50"><td class="memTemplItemLeft" align="right" valign="top">utilities::select_type_t&lt; size_t, Node *, Options::stl_erase &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a114c57e2d67511d052892fa829f80d50">erase</a> (const Comparable &amp;c) CMP_NOEXCEPT(c)</td></tr>
+<tr class="memdesc:a114c57e2d67511d052892fa829f80d50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a node that compares equally to <code> from the tree. </code> <a href="#a114c57e2d67511d052892fa829f80d50">More...</a><br /></td></tr>
+<tr class="separator:a114c57e2d67511d052892fa829f80d50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa58d6b841d48f70e94f4492202699293"><td class="memTemplParams" colspan="2">template&lt;bool reverse&gt; </td></tr>
+<tr class="memitem:aa58d6b841d48f70e94f4492202699293"><td class="memTemplItemLeft" align="right" valign="top">utilities::select_type_t&lt; const iterator&lt; reverse &gt;, Node *, Options::stl_erase &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#aa58d6b841d48f70e94f4492202699293">erase</a> (const iterator&lt; reverse &gt; &amp;it) CMP_NOEXCEPT(*it)</td></tr>
+<tr class="memdesc:aa58d6b841d48f70e94f4492202699293"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a node by iterator.  <a href="#aa58d6b841d48f70e94f4492202699293">More...</a><br /></td></tr>
+<tr class="separator:aa58d6b841d48f70e94f4492202699293"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae621eff435c4a49791cc93c3f18511bf"><td class="memItemLeft" align="right" valign="top"><a id="ae621eff435c4a49791cc93c3f18511bf"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>dbg_verify</b> () const</td></tr>
 <tr class="separator:ae621eff435c4a49791cc93c3f18511bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -184,20 +147,113 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>dbg_print_rank_stats<
 <tr class="memitem:ab1b36392db4047702ffbe5e9d19bd614"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#ab1b36392db4047702ffbe5e9d19bd614">dump_to_dot</a> (const std::string &amp;filename) const</td></tr>
 <tr class="memdesc:ab1b36392db4047702ffbe5e9d19bd614"><td class="mdescLeft">&#160;</td><td class="mdescRight">Debugging Method: Draw the Tree as a .dot file.  <a href="#ab1b36392db4047702ffbe5e9d19bd614">More...</a><br /></td></tr>
 <tr class="separator:ab1b36392db4047702ffbe5e9d19bd614"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a843c94db6110457283c9a8b35e6d365a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#a843c94db6110457283c9a8b35e6d365a">size</a> () const</td></tr>
-<tr class="separator:a843c94db6110457283c9a8b35e6d365a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5b42731e80fbca110f3cef59de469fb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#aa5b42731e80fbca110f3cef59de469fb">empty</a> () const</td></tr>
-<tr class="memdesc:aa5b42731e80fbca110f3cef59de469fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the tree is empty.  <a href="#aa5b42731e80fbca110f3cef59de469fb">More...</a><br /></td></tr>
-<tr class="separator:aa5b42731e80fbca110f3cef59de469fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a090a5790f99d8927335f250dbe8d689a"><td class="memItemLeft" align="right" valign="top"><a id="a090a5790f99d8927335f250dbe8d689a"></a>
-Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_root</b> () const</td></tr>
-<tr class="separator:a090a5790f99d8927335f250dbe8d689a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2eac00f7842b6dcacee164a101f5757"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1ZTree.html#ad2eac00f7842b6dcacee164a101f5757">clear</a> ()</td></tr>
-<tr class="memdesc:ad2eac00f7842b6dcacee164a101f5757"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all elements from the tree.  <a href="#ad2eac00f7842b6dcacee164a101f5757">More...</a><br /></td></tr>
-<tr class="separator:ad2eac00f7842b6dcacee164a101f5757"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2a9b52f89b52286f283768a160abeaa"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#af2a9b52f89b52286f283768a160abeaa">find</a> (const Comparable &amp;query) const CMP_NOEXCEPT(query)</td></tr>
+<tr class="memdesc:af2a9b52f89b52286f283768a160abeaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds an element in the tree.  <a href="#af2a9b52f89b52286f283768a160abeaa">More...</a><br /></td></tr>
+<tr class="separator:af2a9b52f89b52286f283768a160abeaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2798627a6e15ba483ee830d0ae0a792"><td class="memItemLeft" align="right" valign="top"><a id="ac2798627a6e15ba483ee830d0ae0a792"></a>
+iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>find</b> (const Comparable &amp;query) CMP_NOEXCEPT(query)</td></tr>
+<tr class="separator:ac2798627a6e15ba483ee830d0ae0a792"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3219942c85a986c1a20622e1cf61de10"><td class="memItemLeft" align="right" valign="top"><a id="a3219942c85a986c1a20622e1cf61de10"></a>
+iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>find</b> (const Comparable &amp;query, Callbacks *cbs)</td></tr>
+<tr class="separator:a3219942c85a986c1a20622e1cf61de10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02e2ac6f9f67736838ffcf4d64c693f8"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#a02e2ac6f9f67736838ffcf4d64c693f8">upper_bound</a> (const Comparable &amp;query) const CMP_NOEXCEPT(query)</td></tr>
+<tr class="memdesc:a02e2ac6f9f67736838ffcf4d64c693f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upper-bounds an element.  <a href="#a02e2ac6f9f67736838ffcf4d64c693f8">More...</a><br /></td></tr>
+<tr class="separator:a02e2ac6f9f67736838ffcf4d64c693f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fca6fb96abcf379055d31be0140e81a"><td class="memItemLeft" align="right" valign="top"><a id="a1fca6fb96abcf379055d31be0140e81a"></a>
+iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>upper_bound</b> (const Comparable &amp;query) CMP_NOEXCEPT(query)</td></tr>
+<tr class="separator:a1fca6fb96abcf379055d31be0140e81a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4198ed2fb23d8ba8e87ef2169cba0cb6"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#a4198ed2fb23d8ba8e87ef2169cba0cb6">lower_bound</a> (const Comparable &amp;query) const CMP_NOEXCEPT(query)</td></tr>
+<tr class="memdesc:a4198ed2fb23d8ba8e87ef2169cba0cb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lower-bounds an element.  <a href="#a4198ed2fb23d8ba8e87ef2169cba0cb6">More...</a><br /></td></tr>
+<tr class="separator:a4198ed2fb23d8ba8e87ef2169cba0cb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2335c3180976b372b5d58e57dd6a0149"><td class="memItemLeft" align="right" valign="top"><a id="a2335c3180976b372b5d58e57dd6a0149"></a>
+iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>lower_bound</b> (const Comparable &amp;query) CMP_NOEXCEPT(query)</td></tr>
+<tr class="separator:a2335c3180976b372b5d58e57dd6a0149"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab40e662cb8a3a7c7e3b38370f855e5bc"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#ab40e662cb8a3a7c7e3b38370f855e5bc">cbegin</a> () const noexcept</td></tr>
+<tr class="separator:ab40e662cb8a3a7c7e3b38370f855e5bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a179b2946443613e5c8eaab8e072f72d0"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#a179b2946443613e5c8eaab8e072f72d0">cend</a> () const noexcept</td></tr>
+<tr class="separator:a179b2946443613e5c8eaab8e072f72d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9f24eac91666805e3d5000e7c5710e1"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#ad9f24eac91666805e3d5000e7c5710e1">begin</a> () const noexcept</td></tr>
+<tr class="separator:ad9f24eac91666805e3d5000e7c5710e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00850dab1c65016e87b2c45e67cfd489"><td class="memItemLeft" align="right" valign="top"><a id="a00850dab1c65016e87b2c45e67cfd489"></a>
+iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> () noexcept</td></tr>
+<tr class="separator:a00850dab1c65016e87b2c45e67cfd489"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69d0a9f3cb1f0a83522d6b37bd22ba19"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#a69d0a9f3cb1f0a83522d6b37bd22ba19">end</a> () const noexcept</td></tr>
+<tr class="separator:a69d0a9f3cb1f0a83522d6b37bd22ba19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a506ca4e385865448084649f18dba8a70"><td class="memItemLeft" align="right" valign="top"><a id="a506ca4e385865448084649f18dba8a70"></a>
+iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> () noexcept</td></tr>
+<tr class="separator:a506ca4e385865448084649f18dba8a70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae84c81045fb6ae73eed669df25553a39"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#ae84c81045fb6ae73eed669df25553a39">crbegin</a> () const noexcept</td></tr>
+<tr class="separator:ae84c81045fb6ae73eed669df25553a39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af65587269fdf60a4e916aab01859837d"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#af65587269fdf60a4e916aab01859837d">crend</a> () const noexcept</td></tr>
+<tr class="separator:af65587269fdf60a4e916aab01859837d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa59f086b561076182bcf5f7fe3276b45"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#aa59f086b561076182bcf5f7fe3276b45">rbegin</a> () const noexcept</td></tr>
+<tr class="separator:aa59f086b561076182bcf5f7fe3276b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71284c758ee0cd1c89637f83e7ba7766"><td class="memItemLeft" align="right" valign="top"><a id="a71284c758ee0cd1c89637f83e7ba7766"></a>
+iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rbegin</b> () noexcept</td></tr>
+<tr class="separator:a71284c758ee0cd1c89637f83e7ba7766"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73a52a26176e9fe836f4a2dde8ad084f"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#a73a52a26176e9fe836f4a2dde8ad084f">rend</a> () const noexcept</td></tr>
+<tr class="separator:a73a52a26176e9fe836f4a2dde8ad084f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fdc7b2226c429acf552d45bbb30d76d"><td class="memItemLeft" align="right" valign="top"><a id="a2fdc7b2226c429acf552d45bbb30d76d"></a>
+iterator&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>rend</b> () noexcept</td></tr>
+<tr class="separator:a2fdc7b2226c429acf552d45bbb30d76d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82d08b68d001be07e5d346fa6b688aa1"><td class="memItemLeft" align="right" valign="top">const_iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#a82d08b68d001be07e5d346fa6b688aa1">iterator_to</a> (const Node &amp;node) const noexcept</td></tr>
+<tr class="separator:a82d08b68d001be07e5d346fa6b688aa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05f7b295419df0415d321ab41e39adfb"><td class="memItemLeft" align="right" valign="top"><a id="a05f7b295419df0415d321ab41e39adfb"></a>
+iterator&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>iterator_to</b> (Node &amp;node) noexcept</td></tr>
+<tr class="separator:a05f7b295419df0415d321ab41e39adfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7d323b6b173e64f7e7149e7c9c9f0f3"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#ad7d323b6b173e64f7e7149e7c9c9f0f3">size</a> () const noexcept</td></tr>
+<tr class="separator:ad7d323b6b173e64f7e7149e7c9c9f0f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada8fc7db58ce84aa7ea6d490e8eea9bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#ada8fc7db58ce84aa7ea6d490e8eea9bc">clear</a> () noexcept</td></tr>
+<tr class="memdesc:ada8fc7db58ce84aa7ea6d490e8eea9bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all elements from the tree.  <a href="#ada8fc7db58ce84aa7ea6d490e8eea9bc">More...</a><br /></td></tr>
+<tr class="separator:ada8fc7db58ce84aa7ea6d490e8eea9bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbcf8fd396946761bae396042865773e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html#abbcf8fd396946761bae396042865773e">empty</a> () const noexcept</td></tr>
+<tr class="memdesc:abbcf8fd396946761bae396042865773e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the tree is empty.  <a href="#abbcf8fd396946761bae396042865773e">More...</a><br /></td></tr>
+<tr class="separator:abbcf8fd396946761bae396042865773e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fb40291dea872a860b3e64ce2b315b6"><td class="memItemLeft" align="right" valign="top"><a id="a5fb40291dea872a860b3e64ce2b315b6"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_root</b> () const noexcept</td></tr>
+<tr class="separator:a5fb40291dea872a860b3e64ce2b315b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:adb39f1d99b8c5915388cb64ee7e7a77f"><td class="memItemLeft" align="right" valign="top"><a id="adb39f1d99b8c5915388cb64ee7e7a77f"></a>
+static Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_parent</b> (Node *n) noexcept</td></tr>
+<tr class="separator:adb39f1d99b8c5915388cb64ee7e7a77f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3571c8e5f98e25be5d67b79326af0357"><td class="memItemLeft" align="right" valign="top"><a id="a3571c8e5f98e25be5d67b79326af0357"></a>
+static Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_left_child</b> (Node *n) noexcept</td></tr>
+<tr class="separator:a3571c8e5f98e25be5d67b79326af0357"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ef669d562aab8f27253e2e151eaae4e"><td class="memItemLeft" align="right" valign="top"><a id="a9ef669d562aab8f27253e2e151eaae4e"></a>
+static Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_right_child</b> (Node *n) noexcept</td></tr>
+<tr class="separator:a9ef669d562aab8f27253e2e151eaae4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:afeb9bece92954c8640cd1aa0a9f943b1"><td class="memItemLeft" align="right" valign="top"><a id="afeb9bece92954c8640cd1aa0a9f943b1"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_first_equal</b> (Node *n) noexcept</td></tr>
+<tr class="separator:afeb9bece92954c8640cd1aa0a9f943b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acaeedb360b3ab6fe763f481fc85c62b2"><td class="memItemLeft" align="right" valign="top"><a id="acaeedb360b3ab6fe763f481fc85c62b2"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_smallest</b> () const noexcept</td></tr>
+<tr class="separator:acaeedb360b3ab6fe763f481fc85c62b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa8d02bd16896177ad897d8e473af2d8"><td class="memItemLeft" align="right" valign="top"><a id="afa8d02bd16896177ad897d8e473af2d8"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_largest</b> () const noexcept</td></tr>
+<tr class="separator:afa8d02bd16896177ad897d8e473af2d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2f09a59e6cfc9529621901f6456eed2"><td class="memItemLeft" align="right" valign="top"><a id="ad2f09a59e6cfc9529621901f6456eed2"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>get_uncle</b> (Node *node) const noexcept</td></tr>
+<tr class="separator:ad2f09a59e6cfc9529621901f6456eed2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a6dfa7fee6a6f32a720407e823fc593ee"><td class="memItemLeft" align="right" valign="top"><a id="a6dfa7fee6a6f32a720407e823fc593ee"></a>
+Node *&#160;</td><td class="memItemRight" valign="bottom"><b>root</b></td></tr>
+<tr class="separator:a6dfa7fee6a6f32a720407e823fc593ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adafe8d39775de5950d7f52875990f814"><td class="memItemLeft" align="right" valign="top"><a id="adafe8d39775de5950d7f52875990f814"></a>
+Compare&#160;</td><td class="memItemRight" valign="bottom"><b>cmp</b></td></tr>
+<tr class="separator:adafe8d39775de5950d7f52875990f814"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76bd0696a2cacc7f71607dc839d8db14"><td class="memItemLeft" align="right" valign="top"><a id="a76bd0696a2cacc7f71607dc839d8db14"></a>
+SizeHolder&lt; Options::constant_time_size &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>s</b></td></tr>
+<tr class="separator:a76bd0696a2cacc7f71607dc839d8db14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt;<br />
+<div class="textblock"><h3>template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankGenerator&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt;<br />
 class ygg::ZTree&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;</h3>
 
 <p>The Zip Tree. </p>
@@ -214,13 +270,16 @@ class ygg::ZTree&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;</h
   </dd>
 </dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aa9aa58dc78af2b04af5a4f00c439b908"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9aa58dc78af2b04af5a4f00c439b908">&#9670;&nbsp;</a></span>ZTree()</h2>
+<a id="ada33e2a8d78b91bc10e3177313389116"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada33e2a8d78b91bc10e3177313389116">&#9670;&nbsp;</a></span>ZTree()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankGenerator&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::<a class="el" href="classygg_1_1ZTree.html">ZTree</a> </td>
@@ -230,6 +289,11 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Create a new Zip Tree from a different Zip Tree. </p>
@@ -244,81 +308,105 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="af18a53d58fa18d04066fb7416693469f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af18a53d58fa18d04066fb7416693469f">&#9670;&nbsp;</a></span>begin()</h2>
+<a id="ad9f24eac91666805e3d5000e7c5710e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9f24eac91666805e3d5000e7c5710e1">&#9670;&nbsp;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::begin </td>
+          <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::begin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Returns an iterator pointing to the smallest element in the tree. </p>
 
 </div>
 </div>
-<a id="acfe4cbd496f00b179380ebbf65e27333"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acfe4cbd496f00b179380ebbf65e27333">&#9670;&nbsp;</a></span>cbegin()</h2>
+<a id="ab40e662cb8a3a7c7e3b38370f855e5bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab40e662cb8a3a7c7e3b38370f855e5bc">&#9670;&nbsp;</a></span>cbegin()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::cbegin </td>
+          <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::cbegin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Returns an iterator pointing to the smallest element in the tree. </p>
 
 </div>
 </div>
-<a id="a02586888f373e90b8f743d647f773a03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02586888f373e90b8f743d647f773a03">&#9670;&nbsp;</a></span>cend()</h2>
+<a id="a179b2946443613e5c8eaab8e072f72d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a179b2946443613e5c8eaab8e072f72d0">&#9670;&nbsp;</a></span>cend()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::cend </td>
+          <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::cend </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Returns an iterator pointing after the largest element in the tree. </p>
 
 </div>
 </div>
-<a id="ad2eac00f7842b6dcacee164a101f5757"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2eac00f7842b6dcacee164a101f5757">&#9670;&nbsp;</a></span>clear()</h2>
+<a id="ada8fc7db58ce84aa7ea6d490e8eea9bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada8fc7db58ce84aa7ea6d490e8eea9bc">&#9670;&nbsp;</a></span>clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::clear </td>
+          <td class="memname">void <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::clear </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Removes all elements from the tree. </p>
@@ -326,41 +414,53 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 
 </div>
 </div>
-<a id="a84c7e3f2f697fbaed4da37eac7ca6aa4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a84c7e3f2f697fbaed4da37eac7ca6aa4">&#9670;&nbsp;</a></span>crbegin()</h2>
+<a id="ae84c81045fb6ae73eed669df25553a39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae84c81045fb6ae73eed669df25553a39">&#9670;&nbsp;</a></span>crbegin()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;true&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::crbegin </td>
+          <td class="memname">const_iterator&lt;true&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::crbegin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Returns an reverse iterator pointing to the largest element in the tree. </p>
 
 </div>
 </div>
-<a id="a18e092ba5ed7ba3ba372ddd7e7448557"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a18e092ba5ed7ba3ba372ddd7e7448557">&#9670;&nbsp;</a></span>crend()</h2>
+<a id="af65587269fdf60a4e916aab01859837d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af65587269fdf60a4e916aab01859837d">&#9670;&nbsp;</a></span>crend()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;true&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::crend </td>
+          <td class="memname">const_iterator&lt;true&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::crend </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Returns an reverse iterator pointing before the smallest element in the tree. </p>
 
@@ -372,7 +472,7 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankGenerator&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::dump_to_dot </td>
@@ -395,21 +495,27 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 
 </div>
 </div>
-<a id="aa5b42731e80fbca110f3cef59de469fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa5b42731e80fbca110f3cef59de469fb">&#9670;&nbsp;</a></span>empty()</h2>
+<a id="abbcf8fd396946761bae396042865773e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbcf8fd396946761bae396042865773e">&#9670;&nbsp;</a></span>empty()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::empty </td>
+          <td class="memname">bool <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::empty </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Returns whether the tree is empty. </p>
@@ -418,48 +524,128 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 
 </div>
 </div>
-<a id="a7ad8b33a8d130cd0139eff3070b88135"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ad8b33a8d130cd0139eff3070b88135">&#9670;&nbsp;</a></span>end()</h2>
+<a id="a69d0a9f3cb1f0a83522d6b37bd22ba19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69d0a9f3cb1f0a83522d6b37bd22ba19">&#9670;&nbsp;</a></span>end()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::end </td>
+          <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::end </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Returns an iterator pointing after the largest element in the tree. </p>
 
 </div>
 </div>
-<a id="afa31d0b049f3de3bc51a32e7b19b5649"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa31d0b049f3de3bc51a32e7b19b5649">&#9670;&nbsp;</a></span>find()</h2>
+<a id="a114c57e2d67511d052892fa829f80d50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a114c57e2d67511d052892fa829f80d50">&#9670;&nbsp;</a></span>erase() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankGenerator&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
 <div class="memtemplate">
 template&lt;class Comparable &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::find </td>
+          <td class="memname">utilities::select_type_t&lt;size_t, Node *, Options::stl_erase&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::erase </td>
+          <td>(</td>
+          <td class="paramtype">const Comparable &amp;&#160;</td>
+          <td class="paramname"><em>c</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deletes a node that compares equally to <code> from the tree. </code></p>
+<dl class="section warning"><dt>Warning</dt><dd>The behavior of this method strongly depends on whether the STL_ERASE option is set or not!</dd></dl>
+<p>Removes a node that compares equally to <code> from the tree.</code></p>
+<p><code>If STL_ERASE is set, this method removes <em>all</em> nodes that compare equally to c from the tree and returns the number of nodes removed.</code></p>
+<p><code>If STL_ERASE is not set, it removes only one node and returns a pointer to the removed node.</code></p>
+<p><code></p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">c</td><td>Anything comparable to a node. A node (resp. all nodes, see above) that compares equally will be removed</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>If STL_ERASE is unset: A pointer to the node that has been removed, or nullptr if no node was removed. If STL_ERASE is set: The number of erased nodes. </dd></dl>
+<p></code></p>
+
+</div>
+</div>
+<a id="aa58d6b841d48f70e94f4492202699293"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa58d6b841d48f70e94f4492202699293">&#9670;&nbsp;</a></span>erase() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankGenerator&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;bool reverse&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">utilities::select_type_t&lt;const iterator&lt;reverse&gt;, Node *, Options::stl_erase&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::erase </td>
+          <td>(</td>
+          <td class="paramtype">const iterator&lt; reverse &gt; &amp;&#160;</td>
+          <td class="paramname"><em>it</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deletes a node by iterator. </p>
+<dl class="section warning"><dt>Warning</dt><dd>The return type of this method depends on whether the STL_ERASE option is set or not!</dd></dl>
+<p>Removes a node that is pointed to by an iterator.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">c</td><td>Anything comparable to a node. A node (resp. all nodes, see above) that compares equally will be removed</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>If STL_ERASE is unset: A pointer to the node that has been removed. If STL_ERASE is set: An iterator to the node after the removed node (or end()). </dd></dl>
+
+</div>
+</div>
+<a id="af2a9b52f89b52286f283768a160abeaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2a9b52f89b52286f283768a160abeaa">&#9670;&nbsp;</a></span>find()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::find </td>
           <td>(</td>
           <td class="paramtype">const Comparable &amp;&#160;</td>
           <td class="paramname"><em>query</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Finds an element in the tree. </p>
 <p>Returns an iterator to the first element that compares equally to &lt;query&gt;. Note that &lt;query&gt; does not have to be a Node, but can be anything that can be compared to a Node, i.e., for which Compare()(const Node &amp;, const Comparable &amp;) and Compare()(const Comparable &amp;, const Node &amp;) are defined and implemented. In the case of using the default ygg::utilities::flexible_less as Compare, that means you have to implement operator&lt;() for both types.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Not available for explicitly ordered trees</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>An object comparing equally to the element that should be found. </td></tr>
@@ -476,7 +662,7 @@ template&lt;class Comparable &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankGenerator&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -509,22 +695,28 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 
 </div>
 </div>
-<a id="a56aa7e12e0aa720681ad9a1d01e8c7f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56aa7e12e0aa720681ad9a1d01e8c7f1">&#9670;&nbsp;</a></span>iterator_to()</h2>
+<a id="a82d08b68d001be07e5d346fa6b688aa1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82d08b68d001be07e5d346fa6b688aa1">&#9670;&nbsp;</a></span>iterator_to()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::iterator_to </td>
+          <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::iterator_to </td>
           <td>(</td>
           <td class="paramtype">const Node &amp;&#160;</td>
           <td class="paramname"><em>node</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Returns an iterator pointing to the entry held in node.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -536,29 +728,34 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 
 </div>
 </div>
-<a id="aeb37298489e974b2f3a689316133ccac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb37298489e974b2f3a689316133ccac">&#9670;&nbsp;</a></span>lower_bound()</h2>
+<a id="a4198ed2fb23d8ba8e87ef2169cba0cb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4198ed2fb23d8ba8e87ef2169cba0cb6">&#9670;&nbsp;</a></span>lower_bound()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
-<div class="memtemplate">
-template&lt;class Comparable &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::lower_bound </td>
+          <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::lower_bound </td>
           <td>(</td>
           <td class="paramtype">const Comparable &amp;&#160;</td>
           <td class="paramname"><em>query</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Lower-bounds an element. </p>
 <p>Returns an iterator to the first element that is not less that &lt;query&gt;, i.e., that does not have to go before &lt;query&gt;.</p>
 <p>Note that &lt;query&gt; does not have to be a Node, but can be anything that can be compared to a Node, i.e., for which Compare()(const Node &amp;, const Comparable &amp;) and Compare()(const Comparable &amp;, const Node &amp;) are defined and implemented. In the case of using the default ygg::utilities::flexible_less as Compare, that means you have to implement operator&lt;() for both types.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Not available for explicitly ordered trees</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>An object comparable to Node that should be lower-bounded </td></tr>
@@ -569,13 +766,16 @@ template&lt;class Comparable &gt; </div>
 
 </div>
 </div>
-<a id="a9030fb4cd2672dfc5e68f63ca6cf744b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9030fb4cd2672dfc5e68f63ca6cf744b">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/2]</span></h2>
+<a id="ab61f3d51983c049048c3b8abd973d9b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab61f3d51983c049048c3b8abd973d9b5">&#9670;&nbsp;</a></span>operator=()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankGenerator&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classygg_1_1ZTree.html">MyClass</a>&amp; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::operator= </td>
@@ -585,6 +785,11 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Move-assign an other Zip Tree to this one. </p>
@@ -598,73 +803,39 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 
 </div>
 </div>
-<a id="a4cc2d4df960f179398d97eb4d2f5ee3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4cc2d4df960f179398d97eb4d2f5ee3c">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+<a id="aa59f086b561076182bcf5f7fe3276b45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa59f086b561076182bcf5f7fe3276b45">&#9670;&nbsp;</a></span>rbegin()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree.html">MyClass</a>&amp; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classygg_1_1ZTree.html">MyClass</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Copy an other tree into this one. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Both trees must have the same size! The nodes in this tree will be overwritten.</dd>
-<dd>
-Your node class must implement an <a class="el" href="classygg_1_1ZTree.html#a9030fb4cd2672dfc5e68f63ca6cf744b" title="Move-assign an other Zip Tree to this one. ">operator=()</a>. However, the <a class="el" href="classygg_1_1ZTree.html#a9030fb4cd2672dfc5e68f63ca6cf744b" title="Move-assign an other Zip Tree to this one. ">operator=()</a> must not change the assigned rank of a node!</dd>
-<dd>
-This method is only available for trees which:<ul>
-<li>use hash-based ranking and</li>
-<li>store the rank, i.e., for which TreeFlags::ZTREE_RANK_TYPE is set.</li>
-</ul>
-</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">other</td><td>The Zip Tree that this one is copied from </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a23119af9adc1bd5bcc44077fcdcfb84a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a23119af9adc1bd5bcc44077fcdcfb84a">&#9670;&nbsp;</a></span>rbegin()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;true&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::rbegin </td>
+          <td class="memname">const_iterator&lt;true&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::rbegin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Returns an reverse iterator pointing to the largest element in the tree. </p>
 
 </div>
 </div>
-<a id="a80882f561d1f2c90dcc874dc90ef08fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a80882f561d1f2c90dcc874dc90ef08fb">&#9670;&nbsp;</a></span>remove()</h2>
+<a id="a132fe29e53d194190e89202dd6c2356e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a132fe29e53d194190e89202dd6c2356e">&#9670;&nbsp;</a></span>remove()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
+template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankGenerator&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::remove </td>
@@ -674,11 +845,6 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Removes &lt;node&gt; from the tree. </p>
@@ -692,41 +858,53 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 
 </div>
 </div>
-<a id="a1eda82c6f2cf3242175ec24882e0aa83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1eda82c6f2cf3242175ec24882e0aa83">&#9670;&nbsp;</a></span>rend()</h2>
+<a id="a73a52a26176e9fe836f4a2dde8ad084f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73a52a26176e9fe836f4a2dde8ad084f">&#9670;&nbsp;</a></span>rend()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;true&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::rend </td>
+          <td class="memname">const_iterator&lt;true&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::rend </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Returns an reverse iterator pointing before the smallest element in the tree. </p>
 
 </div>
 </div>
-<a id="a843c94db6110457283c9a8b35e6d365a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a843c94db6110457283c9a8b35e6d365a">&#9670;&nbsp;</a></span>size()</h2>
+<a id="ad7d323b6b173e64f7e7149e7c9c9f0f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7d323b6b173e64f7e7149e7c9c9f0f3">&#9670;&nbsp;</a></span>size()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::size </td>
+          <td class="memname">size_t <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::size </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Return the number of elements in the tree.</p>
 <p>This method runs in O(1).</p>
@@ -735,29 +913,34 @@ template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class 
 
 </div>
 </div>
-<a id="acdbc8ab365970492de38097319c31157"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acdbc8ab365970492de38097319c31157">&#9670;&nbsp;</a></span>upper_bound()</h2>
+<a id="a02e2ac6f9f67736838ffcf4d64c693f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02e2ac6f9f67736838ffcf4d64c693f8">&#9670;&nbsp;</a></span>upper_bound()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<div class="memtemplate">
-template&lt;class Node, class NodeTraits, class Options = DefaultOptions, class Tag = int, class Compare = ygg::utilities::flexible_less, class RankGetter = ztree_internal::ZTreeRankFromHash&lt;        Node, Options, Options::ztree_use_hash, Options::ztree_store_rank&gt;&gt; </div>
-<div class="memtemplate">
-template&lt;class Comparable &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classygg_1_1ZTree_1_1const__iterator.html">const_iterator</a>&lt;false&gt; <a class="el" href="classygg_1_1ZTree.html">ygg::ZTree</a>&lt; Node, NodeTraits, Options, Tag, Compare, RankGetter &gt;::upper_bound </td>
+          <td class="memname">const_iterator&lt;false&gt; <a class="el" href="classygg_1_1bst_1_1BinarySearchTree.html">ygg::bst::BinarySearchTree</a>&lt; Node, Options, Tag, Compare, DefaultParentContainer&lt;Node&gt;  &gt;::upper_bound </td>
           <td>(</td>
           <td class="paramtype">const Comparable &amp;&#160;</td>
           <td class="paramname"><em>query</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Upper-bounds an element. </p>
 <p>Returns an iterator to the smallest element to which &lt;query&gt; compares as "less", i.e. the smallest element that is considered go strictly after &lt;query&gt;.</p>
 <p>Note that &lt;query&gt; does not have to be a Node, but can be anything that can be compared to a Node, i.e., for which Compare()(const Node &amp;, const Comparable &amp;) and Compare()(const Comparable &amp;, const Node &amp;) are defined and implemented. In the case of using the default ygg::utilities::flexible_less as Compare, that means you have to implement operator&lt;() for both types.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Not available for explicitly ordered trees</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>An object comparable to Node that should be upper-bounded </td></tr>

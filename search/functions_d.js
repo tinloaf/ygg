@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['traverse_5fleft_5fedge_5fup',['traverse_left_edge_up',['../classygg_1_1MaxCombiner.html#a7ea17b933288e85c0ee4113389af08b6',1,'ygg::MaxCombiner::traverse_left_edge_up()'],['../classygg_1_1RangedMaxCombiner.html#a0c2df0258cab461cb8c5ac34eec7441e',1,'ygg::RangedMaxCombiner::traverse_left_edge_up()']]],
-  ['traverse_5fright_5fedge_5fup',['traverse_right_edge_up',['../classygg_1_1MaxCombiner.html#a86f68683afcfabff5f9d2a12b8d05ef0',1,'ygg::MaxCombiner::traverse_right_edge_up()'],['../classygg_1_1RangedMaxCombiner.html#ae85ed623a0f4b37b88614d4ad431e96e',1,'ygg::RangedMaxCombiner::traverse_right_edge_up()']]]
+  ['update_5frank',['update_rank',['../classygg_1_1ZTreeNodeBase.html#a3bd770811de3b995b45635d72643e894',1,'ygg::ZTreeNodeBase']]],
+  ['upper_5fbound',['upper_bound',['../classygg_1_1bst_1_1BinarySearchTree.html#a02e2ac6f9f67736838ffcf4d64c693f8',1,'ygg::bst::BinarySearchTree']]],
+  ['upper_5fbound_5fevent',['upper_bound_event',['../classygg_1_1DynamicSegmentTree.html#a3e330e5e85ab4f56ea5da6e3b7627f61',1,'ygg::DynamicSegmentTree']]]
 ];
