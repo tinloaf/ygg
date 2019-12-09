@@ -601,6 +601,9 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 	Node * cur = this->root;
 	cbs->init_root(cur);
 
+	/* We do a 3-way comparison here even though it is less efficient,
+	 * to ensure the callbacks are called in the right way. */
+
 	while (cur != nullptr) {
 		if (this->cmp(*cur, query)) {
 			cur = cur->NB::get_right();
@@ -620,7 +623,29 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
-template <class Comparable>
+Node *
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_first_equal(
+    Node * n) noexcept
+{
+	auto it = this->iterator_to(*n);
+	if (it == this->begin()) {
+		return n;
+	}
+
+	Node * ret = n;
+
+	--it;
+	while (!this->cmp(*it, *n)) {
+		ret = &(*it);
+		--it;
+	}
+
+	return ret;
+}
+
+template <class Node, class Options, class Tag, class Compare,
+          class ParentContainer>
+template <class Comparable, bool ensure_first>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
@@ -640,6 +665,9 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 
 			if (__builtin_expect(
 			        (!this->cmp(*cur, query)) && (!this->cmp(query, *cur)), false)) {
+				if constexpr (ensure_first) {
+					cur = this->get_first_equal(cur);
+				}
 				return iterator<false>(cur);
 			}
 			cur = utilities::go_right_if(this->cmp(*cur, query), cur);
@@ -655,6 +683,9 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 
 	if constexpr (!Options::micro_avoid_conditionals) {
 		if ((last_left != nullptr) && (!this->cmp(query, *last_left))) {
+			if constexpr (ensure_first) {
+				last_left = this->get_first_equal(last_left);
+			}
 			return iterator<false>(last_left);
 		} else {
 			return this->end();
@@ -666,14 +697,15 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
-template <class Comparable>
+template <class Comparable, bool ensure_first>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
     const Comparable & query) const CMP_NOEXCEPT(query)
 {
 	return const_iterator<false>(
-	    const_cast<std::remove_const_t<decltype(this)>>(this)->find(query));
+	    const_cast<std::remove_const_t<decltype(this)>>(this)
+	        ->template find<Comparable, ensure_first>(query));
 }
 
 template <class Node, class Options, class Tag, class Compare,

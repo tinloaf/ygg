@@ -15,16 +15,24 @@ namespace rbtree {
 
 constexpr int RBTREE_TESTSIZE = 2000;
 
-using BasicNonMultipleOptions = TreeOptions<TreeFlags::CONSTANT_TIME_SIZE>;
-using BasicMultipleOptions =
-    TreeOptions<TreeFlags::CONSTANT_TIME_SIZE, TreeFlags::MULTIPLE>;
+struct NonOptionDummy;
 
+template <class AdditionalOption = NonOptionDummy>
+using BasicNonMultipleOptions =
+    TreeOptions<TreeFlags::CONSTANT_TIME_SIZE, AdditionalOption>;
+template <class AdditionalOption = NonOptionDummy>
+using BasicMultipleOptions = TreeOptions<TreeFlags::CONSTANT_TIME_SIZE,
+                                         TreeFlags::MULTIPLE, AdditionalOption>;
+
+template <class AdditionalOption = NonOptionDummy>
 using AdvancedNonMultipleOptions =
     TreeOptions<TreeFlags::CONSTANT_TIME_SIZE, TreeFlags::COMPRESS_COLOR,
-                TreeFlags::MICRO_AVOID_CONDITIONALS>;
+                TreeFlags::MICRO_AVOID_CONDITIONALS, AdditionalOption>;
+template <class AdditionalOption = NonOptionDummy>
 using AdvancedMultipleOptions =
     TreeOptions<TreeFlags::CONSTANT_TIME_SIZE, TreeFlags::MULTIPLE,
-                TreeFlags::COMPRESS_COLOR, TreeFlags::MICRO_AVOID_CONDITIONALS>;
+                TreeFlags::COMPRESS_COLOR, TreeFlags::MICRO_AVOID_CONDITIONALS,
+                AdditionalOption>;
 
 #define __RBT_BASENAME(NAME) Basic_##NAME
 #define __RBT_NONMULTIPLE BasicNonMultipleOptions

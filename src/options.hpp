@@ -45,6 +45,7 @@ public:
 	 */
 	class ORDER_QUERIES {
 	};
+
 	/**
 	 * @brief RBTree / List option: support size() in O(1)
 	 *
@@ -53,6 +54,16 @@ public:
 	 * a little space and will slow down insert and remove operations minimally.
 	 */
 	class CONSTANT_TIME_SIZE {
+	};
+
+	/**
+	 * @brief Make the erase() method adhere to STL conventions
+	 *
+	 * If this flag is set, the erase() method of the various trees has a behavior
+	 * that is in line with STL's std::set (or std::multiset), returning an
+	 * iterator to the next element in the tree.
+	 */
+	class STL_ERASE {
 	};
 
 	/**
@@ -347,6 +358,8 @@ public:
 	    OptPack::template has<TreeFlags::COMPRESS_COLOR>();
 	static constexpr bool ztree_use_hash =
 	    OptPack::template has<TreeFlags::ZTREE_USE_HASH>();
+	static constexpr bool stl_erase =
+	    OptPack::template has<TreeFlags::STL_ERASE>();
 	using ztree_rank_type =
 	    typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE, void,
 	                                            Opts...>::type;

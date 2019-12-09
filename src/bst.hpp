@@ -248,6 +248,12 @@ public:
 	 ******************************************************
 	 ******************************************************/
 
+protected:
+	// TODO document
+	inline Node * get_first_equal(Node * n) noexcept;
+
+public:
+	// TODO document ensure_firstx
 	/**
 	 * @brief Finds an element in the tree
 	 *
@@ -268,10 +274,10 @@ public:
 	 * @returns An iterator to the first element comparing equally to <query>, or
 	 * end() if no such element exists
 	 */
-	template <class Comparable>
+	template <class Comparable, bool ensure_first = false>
 	const_iterator<false> find(const Comparable & query) const
 	    CMP_NOEXCEPT(query);
-	template <class Comparable>
+	template <class Comparable, bool ensure_first = false>
 	iterator<false> find(const Comparable & query) CMP_NOEXCEPT(query);
 
 	// TODO document

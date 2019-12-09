@@ -1,19 +1,22 @@
-class Node : public RBTreeNodeBase<Node, __RBT_NONMULTIPLE> { // No multi-nodes!
+template <class AdditionalOption = NonOptionDummy>
+class NodeBase : public RBTreeNodeBase<
+                     NodeBase<AdditionalOption>,
+                     __RBT_NONMULTIPLE<AdditionalOption>> { // No multi-nodes!
 public:
 	int data;
 
-	Node() : data(0){};
-	explicit Node(int data_in) : data(data_in){};
-	Node(const Node & other) : data(other.data){};
+	NodeBase() : data(0){};
+	explicit NodeBase(int data_in) : data(data_in){};
+	NodeBase(const NodeBase<AdditionalOption> & other) : data(other.data){};
 
 	bool
-	operator<(const Node & other) const
+	operator<(const NodeBase<AdditionalOption> & other) const
 	{
 		return this->data < other.data;
 	}
 
-	Node &
-	operator=(const Node & other)
+	NodeBase<AdditionalOption> &
+	operator=(const NodeBase<AdditionalOption> & other)
 	{
 		this->data = other.data;
 		return *this;
@@ -21,36 +24,42 @@ public:
 };
 
 // Make Node comparable to int
+template <class AddOpt>
 bool
-operator<(const Node & lhs, int rhs)
+operator<(const NodeBase<AddOpt> & lhs, int rhs)
 {
 	return lhs.data < rhs;
 }
+template <class AddOpt>
 bool
-operator<(int lhs, const Node & rhs)
+operator<(int lhs, const NodeBase<AddOpt> & rhs)
 {
 	return lhs < rhs.data;
 }
 
-class EqualityNode : public RBTreeNodeBase<EqualityNode, __RBT_MULTIPLE> {
+using Node = NodeBase<>;
+
+template <class AdditionalOption = NonOptionDummy>
+class MultiNodeBase : public RBTreeNodeBase<MultiNodeBase<AdditionalOption>,
+                                            __RBT_MULTIPLE<AdditionalOption>> {
 public:
 	int data;
 	int sub_data;
 
-	EqualityNode() : data(0){};
-	explicit EqualityNode(int data_in, int sub_data_in = 0)
+	MultiNodeBase() : data(0){};
+	explicit MultiNodeBase(int data_in, int sub_data_in = 0)
 	    : data(data_in), sub_data(sub_data_in){};
-	EqualityNode(const EqualityNode & other)
+	MultiNodeBase(const MultiNodeBase<AdditionalOption> & other)
 	    : data(other.data), sub_data(other.sub_data){};
 
 	bool
-	operator<(const EqualityNode & other) const
+	operator<(const MultiNodeBase<AdditionalOption> & other) const
 	{
 		return this->data < other.data;
 	}
 
-	EqualityNode &
-	operator=(const EqualityNode & other)
+	MultiNodeBase<AdditionalOption> &
+	operator=(const MultiNodeBase<AdditionalOption> & other)
 	{
 		this->data = other.data;
 		this->sub_data = other.sub_data;
@@ -58,19 +67,37 @@ public:
 	}
 };
 
+// Make MultiNode comparable to int
+template <class AddOpt>
+bool
+operator<(const MultiNodeBase<AddOpt> & lhs, int rhs)
+{
+	return lhs.data < rhs;
+}
+template <class AddOpt>
+bool
+operator<(int lhs, const MultiNodeBase<AddOpt> & rhs)
+{
+	return lhs < rhs.data;
+}
+
+using MultiNode = MultiNodeBase<>;
+
 class NodeTraits : public RBDefaultNodeTraits {
 public:
+	template <class AddOpt>
 	static std::string
-	get_id(const Node * node)
+	get_id(const NodeBase<AddOpt> * node)
 	{
 		return std::to_string(node->data);
 	}
 };
 
-class EqualityNodeTraits : public RBDefaultNodeTraits {
+class MultiNodeTraits : public RBDefaultNodeTraits {
 public:
+	template <class AddOpt>
 	static std::string
-	get_id(const EqualityNode * node)
+	get_id(const MultiNodeBase<AddOpt> * node)
 	{
 		return std::string("(") + std::to_string(node->data) + std::string("/") +
 		       std::to_string(node->sub_data) + std::string(")");
@@ -79,7 +106,7 @@ public:
 
 TEST(__RBT_BASENAME(RBTreeTest), TrivialInsertionTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node n;
 	n.data = 0;
@@ -90,9 +117,9 @@ TEST(__RBT_BASENAME(RBTreeTest), TrivialInsertionTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), TrivialSizeTest)
 {
-	auto tree = RBTree<EqualityNode, EqualityNodeTraits, __RBT_MULTIPLE>();
+	auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
 
-	EqualityNode n;
+	MultiNode n;
 	n.data = 0;
 
 	ASSERT_EQ(tree.size(), 0);
@@ -110,7 +137,7 @@ TEST(__RBT_BASENAME(RBTreeTest), TrivialSizeTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), RandomInsertionTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	std::mt19937 rng(4); // chosen by fair xkcd
 	std::uniform_int_distribution<int> uni(std::numeric_limits<int>::min(),
@@ -138,7 +165,7 @@ TEST(__RBT_BASENAME(RBTreeTest), RandomInsertionTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 
@@ -154,12 +181,12 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionTest)
 /* Hinted is broken
 TEST(__RBT_BASENAME(RBTreeTest), HintedPostEqualInsertionTest)
 {
-  auto tree = RBTree<EqualityNode, EqualityNodeTraits, __RBT_MULTIPLE>();
+  auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
 
-  EqualityNode n_insert_before(1, 0);
-  EqualityNode n_pre(1, 1);
-  EqualityNode n_insert_between(1, 2);
-  EqualityNode n_post(2, 3);
+  MultiNode n_insert_before(1, 0);
+  MultiNode n_pre(1, 1);
+  MultiNode n_insert_between(1, 2);
+  MultiNode n_post(2, 3);
 
   tree.insert(n_pre);
   tree.insert(n_post);
@@ -190,18 +217,18 @@ TEST(__RBT_BASENAME(RBTreeTest), HintedPostEqualInsertionTest)
   TODO re-enable once hinted insertion is fixed.
 TEST(__RBT_BASENAME(RBTreeTest), RepeatedHintedPostEqualInsertionTest)
 {
-auto tree = RBTree<EqualityNode, EqualityNodeTraits, __RBT_MULTIPLE>();
+auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
 
-EqualityNode nodes_pre[RBTREE_TESTSIZE];
-EqualityNode nodes_post[RBTREE_TESTSIZE];
-EqualityNode nodes_between[RBTREE_TESTSIZE];
-EqualityNode node_border_small(1, RBTREE_TESTSIZE + 2);
-EqualityNode node_border_large(2, RBTREE_TESTSIZE + 2);
+MultiNode nodes_pre[RBTREE_TESTSIZE];
+MultiNode nodes_post[RBTREE_TESTSIZE];
+MultiNode nodes_between[RBTREE_TESTSIZE];
+MultiNode node_border_small(1, RBTREE_TESTSIZE + 2);
+MultiNode node_border_large(2, RBTREE_TESTSIZE + 2);
 
 for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  nodes_pre[i] = EqualityNode(1, (int)i);
-  nodes_post[i] = EqualityNode(2, (int)i);
-  nodes_between[i] = EqualityNode(1, (int)RBTREE_TESTSIZE + 1);
+  nodes_pre[i] = MultiNode(1, (int)i);
+  nodes_post[i] = MultiNode(2, (int)i);
+  nodes_between[i] = MultiNode(1, (int)RBTREE_TESTSIZE + 1);
 }
 
 for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
@@ -250,7 +277,7 @@ for (int i = 0; i < RBTREE_TESTSIZE; ++i) {
 TEST(__RBT_BASENAME(RBTreeTest), LinearEndHintedInsertionTest)
 {
 auto tree =
-    RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+    RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 Node nodes[RBTREE_TESTSIZE];
 
@@ -275,14 +302,14 @@ for (const auto & n : tree) {
 
 TEST(__RBT_BASENAME(RBTreeTest), HintedOrderPreservationTest)
 {
-auto tree = RBTree<EqualityNode, EqualityNodeTraits, __RBT_MULTIPLE>();
+auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
 
-EqualityNode nodes[3 * RBTREE_TESTSIZE];
+MultiNode nodes[3 * RBTREE_TESTSIZE];
 
 for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  nodes[3 * i] = EqualityNode((int)i, 0);
-  nodes[3 * i + 1] = EqualityNode((int)i, 1);
-  nodes[3 * i + 2] = EqualityNode((int)i, 2);
+  nodes[3 * i] = MultiNode((int)i, 0);
+  nodes[3 * i + 1] = MultiNode((int)i, 1);
+  nodes[3 * i + 2] = MultiNode((int)i, 2);
 }
 
 // insert the middles
@@ -314,7 +341,7 @@ for (auto & n : tree) {
 */
 TEST(__RBT_BASENAME(RBTreeTest), EqualityInsertionSizeTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 	Node nodes_duplicates[RBTREE_TESTSIZE];
@@ -340,7 +367,7 @@ TEST(__RBT_BASENAME(RBTreeTest), EqualityInsertionSizeTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), LinearNextHintedInsertionTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 
@@ -364,7 +391,7 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearNextHintedInsertionTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), LowerBoundTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 
@@ -393,7 +420,7 @@ TEST(__RBT_BASENAME(RBTreeTest), LowerBoundTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), UpperBoundTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 
@@ -422,7 +449,7 @@ TEST(__RBT_BASENAME(RBTreeTest), UpperBoundTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), TrivialDeletionTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node n1;
 	n1.data = 0;
@@ -447,7 +474,7 @@ TEST(__RBT_BASENAME(RBTreeTest), TrivialDeletionTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), EraseIteratorTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node n1;
 	n1.data = 0;
@@ -467,9 +494,64 @@ TEST(__RBT_BASENAME(RBTreeTest), EraseIteratorTest)
 	ASSERT_EQ(tree.find(0), tree.end());
 }
 
+TEST(__RBT_BASENAME(RBTreeTest), EraseIteratorSTLReturnTest)
+{
+	using MyNode = MultiNodeBase<TreeFlags::STL_ERASE>;
+	auto tree =
+	    RBTree<MyNode, MultiNodeTraits, __RBT_MULTIPLE<TreeFlags::STL_ERASE>>();
+
+	MyNode n1;
+	n1.data = 0;
+	tree.insert(n1);
+
+	MyNode n2;
+	n2.data = 1;
+	tree.insert(n2);
+
+	ASSERT_FALSE(tree.empty());
+	tree.dbg_verify();
+
+	auto it = tree.begin();
+	auto next_it = tree.erase(it);
+	ASSERT_EQ(next_it, tree.begin());
+
+	ASSERT_EQ(tree.find(0), tree.end());
+}
+
+TEST(__RBT_BASENAME(RBTreeTest), EraseIteratorSTLAllTest)
+{
+	using MyNode = MultiNodeBase<TreeFlags::STL_ERASE>;
+	auto tree =
+	    RBTree<MyNode, MultiNodeTraits, __RBT_MULTIPLE<TreeFlags::STL_ERASE>>();
+
+	std::vector<MyNode> zero_nodes(10);
+	for (auto & node : zero_nodes) {
+		node.data = 0;
+	}
+	std::vector<MyNode> one_nodes(10);
+	for (auto & node : one_nodes) {
+		node.data = 1;
+	}
+	std::vector<MyNode> two_nodes(10);
+	for (auto & node : two_nodes) {
+		node.data = 2;
+	}
+
+	for (unsigned int i = 0; i < 10; ++i) {
+		tree.insert(zero_nodes[i]);
+		tree.insert(one_nodes[i]);
+		tree.insert(two_nodes[i]);
+	}
+
+	size_t erased_count = tree.erase(1);
+	ASSERT_EQ(erased_count, 10);
+	ASSERT_EQ(tree.find(1), tree.end());
+	ASSERT_EQ(tree.size(), 20);
+}
+
 TEST(__RBT_BASENAME(RBTreeTest), TrivialErasureTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node n1;
 	n1.data = 0;
@@ -495,7 +577,7 @@ TEST(__RBT_BASENAME(RBTreeTest), TrivialErasureTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionLinearDeletionTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 
@@ -517,7 +599,7 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionLinearDeletionTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionRandomDeletionTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 	std::vector<unsigned int> indices;
@@ -543,15 +625,15 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionRandomDeletionTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), LinearMultipleIterationTest)
 {
-	auto tree = RBTree<EqualityNode, EqualityNodeTraits, __RBT_MULTIPLE>();
+	auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
 
-	EqualityNode nodes[RBTREE_TESTSIZE * 5];
+	MultiNode nodes[RBTREE_TESTSIZE * 5];
 
 	std::vector<size_t> indices;
 
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
 		for (unsigned j = 0; j < 5; ++j) {
-			nodes[5 * i + j] = EqualityNode((int)i);
+			nodes[5 * i + j] = MultiNode((int)i);
 			indices.push_back(5 * i + j);
 		}
 	}
@@ -577,7 +659,7 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearMultipleIterationTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), LinearIterationTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 	std::vector<size_t> indices;
@@ -604,7 +686,7 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearIterationTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), ReverseIterationTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 	std::vector<size_t> indices;
@@ -634,7 +716,7 @@ TEST(__RBT_BASENAME(RBTreeTest), ReverseIterationTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), FindTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node nodes[RBTREE_TESTSIZE];
 
@@ -660,7 +742,7 @@ TEST(__RBT_BASENAME(RBTreeTest), FindTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), ComprehensiveTest)
 {
-	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
 	Node persistent_nodes[RBTREE_TESTSIZE];
 	std::vector<unsigned int> indices;
@@ -728,15 +810,15 @@ TEST(__RBT_BASENAME(RBTreeTest), ComprehensiveTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), ComprehensiveMultipleTest)
 {
-	auto tree = RBTree<EqualityNode, EqualityNodeTraits, __RBT_MULTIPLE>();
+	auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
 
-	EqualityNode persistent_nodes[RBTREE_TESTSIZE];
+	MultiNode persistent_nodes[RBTREE_TESTSIZE];
 	std::vector<unsigned int> indices;
 	std::mt19937 rng(4); // chosen by fair xkcd
 
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
 		unsigned int data = 10 * i;
-		persistent_nodes[i] = EqualityNode((int)data);
+		persistent_nodes[i] = MultiNode((int)data);
 		indices.push_back(i);
 	}
 
@@ -751,13 +833,13 @@ TEST(__RBT_BASENAME(RBTreeTest), ComprehensiveMultipleTest)
 
 	tree.dbg_verify();
 
-	EqualityNode transient_nodes[RBTREE_TESTSIZE];
+	MultiNode transient_nodes[RBTREE_TESTSIZE];
 	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
 		std::uniform_int_distribution<unsigned int> uni(0,
 		                                                10 * (RBTREE_TESTSIZE + 1));
 		unsigned int data = uni(rng);
 
-		transient_nodes[i] = EqualityNode((int)data);
+		transient_nodes[i] = MultiNode((int)data);
 		// std::cout << "Inserting random value: " << data << "\n";
 	}
 

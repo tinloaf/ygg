@@ -842,7 +842,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::remove_to_leaf(Node & node)
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <class Comparable>
-Node *
+ygg::utilities::select_type_t<size_t, Node *, Options::stl_erase>
 RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
     CMP_NOEXCEPT(c)
 {
@@ -851,19 +851,54 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(const Comparable & c)
 	                         Options::SequenceInterface::get_key(c));
 #endif
 
-	auto el = this->find(c);
+	// If we allow multisets and want to be STL-conform, we must find the *first*
+	// node carrying c, so that we can iteratively delete all of them
+	auto el = this->template find<Comparable,
+	                              (Options::stl_erase && Options::multiple)>(c);
+
 	if (el != this->end()) {
-		this->remove_to_leaf(*el);
-		this->s.reduce(1);
-		return &(*el);
+		if constexpr (Options::stl_erase) {
+			size_t count = 1;
+
+			auto next = el + 1;
+			this->remove_to_leaf(*el);
+			if (Options::multiple) {
+				el = next;
+
+				// el points to the first element comparing equal to c.
+				// For all elements after it, we must only check if they are larger
+				while (__builtin_expect((el != this->end()) && (!this->cmp(c, *el)),
+				                        false)) {
+					count++;
+					next = el + 1;
+					this->remove_to_leaf(*el);
+					el = next;
+				}
+			} else {
+				(void)next;
+			}
+			this->s.reduce(count);
+			return count;
+		} else {
+			this->remove_to_leaf(*el);
+			this->s.reduce(1);
+			return &(*el);
+		}
 	}
 
-	return static_cast<Node *>(nullptr);
+	if constexpr (Options::stl_erase) {
+		return 0;
+	} else {
+		return static_cast<Node *>(nullptr);
+	}
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
 template <bool reverse>
-Node *
+ygg::utilities::select_type_t<
+    const typename RBTree<Node, NodeTraits, Options, Tag,
+                          Compare>::template iterator<reverse>,
+    Node *, Options::stl_erase>
 RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(
     const iterator<reverse> & it) CMP_NOEXCEPT(*it)
 {
@@ -872,10 +907,16 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::erase(
 	                         Options::SequenceInterface::get_key(*it));
 #endif
 
-	Node * n = &(*it);
-	this->remove(*it);
+	if constexpr (!Options::stl_erase) {
+		Node * n = &(*it);
+		this->remove(*it);
 
-	return n;
+		return n;
+	} else {
+		auto ret = it + 1;
+		this->remove(*it);
+		return ret;
+	}
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>

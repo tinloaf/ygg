@@ -273,10 +273,12 @@ public:
 	 * was removed.
 	 */
 	template <class Comparable>
-	Node * erase(const Comparable & c) CMP_NOEXCEPT(c);
+	utilities::select_type_t<size_t, Node *, Options::stl_erase>
+	erase(const Comparable & c) CMP_NOEXCEPT(c);
 
 	template <bool reverse>
-	Node * erase(const iterator<reverse> & it) CMP_NOEXCEPT(*it);
+	utilities::select_type_t<const iterator<reverse>, Node *, Options::stl_erase>
+	erase(const iterator<reverse> & it) CMP_NOEXCEPT(*it);
 
 	// Mainly debugging methods
 	/// @cond INTERNAL

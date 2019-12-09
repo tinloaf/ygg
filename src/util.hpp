@@ -524,6 +524,28 @@ public:
 	using T::T;
 };
 
+/*
+ * Allow selecting between two types.
+ */
+template <class TypeWhenTrue, class TypeWhenFalse, bool b>
+struct select_type;
+
+template <class TypeWhenTrue, class TypeWhenFalse>
+struct select_type<TypeWhenTrue, TypeWhenFalse, false>
+{
+	using type = TypeWhenFalse;
+};
+
+template <class TypeWhenTrue, class TypeWhenFalse>
+struct select_type<TypeWhenTrue, TypeWhenFalse, true>
+{
+	using type = TypeWhenTrue;
+};
+
+template <class TypeWhenTrue, class TypeWhenFalse, bool b>
+using select_type_t =
+    typename select_type<TypeWhenTrue, TypeWhenFalse, b>::type;
+
 } // namespace utilities
 } // namespace ygg
 
