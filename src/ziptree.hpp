@@ -259,20 +259,45 @@ public:
 	 */
 	void remove(Node & node) CMP_NOEXCEPT(node);
 
-	// TODO STL removes *all* elements
 	/**
 	 * @brief Deletes a node that compares equally to <c> from the tree
 	 *
+	 * @warning The behavior of this method strongly depends on whether the
+	 * STL_ERASE option is set or not!
+	 *
 	 * Removes a node that compares equally to <c> from the tree.
 	 *
-	 * @param   c Anything comparable to a node. A node that compares equally will
-	 * be removed
-	 * @return A pointer to the node that was removed, if any, otherwise nullptr.
+	 * If STL_ERASE is set, this method removes *all* nodes that compare equally
+	 * to c from the tree and returns the number of nodes removed.
+	 *
+	 * If STL_ERASE is not set, it removes only one node and returns a pointer to
+	 * the removed node.
+	 *
+	 * @param  c Anything comparable to a node. A node (resp. all nodes, see
+	 * above) that compares equally will be removed
+	 *
+	 * @return If STL_ERASE is unset: A pointer to the node that has been removed,
+	 * or nullptr if no node was removed. If STL_ERASE is set: The number of
+	 * erased nodes.
 	 */
 	template <class Comparable>
 	utilities::select_type_t<size_t, Node *, Options::stl_erase>
 	erase(const Comparable & c) CMP_NOEXCEPT(c);
 
+ 	/**
+	 * @brief Deletes a node by iterator
+	 *
+	 * @warning The return type of this method depends on whether the
+	 * STL_ERASE option is set or not!
+	 *
+	 * Removes a node that is pointed to by an iterator.
+	 *
+	 * @param  c Anything comparable to a node. A node (resp. all nodes, see
+	 * above) that compares equally will be removed
+	 *
+	 * @return If STL_ERASE is unset: A pointer to the node that has been removed.
+	 * If STL_ERASE is set: An iterator to the node after the removed node (or end()).
+	 */
 	template <bool reverse>
 	utilities::select_type_t<const iterator<reverse>, Node *, Options::stl_erase>
 	erase(const iterator<reverse> & it) CMP_NOEXCEPT(*it);

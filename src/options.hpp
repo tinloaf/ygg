@@ -61,7 +61,8 @@ public:
 	 *
 	 * If this flag is set, the erase() method of the various trees has a behavior
 	 * that is in line with STL's std::set (or std::multiset), returning an
-	 * iterator to the next element in the tree.
+	 * iterator to the next element in the tree, and removing all nodes that match
+	 * a key. See documentation on the erase() method for details.
 	 */
 	class STL_ERASE {
 	};
