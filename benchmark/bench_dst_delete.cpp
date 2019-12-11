@@ -29,7 +29,6 @@ BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteRBDSTFixture, BM_DST_Deletion)
 
 /*
  * Zip DST with hashing
@@ -60,7 +59,6 @@ BENCHMARK_DEFINE_F(DeleteZHDSTFixture, BM_DST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteZHDSTFixture, BM_DST_Deletion)
 
 /*
  * Zip DST with truly random ranks
@@ -89,7 +87,6 @@ BENCHMARK_DEFINE_F(DeleteZRDSTFixture, BM_DST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(DeleteZRDSTFixture, BM_DST_Deletion)
 
 /*
  * WB-DST with 3/2
@@ -120,7 +117,6 @@ BENCHMARK_DEFINE_F(Delete32WBDSTFixture, BM_DST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
-REGISTER(Delete32WBDSTFixture, BM_DST_Deletion)
 
 /*
  * WB-DST with 2,3/2
@@ -151,7 +147,14 @@ BENCHMARK_DEFINE_F(DeleteBalWBDSTFixture, BM_DST_Deletion)
 
 	this->papi.report_and_reset(state);
 }
+
+
+REGISTER(DeleteRBDSTFixture, BM_DST_Deletion)
+REGISTER(DeleteZRDSTFixture, BM_DST_Deletion)
+REGISTER(DeleteZHDSTFixture, BM_DST_Deletion)
+REGISTER(Delete32WBDSTFixture, BM_DST_Deletion)
 REGISTER(DeleteBalWBDSTFixture, BM_DST_Deletion)
+
 
 #ifndef NOMAIN
 #include "main.hpp"
