@@ -128,7 +128,6 @@ struct DefaultBenchmarkOptions
 template <class Interface, class Experiment, class Options>
 class BSTFixture : public benchmark::Fixture {
 public:
-	constexpr static bool has_node_interface = true;
 	using NodeInterface = Interface;
 
 	static std::string

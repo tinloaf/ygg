@@ -17,7 +17,7 @@ template <class Interface, typename Experiment, bool need_nodes,
           bool need_values, bool need_indices, bool values_from_fixed>
 class DSTFixture : public benchmark::Fixture {
 public:
-	constexpr static bool has_node_interface = false;
+	using NodeInterface = Interface;
 
 	DSTFixture() : rng(std::random_device{}()) {}
 
