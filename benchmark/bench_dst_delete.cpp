@@ -95,7 +95,8 @@ using Delete32WBDSTFixture = DSTFixture<
     WBDSTInterface<BasicDSTTreeOptions, ygg::TreeFlags::WBT_DELTA_NUMERATOR<3>,
                    ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
                    ygg::TreeFlags::WBT_GAMMA_NUMERATOR<2>,
-                   ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>>,
+                   ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<1>,
+                   ygg::TreeFlags::WBT_SINGLE_PASS>,
     DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(Delete32WBDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
@@ -125,7 +126,8 @@ using DeleteBalWBDSTFixture = DSTFixture<
     WBDSTInterface<BasicDSTTreeOptions, ygg::TreeFlags::WBT_DELTA_NUMERATOR<2>,
                    ygg::TreeFlags::WBT_DELTA_DENOMINATOR<1>,
                    ygg::TreeFlags::WBT_GAMMA_NUMERATOR<3>,
-                   ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>>,
+                   ygg::TreeFlags::WBT_GAMMA_DENOMINATOR<2>,
+                   ygg::TreeFlags::WBT_SINGLE_PASS>,
     DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteBalWBDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
@@ -148,13 +150,11 @@ BENCHMARK_DEFINE_F(DeleteBalWBDSTFixture, BM_DST_Deletion)
 	this->papi.report_and_reset(state);
 }
 
-
 REGISTER(DeleteRBDSTFixture, BM_DST_Deletion)
 REGISTER(DeleteZRDSTFixture, BM_DST_Deletion)
 REGISTER(DeleteZHDSTFixture, BM_DST_Deletion)
 REGISTER(Delete32WBDSTFixture, BM_DST_Deletion)
 REGISTER(DeleteBalWBDSTFixture, BM_DST_Deletion)
-
 
 #ifndef NOMAIN
 #include "main.hpp"
