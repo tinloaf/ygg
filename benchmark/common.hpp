@@ -6,9 +6,9 @@
 #include <algorithm>
 #include <boost/intrusive/set.hpp>
 #include <draup.hpp>
+#include <iostream>
 #include <random>
 #include <vector>
-#include <iostream>
 
 #ifdef USEPAPI
 #include <papi.h>
@@ -32,6 +32,114 @@ using SearchExperiment = decltype(search_experiment_c);
 
 std::vector<std::string> PAPI_MEASUREMENTS;
 bool PAPI_STATS_WRITTEN;
+
+class PointerCountCallback {
+public:
+	static void
+	start()
+	{
+		PointerCountCallback::running = true;
+	}
+	static void
+	stop()
+	{
+		PointerCountCallback::running = false;
+	}
+
+	static void
+	get_left()
+	{
+		if (PointerCountCallback::running)
+			PointerCountCallback::get_left_c++;
+	}
+	static void
+	get_right()
+	{
+		if (PointerCountCallback::running)
+			PointerCountCallback::get_right_c++;
+	}
+	static void
+	get_parent()
+	{
+		if (PointerCountCallback::running)
+			PointerCountCallback::get_parent_c++;
+	}
+	static void
+	set_left()
+	{
+		if (PointerCountCallback::running)
+			PointerCountCallback::set_left_c++;
+	}
+	static void
+	set_right()
+	{
+		if (PointerCountCallback::running)
+			PointerCountCallback::set_right_c++;
+	}
+	static void
+	set_parent()
+	{
+		if (PointerCountCallback::running)
+			PointerCountCallback::set_parent_c++;
+	}
+
+	static void
+	reset()
+	{
+		PointerCountCallback::get_left_c = 0;
+		PointerCountCallback::get_right_c = 0;
+		PointerCountCallback::get_parent_c = 0;
+		PointerCountCallback::set_left_c = 0;
+		PointerCountCallback::set_right_c = 0;
+		PointerCountCallback::set_parent_c = 0;
+		PointerCountCallback::running = false;
+	}
+
+	static void
+	report(::benchmark::State & state)
+	{
+#ifdef COUNTOPS
+		state.counters["GET_RIGHT"] =
+		    static_cast<double>(PointerCountCallback::get_right_c);
+		state.counters["GET_LEFT"] =
+		    static_cast<double>(PointerCountCallback::get_left_c);
+		state.counters["GET_PARENT"] =
+		    static_cast<double>(PointerCountCallback::get_parent_c);
+		state.counters["GET_TOTAL"] = static_cast<double>(
+		    PointerCountCallback::get_parent_c + PointerCountCallback::get_left_c +
+		    PointerCountCallback::get_right_c);
+
+		state.counters["SET_RIGHT"] =
+		    static_cast<double>(PointerCountCallback::set_right_c);
+		state.counters["SET_LEFT"] =
+		    static_cast<double>(PointerCountCallback::set_left_c);
+		state.counters["SET_PARENT"] =
+		    static_cast<double>(PointerCountCallback::set_parent_c);
+		state.counters["SET_TOTAL"] = static_cast<double>(
+		    PointerCountCallback::set_parent_c + PointerCountCallback::set_left_c +
+		    PointerCountCallback::set_right_c);
+#else
+		(void)state;
+#endif
+	}
+
+private:
+	static bool running;
+	static size_t get_left_c;
+	static size_t get_right_c;
+	static size_t get_parent_c;
+	static size_t set_left_c;
+	static size_t set_right_c;
+	static size_t set_parent_c;
+};
+
+bool PointerCountCallback::running;
+size_t PointerCountCallback::get_left_c;
+size_t PointerCountCallback::get_right_c;
+size_t PointerCountCallback::get_parent_c;
+size_t PointerCountCallback::set_left_c;
+size_t PointerCountCallback::set_right_c;
+size_t PointerCountCallback::set_parent_c;
 
 class PapiMeasurements {
 public:

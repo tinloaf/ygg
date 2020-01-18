@@ -73,7 +73,7 @@ public:
 	static DefaultFindCallbacks<Node> dummy;
 };
 
-template <class Node, class Tag = int,
+template <class Node, class Options, class Tag = int,
           class ParentContainer = DefaultParentContainer<Node>>
 class BSTNodeBase {
 
@@ -125,7 +125,7 @@ public:
 	using MyClass =
 	    BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>;
 	// Node Base
-	using NB = BSTNodeBase<Node, Tag, ParentContainer>;
+	using NB = BSTNodeBase<Node, Options, Tag, ParentContainer>;
 	static_assert(std::is_base_of<NB, Node>::value,
 	              "Node class not properly derived from BSTNodeBase");
 

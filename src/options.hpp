@@ -261,6 +261,17 @@ public:
 	public:
 		using type = SequenceInterface;
 	};
+
+	template <class Callback>
+	class BENCHMARK_POINTER_SET_CALLBACK {
+	public:
+		using type = Callback;
+	};
+	template <class Callback>
+	class BENCHMARK_POINTER_GET_CALLBACK {
+	public:
+		using type = Callback;
+	};
 };
 
 /**
@@ -342,6 +353,58 @@ private:
 			return utilities::TypeHolder<typename T::type>{};
 		} else {
 			return utilities::TypeHolder<void>{};
+		}
+	}
+
+	constexpr static auto
+	compute_pointer_set_callback_type()
+	{
+		using T = typename utilities::get_type_if_present<
+		    TreeFlags::BENCHMARK_POINTER_SET_CALLBACK, void, Opts...>::type;
+
+		if constexpr (!std::is_same_v<T, void>) {
+			return utilities::TypeHolder<typename T::type>{};
+		} else {
+			return utilities::TypeHolder<void>{};
+		}
+	}
+
+	constexpr static bool
+	compute_has_pointer_set_callback()
+	{
+		using T = typename utilities::get_type_if_present<
+		    TreeFlags::BENCHMARK_POINTER_SET_CALLBACK, void, Opts...>::type;
+
+		if constexpr (!std::is_same_v<T, void>) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	constexpr static auto
+	compute_pointer_get_callback_type()
+	{
+		using T = typename utilities::get_type_if_present<
+		    TreeFlags::BENCHMARK_POINTER_GET_CALLBACK, void, Opts...>::type;
+
+		if constexpr (!std::is_same_v<T, void>) {
+			return utilities::TypeHolder<typename T::type>{};
+		} else {
+			return utilities::TypeHolder<void>{};
+		}
+	}
+
+	constexpr static bool
+	compute_has_pointer_get_callback()
+	{
+		using T = typename utilities::get_type_if_present<
+		    TreeFlags::BENCHMARK_POINTER_GET_CALLBACK, void, Opts...>::type;
+
+		if constexpr (!std::is_same_v<T, void>) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -504,6 +567,18 @@ public:
 	 **********************************************/
 	using SequenceInterface =
 	    typename decltype(compute_sequence_interface_type())::type;
+	using PointerSetCallback =
+	    typename decltype(compute_pointer_set_callback_type())::type;
+	static constexpr bool has_pointer_set_callback =
+	    compute_has_pointer_set_callback();
+	using PointerGetCallback =
+	    typename decltype(compute_pointer_get_callback_type())::type;
+	static constexpr bool has_pointer_get_callback =
+	    compute_has_pointer_get_callback();
+
+	static_assert(!(has_pointer_get_callback && micro_avoid_conditionals),
+	              "MICRO_AVOID_CONDITIONALS and BENCHMARK_POINTER_GET_CALLBACK "
+	              "are incompatible.");
 	/// @endcond
 private:
 	TreeOptions(); // Instantiation not allowed

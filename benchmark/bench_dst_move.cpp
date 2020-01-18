@@ -10,8 +10,10 @@ using MoveRBDSTFixture = DSTFixture<RBDSTInterface<BasicDSTTreeOptions>,
                                     MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
 		size_t j = 0;
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -22,6 +24,7 @@ BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
@@ -38,6 +41,7 @@ BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(MoveRBDSTFixture, BM_DST_Move)
 
@@ -48,8 +52,10 @@ using MoveWBDSTFixture = DSTFixture<WBDSTInterface<BasicDSTTreeOptions>,
                                     MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
 		size_t j = 0;
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -60,6 +66,7 @@ BENCHMARK_DEFINE_F(MoveWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
@@ -76,6 +83,7 @@ BENCHMARK_DEFINE_F(MoveWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(MoveWBDSTFixture, BM_DST_Move)
 
@@ -90,8 +98,10 @@ using MoveZHDSTFixture = DSTFixture<
     MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
 		size_t j = 0;
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -102,6 +112,7 @@ BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
@@ -118,6 +129,7 @@ BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(MoveZHDSTFixture, BM_DST_Move)
 
@@ -130,8 +142,10 @@ using MoveZRDSTFixture =
                MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveZRDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
 		size_t j = 0;
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -142,6 +156,7 @@ BENCHMARK_DEFINE_F(MoveZRDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
@@ -158,6 +173,7 @@ BENCHMARK_DEFINE_F(MoveZRDSTFixture, BM_DST_Move)(benchmark::State & state)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(MoveZRDSTFixture, BM_DST_Move)
 
@@ -172,8 +188,10 @@ using Move32WBDSTFixture = DSTFixture<
     MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(Move32WBDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
 		size_t j = 0;
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -184,6 +202,7 @@ BENCHMARK_DEFINE_F(Move32WBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
@@ -200,6 +219,7 @@ BENCHMARK_DEFINE_F(Move32WBDSTFixture, BM_DST_Move)(benchmark::State & state)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(Move32WBDSTFixture, BM_DST_Move)
 
@@ -214,8 +234,10 @@ using MoveBalWBDSTFixture = DSTFixture<
     MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveBalWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
 		size_t j = 0;
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -226,6 +248,7 @@ BENCHMARK_DEFINE_F(MoveBalWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
@@ -242,6 +265,7 @@ BENCHMARK_DEFINE_F(MoveBalWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(MoveBalWBDSTFixture, BM_DST_Move)
 

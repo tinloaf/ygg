@@ -12,12 +12,15 @@ using InsertRBDSTFixture =
 BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -28,6 +31,7 @@ BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(InsertRBDSTFixture, BM_DST_Insertion)
 
@@ -43,12 +47,15 @@ using InsertZHDSTFixture = DSTFixture<
 BENCHMARK_DEFINE_F(InsertZHDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -59,6 +66,7 @@ BENCHMARK_DEFINE_F(InsertZHDSTFixture, BM_DST_Insertion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(InsertZHDSTFixture, BM_DST_Insertion)
 
@@ -72,12 +80,15 @@ using InsertZRDSTFixture =
 BENCHMARK_DEFINE_F(InsertZRDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -88,6 +99,7 @@ BENCHMARK_DEFINE_F(InsertZRDSTFixture, BM_DST_Insertion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(InsertZRDSTFixture, BM_DST_Insertion)
 
@@ -104,12 +116,15 @@ using Insert32WBDSTFixture = DSTFixture<
 BENCHMARK_DEFINE_F(Insert32WBDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -120,6 +135,7 @@ BENCHMARK_DEFINE_F(Insert32WBDSTFixture, BM_DST_Insertion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(Insert32WBDSTFixture, BM_DST_Insertion)
 
@@ -136,12 +152,15 @@ using InsertBalWBDSTFixture = DSTFixture<
 BENCHMARK_DEFINE_F(InsertBalWBDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
@@ -152,6 +171,7 @@ BENCHMARK_DEFINE_F(InsertBalWBDSTFixture, BM_DST_Insertion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 REGISTER(InsertBalWBDSTFixture, BM_DST_Insertion)
 

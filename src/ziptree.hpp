@@ -95,7 +95,7 @@ class ZTreeRankGenerator<Node, Options, false, false> {
  * be inserted into. See ZTree for details.
  */
 template <class Node, class Options, class Tag>
-class ZTreeNodeBase : public bst::BSTNodeBase<Node, Tag> {
+class ZTreeNodeBase : public bst::BSTNodeBase<Node, Options, Tag> {
 public:
 	// Debugging methods
 	size_t get_depth() const noexcept;
@@ -284,7 +284,7 @@ public:
 	utilities::select_type_t<size_t, Node *, Options::stl_erase>
 	erase(const Comparable & c) CMP_NOEXCEPT(c);
 
- 	/**
+	/**
 	 * @brief Deletes a node by iterator
 	 *
 	 * @warning The return type of this method depends on whether the
@@ -296,7 +296,8 @@ public:
 	 * above) that compares equally will be removed
 	 *
 	 * @return If STL_ERASE is unset: A pointer to the node that has been removed.
-	 * If STL_ERASE is set: An iterator to the node after the removed node (or end()).
+	 * If STL_ERASE is set: An iterator to the node after the removed node (or
+	 * end()).
 	 */
 	template <bool reverse>
 	utilities::select_type_t<const iterator<reverse>, Node *, Options::stl_erase>

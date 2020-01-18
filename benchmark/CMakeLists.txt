@@ -28,6 +28,12 @@ if (PAPI_FOUND)
 	set_target_properties (run_all_papi PROPERTIES COMPILE_DEFINITIONS "USEPAPI")
 endif()
 
+# OP-COUNTING
+add_executable(run_all_count run_all.cpp random.cpp)
+add_dependencies(run_all_count gbenchmark)
+target_link_libraries(run_all_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+set_target_properties (run_all_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS")
+
 # Zipf
 add_executable(run_all_zipf run_all.cpp random.cpp)
 add_dependencies(run_all_zipf gbenchmark)
@@ -40,6 +46,13 @@ if (PAPI_FOUND)
 	target_link_libraries(run_all_zipf_papi Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
 	target_compile_definitions(run_all_zipf_papi PUBLIC USEPAPI USEZIPF)
 endif()
+
+# OP-COUNTING + Zipf
+add_executable(run_all_zipf_count run_all.cpp random.cpp)
+add_dependencies(run_all_zipf_count gbenchmark)
+target_link_libraries(run_all_zipf_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+set_target_properties (run_all_zipf_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS;USEZIPF")
+
 
 # Presorted
 add_executable(run_all_presorted run_all.cpp random.cpp)
@@ -54,6 +67,12 @@ if (PAPI_FOUND)
 	target_compile_definitions(run_all_presorted_papi PUBLIC USEPAPI PRESORT)
 endif()
 
+# OP-COUNTING + Presorted
+add_executable(run_all_presorted_count run_all.cpp random.cpp)
+add_dependencies(run_all_presorted_count gbenchmark)
+target_link_libraries(run_all_presorted_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+set_target_properties (run_all_presorted_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS;PRESORT")
+
 # Skewed
 add_executable(run_all_skewed run_all.cpp random.cpp)
 add_dependencies(run_all_skewed gbenchmark)
@@ -67,6 +86,11 @@ if (PAPI_FOUND)
 	target_compile_definitions(run_all_skewed_papi PUBLIC USEPAPI USESKEWED)
 endif()
 
+# OP-COUNTING + Skewed
+add_executable(run_all_skewed_count run_all.cpp random.cpp)
+add_dependencies(run_all_skewed_count gbenchmark)
+target_link_libraries(run_all_skewed_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+set_target_properties (run_all_skewed_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS;USESKEWED")
 
 # Create BST scripts
 set(BENCH_DATASTRUCTURE "BST")
@@ -86,8 +110,9 @@ set(DST_OPERATIONS "Insert;Delete;Move")
 FOREACH(OPERATION ${DST_OPERATIONS})
 	FOREACH(POSTFIX "" _zipf _skewed _presorted)
 		configure_file(${PROJECT_SOURCE_DIR}/../scripts/benchmark/benchmark.sh.in ${CMAKE_CURRENT_BINARY_DIR}/bench_${BENCH_DATASTRUCTURE}_${OPERATION}${POSTFIX})
+		configure_file(${PROJECT_SOURCE_DIR}/../scripts/benchmark/benchmark_count.sh.in ${CMAKE_CURRENT_BINARY_DIR}/bench_${BENCH_DATASTRUCTURE}_${OPERATION}${POSTFIX}_count)
 		if (PAPI_FOUND)
-		configure_file(${PROJECT_SOURCE_DIR}/../scripts/benchmark/benchmark_papi.sh.in ${CMAKE_CURRENT_BINARY_DIR}/bench_${BENCH_DATASTRUCTURE}_${OPERATION}${POSTFIX}_papi)			
+			configure_file(${PROJECT_SOURCE_DIR}/../scripts/benchmark/benchmark_papi.sh.in ${CMAKE_CURRENT_BINARY_DIR}/bench_${BENCH_DATASTRUCTURE}_${OPERATION}${POSTFIX}_papi)			
 		endif()
 	ENDFOREACH()
 ENDFOREACH()

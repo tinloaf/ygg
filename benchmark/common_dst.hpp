@@ -156,10 +156,15 @@ using CombinerPack = ygg::EmptyCombinerPack<int, double>;
 /*
  * Red-Black DST Interface
  */
+using RBSelector = ygg::UseRBTree<
+#ifdef COUNTOPS
+    ygg::TreeFlags::BENCHMARK_POINTER_SET_CALLBACK<PointerCountCallback>,
+    ygg::TreeFlags::BENCHMARK_POINTER_GET_CALLBACK<PointerCountCallback>
+#endif
+    >;
 template <class MyTreeOptions>
-class RBDSTNode
-    : public ygg::DynSegTreeNodeBase<int, double, double, CombinerPack,
-                                     ygg::UseDefaultRBTree> {
+class RBDSTNode : public ygg::DynSegTreeNodeBase<int, double, double,
+                                                 CombinerPack, RBSelector> {
 public:
 	int lower;
 	int upper;
@@ -194,8 +199,7 @@ class RBDSTInterface {
 public:
 	using Node = RBDSTNode<MyTreeOptions>;
 	using Tree = ygg::DynamicSegmentTree<Node, RBDSTNodeTraits<MyTreeOptions>,
-	                                     CombinerPack, MyTreeOptions,
-	                                     ygg::UseDefaultRBTree>;
+	                                     CombinerPack, MyTreeOptions, RBSelector>;
 
 	static std::string
 	get_name()
@@ -231,9 +235,16 @@ public:
  * Weight-Balanced DST Interface
  */
 template <class MyTreeOptions, class... UnderlyingOptions>
-class WBDSTNode
-    : public ygg::DynSegTreeNodeBase<int, double, double, CombinerPack,
-                                     ygg::UseWBTree<UnderlyingOptions...>> {
+class WBDSTNode : public ygg::DynSegTreeNodeBase<
+                      int, double, double, CombinerPack,
+                      ygg::UseWBTree<
+#ifdef COUNTOPS
+                          ygg::TreeFlags::BENCHMARK_POINTER_SET_CALLBACK<
+                              PointerCountCallback>,
+                          ygg::TreeFlags::BENCHMARK_POINTER_GET_CALLBACK<
+                              PointerCountCallback>,
+#endif
+                          UnderlyingOptions...>> {
 public:
 	int lower;
 	int upper;
@@ -269,7 +280,13 @@ public:
 	using Node = WBDSTNode<MyTreeOptions, UnderlyingOptions...>;
 	using Tree = ygg::DynamicSegmentTree<
 	    Node, WBDSTNodeTraits<MyTreeOptions, UnderlyingOptions...>, CombinerPack,
-	    MyTreeOptions, ygg::UseWBTree<UnderlyingOptions...>>;
+	    MyTreeOptions,
+	    ygg::UseWBTree<
+#ifdef COUNTOPS
+	        ygg::TreeFlags::BENCHMARK_POINTER_SET_CALLBACK<PointerCountCallback>,
+	        ygg::TreeFlags::BENCHMARK_POINTER_GET_CALLBACK<PointerCountCallback>,
+#endif
+	        UnderlyingOptions...>>;
 
 	static std::string
 	get_name()
@@ -315,9 +332,16 @@ public:
  * Zipping DST Interface
  */
 template <class MyTreeOptions, class... UnderlyingOptions>
-class ZDSTNode
-    : public ygg::DynSegTreeNodeBase<int, double, double, CombinerPack,
-                                     ygg::UseZipTree<UnderlyingOptions...>> {
+class ZDSTNode : public ygg::DynSegTreeNodeBase<
+                     int, double, double, CombinerPack,
+                     ygg::UseZipTree<
+#ifdef COUNTOPS
+                         ygg::TreeFlags::BENCHMARK_POINTER_SET_CALLBACK<
+                             PointerCountCallback>,
+                         ygg::TreeFlags::BENCHMARK_POINTER_GET_CALLBACK<
+                             PointerCountCallback>,
+#endif
+                         UnderlyingOptions...>> {
 public:
 	int lower;
 	int upper;
@@ -353,7 +377,13 @@ public:
 	using Node = ZDSTNode<MyTreeOptions, UnderlyingOptions...>;
 	using Tree = ygg::DynamicSegmentTree<
 	    Node, ZDSTNodeTraits<MyTreeOptions, UnderlyingOptions...>, CombinerPack,
-	    MyTreeOptions, ygg::UseZipTree<UnderlyingOptions...>>;
+	    MyTreeOptions,
+	    ygg::UseZipTree<
+#ifdef COUNTOPS
+	        ygg::TreeFlags::BENCHMARK_POINTER_SET_CALLBACK<PointerCountCallback>,
+	        ygg::TreeFlags::BENCHMARK_POINTER_GET_CALLBACK<PointerCountCallback>,
+#endif
+	        UnderlyingOptions...>>;
 
 	static std::string
 	get_name()

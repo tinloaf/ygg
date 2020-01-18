@@ -12,12 +12,15 @@ using DeleteRBDSTFixture =
 BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
@@ -28,6 +31,7 @@ BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 
 /*
@@ -42,12 +46,15 @@ using DeleteZHDSTFixture = DSTFixture<
 BENCHMARK_DEFINE_F(DeleteZHDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
@@ -58,6 +65,7 @@ BENCHMARK_DEFINE_F(DeleteZHDSTFixture, BM_DST_Deletion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 
 /*
@@ -70,12 +78,15 @@ using DeleteZRDSTFixture =
 BENCHMARK_DEFINE_F(DeleteZRDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
@@ -86,6 +97,7 @@ BENCHMARK_DEFINE_F(DeleteZRDSTFixture, BM_DST_Deletion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 
 /*
@@ -101,12 +113,15 @@ using Delete32WBDSTFixture = DSTFixture<
 BENCHMARK_DEFINE_F(Delete32WBDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
@@ -117,6 +132,7 @@ BENCHMARK_DEFINE_F(Delete32WBDSTFixture, BM_DST_Deletion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 
 /*
@@ -132,12 +148,15 @@ using DeleteBalWBDSTFixture = DSTFixture<
 BENCHMARK_DEFINE_F(DeleteBalWBDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
+	PointerCountCallback::reset();
 	for (auto _ : state) {
+		PointerCountCallback::start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		PointerCountCallback::stop();
 
 		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
@@ -148,6 +167,7 @@ BENCHMARK_DEFINE_F(DeleteBalWBDSTFixture, BM_DST_Deletion)
 	}
 
 	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
 }
 
 REGISTER(DeleteRBDSTFixture, BM_DST_Deletion)

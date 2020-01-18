@@ -29,9 +29,9 @@ DefaultParentContainer<Node>::set_parent(Node * parent) noexcept
 	this->_bst_parent = parent;
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 size_t
-BSTNodeBase<Node, Tag, ParentContainer>::get_depth() const noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::get_depth() const noexcept
 {
 	size_t depth = 0;
 	const Node * n = static_cast<const Node *>(this);
@@ -44,67 +44,97 @@ BSTNodeBase<Node, Tag, ParentContainer>::get_depth() const noexcept
 	return depth;
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 Node *
-BSTNodeBase<Node, Tag, ParentContainer>::get_parent() const noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::get_parent() const noexcept
 {
+	if constexpr (Options::has_pointer_get_callback) {
+		Options::PointerGetCallback::get_parent();
+	}
 	return this->_bst_parent.get_parent();
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 template <class InnerPC>
 std::enable_if_t<InnerPC::parent_reference, Node *&>
-BSTNodeBase<Node, Tag, ParentContainer>::get_parent() const noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::get_parent() const noexcept
 {
+	if constexpr (Options::has_pointer_get_callback) {
+		Options::PointerGetCallback::get_parent();
+	}
 	return this->_bst_parent.get_parent();
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 Node *&
-BSTNodeBase<Node, Tag, ParentContainer>::get_left() noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::get_left() noexcept
 {
+	if constexpr (Options::has_pointer_get_callback) {
+		Options::PointerGetCallback::get_left();
+	}
 	return this->_bst_children[0];
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 Node *&
-BSTNodeBase<Node, Tag, ParentContainer>::get_right() noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::get_right() noexcept
 {
+	if constexpr (Options::has_pointer_get_callback) {
+		Options::PointerGetCallback::get_right();
+	}
 	return this->_bst_children[1];
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 Node * const &
-BSTNodeBase<Node, Tag, ParentContainer>::get_left() const noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::get_left() const noexcept
 {
+	if constexpr (Options::has_pointer_get_callback) {
+		Options::PointerGetCallback::get_left();
+	}
 	return this->_bst_children[0];
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 Node * const &
-BSTNodeBase<Node, Tag, ParentContainer>::get_right() const noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::get_right() const noexcept
 {
+	if constexpr (Options::has_pointer_get_callback) {
+		Options::PointerGetCallback::get_right();
+	}
 	return this->_bst_children[1];
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 void
-BSTNodeBase<Node, Tag, ParentContainer>::set_parent(Node * new_parent) noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::set_parent(
+    Node * new_parent) noexcept
 {
+	if constexpr (Options::has_pointer_set_callback) {
+		Options::PointerSetCallback::set_parent();
+	}
 	this->_bst_parent.set_parent(new_parent);
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 void
-BSTNodeBase<Node, Tag, ParentContainer>::set_left(Node * new_left) noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::set_left(
+    Node * new_left) noexcept
 {
+	if constexpr (Options::has_pointer_set_callback) {
+		Options::PointerSetCallback::set_left();
+	}
 	this->_bst_children[0] = new_left;
 }
 
-template <class Node, class Tag, class ParentContainer>
+template <class Node, class Options, class Tag, class ParentContainer>
 void
-BSTNodeBase<Node, Tag, ParentContainer>::set_right(Node * new_right) noexcept
+BSTNodeBase<Node, Options, Tag, ParentContainer>::set_right(
+    Node * new_right) noexcept
 {
+	if constexpr (Options::has_pointer_set_callback) {
+		Options::PointerSetCallback::set_right();
+	}
 	this->_bst_children[1] = new_right;
 }
 
