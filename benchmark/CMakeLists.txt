@@ -31,7 +31,7 @@ endif()
 # OP-COUNTING
 add_executable(run_all_count run_all.cpp random.cpp)
 add_dependencies(run_all_count gbenchmark)
-target_link_libraries(run_all_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+target_link_libraries(run_all_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
 set_target_properties (run_all_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS")
 
 # Zipf
@@ -50,7 +50,7 @@ endif()
 # OP-COUNTING + Zipf
 add_executable(run_all_zipf_count run_all.cpp random.cpp)
 add_dependencies(run_all_zipf_count gbenchmark)
-target_link_libraries(run_all_zipf_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+target_link_libraries(run_all_zipf_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
 set_target_properties (run_all_zipf_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS;USEZIPF")
 
 
@@ -70,7 +70,7 @@ endif()
 # OP-COUNTING + Presorted
 add_executable(run_all_presorted_count run_all.cpp random.cpp)
 add_dependencies(run_all_presorted_count gbenchmark)
-target_link_libraries(run_all_presorted_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+target_link_libraries(run_all_presorted_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
 set_target_properties (run_all_presorted_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS;PRESORT")
 
 # Skewed
@@ -89,7 +89,7 @@ endif()
 # OP-COUNTING + Skewed
 add_executable(run_all_skewed_count run_all.cpp random.cpp)
 add_dependencies(run_all_skewed_count gbenchmark)
-target_link_libraries(run_all_skewed_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a ${PAPI_LIBRARIES})
+target_link_libraries(run_all_skewed_count Threads::Threads ${GBENCHMARK_LIBS_DIR}/libbenchmark.a)
 set_target_properties (run_all_skewed_count PROPERTIES COMPILE_DEFINITIONS "COUNTOPS;USESKEWED")
 
 # Create BST scripts
