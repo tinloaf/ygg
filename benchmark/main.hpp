@@ -25,6 +25,8 @@ struct ConfigHolder
 
 	int64_t seed_start;
 	size_t seed_count;
+
+	int64_t iteration_count;
 };
 
 ConfigHolder CFG;
@@ -75,6 +77,7 @@ main(int argc, char ** argv)
 	CFG.doublings = DOUBLINGS;
 	CFG.seed_start = 4;
 	CFG.seed_count = 2;
+	CFG.iteration_count = 0;
 
 	std::vector<std::string> filters;
 
@@ -94,6 +97,10 @@ main(int argc, char ** argv)
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--doublings", strlen("--doublings")) == 0) {
 			CFG.doublings = static_cast<size_t>(atoi(argv[i + 1]));
+			i += 1;
+			remaining_argc -= 2;
+		} else if (strncmp(argv[i], "--iterations", strlen("--iterations")) == 0) {
+			CFG.iteration_count = static_cast<size_t>(atoi(argv[i + 1]));
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--base_size", strlen("--base_size")) == 0) {
@@ -162,6 +169,10 @@ main(int argc, char ** argv)
 			// We benchmark manually since Google Benchmark's PauseTiming() /
 			// ResumeTiming() is too heavyweight
 			bench->UseManualTime();
+
+			if (CFG.iteration_count > 0) {
+				bench->Iterations(CFG.iteration_count);
+			}
 
 			bench->Apply(BuildRange);
 			::benchmark::internal::RegisterBenchmarkInternal(bench);
