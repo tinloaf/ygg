@@ -13,21 +13,21 @@ BENCHMARK_DEFINE_F(InsertRBDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
 		PointerCountCallback::stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
-		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -48,21 +48,21 @@ BENCHMARK_DEFINE_F(InsertZHDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
 		PointerCountCallback::stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
-		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -81,21 +81,21 @@ BENCHMARK_DEFINE_F(InsertZRDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
 		PointerCountCallback::stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
-		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -117,21 +117,21 @@ BENCHMARK_DEFINE_F(Insert32WBDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
 		PointerCountCallback::stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
-		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -153,21 +153,21 @@ BENCHMARK_DEFINE_F(InsertBalWBDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
 		PointerCountCallback::stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
-		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);

@@ -22,13 +22,16 @@ using SearchYggRBBSTFixtureArith =
 BENCHMARK_DEFINE_F(SearchYggRBBSTFixtureArith, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		// TODO shuffling?
 	}
 
@@ -44,13 +47,16 @@ using SearchYggRBBSTFixture = BSTFixture<YggRBTreeInterface<BasicTreeOptions>,
 BENCHMARK_DEFINE_F(SearchYggRBBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		// TODO shuffling?
 	}
 
@@ -67,13 +73,16 @@ using SearchYggWBDefTPBSTFixture =
 BENCHMARK_DEFINE_F(SearchYggWBDefTPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		// TODO shuffling?
 	}
 
@@ -90,13 +99,16 @@ using SearchYggWBDefSPBSTFixture =
 BENCHMARK_DEFINE_F(SearchYggWBDefSPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		// TODO shuffling?
 	}
 
@@ -113,13 +125,16 @@ using SearchYggWBLWSPBSTFixture =
 BENCHMARK_DEFINE_F(SearchYggWBLWSPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		// TODO shuffling?
 	}
 
@@ -136,13 +151,16 @@ using SearchYggWBBalSPBSTFixture =
 BENCHMARK_DEFINE_F(SearchYggWBBalSPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		// TODO shuffling?
 	}
 
@@ -159,13 +177,16 @@ using SearchYggWBSuperBalSPBSTFixture =
 BENCHMARK_DEFINE_F(SearchYggWBSuperBalSPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		// TODO shuffling?
 	}
 
@@ -182,13 +203,16 @@ using SearchYggWB32SPBSTFixture =
 BENCHMARK_DEFINE_F(SearchYggWB32SPBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		// TODO shuffling?
 	}
 
@@ -204,13 +228,16 @@ using SearchYggZBSTFixture = BSTFixture<YggZTreeInterface<BasicTreeOptions>,
 BENCHMARK_DEFINE_F(SearchYggZBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 	}
 	this->papi.report_and_reset(state);
 }
@@ -224,13 +251,16 @@ using SearchBISetBSTFixture =
 BENCHMARK_DEFINE_F(SearchBISetBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 	}
 	this->papi.report_and_reset(state);
 }
@@ -244,13 +274,16 @@ using SearchStdSetBSTFixture =
 BENCHMARK_DEFINE_F(SearchStdSetBSTFixture, BM_BST_Search)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto val : this->experiment_values) {
 			auto node = this->t.find(val);
 			benchmark::DoNotOptimize(node);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 	}
 	this->papi.report_and_reset(state);
 }

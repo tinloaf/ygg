@@ -30,7 +30,9 @@ using MoveYggRBBSTFixture = BSTFixture<YggRBTreeInterface<BasicTreeOptions>,
 BENCHMARK_DEFINE_F(MoveYggRBBSTFixture, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -41,7 +43,7 @@ BENCHMARK_DEFINE_F(MoveYggRBBSTFixture, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -51,8 +53,6 @@ BENCHMARK_DEFINE_F(MoveYggRBBSTFixture, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -68,7 +68,9 @@ using MoveYggRBBSTFixtureArith =
 BENCHMARK_DEFINE_F(MoveYggRBBSTFixtureArith, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -79,7 +81,7 @@ BENCHMARK_DEFINE_F(MoveYggRBBSTFixtureArith, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -89,8 +91,6 @@ BENCHMARK_DEFINE_F(MoveYggRBBSTFixtureArith, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -107,7 +107,9 @@ using MoveYggWBDefGDefDTPBSTFixture =
 BENCHMARK_DEFINE_F(MoveYggWBDefGDefDTPBSTFixture, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -118,7 +120,7 @@ BENCHMARK_DEFINE_F(MoveYggWBDefGDefDTPBSTFixture, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -128,8 +130,6 @@ BENCHMARK_DEFINE_F(MoveYggWBDefGDefDTPBSTFixture, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -143,7 +143,9 @@ using MoveYggWBDefGDefDSPBSTFixture =
 BENCHMARK_DEFINE_F(MoveYggWBDefGDefDSPBSTFixture, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -154,7 +156,7 @@ BENCHMARK_DEFINE_F(MoveYggWBDefGDefDSPBSTFixture, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -164,8 +166,6 @@ BENCHMARK_DEFINE_F(MoveYggWBDefGDefDSPBSTFixture, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -179,7 +179,9 @@ using MoveYggWBLWSPBSTFixture =
 BENCHMARK_DEFINE_F(MoveYggWBLWSPBSTFixture, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -190,7 +192,7 @@ BENCHMARK_DEFINE_F(MoveYggWBLWSPBSTFixture, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -200,8 +202,6 @@ BENCHMARK_DEFINE_F(MoveYggWBLWSPBSTFixture, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -215,7 +215,9 @@ using MoveYggWBBalSPBSTFixture =
 BENCHMARK_DEFINE_F(MoveYggWBBalSPBSTFixture, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -226,7 +228,7 @@ BENCHMARK_DEFINE_F(MoveYggWBBalSPBSTFixture, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -236,8 +238,6 @@ BENCHMARK_DEFINE_F(MoveYggWBBalSPBSTFixture, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -251,7 +251,9 @@ using MoveYggWBSuperBalSPBSTFixture =
 BENCHMARK_DEFINE_F(MoveYggWBSuperBalSPBSTFixture, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -262,7 +264,7 @@ BENCHMARK_DEFINE_F(MoveYggWBSuperBalSPBSTFixture, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -272,8 +274,6 @@ BENCHMARK_DEFINE_F(MoveYggWBSuperBalSPBSTFixture, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -287,7 +287,9 @@ using MoveYggWBBalSPArithBSTFixture =
 BENCHMARK_DEFINE_F(MoveYggWBBalSPArithBSTFixture, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -298,7 +300,7 @@ BENCHMARK_DEFINE_F(MoveYggWBBalSPArithBSTFixture, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -308,8 +310,6 @@ BENCHMARK_DEFINE_F(MoveYggWBBalSPArithBSTFixture, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -323,7 +323,9 @@ using MoveYggWB3G2DSPBSTFixture =
 BENCHMARK_DEFINE_F(MoveYggWB3G2DSPBSTFixture, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -334,7 +336,7 @@ BENCHMARK_DEFINE_F(MoveYggWB3G2DSPBSTFixture, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -344,8 +346,6 @@ BENCHMARK_DEFINE_F(MoveYggWB3G2DSPBSTFixture, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -359,7 +359,9 @@ using MoveYggWB3G2DTPBSTFixture =
 BENCHMARK_DEFINE_F(MoveYggWB3G2DTPBSTFixture, BM_BST_Move)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -370,7 +372,7 @@ BENCHMARK_DEFINE_F(MoveYggWB3G2DTPBSTFixture, BM_BST_Move)
 			this->t.insert(*n);
 		}
 		this->papi.stop();
-		state.PauseTiming();
+		state.SetIterationTime(c.get());
 
 		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
 			auto * n = this->experiment_node_pointers[i];
@@ -380,8 +382,6 @@ BENCHMARK_DEFINE_F(MoveYggWB3G2DTPBSTFixture, BM_BST_Move)
 			NodeInterface::set_value(*n, old_val);
 			this->t.insert(*n);
 		}
-
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);

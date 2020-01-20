@@ -24,19 +24,20 @@ using InsertYggRBBSTFixture = BSTFixture<YggRBTreeInterface<BasicTreeOptions>,
 BENCHMARK_DEFINE_F(InsertYggRBBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -52,19 +53,20 @@ using InsertYggRBBSTFixtureArith =
 BENCHMARK_DEFINE_F(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -81,19 +83,20 @@ using InsertYggWBDefGDefDTPBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggWBDefGDefDTPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -107,19 +110,20 @@ using InsertYggWBDefGDefDSPBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggWBDefGDefDSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -133,19 +137,20 @@ using InsertYggWBLWSPBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggWBLWSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -159,19 +164,20 @@ using InsertYggWBBalSPBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggWBBalSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -185,19 +191,20 @@ using InsertYggWBBalSPArithBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggWBBalSPArithBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -211,19 +218,20 @@ using InsertYggWBSuperBalSPBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggWBSuperBalSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -237,19 +245,20 @@ using InsertYggWB3G2DSPBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggWB3G2DSPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -263,19 +272,20 @@ using InsertYggWB3G2DTPBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggWB3G2DTPBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -291,19 +301,20 @@ using InsertYggEBSTFixture =
 BENCHMARK_DEFINE_F(InsertYggEBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -318,19 +329,20 @@ using InsertYggZBSTFixture = BSTFixture<YggZTreeInterface<BasicTreeOptions>,
 BENCHMARK_DEFINE_F(InsertYggZBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 	this->papi.report_and_reset(state);
 }
@@ -344,19 +356,20 @@ using InsertBISetBSTFixture =
 BENCHMARK_DEFINE_F(InsertBISetBSTFixture, BM_BST_Insertion)
 (benchmark::State & state)
 {
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			this->t.insert(n);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto & n : this->experiment_nodes) {
 			this->t.erase(n);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 	this->papi.report_and_reset(state);
 }
@@ -377,15 +390,17 @@ BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)
 	    insertion_iterators;
 	insertion_iterators.reserve(this->experiment_nodes.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
 			// TODO emplace_back incurs a minimal overhead. Can we work around this?
 			insertion_iterators.emplace_back(this->t.insert(std::move(n)));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		// Since we moved, we must completely rebuild the experiment nodes
 		this->experiment_nodes.clear();
 		for (auto & it : insertion_iterators) {
@@ -393,7 +408,6 @@ BENCHMARK_DEFINE_F(InsertStdSetBSTFixture, BM_BST_Insertion)
 		}
 		insertion_iterators.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);

@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <boost/intrusive/set.hpp>
+#include <chrono>
 #include <draup.hpp>
 #include <iostream>
 #include <random>
@@ -32,6 +33,28 @@ using SearchExperiment = decltype(search_experiment_c);
 
 std::vector<std::string> PAPI_MEASUREMENTS;
 bool PAPI_STATS_WRITTEN;
+
+class Clock {
+public:
+	void
+	start()
+	{
+		this->started = std::chrono::steady_clock::now();
+	};
+	
+	double
+	get()
+	{
+		auto stopped = std::chrono::steady_clock::now();
+		long int ret = std::chrono::duration_cast<std::chrono::nanoseconds>(
+		                   stopped - this->started)
+		                   .count();
+		return static_cast<double>(ret) / 1000000000.0;
+	};
+
+private:
+	std::chrono::time_point<std::chrono::steady_clock> started;
+};
 
 class PointerCountCallback {
 public:

@@ -11,9 +11,11 @@ using MoveRBDSTFixture = DSTFixture<RBDSTInterface<BasicDSTTreeOptions>,
 BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		size_t j = 0;
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -24,9 +26,9 @@ BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -37,7 +39,6 @@ BENCHMARK_DEFINE_F(MoveRBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -57,9 +58,11 @@ using MoveZHDSTFixture = DSTFixture<
 BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		size_t j = 0;
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -70,9 +73,9 @@ BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -83,7 +86,6 @@ BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -101,9 +103,11 @@ using MoveZRDSTFixture =
 BENCHMARK_DEFINE_F(MoveZRDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		size_t j = 0;
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -114,9 +118,9 @@ BENCHMARK_DEFINE_F(MoveZRDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -127,7 +131,6 @@ BENCHMARK_DEFINE_F(MoveZRDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -148,9 +151,11 @@ using Move32WBDSTFixture = DSTFixture<
 BENCHMARK_DEFINE_F(Move32WBDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		size_t j = 0;
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -161,9 +166,9 @@ BENCHMARK_DEFINE_F(Move32WBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -174,7 +179,6 @@ BENCHMARK_DEFINE_F(Move32WBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -195,9 +199,11 @@ using MoveBalWBDSTFixture = DSTFixture<
 BENCHMARK_DEFINE_F(MoveBalWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		size_t j = 0;
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -208,9 +214,9 @@ BENCHMARK_DEFINE_F(MoveBalWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		// TODO actually, this is the same as above - also time it?
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -221,7 +227,6 @@ BENCHMARK_DEFINE_F(MoveBalWBDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);

@@ -13,21 +13,21 @@ BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
 			this->t.insert(this->fixed_nodes[i]);
 		}
-		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -47,21 +47,21 @@ BENCHMARK_DEFINE_F(DeleteZHDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
 			this->t.insert(this->fixed_nodes[i]);
 		}
-		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -79,21 +79,22 @@ BENCHMARK_DEFINE_F(DeleteZRDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -114,21 +115,21 @@ BENCHMARK_DEFINE_F(Delete32WBDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
 			this->t.insert(this->fixed_nodes[i]);
 		}
-		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -149,21 +150,21 @@ BENCHMARK_DEFINE_F(DeleteBalWBDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
 	PointerCountCallback::reset();
+	Clock c;
 	for (auto _ : state) {
 		PointerCountCallback::start();
+		c.start();
 		this->papi.start();
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
-		state.PauseTiming();
 		for (auto i : this->experiment_indices) {
 			this->t.insert(this->fixed_nodes[i]);
 		}
-		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);

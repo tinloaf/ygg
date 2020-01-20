@@ -35,21 +35,22 @@ BENCHMARK_DEFINE_F(EraseYggRBBSTFixture, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -69,21 +70,22 @@ BENCHMARK_DEFINE_F(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -104,21 +106,22 @@ BENCHMARK_DEFINE_F(EraseYggWBDefGDefDTPBSTFixture, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -136,21 +139,22 @@ BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPBSTFixture, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -168,21 +172,22 @@ BENCHMARK_DEFINE_F(EraseYggWBLWSPBSTFixture, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -200,21 +205,22 @@ BENCHMARK_DEFINE_F(EraseYggWBBalSPBSTFixture, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -232,21 +238,22 @@ BENCHMARK_DEFINE_F(EraseYggWBSuperBalSPBSTFixture, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -264,21 +271,22 @@ BENCHMARK_DEFINE_F(EraseYggWBBalSPArithBSTFixture, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -296,21 +304,22 @@ BENCHMARK_DEFINE_F(EraseYggWBDefGDefDSPOPTBSTFixture, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -328,21 +337,22 @@ BENCHMARK_DEFINE_F(EraseYggWB3G2DSPBSTFixture, BM_BST_Erasure)
 	    erased_nodes;
 	erased_nodes.reserve(this->experiment_node_pointers.size());
 
+	Clock c;
 	for (auto _ : state) {
+		c.start();
 		this->papi.start();
 		for (auto n : this->experiment_node_pointers) {
 			erased_nodes.push_back(this->t.erase_optimistic(n->get_value()));
 		}
 		this->papi.stop();
+		state.SetIterationTime(c.get());
 
-		state.PauseTiming();
 		for (auto n : erased_nodes) {
 			//		for (auto n : this->experiment_node_pointers) {
 			this->t.insert(*n);
 		}
 		erased_nodes.clear();
 		// TODO shuffling here?
-		state.ResumeTiming();
 	}
 
 	this->papi.report_and_reset(state);
@@ -361,21 +371,21 @@ BENCHMARK_DEFINE_F(EraseYggWB3G2DTPBSTFixture, BM_BST_Erasure)
       erased_nodes;
   erased_nodes.reserve(this->experiment_node_pointers.size());
 
-  for (auto _ : state) {
-    this->papi.start();
+  Clock c; for (auto _ : state) {
+    c.start(); this->papi.start();
     for (auto n : this->experiment_node_pointers) {
       erased_nodes.push_back(this->t.erase(n->get_value()));
     }
-    this->papi.stop();
+    this->papi.stop(); state.SetIterationTime(c.get());
 
-    state.PauseTiming();
+
     for (auto n : erased_nodes) {
       //		for (auto n : this->experiment_node_pointers) {
       this->t.insert(*n);
     }
     erased_nodes.clear();
     // TODO shuffling here?
-    state.ResumeTiming();
+
   }
 
   this->papi.report_and_reset(state);
@@ -397,21 +407,21 @@ BENCHMARK_DEFINE_F(EraseYggEBSTFixture, BM_BST_Erasure)
       erased_nodes;
   erased_nodes.reserve(this->experiment_node_pointers.size());
 
-  for (auto _ : state) {
-    this->papi.start();
+  Clock c; for (auto _ : state) {
+    c.start(); this->papi.start();
     for (auto n : this->experiment_node_pointers) {
       erased_nodes.push_back(this->t.erase(n->get_value()));
     }
-    this->papi.stop();
+    this->papi.stop(); state.SetIterationTime(c.get());
 
-    state.PauseTiming();
+
     for (auto n : erased_nodes) {
       //		for (auto n : this->experiment_node_pointers) {
       this->t.insert(*n);
     }
     erased_nodes.clear();
     // TODO shuffling here?
-    state.ResumeTiming();
+
   }
 
   this->papi.report_and_reset(state);
@@ -432,21 +442,21 @@ BENCHMARK_DEFINE_F(EraseYggZBSTFixture, BM_BST_Erasure)
       erased_nodes;
   erased_nodes.reserve(this->experiment_node_pointers.size());
 
-  for (auto _ : state) {
-    this->papi.start();
+  Clock c; for (auto _ : state) {
+    c.start(); this->papi.start();
     for (auto n : this->experiment_node_pointers) {
       erased_nodes.push_back(this->t.erase(n->get_value()));
     }
-    this->papi.stop();
+    this->papi.stop(); state.SetIterationTime(c.get());
 
-    state.PauseTiming();
+
     for (auto n : erased_nodes) {
       //		for (auto n : this->experiment_node_pointers) {
       this->t.insert(*n);
     }
     erased_nodes.clear();
     // TODO shuffling here?
-    state.ResumeTiming();
+
   }
 
   this->papi.report_and_reset(state);
@@ -464,19 +474,19 @@ UseUniform, false>; BENCHMARK_DEFINE_F(EraseBISetBSTFixture, BM_BST_Erasure)
 (benchmark::State & state)
 {
 TODO Rebuild for the new erased_node system
-  for (auto _ : state) {
-    this->papi.start();
+  Clock c; for (auto _ : state) {
+    c.start(); this->papi.start();
     for (auto n : this->experiment_node_pointers) {
       this->t.erase(*n);
     }
-    this->papi.stop();
+    this->papi.stop(); state.SetIterationTime(c.get());
 
-    state.PauseTiming();
+
     for (auto n : this->experiment_node_pointers) {
       this->t.insert(*n);
     }
     // TODO shuffling here?
-    state.ResumeTiming();
+
   }
 
   this->papi.report_and_reset(state);
@@ -506,21 +516,21 @@ UseNone, false>; BENCHMARK_DEFINE_F(EraseStdSetBSTFixture, BM_BST_Erasure)
               this->rng);
   all_iterators.clear();
 
-  for (auto _ : state) {
-    this->papi.start();
+  Clock c; for (auto _ : state) {
+    c.start(); this->papi.start();
     for (auto inner_it : experiment_iterators) {
       extracted_nodes.push_back(this->t.extract(inner_it));
     }
-    this->papi.stop();
+    this->papi.stop(); state.SetIterationTime(c.get());
 
-    state.PauseTiming();
+
     experiment_iterators.clear();
     for (auto & n : extracted_nodes) {
       experiment_iterators.push_back(this->t.insert(std::move(n)));
     }
     extracted_nodes.clear();
     // TODO shuffling here?
-    state.ResumeTiming();
+
   }
 
   this->papi.report_and_reset(state);

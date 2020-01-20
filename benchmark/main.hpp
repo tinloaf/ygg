@@ -158,13 +158,11 @@ main(int argc, char ** argv)
 
 			auto * bench = new plugin();
 			bench->set_name(name);
-			/*
-			RangeVector ranges;
-			ranges.emplace_back(base_size, base_size * (1 << doublings));
-			ranges.emplace_back(experiment_size, experiment_size);
-			bench->RangeMultiplier(2);
-			bench->Ranges(ranges);
-			*/
+
+			// We benchmark manually since Google Benchmark's PauseTiming() /
+			// ResumeTiming() is too heavyweight
+			bench->UseManualTime();
+
 			bench->Apply(BuildRange);
 			::benchmark::internal::RegisterBenchmarkInternal(bench);
 		}
