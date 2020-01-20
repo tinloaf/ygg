@@ -99,25 +99,35 @@ public:
 	report(::benchmark::State & state)
 	{
 #ifdef COUNTOPS
-		state.counters["GET_RIGHT"] =
-		    static_cast<double>(PointerCountCallback::get_right_c);
-		state.counters["GET_LEFT"] =
-		    static_cast<double>(PointerCountCallback::get_left_c);
-		state.counters["GET_PARENT"] =
-		    static_cast<double>(PointerCountCallback::get_parent_c);
-		state.counters["GET_TOTAL"] = static_cast<double>(
-		    PointerCountCallback::get_parent_c + PointerCountCallback::get_left_c +
-		    PointerCountCallback::get_right_c);
+		state.counters["GET_RIGHT"] = ::benchmark::Counter(
+		    static_cast<double>(PointerCountCallback::get_right_c),
+		    ::benchmark::Counter::Flags::kAvgIterations);
+		state.counters["GET_LEFT"] = ::benchmark::Counter(
+		    static_cast<double>(PointerCountCallback::get_left_c),
+		    ::benchmark::Counter::Flags::kAvgIterations);
+		state.counters["GET_PARENT"] = ::benchmark::Counter(
+		    static_cast<double>(PointerCountCallback::get_parent_c),
+		    ::benchmark::Counter::Flags::kAvgIterations);
+		state.counters["GET_TOTAL"] = ::benchmark::Counter(
+		    static_cast<double>(PointerCountCallback::get_parent_c +
+		                        PointerCountCallback::get_left_c +
+		                        PointerCountCallback::get_right_c),
+		    ::benchmark::Counter::Flags::kAvgIterations);
 
-		state.counters["SET_RIGHT"] =
-		    static_cast<double>(PointerCountCallback::set_right_c);
-		state.counters["SET_LEFT"] =
-		    static_cast<double>(PointerCountCallback::set_left_c);
-		state.counters["SET_PARENT"] =
-		    static_cast<double>(PointerCountCallback::set_parent_c);
-		state.counters["SET_TOTAL"] = static_cast<double>(
-		    PointerCountCallback::set_parent_c + PointerCountCallback::set_left_c +
-		    PointerCountCallback::set_right_c);
+		state.counters["SET_RIGHT"] = ::benchmark::Counter(
+		    static_cast<double>(PointerCountCallback::set_right_c),
+		    ::benchmark::Counter::Flags::kAvgIterations);
+		state.counters["SET_LEFT"] = ::benchmark::Counter(
+		    static_cast<double>(PointerCountCallback::set_left_c),
+		    ::benchmark::Counter::Flags::kAvgIterations);
+		state.counters["SET_PARENT"] = ::benchmark::Counter(
+		    static_cast<double>(PointerCountCallback::set_parent_c),
+		    ::benchmark::Counter::Flags::kAvgIterations);
+		state.counters["SET_TOTAL"] = ::benchmark::Counter(
+		    static_cast<double>(PointerCountCallback::set_parent_c +
+		                        PointerCountCallback::set_left_c +
+		                        PointerCountCallback::set_right_c),
+		    ::benchmark::Counter::Flags::kAvgIterations);
 #else
 		(void)state;
 #endif
@@ -227,7 +237,8 @@ public:
 #ifdef USEPAPI
 		for (size_t i = 0; i < PAPI_MEASUREMENTS.size(); ++i) {
 			state.counters[PAPI_MEASUREMENTS[i]] =
-			    static_cast<double>(this->event_count_accu[i]);
+			    ::benchmark::Counter(static_cast<double>(this->event_count_accu[i]),
+			                         ::benchmark::Counter::Flags::kAvgIterations);
 		}
 		std::fill(this->event_count_accu.begin(), this->event_count_accu.end(), 0);
 #else
