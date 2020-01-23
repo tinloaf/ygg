@@ -140,15 +140,28 @@ struct UseWBTree
 /********************************************
  * Base Class Definitions for Zip Tree
  ********************************************/
+
 template <class... AdditionalOptions>
 struct UseZipTree
 {
+	template <class InnerNode>
+	struct ZipTreeHasher
+	{
+		size_t
+		operator()(const InnerNode & n) const noexcept
+		{
+			return std::hash<size_t>()(reinterpret_cast<size_t>(&n));
+		}
+	};
+
 	template <class InnerNode, class KeyT>
 	using Options =
-	    TreeOptions<TreeFlags::MULTIPLE, TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
+	    TreeOptions<TreeFlags::MULTIPLE,
 	                TreeFlags::BENCHMARK_SEQUENCE_INTERFACE<
 	                    InnerSequenceInterface<InnerNode, KeyT>>,
+	                TreeFlags::ZTREE_HASHER_TYPE<ZipTreeHasher<InnerNode>>,
 	                AdditionalOptions...>;
+
 	template <class Tag>
 	struct InnerNodeBaseBuilder
 	{
@@ -169,6 +182,7 @@ struct UseZipTree
 	template <class TagType>
 	using Tag = InnerZTTag<TagType>;
 };
+
 /// @endcond
 
 /**
@@ -426,7 +440,7 @@ template <class... AdditionalOptions>
 class UseZipTree
     : public dyn_segtree_internal::UseZipTree<AdditionalOptions...> {
 };
-using UseDefaultZipTree = UseZipTree<>;
+using UseDefaultZipTree = UseZipTree<TreeFlags::ZTREE_RANK_TYPE<std::uint8_t>>;
 
 /**
  * @brief Class used to select the weight balanced tree as underlying tree for

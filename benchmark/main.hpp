@@ -1,6 +1,7 @@
 #ifndef MAIN_HPP
 #define MAIN_HPP
 
+#include "benchmark_config.hpp"
 #include "common.hpp"
 
 #include <cstdlib>
@@ -14,22 +15,6 @@
 #define EXPERIMENT_SIZE 1000
 #define BASE_SIZE 2048
 #define DOUBLINGS 10
-
-struct ConfigHolder
-{
-	int64_t experiment_size;
-	double relative_experiment_size;
-	bool use_relative_size = false;
-	int64_t base_size;
-	size_t doublings;
-
-	int64_t seed_start;
-	size_t seed_count;
-
-	int64_t iteration_count;
-};
-
-ConfigHolder CFG;
 
 void
 BuildRange(::benchmark::internal::Benchmark * b)
@@ -101,6 +86,11 @@ main(int argc, char ** argv)
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--iterations", strlen("--iterations")) == 0) {
 			CFG.iteration_count = static_cast<size_t>(atoi(argv[i + 1]));
+			i += 1;
+			remaining_argc -= 2;
+		} else if (strncmp(argv[i], "--ziptree-export-ranks",
+		                   strlen("--ziptree-export-ranks")) == 0) {
+			CFG.ziptree_export_ranks = static_cast<size_t>(atoi(argv[i + 1]));
 			i += 1;
 			remaining_argc -= 2;
 		} else if (strncmp(argv[i], "--base_size", strlen("--base_size")) == 0) {

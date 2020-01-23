@@ -38,12 +38,12 @@ REGISTER(InsertRBDSTFixture, BM_DST_Insertion)
 /*
  * Zip DST with Hashing
  */
-using InsertZHDSTFixture = DSTFixture<
-    ZDSTInterface<
-        BasicDSTTreeOptions,
-        ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
-        ygg::TreeFlags::ZTREE_USE_HASH>,
-    InsertExperiment, true, false, false, false>;
+using InsertZHDSTInterface = ZDSTInterface<
+    BasicDSTTreeOptions,
+    ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
+    ygg::TreeFlags::ZTREE_USE_HASH>;
+using InsertZHDSTFixture = DSTFixture<InsertZHDSTInterface, InsertExperiment,
+                                      true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertZHDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
@@ -60,6 +60,7 @@ BENCHMARK_DEFINE_F(InsertZHDSTFixture, BM_DST_Insertion)
 		PointerCountCallback::stop();
 		state.SetIterationTime(c.get());
 
+		InsertZHDSTInterface::report_ranks(state, this->t);
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}
@@ -73,10 +74,11 @@ REGISTER(InsertZHDSTFixture, BM_DST_Insertion)
 /*
  * Zip DST with truly random ranks
  */
-using InsertZRDSTFixture =
-    DSTFixture<ZDSTInterface<BasicDSTTreeOptions,
-                             ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>>,
-               InsertExperiment, true, false, false, false>;
+using InsertZRDSTInterface =
+    ZDSTInterface<BasicDSTTreeOptions,
+                  ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>>;
+using InsertZRDSTFixture = DSTFixture<InsertZRDSTInterface, InsertExperiment,
+                                      true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertZRDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
@@ -93,6 +95,7 @@ BENCHMARK_DEFINE_F(InsertZRDSTFixture, BM_DST_Insertion)
 		PointerCountCallback::stop();
 		state.SetIterationTime(c.get());
 
+		InsertZRDSTInterface::report_ranks(state, this->t);
 		for (auto & n : this->experiment_nodes) {
 			this->t.remove(n);
 		}

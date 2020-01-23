@@ -37,12 +37,13 @@ BENCHMARK_DEFINE_F(DeleteRBDSTFixture, BM_DST_Deletion)
 /*
  * Zip DST with hashing
  */
-using DeleteZHDSTFixture = DSTFixture<
-    ZDSTInterface<
-        BasicDSTTreeOptions,
-        ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
-        ygg::TreeFlags::ZTREE_USE_HASH>,
-    DeleteExperiment, false, false, true, false>;
+using ZHDSTInterface = ZDSTInterface<
+    BasicDSTTreeOptions,
+    ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
+    ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<94560934207>,
+    ygg::TreeFlags::ZTREE_USE_HASH>;
+using DeleteZHDSTFixture =
+    DSTFixture<ZHDSTInterface, DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteZHDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
@@ -59,6 +60,7 @@ BENCHMARK_DEFINE_F(DeleteZHDSTFixture, BM_DST_Deletion)
 		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
+		ZHDSTInterface::report_ranks(state, this->t);
 		for (auto i : this->experiment_indices) {
 			this->t.insert(this->fixed_nodes[i]);
 		}
@@ -71,10 +73,10 @@ BENCHMARK_DEFINE_F(DeleteZHDSTFixture, BM_DST_Deletion)
 /*
  * Zip DST with truly random ranks
  */
+using ZRDSTInterface = ZDSTInterface<BasicDSTTreeOptions,
+                                     ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>>;
 using DeleteZRDSTFixture =
-    DSTFixture<ZDSTInterface<BasicDSTTreeOptions,
-                             ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>>,
-               DeleteExperiment, false, false, true, false>;
+    DSTFixture<ZRDSTInterface, DeleteExperiment, false, false, true, false>;
 BENCHMARK_DEFINE_F(DeleteZRDSTFixture, BM_DST_Deletion)
 (benchmark::State & state)
 {
@@ -91,6 +93,7 @@ BENCHMARK_DEFINE_F(DeleteZRDSTFixture, BM_DST_Deletion)
 		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
+		ZRDSTInterface::report_ranks(state, this->t);
 		for (auto i : this->experiment_indices) {
 			this->t.insert(this->fixed_nodes[i]);
 		}

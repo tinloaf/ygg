@@ -106,6 +106,28 @@ public:
 	};
 
 	/**
+	 * @brief Zip Tree Option: Supply your own hasher class to be used with
+	 * hash-based ranks.
+	 *
+	 * The ranks of the nodes can be derived from hashing the nodes. By default,
+	 * std::hash is used on the node class you supply, so you must specialize
+	 * std::hash for your node class. Alternatively, you can supply your own
+	 * hasher class here. It must have the same interface as std::hash, i.e., a
+	 * method
+	 *
+	 * size_t operator()(const Node &)
+	 *
+	 * must be defined, which must return the hash value.
+	 *
+	 * @tparam T The type that you want to use as hasher.
+	 */
+	template <class T>
+	class ZTREE_HASHER_TYPE {
+	public:
+		using type = T;
+	};
+
+	/**
 	 * @brief Zip Tree Option: Apply universal hashing to compute node ranks. This
 	 * sets the coefficient.
 	 *
@@ -408,6 +430,30 @@ private:
 		}
 	}
 
+	template <class Node>
+	constexpr static auto
+	compute_ztree_hasher_type()
+	{
+		using T =
+		    typename utilities::get_type_if_present<TreeFlags::ZTREE_HASHER_TYPE,
+		                                            void, Opts...>::type;
+
+		if constexpr (!std::is_same<T, void>::value) {
+			return utilities::TypeHolder<typename T::type>{};
+		} else {
+			return utilities::TypeHolder<std::hash<Node>>{};
+		}
+	}
+
+	/* This is necessary to work around core issue #1554 - it's not clear whether
+	 * ztree_hasher_type below may access compute_ztree_hasher_type() or not.
+	 * Clang implements "no".
+	 *
+	 * See here: http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1554
+	 */
+	template <class Node, class Options, bool use_hash, bool store>
+	friend class ZTreeRankGenerator;
+
 	using OptPack = utilities::Pack<Opts...>;
 
 public:
@@ -427,6 +473,10 @@ public:
 	using ztree_rank_type =
 	    typename utilities::get_type_if_present<TreeFlags::ZTREE_RANK_TYPE, void,
 	                                            Opts...>::type;
+
+	template <class Node>
+	using ztree_hasher_type = typename decltype(
+	    TreeOptions<Opts...>::template compute_ztree_hasher_type<Node>())::type;
 
 	static constexpr bool ztree_universalize_lincong =
 	    (utilities::get_value_if_present<

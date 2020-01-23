@@ -49,12 +49,12 @@ REGISTER(MoveRBDSTFixture, BM_DST_Move)
 /*
  * Zip DST with hashing
  */
-using MoveZHDSTFixture = DSTFixture<
-    ZDSTInterface<
-        BasicDSTTreeOptions,
-        ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
-        ygg::TreeFlags::ZTREE_USE_HASH>,
-    MoveExperiment, false, true, true, false>;
+using MoveZHDSTInterface = ZDSTInterface<
+    BasicDSTTreeOptions,
+    ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
+    ygg::TreeFlags::ZTREE_USE_HASH>;
+using MoveZHDSTFixture =
+    DSTFixture<MoveZHDSTInterface, MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	PointerCountCallback::reset();
@@ -76,6 +76,8 @@ BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
 		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
 
+		MoveZHDSTInterface::report_ranks(state, this->t);
+
 		// TODO actually, this is the same as above - also time it?
 		for (auto i : this->experiment_indices) {
 			this->t.remove(this->fixed_nodes[i]);
@@ -96,10 +98,11 @@ REGISTER(MoveZHDSTFixture, BM_DST_Move)
 /*
  * Zip DST with truly random ranks
  */
+using MoveZRDSTInterface =
+    ZDSTInterface<BasicDSTTreeOptions,
+                  ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>>;
 using MoveZRDSTFixture =
-    DSTFixture<ZDSTInterface<BasicDSTTreeOptions,
-                             ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>>,
-               MoveExperiment, false, true, true, false>;
+    DSTFixture<MoveZRDSTInterface, MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveZRDSTFixture, BM_DST_Move)(benchmark::State & state)
 {
 	PointerCountCallback::reset();
@@ -120,6 +123,8 @@ BENCHMARK_DEFINE_F(MoveZRDSTFixture, BM_DST_Move)(benchmark::State & state)
 		this->papi.stop();
 		state.SetIterationTime(c.get());
 		PointerCountCallback::stop();
+
+		MoveZRDSTInterface::report_ranks(state, this->t);
 
 		// TODO actually, this is the same as above - also time it?
 		for (auto i : this->experiment_indices) {

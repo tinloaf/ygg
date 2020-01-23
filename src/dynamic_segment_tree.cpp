@@ -733,13 +733,14 @@ DOTInnerNodeNameGetter<InnerNode, Combiners...>::get_name(
 }
 
 template <class InnerNode>
-std::string DOTInnerEdgeNameGetter<InnerNode>::get_name(InnerNode *node, bool left) const
+std::string
+DOTInnerEdgeNameGetter<InnerNode>::get_name(InnerNode * node, bool left) const
 {
-		if (left) {
-			return std::to_string(node->agg_left);
-		} else {
-			return std::to_string(node->agg_right);
-		}
+	if (left) {
+		return std::to_string(node->agg_left);
+	} else {
+		return std::to_string(node->agg_right);
+	}
 }
 
 } // namespace dyn_segtree_internal
@@ -781,6 +782,13 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 
 	n.NB::start.start = true;
 	n.NB::start.container = static_cast<NB *>(&n);
+
+	if constexpr (utilities::is_specialization<TreeSelector, UseZipTree>{} &&
+	              Options::ztree_use_hash && Options::ztree_store_rank) {
+		// We need to update the ranks
+		n.NB::start.update_rank();
+		n.NB::end.update_rank();
+	}
 
 	this->t.insert(n.NB::start);
 	n.NB::end.point = NodeTraits::get_upper(n);
@@ -1620,7 +1628,8 @@ RangedMaxCombiner<KeyT, ValueT>::traverse_right_edge_up(KeyT new_point,
 template <class KeyT, class ValueT>
 bool
 RangedMaxCombiner<KeyT, ValueT>::collect_left(
-    const KeyT my_point, const MyType * left_child_combiner, const ValueT edge_val)
+    const KeyT my_point, const MyType * left_child_combiner,
+    const ValueT edge_val)
 {
 	const auto new_candidate_value = child_value(left_child_combiner) + edge_val;
 
@@ -1692,7 +1701,8 @@ RangedMaxCombiner<KeyT, ValueT>::collect_left(
 template <class KeyT, class ValueT>
 bool
 RangedMaxCombiner<KeyT, ValueT>::collect_right(
-    const KeyT my_point, const MyType * right_child_combiner, const ValueT edge_val)
+    const KeyT my_point, const MyType * right_child_combiner,
+    const ValueT edge_val)
 {
 	const auto new_candidate_value = child_value(right_child_combiner) + edge_val;
 

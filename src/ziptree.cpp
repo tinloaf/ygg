@@ -54,21 +54,23 @@ int
 ZTreeRankGenerator<Node, Options, true, false>::get_rank(
     const Node & node) noexcept
 {
+	auto hasher = typename Options::template ztree_hasher_type<Node>();
+
 	// TODO ffsl? ffs?
 	if constexpr (Options::ztree_universalize_lincong) {
 		// TODO this is not strictly a universal family
 		size_t universalized =
-		    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
+		    (hasher(node) * Options::ztree_universalize_coefficient) %
 		    Options::ztree_universalize_modul;
 		return __builtin_ffsl(static_cast<long int>(universalized));
 	} else if constexpr (Options::ztree_universalize_multiply) {
 		// This is a variant of the multiply-shift method by Dietzfelbinger et al.
 		// Since we hash to all of size_t, we don't need a shift.
 		size_t universalized =
-		    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient);
+		    (hasher(node) * Options::ztree_universalize_coefficient);
 		return __builtin_ffsl(static_cast<long int>(universalized));
 	} else {
-		return __builtin_ffsl(static_cast<long int>(std::hash<Node>{}(node)));
+		return __builtin_ffsl(static_cast<long int>(hasher(node)));
 	}
 }
 
@@ -80,11 +82,13 @@ template <class Node, class Options>
 void
 ZTreeRankGenerator<Node, Options, true, true>::update_rank(Node & node) noexcept
 {
+	const auto hasher = typename Options::template ztree_hasher_type<Node>();
+
 	// TODO ffsl? ffs?
 	if constexpr (Options::ztree_universalize_lincong) {
 		// TODO this is not strictly a universal family
 		size_t universalized =
-		    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient) %
+		    (hasher(node) * Options::ztree_universalize_coefficient) %
 		    Options::ztree_universalize_modul;
 		node._zt_rank.rank = static_cast<decltype(node._zt_rank.rank)>(
 		    __builtin_ffsl(static_cast<long int>(universalized)));
@@ -92,12 +96,12 @@ ZTreeRankGenerator<Node, Options, true, true>::update_rank(Node & node) noexcept
 		// This is a variant of the multiply-shift method by Dietzfelbinger et al.
 		// Since we hash to all of size_t, we don't need a shift.
 		size_t universalized =
-		    (std::hash<Node>{}(node)*Options::ztree_universalize_coefficient);
+		    (hasher(node) * Options::ztree_universalize_coefficient);
 		node._zt_rank.rank = static_cast<decltype(node._zt_rank.rank)>(
 		    __builtin_ffsl(static_cast<long int>(universalized)));
 	} else {
 		node._zt_rank.rank = static_cast<decltype(node._zt_rank.rank)>(
-		    __builtin_ffsl(static_cast<long int>(std::hash<Node>{}(node))));
+		    __builtin_ffsl(static_cast<long int>(hasher(node))));
 	}
 }
 
@@ -168,6 +172,13 @@ ZTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
 	}
 
 	return depth;
+}
+
+template <class Node, class Options, class Tag>
+size_t
+ZTreeNodeBase<Node, Options, Tag>::dbg_get_rank() const noexcept
+{
+	return decltype(this->_zt_rank)::get_rank(*(static_cast<const Node *>(this)));
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare,

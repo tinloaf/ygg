@@ -427,6 +427,30 @@ public:
 	{
 		t.clear();
 	}
+
+	static void
+	report_ranks(::benchmark::State & state, Tree & t)
+	{
+		if (CFG.ziptree_export_ranks == 0) {
+			return;
+		}
+
+		std::vector<size_t> rank_count(CFG.ziptree_export_ranks, 0);
+
+		for (auto & node : t) {
+			if (node.dbg_get_rank() < CFG.ziptree_export_ranks) {
+				rank_count[node.dbg_get_rank()]++;
+			}
+		}
+
+		for (size_t i = 0; i < CFG.ziptree_export_ranks; ++i) {
+			std::ostringstream name;
+			name << "COUNT_RANK_" << i;
+			state.counters[name.str()] =
+			    ::benchmark::Counter(static_cast<double>(rank_count[i]),
+			                         ::benchmark::Counter::Flags::kAvgIterations);
+		}
+	}
 };
 
 using BasicDSTTreeOptions =

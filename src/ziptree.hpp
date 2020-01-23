@@ -37,6 +37,7 @@ class ZTreeRankGenerator<Node, Options, true, false> {
 public:
 	ZTreeRankGenerator();
 	static void update_rank(Node & node) noexcept;
+	// TODO why is this "int"?
 	static int get_rank(const Node & node) noexcept;
 };
 
@@ -99,6 +100,7 @@ class ZTreeNodeBase : public bst::BSTNodeBase<Node, Options, Tag> {
 public:
 	// Debugging methods
 	size_t get_depth() const noexcept;
+	size_t dbg_get_rank() const noexcept;
 
 protected:
 	/**
@@ -110,7 +112,7 @@ protected:
 	 * the node to your tree, but *after* the node's hash has become valid.
 	 *
 	 * @warning Inserting a node into the tree in the aforementioned case before
-	 * calling calling this method leads to undefined behavior.
+	 * calling this method leads to undefined behavior.
 	 */
 	void
 	update_rank() noexcept

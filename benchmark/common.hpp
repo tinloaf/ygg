@@ -2,6 +2,7 @@
 #define BENCH_COMMON_HPP
 
 #include "benchmark.h"
+#include "benchmark_config.hpp"
 
 #include <algorithm>
 #include <boost/intrusive/set.hpp>
@@ -41,7 +42,7 @@ public:
 	{
 		this->started = std::chrono::steady_clock::now();
 	};
-	
+
 	double
 	get()
 	{
