@@ -49,10 +49,11 @@ REGISTER(MoveRBDSTFixture, BM_DST_Move)
 /*
  * Zip DST with hashing
  */
-using MoveZHDSTInterface = ZDSTInterface<
-    BasicDSTTreeOptions,
-    ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
-    ygg::TreeFlags::ZTREE_USE_HASH>;
+using MoveZHDSTInterface =
+    ZDSTInterface<BasicDSTTreeOptions,
+                  ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
+                      16186402584962403883ul>,
+                  ygg::TreeFlags::ZTREE_USE_HASH>;
 using MoveZHDSTFixture =
     DSTFixture<MoveZHDSTInterface, MoveExperiment, false, true, true, false>;
 BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
@@ -94,6 +95,57 @@ BENCHMARK_DEFINE_F(MoveZHDSTFixture, BM_DST_Move)(benchmark::State & state)
 	PointerCountCallback::report(state);
 }
 REGISTER(MoveZHDSTFixture, BM_DST_Move)
+
+/*
+ * Zip DST with hashing and storing the ranks
+ */
+using MoveZHSDSTInterface =
+    ZDSTInterface<BasicDSTTreeOptions,
+                  ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
+                      16186402584962403883ul>,
+                  ygg::TreeFlags::ZTREE_RANK_TYPE<std::uint8_t>,
+                  ygg::TreeFlags::ZTREE_USE_HASH>;
+using MoveZHSDSTFixture =
+    DSTFixture<MoveZHSDSTInterface, MoveExperiment, false, true, true, false>;
+BENCHMARK_DEFINE_F(MoveZHSDSTFixture, BM_DST_Move)(benchmark::State & state)
+{
+	PointerCountCallback::reset();
+	Clock c;
+	for (auto _ : state) {
+		size_t j = 0;
+		PointerCountCallback::start();
+		c.start();
+		this->papi.start();
+		for (auto i : this->experiment_indices) {
+			this->t.remove(this->fixed_nodes[i]);
+			auto [upper, lower, value] = this->experiment_values[j++];
+			this->fixed_nodes[i].upper = upper;
+			this->fixed_nodes[i].lower = lower;
+			this->fixed_nodes[i].value = value; // TODO don't do this?
+			this->t.insert(this->fixed_nodes[i]);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+		PointerCountCallback::stop();
+
+		MoveZHSDSTInterface::report_ranks(state, this->t);
+
+		// TODO actually, this is the same as above - also time it?
+		for (auto i : this->experiment_indices) {
+			this->t.remove(this->fixed_nodes[i]);
+			auto [upper, lower, value] = this->fixed_values[i];
+			this->fixed_nodes[i].upper = upper;
+			this->fixed_nodes[i].lower = lower;
+			this->fixed_nodes[i].value = value; // TODO don't do this?
+			this->t.insert(this->fixed_nodes[i]);
+		}
+		// TODO shuffling here?
+	}
+
+	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
+}
+REGISTER(MoveZHSDSTFixture, BM_DST_Move)
 
 /*
  * Zip DST with truly random ranks

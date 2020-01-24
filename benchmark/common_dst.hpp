@@ -402,7 +402,25 @@ public:
 			universalize = ",UM";
 		}
 
-		return "ZipTree[" + randomness + universalize + "]";
+		std::string storage = "";
+		if constexpr (DummyOptions::ztree_store_rank) {
+			if constexpr (sizeof(typename DummyOptions::ztree_rank_type) == 1) {
+				storage = ",S8";
+			} else if constexpr (sizeof(typename DummyOptions::ztree_rank_type) ==
+			                     2) {
+				storage = ",S16";
+			} else if constexpr (sizeof(typename DummyOptions::ztree_rank_type) ==
+			                     3) {
+				storage = ",S32";
+			} else if constexpr (sizeof(typename DummyOptions::ztree_rank_type) ==
+			                     4) {
+				storage = ",S64";
+			} else {
+				storage = ",S?";
+			}
+		}
+
+		return "ZipTree[" + randomness + universalize + storage + "]";
 	}
 
 	static void
@@ -454,11 +472,8 @@ public:
 };
 
 using BasicDSTTreeOptions =
-    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
-                     ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
                      ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
-                         9859957398433823229ul>,
-                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
-                         std::numeric_limits<size_t>::max()>>;
+                         9859957398433823229ul>>;
 
 #endif

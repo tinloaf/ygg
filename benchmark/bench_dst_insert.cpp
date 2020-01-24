@@ -38,10 +38,11 @@ REGISTER(InsertRBDSTFixture, BM_DST_Insertion)
 /*
  * Zip DST with Hashing
  */
-using InsertZHDSTInterface = ZDSTInterface<
-    BasicDSTTreeOptions,
-    ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<3445358421>,
-    ygg::TreeFlags::ZTREE_USE_HASH>;
+using InsertZHDSTInterface =
+    ZDSTInterface<BasicDSTTreeOptions,
+                  ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
+                      16186402584962403883ul>,
+                  ygg::TreeFlags::ZTREE_USE_HASH>;
 using InsertZHDSTFixture = DSTFixture<InsertZHDSTInterface, InsertExperiment,
                                       true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertZHDSTFixture, BM_DST_Insertion)
@@ -70,6 +71,44 @@ BENCHMARK_DEFINE_F(InsertZHDSTFixture, BM_DST_Insertion)
 	PointerCountCallback::report(state);
 }
 REGISTER(InsertZHDSTFixture, BM_DST_Insertion)
+
+/*
+ * Zip DST with Hashing and storing the ranks
+ */
+using InsertZHSDSTInterface =
+    ZDSTInterface<BasicDSTTreeOptions,
+                  ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
+                      16186402584962403883ul>,
+                  ygg::TreeFlags::ZTREE_RANK_TYPE<std::uint8_t>,
+                  ygg::TreeFlags::ZTREE_USE_HASH>;
+using InsertZHSDSTFixture = DSTFixture<InsertZHSDSTInterface, InsertExperiment,
+                                      true, false, false, false>;
+BENCHMARK_DEFINE_F(InsertZHSDSTFixture, BM_DST_Insertion)
+(benchmark::State & state)
+{
+	PointerCountCallback::reset();
+	Clock c;
+	for (auto _ : state) {
+		PointerCountCallback::start();
+		c.start();
+		this->papi.start();
+		for (auto & n : this->experiment_nodes) {
+			this->t.insert(n);
+		}
+		this->papi.stop();
+		PointerCountCallback::stop();
+		state.SetIterationTime(c.get());
+
+		InsertZHSDSTInterface::report_ranks(state, this->t);
+		for (auto & n : this->experiment_nodes) {
+			this->t.remove(n);
+		}
+	}
+
+	this->papi.report_and_reset(state);
+	PointerCountCallback::report(state);
+}
+REGISTER(InsertZHSDSTFixture, BM_DST_Insertion)
 
 /*
  * Zip DST with truly random ranks
