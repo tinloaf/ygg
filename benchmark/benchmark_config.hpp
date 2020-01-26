@@ -4,6 +4,7 @@
 struct ConfigHolder
 {
 	int64_t experiment_size;
+	bool use_static_size = false;
 	double relative_experiment_size;
 	bool use_relative_size = false;
 	int64_t base_size;
