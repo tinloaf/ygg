@@ -784,7 +784,8 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 	n.NB::start.container = static_cast<NB *>(&n);
 
 	if constexpr (utilities::is_specialization<TreeSelector, UseZipTree>{} &&
-	              Options::ztree_use_hash && Options::ztree_store_rank) {
+	              InnerOptions::ztree_use_hash &&
+	              InnerOptions::ztree_store_rank) {
 		// We need to update the ranks
 		n.NB::start.update_rank();
 		n.NB::end.update_rank();

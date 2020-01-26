@@ -1087,6 +1087,8 @@ private:
 	                              typename Node::AggValueT, Combiners,
 	                              TreeSelector, Tag>;
 	using InnerNode = typename NB::InnerNode;
+	using InnerOptions =
+	    typename TreeSelector::template Options<InnerNode, typename Node::KeyT>;
 
 	static_assert(std::is_base_of<DynSegTreeNodeTraits<Node>, NodeTraits>::value,
 	              "NodeTraits not properly derived from DynSegTreeNodeTraits!");
