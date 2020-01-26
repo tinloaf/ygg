@@ -1,5 +1,5 @@
 // This must be defined before including any Ygg headers
-#define YGG_STORE_SEQUENCE
+#define YGG_STORE_SEQUENCE_DST
 
 #include "../src/ygg.hpp"
 
@@ -9,6 +9,25 @@ using MCombiner = RangedMaxCombiner<double, int>;
 using Combiners = CombinerPack<double, int, MCombiner>;
 
 using TreeSelector = UseDefaultZipTree;
+
+class SequenceInterface {
+public:
+	using ValueT = int;
+
+	// Resolve cyclic dependency via template
+	template <class Interval>
+	static int
+	get_value(const Interval & interval)
+	{
+		return interval.value;
+	}
+};
+
+/* Specify the sequence interface in the options to the DST.
+ */
+using MyOptions = TreeOptions<
+    TreeFlags::MULTIPLE,
+    TreeFlags::template BENCHMARK_SEQUENCE_INTERFACE<SequenceInterface>>;
 
 class Interval
     : public DynSegTreeNodeBase<double, int, int, Combiners, TreeSelector> {
@@ -66,7 +85,7 @@ public:
 /* This is our DynamicSegmentTree
  */
 using MyTree = DynamicSegmentTree<Interval, IntervalTraits, Combiners,
-                                  DefaultOptions, TreeSelector>;
+                                  MyOptions, TreeSelector>;
 
 int
 main(int argc, char ** argv)

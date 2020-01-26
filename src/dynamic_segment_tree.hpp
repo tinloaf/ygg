@@ -5,6 +5,7 @@
 #ifndef YGG_DYNAMIC_SEGMENT_TREE_HPP
 #define YGG_DYNAMIC_SEGMENT_TREE_HPP
 
+#include "benchmark_sequence.hpp"
 #include "debug.hpp"
 #include "options.hpp"
 #include "rbtree.hpp"
@@ -22,8 +23,8 @@ class DynamicSegmentTree;
 
 namespace dyn_segtree_internal {
 
-/* Interface for when modification sequences should be stored for benchmarking
- * purposes */
+/* Interface for when modification sequences of the underlying BST should be
+ * stored for benchmarking purposes */
 template <class InnerNode, class KeyT_in>
 class InnerSequenceInterface {
 public:
@@ -41,7 +42,7 @@ public:
 		return query;
 	}
 
-	static KeyT_in
+	KeyT_in
 	get_key(const std::pair<KeyT_in, bool> & query) noexcept
 	{
 		return std::get<0>(query);
@@ -1360,6 +1361,13 @@ private:
 
 	void dbg_verify_all_points() const;
 	void dbg_verify_start_end() const;
+
+#ifdef YGG_STORE_SEQUENCE_DST
+	mutable typename ::ygg::utilities::BenchmarkSequenceStorage<
+	    std::pair<typename Node::KeyT, typename Node::KeyT>, typename Node::KeyT,
+	    typename Options::SequenceInterface::ValueT>
+	    bss;
+#endif
 };
 
 } // namespace ygg

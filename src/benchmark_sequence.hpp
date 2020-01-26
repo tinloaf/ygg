@@ -5,13 +5,21 @@
 #include <memory>
 #include <tuple>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 namespace ygg {
 namespace utilities {
 
-template <class KeyT>
+struct NoValue
+{
+};
+
+template <class KeyT, class SearchKeyT = KeyT, class ValueT = NoValue>
 class BenchmarkSequenceStorage {
+private:
+	constexpr static bool has_value = !std::is_same_v<ValueT, NoValue>;
+
 public:
 	enum class Type : char
 	{
@@ -26,11 +34,67 @@ public:
 	struct Entry
 	{
 		Type type;
-		KeyT key;
+		std::variant<KeyT, SearchKeyT> key;
+		ValueT value;
 		const void * id;
 
+		//		template <class Dummy = KeyT>
+		//		Entry(Type type_in, typename std::enable_if_t<!has_value, Dummy>
+		// key_in,
 		Entry(Type type_in, KeyT key_in, const void * id_in)
-		    : type(type_in), key(key_in), id(id_in)
+		    : type(type_in), id(id_in)
+		{
+			switch (type) {
+			case Type::INSERT:
+			case Type::DELETE:
+			case Type::ERASE:
+				this->key =
+				    std::variant<KeyT, SearchKeyT>(std::in_place_index_t<0>{}, key_in);
+				break;
+			case Type::LBOUND:
+			case Type::UBOUND:
+			case Type::SEARCH:
+				this->key =
+				    std::variant<KeyT, SearchKeyT>(std::in_place_index_t<1>{}, key_in);
+				break;
+			}
+		}
+
+		template <class Dummy = ValueT>
+		Entry(Type type_in, KeyT key_in,
+		      std::enable_if_t<has_value, Dummy> value_in, const void * id_in)
+		    : type(type_in), key(key_in), value(value_in), id(id_in)
+		{}
+
+		template <class Dummy = KeyT>
+		Entry(
+		    Type type_in,
+		    std::enable_if_t<!std::is_same_v<Dummy, SearchKeyT>, SearchKeyT> key_in,
+		    const void * id_in)
+		    : type(type_in), id(id_in)
+		{
+			switch (type) {
+			case Type::INSERT:
+			case Type::DELETE:
+			case Type::ERASE:
+				// Called with wrong type of key!
+				throw "Called with wrong type of key";
+				break;
+			case Type::LBOUND:
+			case Type::UBOUND:
+			case Type::SEARCH:
+				this->key =
+				    std::variant<KeyT, SearchKeyT>(std::in_place_index_t<1>{}, key_in);
+				break;
+			}
+		}
+
+		template <class Dummy = ValueT, class KeyDummy = KeyT>
+		Entry(Type type_in,
+		      std::enable_if_t<!std::is_same_v<KeyDummy, SearchKeyT>, SearchKeyT>
+		          key_in,
+		      std::enable_if_t<has_value, Dummy> value_in, const void * id_in)
+		    : type(type_in), key(key_in), value(value_in), id(id_in)
 		{}
 
 		Entry() = default;
@@ -46,6 +110,7 @@ public:
 		bool is_integral;
 		bool is_float;
 		bool is_signed;
+		bool present;
 
 		bool
 		operator!=(const TypeInfo & other)
@@ -54,7 +119,8 @@ public:
 			         (this->key_size == other.key_size) &&
 			         (this->is_integral == other.is_integral) &&
 			         (this->is_float == other.is_float) &&
-			         (this->is_signed == other.is_signed));
+			         (this->is_signed == other.is_signed) &&
+			         (this->present = other.present));
 		}
 	};
 
@@ -72,12 +138,18 @@ public:
 		size_t remaining_in_chunk;
 	};
 
-	void register_insert(const void * id, const KeyT & key);
+	template <class Dummy = KeyT>
+	void register_insert(const void * id,
+	                     const std::enable_if_t<!has_value, Dummy> & key);
+	template <class Dummy = ValueT>
+	void register_insert(const void * id, const KeyT & key,
+	                     const std::enable_if_t<has_value, Dummy> & value);
+
 	void register_delete(const void * id, const KeyT & key);
 	void register_erase(const void * id, const KeyT & key);
-	void register_search(const void * id, const KeyT & key);
-	void register_lbound(const void * id, const KeyT & key);
-	void register_ubound(const void * id, const KeyT & key);
+	void register_search(const void * id, const SearchKeyT & key);
+	void register_lbound(const void * id, const SearchKeyT & key);
+	void register_ubound(const void * id, const SearchKeyT & key);
 
 	BenchmarkSequenceStorage();
 	BenchmarkSequenceStorage(std::string filename_in);

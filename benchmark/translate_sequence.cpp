@@ -47,22 +47,22 @@ main(int argc, char ** argv)
 
 			switch (entry.type) {
 			case BSS::Type::INSERT:
-				writer.register_insert(translated_id, entry.key);
+				writer.register_insert(translated_id, std::get<0>(entry.key));
 				break;
 			case BSS::Type::ERASE:
-				writer.register_erase(translated_id, entry.key);
+				writer.register_erase(translated_id, std::get<0>(entry.key));
 				break;
 			case BSS::Type::DELETE:
-				writer.register_delete(translated_id, entry.key);
+				writer.register_delete(translated_id, std::get<0>(entry.key));
 				break;
 			case BSS::Type::SEARCH:
-				writer.register_search(translated_id, entry.key);
+				writer.register_search(translated_id, std::get<1>(entry.key));
 				break;
 			case BSS::Type::LBOUND:
-				writer.register_lbound(translated_id, entry.key);
+				writer.register_lbound(translated_id, std::get<1>(entry.key));
 				break;
 			case BSS::Type::UBOUND:
-				writer.register_ubound(translated_id, entry.key);
+				writer.register_ubound(translated_id, std::get<1>(entry.key));
 				break;
 			default:
 				break;

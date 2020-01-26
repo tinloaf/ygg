@@ -100,7 +100,7 @@ class ZTreeNodeBase : public bst::BSTNodeBase<Node, Options, Tag> {
 public:
 	// Debugging methods
 	size_t get_depth() const noexcept;
-	size_t dbg_get_rank() const noexcept;
+	auto dbg_get_rank() const noexcept;
 
 protected:
 	/**

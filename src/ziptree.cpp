@@ -175,7 +175,7 @@ ZTreeNodeBase<Node, Options, Tag>::get_depth() const noexcept
 }
 
 template <class Node, class Options, class Tag>
-size_t
+auto
 ZTreeNodeBase<Node, Options, Tag>::dbg_get_rank() const noexcept
 {
 	return decltype(this->_zt_rank)::get_rank(*(static_cast<const Node *>(this)));

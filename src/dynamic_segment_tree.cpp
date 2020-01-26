@@ -773,6 +773,13 @@ void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::insert(Node & n)
 {
+#ifdef YGG_STORE_SEQUENCE_DST
+	this->bss.register_insert(
+	    reinterpret_cast<const void *>(&n),
+	    {NodeTraits::get_lower(n), NodeTraits::get_upper(n)},
+	    Options::SequenceInterface::get_value(n));
+#endif
+
 	// TODO why are we doing this every time? Should be done once in the
 	// constructor!
 	n.NB::start.point = NodeTraits::get_lower(n);
@@ -825,6 +832,11 @@ void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::remove(Node & n)
 {
+#ifdef YGG_STORE_SEQUENCE_DST
+	this->bss.register_delete(
+	    reinterpret_cast<const void *>(&n),
+	    {NodeTraits::get_lower(n), NodeTraits::get_upper(n)});
+#endif
 	//	std::cout << "############### Unapplying interval\n";
 
 	this->unapply_interval(n);
@@ -1111,6 +1123,9 @@ typename Node::AggValueT
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::query(const typename Node::KeyT & x) const noexcept
 {
+#ifdef YGG_STORE_SEQUENCE_DST
+	this->bss.register_search(reinterpret_cast<const void *>(&x), x);
+#endif
 	InnerNode * cur = this->t.get_root();
 	AggValueT agg = AggValueT();
 
@@ -1474,6 +1489,10 @@ typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::lower_bound_event(const KeyT & key) const
 {
+#ifdef YGG_STORE_SEQUENCE_DST
+	this->bss.register_lbound(reinterpret_cast<const void *>(&key), key);
+#endif
+
 	return this->t.lower_bound(key);
 }
 
@@ -1484,6 +1503,9 @@ typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::lower_bound_event(const KeyT & key)
 {
+#ifdef YGG_STORE_SEQUENCE_DST
+	this->bss.register_lbound(reinterpret_cast<const void *>(&key), key);
+#endif
 	return this->t.lower_bound(key);
 }
 
@@ -1494,6 +1516,9 @@ typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::upper_bound_event(const KeyT & key) const
 {
+#ifdef YGG_STORE_SEQUENCE_DST
+	this->bss.register_ubound(reinterpret_cast<const void *>(&key), key);
+#endif
 	return this->t.upper_bound(key);
 }
 
@@ -1504,6 +1529,9 @@ typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::upper_bound_event(const KeyT & key)
 {
+#ifdef YGG_STORE_SEQUENCE_DST
+	this->bss.register_ubound(reinterpret_cast<const void *>(&key), key);
+#endif
 	return this->t.upper_bound(key);
 }
 

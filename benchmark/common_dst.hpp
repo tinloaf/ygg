@@ -456,8 +456,8 @@ public:
 		std::vector<size_t> rank_count(CFG.ziptree_export_ranks, 0);
 
 		for (auto & node : t) {
-			if (node.dbg_get_rank() < CFG.ziptree_export_ranks) {
-				rank_count[node.dbg_get_rank()]++;
+			if (static_cast<size_t>(node.dbg_get_rank()) < CFG.ziptree_export_ranks) {
+				rank_count[static_cast<size_t>(node.dbg_get_rank())]++;
 			}
 		}
 

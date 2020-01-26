@@ -10,8 +10,9 @@
 namespace ygg {
 namespace utilities {
 
-template <class KeyT>
-BenchmarkSequenceStorage<KeyT>::Reader::Reader(std::string filename)
+template <class KeyT, class SearchKeyT, class ValueT>
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::Reader::Reader(
+    std::string filename)
     : infile(filename, std::ios::binary), remaining_in_chunk(0)
 {
 	if (!this->infile.good()) {
@@ -22,45 +23,81 @@ BenchmarkSequenceStorage<KeyT>::Reader::Reader(std::string filename)
 	this->verify_type();
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 void
-BenchmarkSequenceStorage<KeyT>::Reader::verify_type()
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::Reader::verify_type()
 {
-	TypeInfo ti{
-	    1,
-	    sizeof(KeyT),
-	    std::is_integral_v<KeyT>,
-	    std::is_floating_point_v<KeyT>,
-	    std::is_signed_v<KeyT>,
-	};
+	TypeInfo key_ti{2,
+	                sizeof(KeyT),
+	                std::is_integral_v<KeyT>,
+	                std::is_floating_point_v<KeyT>,
+	                std::is_signed_v<KeyT>,
+	                true};
 
 	if (!this->infile.good()) {
 		std::cout << "==== I/O error!\n";
 		exit(-1);
 	}
 
-	TypeInfo read_ti;
-	this->infile.read(reinterpret_cast<char *>(&read_ti), sizeof(read_ti));
+	TypeInfo read_key_ti;
+	this->infile.read(reinterpret_cast<char *>(&read_key_ti),
+	                  sizeof(read_key_ti));
 
-	if (ti != read_ti) {
+	if (key_ti != read_key_ti) {
+		throw WrongTypeException{};
+	}
+
+	TypeInfo search_key_ti{2,
+	                       sizeof(SearchKeyT),
+	                       std::is_integral_v<SearchKeyT>,
+	                       std::is_floating_point_v<SearchKeyT>,
+	                       std::is_signed_v<SearchKeyT>,
+	                       true};
+
+	if (!this->infile.good()) {
+		std::cout << "==== I/O error!\n";
+		exit(-1);
+	}
+
+	TypeInfo read_search_key_ti;
+	this->infile.read(reinterpret_cast<char *>(&read_search_key_ti),
+	                  sizeof(read_search_key_ti));
+
+	if (search_key_ti != read_search_key_ti) {
+		throw WrongTypeException{};
+	}
+
+	TypeInfo value_ti{2,
+	                  sizeof(ValueT),
+	                  std::is_integral_v<ValueT>,
+	                  std::is_floating_point_v<ValueT>,
+	                  std::is_signed_v<ValueT>,
+	                  !std::is_same_v<ValueT, void>};
+
+	TypeInfo read_value_ti;
+	this->infile.read(reinterpret_cast<char *>(&read_value_ti),
+	                  sizeof(read_value_ti));
+
+	if (value_ti != read_value_ti) {
 		throw WrongTypeException{};
 	}
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 void
-BenchmarkSequenceStorage<KeyT>::Reader::reset()
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::Reader::reset()
 {
 
 	this->infile.clear();
 	this->remaining_in_chunk = 0;
 	this->buf.clear();
-	this->infile.seekg(sizeof(TypeInfo), std::ios::beg);
+	this->infile.seekg(3 * sizeof(TypeInfo), std::ios::beg);
 }
 
-template <class KeyT>
-const std::vector<typename BenchmarkSequenceStorage<KeyT>::Entry> &
-BenchmarkSequenceStorage<KeyT>::Reader::get(size_t count)
+template <class KeyT, class SearchKeyT, class ValueT>
+const std::vector<
+    typename BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::Entry> &
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::Reader::get(size_t count)
 {
 	size_t assembled = 0;
 	this->buf.resize(count);
@@ -89,9 +126,10 @@ BenchmarkSequenceStorage<KeyT>::Reader::get(size_t count)
 	return this->buf;
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 bool
-BenchmarkSequenceStorage<KeyT>::file_exists(const std::string & test_file) const
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::file_exists(
+    const std::string & test_file) const
 {
 	if (auto * file = fopen(test_file.c_str(), "r")) {
 		return true;
@@ -101,9 +139,9 @@ BenchmarkSequenceStorage<KeyT>::file_exists(const std::string & test_file) const
 	}
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 std::string
-BenchmarkSequenceStorage<KeyT>::get_filename() const
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::get_filename() const
 {
 	const char * hint = std::getenv("YGG_SEQUENCE_PREFIX");
 	if (hint != nullptr) {
@@ -155,53 +193,73 @@ BenchmarkSequenceStorage<KeyT>::get_filename() const
 	}
 }
 
-template <class KeyT>
-BenchmarkSequenceStorage<KeyT>::BenchmarkSequenceStorage()
+template <class KeyT, class SearchKeyT, class ValueT>
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::BenchmarkSequenceStorage()
     : filename(get_filename()), outfile(filename)
 {
-	this->buf.reserve(BenchmarkSequenceStorage<KeyT>::BUFSIZE);
+	this->buf.reserve(
+	    BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::BUFSIZE);
 
 	std::cout << "Writing tree operations to " << this->filename << std::endl;
 
 	this->write_typeinfo();
 }
 
-template <class KeyT>
-BenchmarkSequenceStorage<KeyT>::BenchmarkSequenceStorage(
+template <class KeyT, class SearchKeyT, class ValueT>
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::BenchmarkSequenceStorage(
     std::string filename_in)
     : filename(filename_in), outfile(filename)
 {
-	this->buf.reserve(BenchmarkSequenceStorage<KeyT>::BUFSIZE);
+	this->buf.reserve(
+	    BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::BUFSIZE);
 
 	std::cout << "Writing tree operations to " << this->filename << std::endl;
 
 	this->write_typeinfo();
 }
 
-template <class KeyT>
-BenchmarkSequenceStorage<KeyT>::~BenchmarkSequenceStorage()
+template <class KeyT, class SearchKeyT, class ValueT>
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::~BenchmarkSequenceStorage()
 {
 	this->sync();
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 void
-BenchmarkSequenceStorage<KeyT>::write_typeinfo()
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::write_typeinfo()
 {
-	TypeInfo ti{
-	    1,
-	    sizeof(KeyT),
-	    std::is_integral_v<KeyT>,
-	    std::is_floating_point_v<KeyT>,
-	    std::is_signed_v<KeyT>,
-	};
+	TypeInfo key_ti{2,
+	                sizeof(KeyT),
+	                std::is_integral_v<KeyT>,
+	                std::is_floating_point_v<KeyT>,
+	                std::is_signed_v<KeyT>,
+	                true};
 
-	this->outfile.write(reinterpret_cast<char const *>(&ti), sizeof(ti));
+	this->outfile.write(reinterpret_cast<char const *>(&key_ti), sizeof(key_ti));
+
+	TypeInfo search_key_ti{2,
+	                       sizeof(SearchKeyT),
+	                       std::is_integral_v<SearchKeyT>,
+	                       std::is_floating_point_v<SearchKeyT>,
+	                       std::is_signed_v<SearchKeyT>,
+	                       true};
+
+	this->outfile.write(reinterpret_cast<char const *>(&search_key_ti),
+	                    sizeof(search_key_ti));
+
+	TypeInfo val_ti{2,
+	                sizeof(ValueT),
+	                std::is_integral_v<ValueT>,
+	                std::is_floating_point_v<ValueT>,
+	                std::is_signed_v<ValueT>,
+	                has_value};
+
+	this->outfile.write(reinterpret_cast<char const *>(&val_ti), sizeof(val_ti));
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 void
-BenchmarkSequenceStorage<KeyT>::sync()
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::sync()
 {
 	// write number of records
 	size_t count = this->buf.size();
@@ -214,10 +272,11 @@ BenchmarkSequenceStorage<KeyT>::sync()
 	this->buf.clear();
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
+template <class Dummy>
 void
-BenchmarkSequenceStorage<KeyT>::register_insert(const void * id,
-                                                const KeyT & key)
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::register_insert(
+    const void * id, const std::enable_if_t<!has_value, Dummy> & key)
 {
 	this->buf.emplace_back(Type::INSERT, key, id);
 	if (this->buf.size() > BUFSIZE) {
@@ -225,10 +284,23 @@ BenchmarkSequenceStorage<KeyT>::register_insert(const void * id,
 	}
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
+template <class Dummy>
 void
-BenchmarkSequenceStorage<KeyT>::register_erase(const void * id,
-                                               const KeyT & key)
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::register_insert(
+    const void * id, const KeyT & key,
+    const std::enable_if_t<has_value, Dummy> & value)
+{
+	this->buf.emplace_back(Type::INSERT, key, value, id);
+	if (this->buf.size() > BUFSIZE) {
+		this->sync();
+	}
+}
+
+template <class KeyT, class SearchKeyT, class ValueT>
+void
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::register_erase(
+    const void * id, const KeyT & key)
 {
 	this->buf.emplace_back(Type::ERASE, key, id);
 	if (this->buf.size() > BUFSIZE) {
@@ -236,10 +308,10 @@ BenchmarkSequenceStorage<KeyT>::register_erase(const void * id,
 	}
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 void
-BenchmarkSequenceStorage<KeyT>::register_search(const void * id,
-                                                const KeyT & key)
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::register_search(
+    const void * id, const SearchKeyT & key)
 {
 	this->buf.emplace_back(Type::SEARCH, key, id);
 	if (this->buf.size() > BUFSIZE) {
@@ -247,10 +319,10 @@ BenchmarkSequenceStorage<KeyT>::register_search(const void * id,
 	}
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 void
-BenchmarkSequenceStorage<KeyT>::register_delete(const void * id,
-                                                const KeyT & key)
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::register_delete(
+    const void * id, const KeyT & key)
 {
 	this->buf.emplace_back(Type::DELETE, key, id);
 	if (this->buf.size() > BUFSIZE) {
@@ -258,10 +330,10 @@ BenchmarkSequenceStorage<KeyT>::register_delete(const void * id,
 	}
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 void
-BenchmarkSequenceStorage<KeyT>::register_ubound(const void * id,
-                                                const KeyT & key)
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::register_ubound(
+    const void * id, const SearchKeyT & key)
 {
 	this->buf.emplace_back(Type::UBOUND, key, id);
 	if (this->buf.size() > BUFSIZE) {
@@ -269,10 +341,10 @@ BenchmarkSequenceStorage<KeyT>::register_ubound(const void * id,
 	}
 }
 
-template <class KeyT>
+template <class KeyT, class SearchKeyT, class ValueT>
 void
-BenchmarkSequenceStorage<KeyT>::register_lbound(const void * id,
-                                                const KeyT & key)
+BenchmarkSequenceStorage<KeyT, SearchKeyT, ValueT>::register_lbound(
+    const void * id, const SearchKeyT & key)
 {
 	this->buf.emplace_back(Type::LBOUND, key, id);
 	if (this->buf.size() > BUFSIZE) {

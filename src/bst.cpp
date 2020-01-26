@@ -733,6 +733,8 @@ typename BinarySearchTree<Node, Options, Tag, Compare,
 BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
     const Comparable & query) const CMP_NOEXCEPT(query)
 {
+	// TODO this should be the other way round! The non-const variant should
+	// utilize the const variant.
 	return const_iterator<false>(
 	    const_cast<std::remove_const_t<decltype(this)>>(this)
 	        ->template find<Comparable, ensure_first>(query));

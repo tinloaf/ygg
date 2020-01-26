@@ -151,12 +151,12 @@ private:
 
 					switch (entry.type) {
 					case BSS::Type::INSERT:
-						n.set_key(entry.key);
+						n.set_key(std::get<0>(entry.key));
 						t.insert(n);
 						insert_count++;
 						break;
 					case BSS::Type::ERASE:
-						t.erase(entry.key);
+						t.erase(std::get<0>(entry.key));
 						erase_count++;
 						break;
 					case BSS::Type::DELETE:
@@ -164,17 +164,17 @@ private:
 						delete_count++;
 						break;
 					case BSS::Type::SEARCH: {
-						auto it = t.find(entry.key);
+						auto it = t.find(std::get<1>(entry.key));
 						asm volatile("" : : "r,m"(it) : "memory");
 						search_count++;
 					} break;
 					case BSS::Type::LBOUND: {
-						auto it = t.lower_bound(entry.key);
+						auto it = t.lower_bound(std::get<1>(entry.key));
 						asm volatile("" : : "r,m"(it) : "memory");
 						bound_count++;
 					} break;
 					case BSS::Type::UBOUND: {
-						auto it = t.upper_bound(entry.key);
+						auto it = t.upper_bound(std::get<1>(entry.key));
 						asm volatile("" : : "r,m"(it) : "memory");
 						bound_count++;
 					} break;

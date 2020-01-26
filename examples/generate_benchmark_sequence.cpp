@@ -9,7 +9,7 @@ class SequenceInterface {
 public:
 	using KeyT = int;
 
-	// We use the template here to resolve the cycling dependency below
+	// We use the template here to resolve the cyclic dependency below
 	template <class Node>
 	static int
 	get_key(const Node & n)
@@ -74,7 +74,6 @@ main(int argc, char ** argv)
 		nodes[i].key = i;
 	}
 
-	
 	// Insert them
 	for (size_t i = 0; i < 5; ++i) {
 		t.insert(nodes[i]);
@@ -85,6 +84,6 @@ main(int argc, char ** argv)
 
 	// Okay, we don't need that Node anymore.
 	t.remove(*it);
-	
+
 	return 0;
 }

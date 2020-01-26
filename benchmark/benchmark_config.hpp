@@ -13,7 +13,7 @@ struct ConfigHolder
 	int64_t seed_start;
 	size_t seed_count;
 
-	int64_t iteration_count;
+	size_t iteration_count;
 
 	size_t ziptree_export_ranks = 0;
 };
