@@ -82,7 +82,7 @@ using InsertZHSDSTInterface =
                   ygg::TreeFlags::ZTREE_RANK_TYPE<std::uint8_t>,
                   ygg::TreeFlags::ZTREE_USE_HASH>;
 using InsertZHSDSTFixture = DSTFixture<InsertZHSDSTInterface, InsertExperiment,
-                                      true, false, false, false>;
+                                       true, false, false, false>;
 BENCHMARK_DEFINE_F(InsertZHSDSTFixture, BM_DST_Insertion)
 (benchmark::State & state)
 {
@@ -128,6 +128,12 @@ BENCHMARK_DEFINE_F(InsertZRDSTFixture, BM_DST_Insertion)
 		c.start();
 		this->papi.start();
 		for (auto & n : this->experiment_nodes) {
+
+			// To also measure the overhead of randomly generating the ranks, we have
+			// to update the ranks here. For hashing-based Zip Trees, the DST does
+			// this automatically in insert().
+			n.benchmark_update_inner_ranks();
+			
 			this->t.insert(n);
 		}
 		this->papi.stop();

@@ -167,8 +167,17 @@ struct UseZipTree
 	struct InnerNodeBaseBuilder
 	{
 		template <class InnerNodeCRTP, class KeyT>
-		using Base =
-		    ZTreeNodeBase<InnerNodeCRTP, Options<InnerNodeCRTP, KeyT>, Tag>;
+		class Base : public ZTreeNodeBase<InnerNodeCRTP,
+		                                  Options<InnerNodeCRTP, KeyT>, Tag> {
+		public:
+			using MyBase = ZTreeNodeBase<InnerNodeCRTP, Options<InnerNodeCRTP, KeyT>,
+			                             Tag>;
+
+			// Export to public, so that we can update ranks
+			void update_rank() noexcept {
+				this->MyBase::update_rank();
+			}
+		};
 	};
 
 	template <class CRTP, class Node, class NodeTraits, class InnerNode,
@@ -953,6 +962,16 @@ public:
 	 * this DynSegTreeNodeBase
 	 */
 	InnerNode end;
+
+	/* Methods to be used for benchmarking purposes only! */
+	template <class Dummy = TreeSelector>
+std::enable_if_t<utilities::is_specialization<Dummy, UseZipTree>{}, void>
+		benchmark_update_inner_ranks() noexcept
+	{
+		this->start.update_rank();
+		this->end.update_rank();
+	}
+
 	/// @endcond
 };
 

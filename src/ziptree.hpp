@@ -16,7 +16,7 @@
 
 namespace ygg {
 
-// Forward
+// Forwards
 template <class Node, class Options = DefaultOptions, class Tag = int>
 class ZTreeNodeBase;
 
@@ -61,6 +61,8 @@ public:
 	template <class URBG>
 	ZTreeRankGenerator(URBG && g);
 	static void update_rank(Node & node) noexcept;
+	template <class URBG>
+	static void update_rank(Node & node, URBG && g) noexcept;
 	static size_t get_rank(const Node & node) noexcept;
 
 private:
@@ -110,6 +112,10 @@ protected:
 	 * set TreeFlags::ZTREE_USE_HASH) *and* to store the nodes' ranks (i.e., set
 	 * TreeFlags::ZTREE_RANK_TYPE), you **must** call this method *before* adding
 	 * the node to your tree, but *after* the node's hash has become valid.
+	 *
+	 * If you use true randomness (i.e., do not set TreeFlags::ZTREE_USE_HASH),
+	 * the ranks of nodes will be set in the constructor. However, you can call
+	 * update_rank() to re-randomize the rank of this node.
 	 *
 	 * @warning Inserting a node into the tree in the aforementioned case before
 	 * calling this method leads to undefined behavior.

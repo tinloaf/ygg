@@ -145,7 +145,33 @@ void
 ZTreeRankGenerator<Node, Options, false, true>::update_rank(
     Node & node) noexcept
 {
-	(void)node;
+	// Re-Randomize!
+	auto rand_val = std::rand();
+	node._zt_rank.rank = 0;
+	while (rand_val == RAND_MAX) {
+		node._zt_rank.rank = static_cast<decltype(node._zt_rank.rank)>(
+		    (node._zt_rank.rank +
+		     static_cast<decltype(node._zt_rank.rank)>(std::log2(RAND_MAX))));
+		rand_val = std::rand();
+	}
+	node._zt_rank.rank = static_cast<decltype(node._zt_rank.rank)>(
+	    __builtin_ffsl(static_cast<long int>(rand_val)));
+}
+
+template <class Node, class Options>
+template <class URBG>
+void
+ZTreeRankGenerator<Node, Options, false, true>::update_rank(Node & node,
+                                                            URBG && g) noexcept
+{
+	// Re-Randomize!
+	auto rand_val = g();
+	node._zt_rank.rank = 0;
+	while (rand_val == g.max()) {
+		node._zt_rank.rank += static_cast<size_t>(std::log2(g.max()));
+		rand_val = g();
+	}
+	node._zt_rank.rank = __builtin_ffsl(static_cast<long int>(rand_val));
 }
 
 template <class Node, class Options>

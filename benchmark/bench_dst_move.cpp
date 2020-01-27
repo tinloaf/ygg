@@ -170,6 +170,12 @@ BENCHMARK_DEFINE_F(MoveZRDSTFixture, BM_DST_Move)(benchmark::State & state)
 			this->fixed_nodes[i].upper = upper;
 			this->fixed_nodes[i].lower = lower;
 			this->fixed_nodes[i].value = value; // TODO don't do this?
+
+			// To also measure the overhead of randomly generating the ranks, we have
+			// to update the ranks here. For hashing-based Zip Trees, the DST does
+			// this automatically in insert().
+			this->fixed_nodes[i].benchmark_update_inner_ranks();
+
 			this->t.insert(this->fixed_nodes[i]);
 		}
 		this->papi.stop();
