@@ -5,7 +5,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 set (CMAKE_CXX_STANDARD 17)
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-         "Valgrind")
+         "Valgrind" "Sanitize")
 
 # Work around Boost bug: https://github.com/boostorg/icl/issues/21
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -51,6 +51,18 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wuseless-cast -Wlogical-op -Wduplicated-branches -Wduplicated-cond")
   endif()
 endif()
+
+#===============================================
+#==== Build type: sanitize
+#===============================================
+
+set(CMAKE_C_FLAGS_SANITIZE "-g -O0 -fno-omit-frame-pointer -Wall -Wextra -pedantic \
+-Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings \
+-Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal \
+-Wswitch-default -fstack-protector -fsanitize=undefined -ftrapv -fno-sanitize-recover \
+-fsanitize=address -fsanitize-undefined-trap-on-error")
+set(CMAKE_CXX_FLAGS_SANITIZE "${CMAKE_C_FLAGS_INSTRUMENT}")
+
 
 #===============================================
 #==== Build type: valgrind
