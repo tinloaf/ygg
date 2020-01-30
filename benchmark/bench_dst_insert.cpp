@@ -133,7 +133,7 @@ BENCHMARK_DEFINE_F(InsertZRDSTFixture, BM_DST_Insertion)
 			// to update the ranks here. For hashing-based Zip Trees, the DST does
 			// this automatically in insert().
 			n.benchmark_update_inner_ranks();
-			
+
 			this->t.insert(n);
 		}
 		this->papi.stop();

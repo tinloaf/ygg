@@ -120,6 +120,7 @@ ENDFOREACH()
 
 add_executable(pathlengths pathlengths.cpp random.cpp)
 add_executable(wbtree_balance wbtree_balance.cpp)
+add_executable(dst_balance dst_balance.cpp)
 add_executable(count_rotations count_rotations.cpp)
 add_executable(translate_sequence translate_sequence.cpp)
 add_executable(sequence sequence.cpp)
