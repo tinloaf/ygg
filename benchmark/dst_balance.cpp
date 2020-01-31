@@ -22,8 +22,10 @@ public:
 	double
 	get_average_depth() const noexcept
 	{
+		// Every DST node contributes two BST nodes, so we have to multiply their
+		// number by two.
 		return static_cast<double>(this->depth_sum) /
-		       static_cast<double>(this->nodes.size());
+		       (static_cast<double>(this->nodes.size()) * 2);
 	}
 
 	size_t
