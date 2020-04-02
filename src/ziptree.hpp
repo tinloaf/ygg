@@ -205,6 +205,13 @@ public:
 	using TB = bst::BinarySearchTree<Node, Options, Tag, Compare>;
 	using MyClass = ZTree<Node, NodeTraits, Options, Tag, Compare, RankGetter>;
 
+	/**********************************************
+	 * Sanity Checks                              *
+	 **********************************************/
+	static_assert(
+	    Options::ztree_store_rank || Options::ztree_use_hash,
+	    "ZipTrees to have either ZTREE_RANK_TYPE or ZTREE_USE_HASH set");
+
 	/**
 	 * @brief Construct a new empty Zip Tree.
 	 */
