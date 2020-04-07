@@ -1,7 +1,3 @@
-//
-// Created by lukas on 26.09.17.
-//
-
 #include "../src/ygg.hpp"
 
 using namespace ygg;

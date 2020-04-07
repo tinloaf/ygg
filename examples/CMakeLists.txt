@@ -5,6 +5,13 @@ set_target_properties(example_rbtree
                       PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
                       )
 
+add_executable (example_dump_to_dot example_dump_to_dot.cpp)
+set_target_properties(example_dump_to_dot
+        PROPERTIES CXX_STANDARD 17)
+set_target_properties(example_dump_to_dot
+                      PROPERTIES COMPILE_FLAGS "-g -O0 -Wall -Wextra -pedantic"
+                      )
+										
 add_executable (example_energy example_energy.cpp)
 set_target_properties(example_energy
         PROPERTIES CXX_STANDARD 17)

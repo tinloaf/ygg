@@ -374,8 +374,8 @@ BinarySearchTree<Node, Options, Tag, Compare,
 		return;
 	}
 
-	out << "  " << std::hex << node << std::dec << "[ "
-	    << " label=\"" << name_getter(node) << "\"]\n";
+	out << "  \"" << std::hex << node << std::dec << "\" ["
+	    << "label=\"" << name_getter(node) << "\"]\n";
 
 	if (node->NB::get_parent() != nullptr) {
 		std::string label;
@@ -385,8 +385,9 @@ BinarySearchTree<Node, Options, Tag, Compare,
 			label = std::string("R");
 		}
 
-		out << "  " << std::hex << node->NB::get_parent() << std::dec << " -> "
-		    << std::hex << node << std::dec << "[ label=\"" << label << "\"]\n";
+		out << "  \"" << std::hex << node->NB::get_parent() << std::dec
+		    << "\" -> \"" << std::hex << node << std::dec << "\" [label=\"" << label
+		    << "\"]\n";
 	}
 
 	this->output_node_base(node->NB::get_left(), out, name_getter);
@@ -396,8 +397,8 @@ BinarySearchTree<Node, Options, Tag, Compare,
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 size_t
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::size() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::size()
+    const noexcept
 {
 	return this->s.get();
 }
@@ -405,8 +406,8 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::size() const
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 bool
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::empty() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::empty()
+    const noexcept
 {
 	return this->root == nullptr;
 }
@@ -482,8 +483,8 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::cbegin() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::cbegin()
+    const noexcept
 {
 	Node * smallest = this->get_smallest();
 	if (smallest == nullptr) { // TODO what the hell?
@@ -497,8 +498,8 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::cend() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::cend()
+    const noexcept
 {
 	return const_iterator<false>(nullptr);
 }
@@ -507,8 +508,8 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::begin() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::begin()
+    const noexcept
 {
 	return this->cbegin();
 }
@@ -531,8 +532,8 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<false>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::end() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::end()
+    const noexcept
 {
 	return this->cend();
 }
@@ -550,8 +551,8 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<true>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::crbegin() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::crbegin()
+    const noexcept
 {
 	Node * largest = this->get_largest();
 	if (largest == nullptr) {
@@ -565,8 +566,8 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<true>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::crend() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::crend()
+    const noexcept
 {
 	return const_iterator<true>(nullptr);
 }
@@ -575,8 +576,8 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<true>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::rbegin() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::rbegin()
+    const noexcept
 {
 	return this->crbegin();
 }
@@ -585,8 +586,8 @@ template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 typename BinarySearchTree<Node, Options, Tag, Compare,
                           ParentContainer>::template const_iterator<true>
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::rend() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::rend()
+    const noexcept
 {
 	return this->crend();
 }
@@ -831,8 +832,8 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::lower_bound(
 template <class Node, class Options, class Tag, class Compare,
           class ParentContainer>
 Node *
-BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_root() const
-    noexcept
+BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::get_root()
+    const noexcept
 {
 	return this->root;
 }
