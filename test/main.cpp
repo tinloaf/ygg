@@ -10,19 +10,6 @@
 #include "test_energy.hpp"
 #include "test_wbtree.hpp"
 
-//#include "test_orderlist.hpp"
-
-/* Note: The "MS" section flags are to remove duplicates.  */
-#define DEFINE_GDB_PY_SCRIPT(script_name)                                      \
-  asm("\
-.pushsection \".debug_gdb_scripts\", \"MS\",@progbits,1\n\
-.byte 1 /* Python */\n\
-.asciz \"" script_name "\"\n\
-.popsection \n\
-");
-
-DEFINE_GDB_PY_SCRIPT("gdbscripts/ygg_printers.py")
-
 int
 main(int argc, char ** argv)
 {

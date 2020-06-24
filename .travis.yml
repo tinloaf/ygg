@@ -94,9 +94,5 @@ jobs:
         
       # Secondary job. Build only, but build everything
       script:
-        - pwd
-        - ls -R
-        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
-        - ls -R
-        - make VERBOSE=1 -j
+        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j
 
