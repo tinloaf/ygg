@@ -24,14 +24,14 @@ public:
 
 	using result_type = size_t;
 
-	constexpr size_t
-	min() const noexcept
+	static constexpr size_t
+	min()
 	{
 		return std::numeric_limits<size_t>::min();
 	}
 
-	constexpr size_t
-	max() const noexcept
+	static constexpr size_t
+	max()
 	{
 		return std::numeric_limits<size_t>::max();
 	}
