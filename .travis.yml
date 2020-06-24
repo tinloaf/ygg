@@ -31,7 +31,7 @@ jobs:
 
       # This is the main job. Build, test, report coverage
       script:
-        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cd test && make -j
+        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Coverage .. && cd test && make -j
         - travis_wait 30 python /usr/bin/gtest_parallel.py -w 2 --print_test_times ./run_tests 
 
       after_success:
@@ -66,22 +66,27 @@ jobs:
     # Secondary job: clang 7 on Mac OS
     - addons:
         homebrew:
-          update: true
           packages:
             - boost
             - cmake
             
       os: osx
+      osx_image: xcode11
       
       # Non-testing job. Install only what's needed to build
       before_install:
         - git clone https://github.com/google/googletest
         - cd googletest
+        - echo "set(CMAKE_CXX_STANDARD 11)" > /tmp/patched_cmake
+        - cat CMakeLists.txt >> /tmp/patched_cmake
+        - cp /tmp/patched_cmake ./CMakeLists.txt
         - mkdir build
         - cd build
         - cmake ..
         - make
         - sudo make install
+        # On the osx image, we need to leave the directory again
+        - cd .. ; cd ..
 
       # Yes, we override this. This is just here so that the job is appropriately named
       compiler:
@@ -89,5 +94,9 @@ jobs:
         
       # Secondary job. Build only, but build everything
       script:
-        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
+        - pwd
+        - ls -R
+        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
+        - ls -R
+        - make VERBOSE=1 -j
 
