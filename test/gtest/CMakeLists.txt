@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.8)
 project(gtest_builder C CXX)
 include(ExternalProject)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 set(GTEST_FORCE_SHARED_CRT ON)
 set(GTEST_DISABLE_PTHREADS OFF)

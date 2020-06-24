@@ -28,8 +28,12 @@ set_target_properties(run_tests
                       PROPERTIES CXX_STANDARD 17
                       )
 
-target_link_libraries (run_tests ${LIBS} ${GTEST_LIBS_DIR}/libgtest.a ${GTEST_LIBS_DIR}/libgtest_main.a
-        ${CMAKE_THREAD_LIBS_INIT} gcov)
+target_link_libraries (run_tests ${LIBS} ${GTEST_LIBS_DIR}/libgtest.a ${GTEST_LIBS_DIR}/libgtest_main.a ${CMAKE_THREAD_LIBS_INIT})
+
+string( TOLOWER "${CMAKE_BUILD_TYPE}" build_type_lower )
+IF(build_type_lower MATCHES "coverage")
+	target_link_libraries (run_tests gcov)
+ENDIF()
 
 # copy gdb pretty printers to build dir
 add_custom_command(TARGET run_tests PRE_BUILD

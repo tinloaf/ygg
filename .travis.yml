@@ -73,21 +73,6 @@ jobs:
       os: osx
       osx_image: xcode11
       
-      # Non-testing job. Install only what's needed to build
-      before_install:
-        - git clone https://github.com/google/googletest
-        - cd googletest
-        - echo "set(CMAKE_CXX_STANDARD 11)" > /tmp/patched_cmake
-        - cat CMakeLists.txt >> /tmp/patched_cmake
-        - cp /tmp/patched_cmake ./CMakeLists.txt
-        - mkdir build
-        - cd build
-        - cmake ..
-        - make
-        - sudo make install
-        # On the osx image, we need to leave the directory again
-        - cd .. ; cd ..
-
       # Yes, we override this. This is just here so that the job is appropriately named
       compiler:
         - clang
