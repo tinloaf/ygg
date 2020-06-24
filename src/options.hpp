@@ -10,6 +10,9 @@
 #include <cstddef>
 #include <limits>
 #include <type_traits>
+#include <string>
+#include <sstream>
+#include <iostream>
 
 namespace ygg {
 //@cond INTERNAL
