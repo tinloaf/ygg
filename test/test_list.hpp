@@ -63,7 +63,7 @@ TEST(ListTest, ComprehensiveTest)
   size_t size = 0;
   for (unsigned int i = 0; i < LIST_TESTSIZE; ++i) {
     delete_me[i].data = 0;
-    nodes[i].data = (int)i;
+    nodes[i].data = static_cast<int>(i);
 
     l.insert(nullptr, &delete_me[i]);
     size++;

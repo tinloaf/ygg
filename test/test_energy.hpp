@@ -116,7 +116,7 @@ TEST(EnergyTreeTest, LinearInsertionTest)
 	Node nodes[ETREE_TESTSIZE];
 
 	for (unsigned int i = 0; i < ETREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 
 		tree.insert(nodes[i]);
 
@@ -156,7 +156,7 @@ TEST(EnergyTreeTest, LinearInsertionLinearDeletionTest)
 	Node nodes[ETREE_TESTSIZE];
 
 	for (unsigned int i = 0; i < ETREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 
 		tree.insert(nodes[i]);
 	}
@@ -179,7 +179,7 @@ TEST(EnergyTreeTest, LinearInsertionRandomDeletionTest)
 	std::vector<unsigned int> indices;
 
 	for (unsigned int i = 0; i < ETREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 
 		tree.insert(nodes[i]);
 		indices.push_back(i);
@@ -208,7 +208,7 @@ TEST(EnergyTreeTest, LinearIterationTest)
 
 	for (unsigned int i = 0; i < ETREE_TESTSIZE; ++i) {
 		for (unsigned j = 0; j < 5; ++j) {
-			nodes[5 * i + j] = Node((int)i);
+			nodes[5 * i + j] = Node(static_cast<int>(i));
 			indices.push_back(5 * i + j);
 		}
 	}
@@ -236,7 +236,7 @@ TEST(EnergyTreeTest, ReverseIterationTest)
 	Node nodes[ETREE_TESTSIZE];
 	std::vector<size_t> indices;
 	for (unsigned int i = 0; i < ETREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 		indices.push_back(i);
 	}
 
@@ -271,7 +271,7 @@ TEST(EnergyTreeTest, ComprehensiveTest)
 
 	for (unsigned int i = 0; i < ETREE_TESTSIZE; ++i) {
 		unsigned int data = 10 * i;
-		persistent_nodes[i] = Node((int)data);
+		persistent_nodes[i] = Node(static_cast<int>(data));
 		indices.push_back(i);
 		values_seen.insert(data);
 	}
@@ -295,7 +295,7 @@ TEST(EnergyTreeTest, ComprehensiveTest)
 			data = uni(rng);
 		}
 
-		transient_nodes[i] = Node((int)data);
+		transient_nodes[i] = Node(static_cast<int>(data));
 
 		values_seen.insert(data);
 	}

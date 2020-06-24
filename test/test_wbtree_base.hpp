@@ -255,7 +255,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionTest)
 	Node nodes[WBTREE_TESTSIZE];
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 
 		tree.insert(nodes[i]);
 
@@ -450,18 +450,18 @@ TEST(__WBT_BASENAME(WBTreeTest), LowerBoundTest)
 	Node nodes[WBTREE_TESTSIZE];
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)(2 * i));
+		nodes[i] = Node(static_cast<int>(2 * i));
 		tree.insert(nodes[i]);
 	}
 
 	ASSERT_TRUE(tree.verify_integrity());
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE - 1; ++i) {
-		Node query_next((int)(2 * i + 1));
+		Node query_next(static_cast<int>(2 * i + 1));
 		auto it_next = tree.lower_bound(query_next);
 		ASSERT_EQ(it_next->data, nodes[i + 1].data);
 
-		Node query((int)(2 * i));
+		Node query(static_cast<int>(2 * i));
 		auto it = tree.lower_bound(query);
 		// We look for "not less"
 		ASSERT_EQ(it->data, nodes[i].data);
@@ -479,18 +479,18 @@ TEST(__WBT_BASENAME(WBTreeTest), UpperBoundTest)
 	Node nodes[WBTREE_TESTSIZE];
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)(2 * i));
+		nodes[i] = Node(static_cast<int>(2 * i));
 		tree.insert(nodes[i]);
 	}
 
 	ASSERT_TRUE(tree.verify_integrity());
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE - 1; ++i) {
-		Node query_next((int)(2 * i + 1));
+		Node query_next(static_cast<int>(2 * i + 1));
 		auto it_next = tree.upper_bound(query_next);
 		ASSERT_EQ(it_next->data, nodes[i + 1].data);
 
-		Node query((int)(2 * i));
+		Node query(static_cast<int>(2 * i));
 		auto it = tree.upper_bound(query);
 		// We look for "truly greater"
 		ASSERT_EQ(it->data, nodes[i + 1].data);
@@ -611,7 +611,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionLinearDeletionTest)
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
 		//		std::cout << "Inserting " << i<< "\n";
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 
 		tree.insert(nodes[i]);
 		ASSERT_EQ(tree.size(), i + 1);
@@ -647,7 +647,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionRandomDeletionTest)
 	std::vector<unsigned int> indices;
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 
 		tree.insert(nodes[i]);
 		indices.push_back(i);
@@ -752,7 +752,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearInsertionRandomOptimisticErasureTest)
 	std::vector<unsigned int> indices;
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 
 		tree.insert(nodes[i]);
 		indices.push_back(i);
@@ -782,7 +782,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearMultipleIterationTest)
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
 		for (unsigned j = 0; j < 5; ++j) {
-			nodes[5 * i + j] = MultiNode((int)i);
+			nodes[5 * i + j] = MultiNode(static_cast<int>(i));
 			indices.push_back(5 * i + j);
 		}
 	}
@@ -813,7 +813,7 @@ TEST(__WBT_BASENAME(WBTreeTest), LinearIterationTest)
 	Node nodes[WBTREE_TESTSIZE];
 	std::vector<size_t> indices;
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 		indices.push_back(i);
 	}
 
@@ -840,7 +840,7 @@ TEST(__WBT_BASENAME(WBTreeTest), ReverseIterationTest)
 	Node nodes[WBTREE_TESTSIZE];
 	std::vector<size_t> indices;
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i);
+		nodes[i] = Node(static_cast<int>(i));
 		indices.push_back(i);
 	}
 
@@ -870,20 +870,20 @@ TEST(__WBT_BASENAME(WBTreeTest), FindTest)
 	Node nodes[WBTREE_TESTSIZE];
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)(2 * i));
+		nodes[i] = Node(static_cast<int>(2 * i));
 		tree.insert(nodes[i]);
 	}
 
 	// Nonexisting
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		Node findme((int)(2 * i + 1));
+		Node findme(static_cast<int>(2 * i + 1));
 		auto it = tree.find(findme);
 		ASSERT_EQ(it, tree.end());
 	}
 
 	// Existing
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
-		Node findme((int)(2 * i));
+		Node findme(static_cast<int>(2 * i));
 		auto it = tree.find(findme);
 		ASSERT_EQ(&(*it), &(nodes[i]));
 	}
@@ -901,7 +901,7 @@ TEST(__WBT_BASENAME(WBTreeTest), ComprehensiveTest)
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
 		unsigned int data = 10 * i;
-		persistent_nodes[i] = Node((int)data);
+		persistent_nodes[i] = Node(static_cast<int>(data));
 		indices.push_back(i);
 		values_seen.insert(data);
 	}
@@ -925,7 +925,7 @@ TEST(__WBT_BASENAME(WBTreeTest), ComprehensiveTest)
 			data = uni(rng);
 		}
 
-		transient_nodes[i] = Node((int)data);
+		transient_nodes[i] = Node(static_cast<int>(data));
 
 		values_seen.insert(data);
 	}
@@ -978,7 +978,7 @@ TEST(__WBT_BASENAME(WBTreeTest), ComprehensiveMultipleTest)
 
 	for (unsigned int i = 0; i < WBTREE_TESTSIZE; ++i) {
 		unsigned int data = 10 * i;
-		persistent_nodes[i] = MultiNode((int)data);
+		persistent_nodes[i] = MultiNode(static_cast<int>(data));
 		indices.push_back(i);
 	}
 
@@ -999,7 +999,7 @@ TEST(__WBT_BASENAME(WBTreeTest), ComprehensiveMultipleTest)
 		                                                10 * (WBTREE_TESTSIZE + 1));
 		unsigned int data = uni(rng);
 
-		transient_nodes[i] = MultiNode((int)data);
+		transient_nodes[i] = MultiNode(static_cast<int>(data));
 		// std::cout << "Inserting random value: " << data << "\n";
 	}
 

@@ -101,8 +101,8 @@ TEST(IMapTest, SegmentMergingTest)
   IMap m;
 
   for (unsigned int i = 0; i < IMAP_TESTSIZE; ++i) {
-    nodes[i].lower = (int)i;
-    nodes[i].upper = (int)i + 1;
+	  nodes[i].lower = static_cast<int>(i);
+	  nodes[i].upper = static_cast<int>(i) + 1;
     nodes[i].value = 42;
   }
 
@@ -181,16 +181,16 @@ TEST(IMapTest, BasedSegmentMergingTest)
   base_right.value = 3000;
 
   for (unsigned int i = 0; i < IMAP_TESTSIZE; ++i) {
-    nodes_small[i].lower = (int)i;
-    nodes_small[i].upper = (int)i + 1;
+    nodes_small[i].lower = static_cast<int>(i);
+    nodes_small[i].upper = static_cast<int>(i) + 1;
     nodes_small[i].value = 23;
 
-    nodes_large[i].lower = (int)i;
-    nodes_large[i].upper = (int)i + 1;
+    nodes_large[i].lower = static_cast<int>(i);
+    nodes_large[i].upper = static_cast<int>(i) + 1;
     nodes_large[i].value = 42;
 
-    nodes_long[i].lower = (int)i;
-    nodes_long[i].upper = (int)i + 10;
+    nodes_long[i].lower = static_cast<int>(i);
+    nodes_long[i].upper = static_cast<int>(i) + 10;
     nodes_long[i].value = 1;
 
     insert_me.push_back(&nodes_small[i]);
@@ -253,8 +253,8 @@ TEST(IMapTest, GappedInsertionTest)
   std::vector<Node> nodes(IMAP_TESTSIZE);
 
   for (unsigned int i = 0; i < IMAP_TESTSIZE; ++i) {
-    nodes[i].lower = (int)(3 * i);
-    nodes[i].upper = (int)(3 * i + 1);
+    nodes[i].lower = static_cast<int>(3 * i);
+    nodes[i].upper = static_cast<int>(3 * i + 1);
     nodes[i].value = 42;
   }
 
@@ -293,8 +293,8 @@ TEST(IMapTest, NestedInsertionTest)
   std::vector<Node> nodes(IMAP_TESTSIZE);
 
   for (unsigned int i = 0; i < IMAP_TESTSIZE; ++i) {
-    nodes[i].lower = (int)i;
-    nodes[i].upper = (int)((2 * IMAP_TESTSIZE) - i - 1);
+    nodes[i].lower = static_cast<int>(i);
+    nodes[i].upper = static_cast<int>((2 * IMAP_TESTSIZE) - i - 1);
     nodes[i].value = 1;
   }
 
@@ -327,9 +327,9 @@ TEST(IMapTest, MultipleNestedInsertionTest)
 
   for (unsigned int i = 0; i < IMAP_TESTSIZE; ++i) {
     for (unsigned int j = 0; j < IMAP_MULTIPLICITY; ++j) {
-      nodes[i * IMAP_MULTIPLICITY + j].lower = (int)i;
+      nodes[i * IMAP_MULTIPLICITY + j].lower = static_cast<int>(i);
       nodes[i * IMAP_MULTIPLICITY + j].upper =
-          (int)((2 * IMAP_TESTSIZE) - i - 1);
+          static_cast<int>((2 * IMAP_TESTSIZE) - i - 1);
       nodes[i * IMAP_MULTIPLICITY + j].value = 1;
     }
   }

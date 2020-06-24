@@ -42,7 +42,7 @@ public:
 	{
 		return std::get<1>(i);
 	}
-	
+
 	static std::string
 	get_id(const Node * node)
 	{
@@ -81,9 +81,9 @@ TEST(ITreeTest, CatchBug3)
 	auto t = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
 	ITNode nodes[5];
 	for (std::uint64_t i = 0; i < 5; i++) {
-		nodes[i].lower = (unsigned int)i;
-		nodes[i].upper = (unsigned int)i + 5;
-		nodes[i].data = (int)i;
+		nodes[i].lower = static_cast<unsigned int>(i);
+		nodes[i].upper = static_cast<unsigned int>(i) + 5;
+		nodes[i].data = static_cast<int>(i);
 		t.insert(nodes[i]);
 	}
 
@@ -112,7 +112,7 @@ TEST(ITreeTest, RandomInsertionTest)
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + bounds_distr(rng);
 
-		nodes[i] = ITNode(lower, upper, (int)i);
+		nodes[i] = ITNode(lower, upper, static_cast<int>(i));
 
 		std::string fname = std::string("/tmp/trees/before-") + std::to_string(i) +
 		                    std::string(".dot");
@@ -142,7 +142,7 @@ TEST(ITreeTest, RandomInsertionRandomDeletionTest)
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + bounds_distr(rng);
 
-		nodes[i] = ITNode(lower, upper, (int)i);
+		nodes[i] = ITNode(lower, upper, static_cast<int>(i));
 
 		tree.insert(nodes[i]);
 		indices.push_back(i);
@@ -308,7 +308,7 @@ TEST(ITreeTest, ComprehensiveTest)
 		unsigned int lower = 10 * i;
 		unsigned int upper = lower + 50;
 
-		persistent_nodes[i] = ITNode(lower, upper, (int)i);
+		persistent_nodes[i] = ITNode(lower, upper, static_cast<int>(i));
 		indices.push_back(i);
 	}
 
@@ -328,7 +328,8 @@ TEST(ITreeTest, ComprehensiveTest)
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + bounds_distr(rng);
 
-		transient_nodes[i] = ITNode(lower, upper, (int)(IT_TESTSIZE + i));
+		transient_nodes[i] =
+		    ITNode(lower, upper, static_cast<int>(IT_TESTSIZE + i));
 	}
 
 	std::shuffle(indices.begin(), indices.end(),
@@ -351,7 +352,7 @@ TEST(ITreeTest, ComprehensiveTest)
 
 	// Query prefixes
 	for (int i = 0; i < IT_TESTSIZE; ++i) {
-		ITNode query(0, (unsigned int)((i + 1) * 10) - 1, 0);
+		ITNode query(0, static_cast<unsigned int>((i + 1) * 10) - 1, 0);
 		auto container = tree.query(query);
 		auto it = container.begin();
 
@@ -380,7 +381,7 @@ TEST(ITreeTest, RandomEqualInsertionRandomDeletionTest)
 		unsigned int upper = lower + bounds_distr(rng);
 
 		for (unsigned int j = 0; j < 5; ++j) {
-			nodes[5 * i + j] = ITNode(lower, upper, (int)(5 * i + j));
+			nodes[5 * i + j] = ITNode(lower, upper, static_cast<int>(5 * i + j));
 			tree.insert(nodes[5 * i + j]);
 			indices.push_back(5 * i + j);
 		}

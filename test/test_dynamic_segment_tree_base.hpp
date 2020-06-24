@@ -162,8 +162,8 @@ TEST(__DST_BASENAME(DynSegTreeTest), NestingTest)
 {
 	__DST_BASENAME(Node) n[DYNSEGTREE_TESTSIZE];
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-		n[i].lower = (int)i;
-		n[i].upper = (int)(2 * DYNSEGTREE_TESTSIZE - i + 1);
+		n[i].lower = static_cast<int>(i);
+		n[i].upper = static_cast<int>(2 * DYNSEGTREE_TESTSIZE - i + 1);
 		n[i].value = 1;
 	}
 
@@ -174,7 +174,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), NestingTest)
 	}
 
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-		auto val = agg.query((int)i);
+		auto val = agg.query(static_cast<int>(i));
 		ASSERT_EQ(val, i + 1);
 	}
 
@@ -183,7 +183,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), NestingTest)
 
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
 		int combined_range =
-		    agg.get_combined<MCombiner>(0, (int)(i + 1), true, false);
+		    agg.get_combined<MCombiner>(0, static_cast<int>(i + 1), true, false);
 		ASSERT_EQ(combined_range, i + 1);
 	}
 
@@ -206,8 +206,8 @@ TEST(__DST_BASENAME(DynSegTreeTest), OverlappingTest)
 {
 	__DST_BASENAME(Node) n[DYNSEGTREE_TESTSIZE];
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-		n[i].lower = (int)i;
-		n[i].upper = (int)(DYNSEGTREE_TESTSIZE + i);
+		n[i].lower = static_cast<int>(i);
+		n[i].upper = static_cast<int>(DYNSEGTREE_TESTSIZE + i);
 		n[i].value = 1;
 	}
 
@@ -221,11 +221,11 @@ TEST(__DST_BASENAME(DynSegTreeTest), OverlappingTest)
 	ASSERT_EQ(combined, DYNSEGTREE_TESTSIZE);
 
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-		auto val = agg.query((int)i);
+		auto val = agg.query(static_cast<int>(i));
 		ASSERT_EQ(val, i + 1);
 	}
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-		auto val = agg.query((int)(i + DYNSEGTREE_TESTSIZE));
+		auto val = agg.query(static_cast<int>(i + DYNSEGTREE_TESTSIZE));
 		ASSERT_EQ(val, DYNSEGTREE_TESTSIZE - i - 1);
 	}
 }
@@ -234,8 +234,8 @@ TEST(__DST_BASENAME(DynSegTreeTest), DeletionTest)
 {
 	__DST_BASENAME(Node) n[DYNSEGTREE_DELETION_TESTSIZE];
 	for (unsigned int i = 0; i < DYNSEGTREE_DELETION_TESTSIZE; ++i) {
-		n[i].lower = (int)i;
-		n[i].upper = (int)(DYNSEGTREE_DELETION_TESTSIZE + i);
+		n[i].lower = static_cast<int>(i);
+		n[i].upper = static_cast<int>(DYNSEGTREE_DELETION_TESTSIZE + i);
 		n[i].value = 1;
 	}
 
@@ -253,12 +253,13 @@ TEST(__DST_BASENAME(DynSegTreeTest), DeletionTest)
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + bounds_distr(rng) + 1;
 
-		__DST_BASENAME(Node) deleteme((int)lower, (int)upper, 42);
+		__DST_BASENAME(Node)
+		deleteme(static_cast<int>(lower), static_cast<int>(upper), 42);
 
 		agg.insert(deleteme);
 
 		for (unsigned int i = 0; i < DYNSEGTREE_DELETION_TESTSIZE; ++i) {
-			auto val = agg.query((int)i);
+			auto val = agg.query(static_cast<int>(i));
 
 			if ((i >= lower) && (i < upper)) {
 				ASSERT_EQ(val, i + 1 + 42);
@@ -267,7 +268,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), DeletionTest)
 			}
 		}
 		for (unsigned int i = 0; i < DYNSEGTREE_DELETION_TESTSIZE; ++i) {
-			auto val = agg.query((int)(i + DYNSEGTREE_DELETION_TESTSIZE));
+			auto val = agg.query(static_cast<int>(i + DYNSEGTREE_DELETION_TESTSIZE));
 			if ((i + DYNSEGTREE_DELETION_TESTSIZE >= lower) &&
 			    (i + DYNSEGTREE_DELETION_TESTSIZE < upper)) {
 				ASSERT_EQ(val, DYNSEGTREE_DELETION_TESTSIZE - i - 1 + 42);
@@ -280,11 +281,11 @@ TEST(__DST_BASENAME(DynSegTreeTest), DeletionTest)
 		agg.dbg_verify_max_combiner<MCombiner>();
 
 		for (unsigned int i = 0; i < DYNSEGTREE_DELETION_TESTSIZE; ++i) {
-			auto val = agg.query((int)i);
+			auto val = agg.query(static_cast<int>(i));
 			ASSERT_EQ(val, i + 1);
 		}
 		for (unsigned int i = 0; i < DYNSEGTREE_DELETION_TESTSIZE; ++i) {
-			auto val = agg.query((int)(i + DYNSEGTREE_DELETION_TESTSIZE));
+			auto val = agg.query(static_cast<int>(i + DYNSEGTREE_DELETION_TESTSIZE));
 			ASSERT_EQ(val, DYNSEGTREE_DELETION_TESTSIZE - i - 1);
 		}
 
@@ -297,15 +298,15 @@ TEST(__DST_BASENAME(DynSegTreeTest), NestingInsertionOverlappingDeletionTest)
 {
 	__DST_BASENAME(Node) n[DYNSEGTREE_TESTSIZE];
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-		n[i].lower = 10 * (int)i;
-		n[i].upper = 10 * (int)(2 * DYNSEGTREE_TESTSIZE - i + 1);
+		n[i].lower = 10 * static_cast<int>(i);
+		n[i].upper = 10 * static_cast<int>(2 * DYNSEGTREE_TESTSIZE - i + 1);
 		n[i].value = 1;
 	}
 
 	__DST_BASENAME(Node) transient[DYNSEGTREE_TESTSIZE];
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-		transient[i].lower = 10 * (int)i;
-		transient[i].upper = 10 * (int)(DYNSEGTREE_TESTSIZE + i);
+		transient[i].lower = 10 * static_cast<int>(i);
+		transient[i].upper = 10 * static_cast<int>(DYNSEGTREE_TESTSIZE + i);
 		transient[i].value = 10;
 	}
 
@@ -317,7 +318,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), NestingInsertionOverlappingDeletionTest)
 		agg.dbg_verify();
 	}
 
-	auto val = agg.query((int)0);
+	auto val = agg.query(static_cast<int>(0));
 	ASSERT_EQ(val, 11);
 
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
@@ -326,7 +327,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), NestingInsertionOverlappingDeletionTest)
 	}
 
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-		val = agg.query((int)(10 * i));
+		val = agg.query(static_cast<int>(10 * i));
 		ASSERT_EQ(val, i + 1);
 	}
 }
@@ -396,7 +397,8 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
-		persistent_nodes[i] = __DST_BASENAME(Node)((int)lower, (int)upper, (int)i);
+		persistent_nodes[i] = __DST_BASENAME(Node)(
+		    static_cast<int>(lower), static_cast<int>(upper), static_cast<int>(i));
 		indices.push_back(i);
 
 		/*		std::cout << "Persistent: " << lower << " -> " << upper << ": " << i
@@ -411,7 +413,8 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
 		transient_nodes[i] = __DST_BASENAME(Node)(
-		    (int)lower, (int)upper, (int)(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
+		    static_cast<int>(lower), static_cast<int>(upper),
+		    static_cast<int>(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
 	}
 
 	std::shuffle(indices.begin(), indices.end(),
@@ -470,7 +473,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveTest)
 			      << "\n";*/
 
 			for (int i = lower; i < upper; ++i) {
-				int result = agg.query((int)i);
+				int result = agg.query(static_cast<int>(i));
 				// std::cout << "Query at " << i << "\n";
 				ASSERT_EQ(val, result);
 				maxval = std::max(result, maxval);
@@ -521,7 +524,8 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveCombinerTest)
 		unsigned int lower = bounds_distr(rng);
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
-		persistent_nodes[i] = __DST_BASENAME(Node)((int)lower, (int)upper, (int)i);
+		persistent_nodes[i] =
+			__DST_BASENAME(Node)(static_cast<int>(lower), static_cast<int>(upper), static_cast<int>(i));
 		indices.push_back(i);
 	}
 
@@ -533,7 +537,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), ComprehensiveCombinerTest)
 		unsigned int upper = lower + 1 + bounds_distr(rng);
 
 		transient_nodes[i] = __DST_BASENAME(Node)(
-		    (int)lower, (int)upper, (int)(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
+		                                          static_cast<int>(lower), static_cast<int>(upper), static_cast<int>(DYNSEGTREE_COMPREHENSIVE_TESTSIZE + i));
 	}
 
 	std::shuffle(indices.begin(), indices.end(),
@@ -752,8 +756,8 @@ TEST(__DST_BASENAME(RangedMaxCombinerTest), NestingTest)
 {
 	__DST_BASENAME(Node) n[DYNSEGTREE_TESTSIZE];
 	for (unsigned int i = 0; i < DYNSEGTREE_TESTSIZE; ++i) {
-		n[i].lower = (int)i;
-		n[i].upper = (int)(2 * DYNSEGTREE_TESTSIZE - i + 1);
+		n[i].lower = static_cast<int>(i);
+		n[i].upper = static_cast<int>(2 * DYNSEGTREE_TESTSIZE - i + 1);
 		n[i].value = 1;
 	}
 
@@ -777,16 +781,17 @@ TEST(__DST_BASENAME(RangedMaxCombinerTest), NestingTest)
 	ASSERT_EQ(combiner.get_right_border(),
 	          2 * DYNSEGTREE_TESTSIZE - (DYNSEGTREE_TESTSIZE - 1) + 1);
 
-	for (unsigned int i = 0; i < (unsigned int)DYNSEGTREE_TESTSIZE - 1u; ++i) {
-		combiner = agg.get_combiner<RMCombiner>((int)i, (int)(i + 1), true, false);
+	for (unsigned int i = 0; i < static_cast<unsigned int>(DYNSEGTREE_TESTSIZE) - 1u; ++i) {
+		combiner = agg.get_combiner<RMCombiner>(static_cast<int>(i), static_cast<int>(i + 1),
+		                                        true, false);
 		ASSERT_EQ(combiner.get(), i + 1);
 		ASSERT_EQ(combiner.get_left_border(), i);
 		ASSERT_EQ(combiner.get_right_border(), i + 1);
 
-		combiner = agg.get_combiner<RMCombiner>(0, (int)(i + 1), true, true);
+		combiner = agg.get_combiner<RMCombiner>(0, static_cast<int>(i + 1), true, true);
 		ASSERT_EQ(combiner.get(), i + 2);
 		ASSERT_EQ(combiner.get_left_border(), i + 1);
-		ASSERT_TRUE(combiner.get_right_border() >= (int)(i + 1));
+		ASSERT_TRUE(combiner.get_right_border() >= static_cast<int>(i + 1));
 	}
 }
 

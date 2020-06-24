@@ -217,7 +217,7 @@ TEST(MultiRBTreeTest, LinearInsertionTest)
 	Node nodes[TESTSIZE];
 
 	for (unsigned int i = 0; i < TESTSIZE; ++i) {
-		nodes[i] = Node((int)i, (int)i);
+		nodes[i] = Node(static_cast<int>(i), static_cast<int>(i));
 
 		ta.insert(nodes[i]);
 		tb.insert(nodes[i]);
@@ -239,7 +239,7 @@ TEST(MultiRBTreeTest, LinearIterationTest)
 
 	std::vector<size_t> indices;
 	for (unsigned int i = 0; i < TESTSIZE; ++i) {
-		nodes[i] = Node((int)i, (int)(TESTSIZE - i));
+		nodes[i] = Node(static_cast<int>(i), static_cast<int>(TESTSIZE - i));
 		indices.push_back(i);
 	}
 

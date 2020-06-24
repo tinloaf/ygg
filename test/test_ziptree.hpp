@@ -75,7 +75,7 @@ public:
 	static size_t
 	get_rank(const NodeBase<AddOpt> & n)
 	{
-		return (size_t)n.get_rank();
+		return static_cast<size_t>(n.get_rank());
 	}
 };
 
@@ -170,8 +170,8 @@ template <class AddOpt>
 struct hash<ygg::testing::ziptree::HashRankNodeBase<AddOpt>>
 {
 	size_t
-	operator()(const ygg::testing::ziptree::HashRankNodeBase<AddOpt> & n) const
-	    noexcept
+	operator()(
+	    const ygg::testing::ziptree::HashRankNodeBase<AddOpt> & n) const noexcept
 	{
 		return hash<int>{}(n.get_data());
 	}
@@ -346,8 +346,8 @@ TEST(ZipTreeTest, InsertionAndIterationTest)
 	std::vector<size_t> indices;
 
 	for (size_t i = 0; i < ZIPTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i, (int)i);
-		inodes[i].set_from(HashRankNode((int)i));
+		nodes[i] = Node(static_cast<int>(i), static_cast<int>(i));
+		inodes[i].set_from(HashRankNode(static_cast<int>(i)));
 
 		indices.push_back(i);
 	}
@@ -388,8 +388,8 @@ TEST(ZipTreeTest, InsertionAndDeletionTest)
 	std::vector<size_t> remove_indices;
 
 	for (size_t i = 0; i < ZIPTREE_TESTSIZE; ++i) {
-		nodes[i] = Node((int)i, (int)i);
-		inodes[i].set_from(HashRankNode((int)i));
+		nodes[i] = Node(static_cast<int>(i), static_cast<int>(i));
+		inodes[i].set_from(HashRankNode(static_cast<int>(i)));
 
 		indices.push_back(i);
 		remove_indices.push_back(i);
@@ -524,8 +524,8 @@ TEST(ZipTreeTest, ComprehensiveTest)
 
 	for (unsigned int i = 0; i < ZIPTREE_TESTSIZE; ++i) {
 		unsigned int data = 10 * i;
-		persistent_nodes[i] = Node((int)data, (int)data);
-		ipersistent_nodes[i].set_from(HashRankNode((int)data));
+		persistent_nodes[i] = Node(static_cast<int>(data), static_cast<int>(data));
+		ipersistent_nodes[i].set_from(HashRankNode(static_cast<int>(data)));
 
 		indices.push_back(i);
 		values_seen.insert(data);
@@ -554,8 +554,8 @@ TEST(ZipTreeTest, ComprehensiveTest)
 			data = uni(rng);
 		}
 
-		transient_nodes[i] = Node((int)data, (int)data);
-		itransient_nodes[i].set_from(HashRankNode((int)data));
+		transient_nodes[i] = Node(static_cast<int>(data), static_cast<int>(data));
+		itransient_nodes[i].set_from(HashRankNode(static_cast<int>(data)));
 
 		values_seen.insert(data);
 	}
@@ -571,7 +571,7 @@ TEST(ZipTreeTest, ComprehensiveTest)
 	tree.dbg_verify();
 	itree.dbg_verify();
 
-	for (int i = 0; i < (int)ZIPTREE_TESTSIZE; ++i) {
+	for (int i = 0; i < static_cast<int>(ZIPTREE_TESTSIZE); ++i) {
 		tree.remove(transient_nodes[i]);
 		itree.remove(itransient_nodes[i]);
 
@@ -580,7 +580,7 @@ TEST(ZipTreeTest, ComprehensiveTest)
 	}
 
 	// Query elements
-	for (int i = 0; i < (int)ZIPTREE_TESTSIZE; ++i) {
+	for (int i = 0; i < static_cast<int>(ZIPTREE_TESTSIZE); ++i) {
 		auto it = tree.find(persistent_nodes[i]);
 		assert(&(*it) == &(persistent_nodes[i]));
 		ASSERT_EQ(&(*it), &(persistent_nodes[i]));
