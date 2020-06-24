@@ -33,7 +33,7 @@ before_install:
 
 # Travis' clang is broken and fails to find the gold linker. Use the freshly installed one.
 install:
-    - if [ "$CXX" = "clang++" ]; then export CXX="/usr/bin/clang++7" CC="/usr/bin/clang-7"; fi
+    - if [ "$CXX" = "clang++" ]; then export CXX="/usr/bin/clang++-7" CC="/usr/bin/clang-7"; fi
 
 language: cpp
 
@@ -47,5 +47,4 @@ script:
 
 
 after_success:
-  - ls -R
-  - cd CMakeFiles/run_tests.dir && coveralls --exclude /usr --gcov-options '\-lp'
+  - if [ "${CXX}" = "g++" ]; then cd CMakeFiles/run_tests.dir && coveralls --exclude /usr --gcov-options '\-lp' ; fi
