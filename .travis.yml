@@ -4,19 +4,16 @@ addons:
 #            - llvm-toolchain-precise
             - ubuntu-toolchain-r-test
         packages:
-#            - clang-3.7
-            - g++-7
-            - gcc-7
+            - clang-7
+            - llvm-7-dev
+            - g++-5
+            - gcc-5
             - libboost-all-dev
             - libgtest-dev
 
 
-# before_install:
-#     - eval "${MATRIX_EVAL}"
-
-sudo: required
-dist: xenial
-#group: deprecated-2017Q4
+os: linux
+dist: bionic
 
 before_install:
   - sudo pip install cmake
@@ -24,29 +21,29 @@ before_install:
   - sudo mkdir gtest-parallel
   - sudo unzip -j -d gtest-parallel gtest-parallel.zip
   - sudo cp gtest-parallel/gtest_parallel.py /usr/bin/gtest_parallel.py
-  - sudo wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz
-  - sudo tar xf release-1.7.0.tar.gz
-  - cd googletest-release-1.7.0
-  - sudo cmake -DBUILD_SHARED_LIBS=ON .
-  - sudo make -j
-  - sudo cp -a include/gtest /usr/include
-  - sudo cp -a libgtest_main.so libgtest.so /usr/lib/
+  # - sudo wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz
+  # - sudo tar xf release-1.7.0.tar.gz
+  # - cd googletest-release-1.7.0
+  # - sudo cmake -DBUILD_SHARED_LIBS=ON .
+  # - sudo make -j
+  # - sudo cp -a include/gtest /usr/include
+  # - sudo cp -a libgtest_main.so libgtest.so /usr/lib/
   - cd "${TRAVIS_BUILD_DIR}"
   - pip install --user cpp-coveralls
 
-install:
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-7" CC="gcc-7"; fi
-    - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
+# install:
+#     - if [ "$CXX" = "g++" ]; then export CXX="g++-7" CC="gcc-7"; fi
+#     - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
 
 language: cpp
 
 compiler:
-#  - clang
+  - clang
   - gcc
 
 script:
   - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cd test && make -j2
-  - travis_wait 30 python /usr/bin/gtest_parallel.py -w 2 --print_test_times ./run_tests
+  - if [ "$CXX" = "g++" ] ; then travis_wait 30 python /usr/bin/gtest_parallel.py -w 2 --print_test_times ./run_tests fi;
 
 
 after_success:
