@@ -22,6 +22,10 @@ jobs:
         - cd "${TRAVIS_BUILD_DIR}"
         - pip install --user cpp-coveralls
 
+      # Yes, we override this. This is just here so that the job is appropriately named
+      compiler:
+        - gcc
+        
       install:
         - export CXX="/usr/bin/g++-7" CC="/usr/bin/gcc-7"
 
@@ -47,6 +51,10 @@ jobs:
       before_install:
         - sudo pip install cmake
 
+      # Yes, we override this. This is just here so that the job is appropriately named
+      compiler:
+        - clang
+        
       # Travis ships a broken clang that does not find gold. Use our custom one.
       install:
         - export CXX="/usr/bin/clang++-7" CC="/usr/bin/clang-7"
@@ -55,56 +63,31 @@ jobs:
       script:
         - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
 
+    # Secondary job: clang 7 on Mac OS
+    - addons:
+        homebrew:
+          update: true
+          packages:
+            - boost
+            - cmake
+            
+      os: osx
+      
+      # Non-testing job. Install only what's needed to build
+      before_install:
+        - git clone https://github.com/google/googletest
+        - cd googletest
+        - mkdir build
+        - cd build
+        - cmake ..
+        - make
+        - sudo make install
+
+      # Yes, we override this. This is just here so that the job is appropriately named
+      compiler:
+        - clang
         
-# after_success:
-#   - if [ "${CXX}" = "g++" ]; then cd CMakeFiles/run_tests.dir && coveralls --exclude /usr --gcov-options '\-lp' ; fi
-        
-# addons:
-#     apt:
-#         sources:
-# #            - llvm-toolchain-precise
-#             - ubuntu-toolchain-r-test
-#         packages:
-#             - clang-7
-#             - llvm-7-dev
-#             - g++-5
-#             - gcc-5
-#             - libboost-all-dev
-#             - libgtest-dev
+      # Secondary job. Build only, but build everything
+      script:
+        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
 
-
-# os: linux
-# dist: bionic
-
-# before_install:
-#   - sudo pip install cmake
-#   - sudo wget https://github.com/google/gtest-parallel/archive/3ca6798e2c2a06708888611bc5147bd1266f97a0.zip -O gtest-parallel.zip
-#   - sudo mkdir gtest-parallel
-#   - sudo unzip -j -d gtest-parallel gtest-parallel.zip
-#   - sudo cp gtest-parallel/gtest_parallel.py /usr/bin/gtest_parallel.py
-#   # - sudo wget https://github.com/google/googletest/archive/release-1.7.0.tar.gz
-#   # - sudo tar xf release-1.7.0.tar.gz
-#   # - cd googletest-release-1.7.0
-#   # - sudo cmake -DBUILD_SHARED_LIBS=ON .
-#   # - sudo make -j
-#   # - sudo cp -a include/gtest /usr/include
-#   # - sudo cp -a libgtest_main.so libgtest.so /usr/lib/
-#   - cd "${TRAVIS_BUILD_DIR}"
-#   - pip install --user cpp-coveralls
-
-# # Travis' clang is broken and fails to find the gold linker. Use the freshly installed one.
-# install:
-#     - if [ "$CXX" = "clang++" ]; then export CXX="/usr/bin/clang++-7" CC="/usr/bin/clang-7"; fi
-
-
-# compiler:
-#   - clang
-#   - gcc
-
-# script:
-#   - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cd test && make -j2
-#   - travis_wait 30 if [ "${CXX}" = "g++" ]; then python /usr/bin/gtest_parallel.py -w 2 --print_test_times ./run_tests ; fi
-
-
-# after_success:
-#   - if [ "${CXX}" = "g++" ]; then cd CMakeFiles/run_tests.dir && coveralls --exclude /usr --gcov-options '\-lp' ; fi
