@@ -187,21 +187,24 @@ main(int argc, char ** argv)
 
 	for (size_t seed = seed_start; seed < seed_start + seed_count; seed++) {
 		for (size_t doubling = 1; doubling <= doublings; doubling++) {
-			size_t size = base_size * std::pow(2, doubling);
+			size_t size = static_cast<size_t>(base_size * std::pow(2, doubling));
 
-			BalanceAnalyzer<RBTTree, RBDSTNode> rbt_analyzer(size, seed);
+			BalanceAnalyzer<RBTTree, RBDSTNode> rbt_analyzer(size,
+			                                                 static_cast<int>(seed));
 			rbt_analyzer.run();
 			out_stream << "rbt," << seed << "," << size << ","
 			           << rbt_analyzer.get_average_depth() << ","
 			           << rbt_analyzer.get_max_depth() << "\n";
 
-			BalanceAnalyzer<ZHTree, ZHDSTNode> zh_analyzer(size, seed);
+			BalanceAnalyzer<ZHTree, ZHDSTNode> zh_analyzer(size,
+			                                               static_cast<int>(seed));
 			zh_analyzer.run();
 			out_stream << "zh," << seed << "," << size << ","
 			           << zh_analyzer.get_average_depth() << ","
 			           << zh_analyzer.get_max_depth() << "\n";
 
-			BalanceAnalyzer<ZRTree, ZRDSTNode> zr_analyzer(size, seed);
+			BalanceAnalyzer<ZRTree, ZRDSTNode> zr_analyzer(size,
+			                                               static_cast<int>(seed));
 			zr_analyzer.run();
 			out_stream << "zr," << seed << "," << size << ","
 			           << zr_analyzer.get_average_depth() << ","

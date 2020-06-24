@@ -30,7 +30,7 @@ public:
 template <class Node, class INB, class NodeTraits>
 class ExtendedNodeTraits : public NodeTraits {
 public:
-	// TODO these can probably made more efficient
+	// TODO these can probably be made more efficient
 	template <class BaseTree>
 	static void leaf_inserted(Node & node, BaseTree & t);
 

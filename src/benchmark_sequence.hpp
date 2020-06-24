@@ -1,6 +1,7 @@
 #ifndef YGG_BENCHMARK_SEQUENCE_HPP
 #define YGG_BENCHMARK_SEQUENCE_HPP
 
+#include <cassert>
 #include <fstream>
 #include <memory>
 #include <tuple>
@@ -57,6 +58,8 @@ public:
 				this->key =
 				    std::variant<KeyT, SearchKeyT>(std::in_place_index_t<1>{}, key_in);
 				break;
+			default:
+				assert(false);
 			}
 		}
 
@@ -86,6 +89,8 @@ public:
 				this->key =
 				    std::variant<KeyT, SearchKeyT>(std::in_place_index_t<1>{}, key_in);
 				break;
+			default:
+				assert(false);
 			}
 		}
 

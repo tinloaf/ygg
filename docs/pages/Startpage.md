@@ -42,6 +42,8 @@ It's a header-only library. (Yes I know, there are .cpp files. I like to keep de
 definition separated, even if everything's actually a header.) Just make sure everything in the 
 src folder is in your include path, and you're set.
 
+Note that Ygg relies heavily on C++17 features. Thus, your compiler must fully support C++17 and must be set to compile using the C++17 standard. I currently test compilation with GCC 7.0, Clang 7 and XCode 11, so those should be fine.
+
 Getting Started
 =============
 

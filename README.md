@@ -22,8 +22,7 @@ suited for you, Ygg may be the answer. Also, I do not know of any other implemen
 See the list of features below for why Ygg is awesome!
 
 If you're not sure whether one of these data structures is the right data structure for your 
-application, check out the datastructure overview in the 
-[Documentation](https://tinloaf.github.io/ygg/).
+application, check out the [datastructure overview](https://tinloaf.github.io/ygg/datastructuresoverview.html) in the [Documentation](https://tinloaf.github.io/ygg/).
 
 **Warning**: This is still in development. Therefore, things could break. Also, the API
 might change. If you found an example where one of the data structures does not behave as 
@@ -40,6 +39,8 @@ Installation
 ============
 
 It's a header-only library. (Yes I know, there are .cpp files. I like to keep declaration and definition separated, even if everything's actually a header.) Just make sure everything in the src folder is in your include path, and you're set.
+
+Note that Ygg relies heavily on C++17 features. Thus, your compiler must fully support C++17 and must be set to compile using the C++17 standard. I currently test compilation with GCC 7.0, Clang 7 and XCode 11, so those should be fine.
 
 Documentation
 =============
