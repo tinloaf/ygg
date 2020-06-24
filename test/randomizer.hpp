@@ -12,43 +12,42 @@ namespace utilities {
 
 class Randomizer {
 public:
-  explicit Randomizer(size_t seed)
-    : rng(seed), distr(0, std::numeric_limits<size_t>::max())
-  {}
-  
-  Randomizer()
-    : rng(), distr(0, std::numeric_limits<size_t>::max())
-  {
-    std::random_device rd;
-    rng = std::mt19937(rd());
-  }
-  
-  using result_type = size_t;
+	explicit Randomizer(size_t seed)
+	    : rng(seed), distr(0, std::numeric_limits<size_t>::max())
+	{}
 
-  size_t
-  min() const noexcept
-  {
-    return std::numeric_limits<size_t>::min();
-  }
+	Randomizer() : rng(), distr(0, std::numeric_limits<size_t>::max())
+	{
+		std::random_device rd;
+		rng = std::mt19937(rd());
+	}
 
-  size_t
-  max() const noexcept
-  {
-    return std::numeric_limits<size_t>::max();
-  }
+	using result_type = size_t;
 
-  size_t
-  operator()()
-  {
-    return this->distr(this->rng);
-  }
+	constexpr size_t
+	min() const noexcept
+	{
+		return std::numeric_limits<size_t>::min();
+	}
+
+	constexpr size_t
+	max() const noexcept
+	{
+		return std::numeric_limits<size_t>::max();
+	}
+
+	size_t
+	operator()()
+	{
+		return this->distr(this->rng);
+	}
 
 private:
-  std::mt19937 rng;
-  std::uniform_int_distribution<size_t> distr;
+	std::mt19937 rng;
+	std::uniform_int_distribution<size_t> distr;
 };
 
-} // namespace util
+} // namespace utilities
 } // namespace testing
 } // namespace ygg
 
