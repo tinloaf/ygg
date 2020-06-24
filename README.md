@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tinloaf/ygg.svg?branch=master)](https://travis-ci.org/tinloaf/ygg)
+[![Build Status](https://travis-ci.org/tinloaf/ygg.svg?branch=master)](https://travis-ci.org/tinloaf/ygg) [![Coverage Status](https://coveralls.io/repos/github/tinloaf/ygg/badge.svg?branch=update-travis)](https://coveralls.io/github/tinloaf/ygg?branch=update-travis)
 
 This is Ygg (short for [Yggdrasil](https://en.wikipedia.org/wiki/Yggdrasil)), a C++17
 implementation of several intrusive data structures:
