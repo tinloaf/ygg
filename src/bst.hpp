@@ -100,18 +100,22 @@ protected:
 	friend InnerNode * utilities::go_left_if(bool cond, InnerNode * parent);
 
 public:
-	void set_parent(Node * new_parent) noexcept;
-	Node * get_parent() const noexcept;
+	[[gnu::always_inline]] inline void set_parent(Node * new_parent) noexcept;
+	[[gnu::always_inline, gnu::pure]] inline Node * get_parent() const noexcept;
 	template <class InnerPC = ParentContainer>
-	std::enable_if_t<InnerPC::parent_reference, Node *&> get_parent() const
-	    noexcept;
 
-	void set_left(Node * new_left) noexcept;
-	void set_right(Node * new_right) noexcept;
-	Node *& get_left() noexcept;
-	Node *& get_right() noexcept;
-	Node * const & get_left() const noexcept;
-	Node * const & get_right() const noexcept;
+	[[gnu::always_inline]] inline std::enable_if_t<InnerPC::parent_reference,
+	                                               Node *&>
+	get_parent() const noexcept;
+
+	[[gnu::always_inline]] inline void set_left(Node * new_left) noexcept;
+	[[gnu::always_inline]] inline void set_right(Node * new_right) noexcept;
+	[[gnu::always_inline, gnu::pure]] inline Node *& get_left() noexcept;
+	[[gnu::always_inline, gnu::pure]] inline Node *& get_right() noexcept;
+	[[gnu::always_inline, gnu::pure]] inline Node * const &
+	get_left() const noexcept;
+	[[gnu::always_inline, gnu::pure]] inline Node * const &
+	get_right() const noexcept;
 
 	// Debugging methods TODO remove this
 	size_t get_depth() const noexcept;
@@ -163,33 +167,37 @@ private:
 	// Class to tell the abstract search tree iterator how to handle our nodes
 	class NodeInterface {
 	public:
-		static Node *
+		[[gnu::always_inline, gnu::const]] static inline Node *
 		get_parent(Node * n) noexcept
 		{
 			return n->NB::get_parent();
 		}
-		static Node *
+
+		[[gnu::always_inline, gnu::const]] static inline Node *
 		get_left(Node * n) noexcept
 		{
 			return n->NB::get_left();
 		}
-		static Node *
+
+		[[gnu::always_inline, gnu::const]] static inline Node *
 		get_right(Node * n) noexcept
 		{
 			return n->NB::get_right();
 		}
 
-		static const Node *
+		[[gnu::always_inline, gnu::const]] static inline const Node *
 		get_parent(const Node * n) noexcept
 		{
 			return n->NB::get_parent();
 		}
-		static const Node *
+
+		[[gnu::always_inline, gnu::const]] static inline const Node *
 		get_left(const Node * n) noexcept
 		{
 			return n->NB::get_left();
 		}
-		static const Node *
+
+		[[gnu::always_inline, gnu::const]] static inline const Node *
 		get_right(const Node * n) noexcept
 		{
 			return n->NB::get_right();

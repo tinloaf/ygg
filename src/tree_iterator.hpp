@@ -21,79 +21,87 @@ namespace internal {
 template <class ConcreteIterator, class Node, class NodeInterface, bool reverse>
 class IteratorBase {
 public:
-  /// @cond INTERNAL
-  typedef ptrdiff_t difference_type;
-  typedef Node value_type;
-  typedef Node & reference;
-  typedef Node * pointer;
-  typedef std::input_iterator_tag iterator_category;
+	/// @cond INTERNAL
+	typedef ptrdiff_t difference_type;
+	typedef Node value_type;
+	typedef Node & reference;
+	typedef Node * pointer;
+	typedef std::input_iterator_tag iterator_category;
 
-  IteratorBase();
-  IteratorBase(Node * n);
-  IteratorBase(const ConcreteIterator & other);
+	IteratorBase();
+	IteratorBase(Node * n);
+	IteratorBase(const ConcreteIterator & other);
 
-  ConcreteIterator & operator=(const ConcreteIterator & other);
-  ConcreteIterator & operator=(ConcreteIterator && other);
+	[[gnu::always_inline]] inline ConcreteIterator &
+	operator=(const ConcreteIterator & other);
+	[[gnu::always_inline]] inline ConcreteIterator &
+	operator=(ConcreteIterator && other);
 
-  bool operator==(const ConcreteIterator & other) const;
-  bool operator!=(const ConcreteIterator & other) const;
+	[[gnu::always_inline]] inline bool
+	operator==(const ConcreteIterator & other) const;
+	[[gnu::always_inline]] inline bool
+	operator!=(const ConcreteIterator & other) const;
 
-  ConcreteIterator & operator++();
-  ConcreteIterator operator++(int);
-  ConcreteIterator & operator+=(size_t steps);
-  ConcreteIterator operator+(size_t steps) const;
+	[[gnu::always_inline]] inline ConcreteIterator & operator++();
+	[[gnu::always_inline]] inline ConcreteIterator operator++(int);
+	[[gnu::always_inline]] inline ConcreteIterator & operator+=(size_t steps);
+	[[gnu::always_inline]] inline ConcreteIterator operator+(size_t steps) const;
 
-  ConcreteIterator & operator--();
-  ConcreteIterator operator--(int);
-  ConcreteIterator & operator-=(size_t steps);
-  ConcreteIterator operator-(size_t steps) const;
+	[[gnu::always_inline]] inline ConcreteIterator & operator--();
+	[[gnu::always_inline]] inline ConcreteIterator operator--(int);
+	[[gnu::always_inline]] inline ConcreteIterator & operator-=(size_t steps);
+	[[gnu::always_inline]] inline ConcreteIterator operator-(size_t steps) const;
 
-  reference operator*() const;
-  pointer operator->() const;
+	[[gnu::always_inline]] inline reference operator*() const;
+	[[gnu::always_inline]] inline pointer operator->() const;
 
-  IteratorBase<ConcreteIterator, Node, NodeInterface, !reverse>
-  get_reverse() const;
+	IteratorBase<ConcreteIterator, Node, NodeInterface, !reverse>
+	get_reverse() const;
 
 protected:
-  /*
-   * Dispatch methods to switch the meaning of ++ / -- via SFINAE based on
-   * the value of reverse
-   */
-  template <bool inner_reverse = reverse>
-  typename std::enable_if<inner_reverse, void>::type
-  dispatch_operator_pp()
-  {
-    this->step_back();
-  }
-  template <bool inner_reverse = reverse>
-  typename std::enable_if<!inner_reverse, void>::type
-  dispatch_operator_pp()
-  {
-    this->step_forward();
-  }
-  template <bool inner_reverse = reverse>
-  typename std::enable_if<inner_reverse, void>::type
-  dispatch_operator_mm()
-  {
-    this->step_forward();
-  }
-  template <bool inner_reverse = reverse>
-  typename std::enable_if<!inner_reverse, void>::type
-  dispatch_operator_mm()
-  {
-    this->step_back();
-  }
+	/*
+	 * Dispatch methods to switch the meaning of ++ / -- via SFINAE based on
+	 * the value of reverse
+	 */
+	template <bool inner_reverse = reverse>
+	[[gnu::always_inline]] inline
+	    typename std::enable_if<inner_reverse, void>::type
+	    dispatch_operator_pp()
+	{
+		this->step_back();
+	}
+	template <bool inner_reverse = reverse>
+	[[gnu::always_inline]] inline
+	    typename std::enable_if<!inner_reverse, void>::type
+	    dispatch_operator_pp()
+	{
+		this->step_forward();
+	}
+	template <bool inner_reverse = reverse>
+	[[gnu::always_inline]] inline
+	    typename std::enable_if<inner_reverse, void>::type
+	    dispatch_operator_mm()
+	{
+		this->step_forward();
+	}
+	template <bool inner_reverse = reverse>
+	[[gnu::always_inline]] inline
+	    typename std::enable_if<!inner_reverse, void>::type
+	    dispatch_operator_mm()
+	{
+		this->step_back();
+	}
 
-  /*
-   * Actual implementation of "going forwards" and "going backwards"
-   */
-  void step_forward();
-  void step_back();
+	/*
+	 * Actual implementation of "going forwards" and "going backwards"
+	 */
+	[[gnu::always_inline]] inline void step_forward();
+	[[gnu::always_inline]] inline void step_back();
 
-  Node * n;
+	Node * n;
 
-  using my_type = IteratorBase<ConcreteIterator, Node, NodeInterface, reverse>;
-  /// @endcond
+	using my_type = IteratorBase<ConcreteIterator, Node, NodeInterface, reverse>;
+	/// @endcond
 };
 
 } // namespace internal

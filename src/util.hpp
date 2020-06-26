@@ -13,15 +13,15 @@ template <bool use_arith>
 struct choose_ptr_impl
 {
 	template <class T>
-	static inline T * choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
-	    __attribute__((always_inline, const));
+	[[gnu::always_inline, gnu::const]] static inline T *
+	choose_ptr(bool condition, T * yes_ptr, T * no_ptr);
 };
 
 template <>
 struct choose_ptr_impl<true>
 {
 	template <class T>
-	static inline T *
+	[[gnu::always_inline, gnu::const]] static inline T *
 	choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
 	{
 		return reinterpret_cast<T *>(
@@ -36,7 +36,7 @@ template <>
 struct choose_ptr_impl<false>
 {
 	template <class T>
-	static inline T *&
+	[[gnu::always_inline, gnu::const]] static inline T *&
 	choose_ptr(bool condition, T *& yes_ptr, T *& no_ptr)
 	{
 		if (condition) {
@@ -48,11 +48,11 @@ struct choose_ptr_impl<false>
 };
 
 template <class Options, class T>
-static inline T * choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
-    __attribute__((always_inline, const));
+[[gnu::always_inline, gnu::const]] static inline T *
+choose_ptr(bool condition, T * yes_ptr, T * no_ptr);
 
 template <class Options, class T>
-static inline T *
+[[gnu::always_inline, gnu::const]] static inline T *
 choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
 {
 	return choose_ptr_impl<Options::micro_avoid_conditionals>::choose_ptr(
@@ -60,14 +60,14 @@ choose_ptr(bool condition, T * yes_ptr, T * no_ptr)
 }
 
 template <class Node>
-static inline Node *
+[[gnu::always_inline, gnu::pure]] static inline Node *
 go_right_if(bool cond, Node * parent)
 {
 	return parent->_bst_children[cond];
 }
 
 template <class Node>
-static inline Node *
+[[gnu::always_inline, gnu::pure]] static inline Node *
 go_left_if(bool cond, Node * parent)
 {
 	return parent->_bst_children[(1 - cond)];
@@ -305,11 +305,23 @@ public:
 			return this->val >= other.val;
 		}
 
-		reference operator[](size_t n) { return this->val + n; }
+		reference
+		operator[](size_t n)
+		{
+			return this->val + n;
+		}
 
-		reference operator*() const { return this->val; }
+		reference
+		operator*() const
+		{
+			return this->val;
+		}
 
-		pointer operator->() const { return &(this->val); }
+		pointer
+		operator->() const
+		{
+			return &(this->val);
+		}
 
 	private:
 		T val;
@@ -342,7 +354,7 @@ private:
 class flexible_less {
 public:
 	template <class T1, class T2>
-	constexpr bool
+	[[gnu::always_inline, gnu::const]] inline constexpr bool
 	operator()(const T1 & lhs, const T2 & rhs) const noexcept
 	{
 		return lhs < rhs;
