@@ -31,7 +31,7 @@ jobs:
 
       # This is the main job. Build, test, report coverage
       script:
-        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Coverage .. && make -j && cd test
+        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Coverage .. && make && cd test
         - travis_wait 30 python /usr/bin/gtest_parallel.py -w 2 --print_test_times ./run_tests 
 
       after_success:
@@ -67,7 +67,7 @@ jobs:
 
       # Build and test against an optimized build
       script:
-        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j && cd test
+        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make && cd test
         - travis_wait 30 python /usr/bin/gtest_parallel.py -w 2 --print_test_times ./run_tests 
 
     # Secondary job: clang 7 on Mac OS
@@ -86,5 +86,5 @@ jobs:
         
       # Secondary job. Build only, but build everything
       script:
-        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make VERBOSE=1 -j
+        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make
 
