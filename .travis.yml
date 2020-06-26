@@ -31,7 +31,7 @@ jobs:
 
       # This is the main job. Build, test, report coverage
       script:
-        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Coverage .. && cd test && make -j
+        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Coverage .. && make -j && cd test
         - travis_wait 30 python /usr/bin/gtest_parallel.py -w 2 --print_test_times ./run_tests 
 
       after_success:
@@ -47,9 +47,15 @@ jobs:
             - libgtest-dev
       os: linux
       dist: bionic
-      # Non-testing job. Install only what's needed to build
+      
+      # In this job, we run tests against an optimized build. Install everything but coveralls
       before_install:
         - sudo pip install cmake
+        - sudo wget https://github.com/google/gtest-parallel/archive/3ca6798e2c2a06708888611bc5147bd1266f97a0.zip -O gtest-parallel.zip
+        - sudo mkdir gtest-parallel
+        - sudo unzip -j -d gtest-parallel gtest-parallel.zip
+        - sudo cp gtest-parallel/gtest_parallel.py /usr/bin/gtest_parallel.py
+        - cd "${TRAVIS_BUILD_DIR}"
 
       # Yes, we override this. This is just here so that the job is appropriately named
       compiler:
@@ -59,9 +65,10 @@ jobs:
       install:
         - export CXX="/usr/bin/clang++-7" CC="/usr/bin/clang-7"
 
-      # Secondary job. Build only, but build everything
+      # Build and test against an optimized build
       script:
-        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
+        - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j && cd test
+        - travis_wait 30 python /usr/bin/gtest_parallel.py -w 2 --print_test_times ./run_tests 
 
     # Secondary job: clang 7 on Mac OS
     - addons:
