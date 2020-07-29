@@ -1,0 +1,104 @@
+[
+		{"filters": [
+				{"field": "group",
+				 "match": "DST"},
+				{"field": "experiment",
+				 "match": "Insert"}
+		],
+		 "filename": "dst_insert.pdf"
+		},
+		{"filters": [
+				{"field": "group",
+				 "match": "DST"},
+				{"field": "experiment",
+				 "match": "Delete"}
+		],
+		 "filename": "dst_delete.pdf"
+		},
+		{"filters": [
+				{"field": "group",
+				 "match": "DST"},
+				{"field": "experiment",
+				 "match": "Move"}
+		],
+		 "filename": "dst_move.pdf"
+		},
+
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
+				 "match": "Insert"},
+				{"field": "algorithm",
+				 "match": "EnergyTree",
+				 "negate": true}
+		],
+		 "filename": "bst_insert.pdf"
+		},
+
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
+				 "match": "Insert"},
+				{"kind": "set",
+				 "field": "full_algo",
+				 "set": [
+						 "std::multiset.*",
+						 "boost::intrusive::multiset.*",
+						 "RBTree.*",
+						 "ZipTree \\[H,UL\\]",
+						 "WBTree \\[3,4/3,SP\\]"
+				 ]}
+		],
+		 "filename": "bst_usvsthem_insert.pdf"
+		},
+
+		
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
+				 "match": "Erase"}
+		],
+		 "filename": "bst_erase.pdf"
+		},
+
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
+				 "match": "Delete"}
+		],
+		 "filename": "bst_delete.pdf"
+		},
+
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
+				 "match": "Delete"},
+				{"kind": "set",
+				 "field": "full_algo",
+				 "set": [
+						 "std::multiset.*",
+						 "boost::intrusive::multiset.*",
+						 "RBTree.*",
+						 "ZipTree \\[H,UL\\]",
+						 "WBTree \\[3,4/3,SP\\]"
+				 ]}
+		],
+		 "filename": "bst_usvsthem_delete.pdf"
+		},
+
+		
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
+				 "match": "Search"}
+		],
+		 "filename": "bst_search.pdf"
+		}
+		
+]

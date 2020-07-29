@@ -3,67 +3,145 @@ import seaborn as sns
 import re
 import sys
 import os
+import os.path
 import pandas as pd
+import tinydb
 from matplotlib import pyplot as plt
+import pprint
 
 DEFAULT_STYLE = {
     'secondary': 'style'
 }
 
+pp = pprint.PrettyPrinter()
+
 
 class ExperimentPlotter(object):
-    def __init__(self, data, x='base', style=DEFAULT_STYLE):
-        self._raw_d = data
-        self._x_dimension = x
-        self._secondary_key = 'experiment_size' if self._x_dimension == 'base' else 'base_size'
-        self._style = style
+    def __init__(self, base_path, data, config):
+        self._data = data
+        self._config = config
+        self._base_path = base_path
 
-        self._prepare()
+    def _build_query(self, qspec):
+        if isinstance(qspec, list):
+            # implicit and
+            dummy_spec = {'sub': qspec}
+            return self._build_and_query(dummy_spec)
 
-    def _prepare(self):
-        self._d = list(self._raw_d)
-
-        # Figure out whether the size that's not on the x axis has more than one value
-        self._secondary_x = False
-        value = self._raw_d[0][self._secondary_key]
-        for entry in self._raw_d:
-            if entry[self._secondary_key] != value:
-                self._secondary_x = True
-                break
-
-        if self._secondary_x and self._style['secondary'] != 'style':
-            # We need to incorporate the secondary size into the value used for hue
-            for entry in self._d:
-                self._d['algorithm'] += "[" + \
-                    str(entry[self._secondary_x]) + "]"
-
-    def plot(self, filename):
-        plt.clf()
-        if self._secondary_x and self._style['secondary'] == 'style':
-            style = self._secondary_key
+        kind = qspec.get('kind', 'simple')
+        if kind == 'and':
+            return self._build_and_query(qspec)
+        elif kind == 'or':
+            return self._build_or_query(qspec)
+        elif kind == 'set':
+            return self._build_set_query(qspec)
         else:
-            style = None
+            assert kind == 'simple'
+            return self._build_simple_query(qspec)
 
-        df = pd.DataFrame(self._d)
+    def _build_set_query(self, qspec):
+        q_builder = tinydb.Query()
+        composed_q = None
 
-        plot = sns.lineplot(x='base_size',
-                            y='cpu_time',  # TODO make configurable
-                            hue='algorithm',
-                            style=style,
+        field = qspec['field']
+        for item in qspec['set']:
+            print(f"Item: {item}")
+            q = getattr(q_builder, field).search(item)
+
+            if composed_q is None:
+                composed_q = q
+            else:
+                composed_q |= q
+
+        return composed_q
+
+    def _build_and_query(self, qspec):
+        composed_q = None
+
+        for sub_spec in qspec['sub']:
+            sub_q = self._build_query(sub_spec)
+            if composed_q is None:
+                composed_q = sub_q
+            else:
+                composed_q &= sub_q
+
+        return composed_q
+
+    def _build_or_query(self, qspec):
+        composed_q = None
+
+        for sub_spec in qspec['sub']:
+            sub_q = self._build_query(sub_spec)
+            if composed_q is None:
+                composed_q = sub_q
+            else:
+                composed_q |= sub_q
+
+        return composed_q
+
+    def _build_simple_query(self, qspec):
+        q_builder = tinydb.Query()
+
+        field = qspec['field']
+        if 'match' in qspec:
+            q = getattr(q_builder, field).search(qspec['match'])
+        elif 'min' in qspec:
+            q = getattr(q_builder, field).test(
+                lambda s: float(s) >= float(qspec['min']))
+        elif 'max' in qspec:
+            q = getattr(q_builder, field).test(
+                lambda s: float(s) <= float(qspec['min']))
+
+        if qspec.get('negate', False):
+            q = ~q
+
+        return q
+
+    def _get_data(self):
+        q = self._build_query(self._config['filters'])
+
+        return list(self._data.search(q))
+
+    def plot(self):
+        plt.clf()
+
+        d = self._get_data()
+
+        df = pd.DataFrame(d)
+
+        x_axis = self._config.get('x_axis', 'base_size')
+        x_power = int(self._config.get('x_power', 6))
+        x_label = self._config.get('x_label', 'Size')
+        if x_power > 1:
+            df[x_axis] = df[x_axis].apply(lambda x: x / (10**x_power))
+            x_label += f" $(\\times 10^{{{x_power}}})$"
+
+        y_axis = self._config.get('y_axis', 'cpu_time')
+        y_power = int(self._config.get('y_power', 6))
+        y_label = self._config.get('y_label', 'Time (ns)')
+        if y_power > 1:
+            df[y_axis] = df[y_axis].apply(lambda y: y / (10**y_power))
+            y_label += f" $(\\times 10^{{{y_power}}})$"
+
+        plot = sns.lineplot(x=x_axis,
+                            y=y_axis,
+                            hue=self._config.get('hue', 'full_algo'),
                             data=df)
 
-        plot.get_figure().savefig(filename)
+        plot.set(xlabel=x_label,
+                 ylabel=y_label)
+
+        output_file = os.path.join(self._base_path, self._config['filename'])
+        plot.get_figure().savefig(output_file)
 
 
 class DataReader(object):
     name_re = re.compile(
-        r'(?P<group>[^\s]+) :: (?P<experiment>[^\s]+) :: (?P<algorithm>[^/]+)/(?P<base_size>\d+)/(?P<experiment_size>\d+)')
+        r'(?P<group>[^\s]+) :: (?P<experiment>[^\s]+) :: (?P<algorithm>[^[/]+)(\[(?P<algopts>[^\]]*)\])?/(?P<base_size>\d+)/(?P<experiment_size>\d+)/\d+/manual_time')
 
     def __init__(self, json_data):
         self._data = []
         self._json_data = json_data
-
-        self._experiments = set()
 
         self._process()
 
@@ -88,38 +166,34 @@ class DataReader(object):
                 'experiment_size': float(m.group('experiment_size')),
                 'group': m.group('group'),
                 'experiment': m.group('experiment'),
-                'algorithm': m.group('algorithm')
+                'algorithm': m.group('algorithm'),
+                'algopts': m.group('algopts'),
+                'full_algo': "{} [{}]".format(m.group('algorithm'),
+                                              m.groupdict().get('algopts', 'foo'))
             }
-
-            self._experiments.add((m.group('group'), m.group('experiment')))
 
             self._data.append(d)
 
-    def get_experiments(self):
-        return self._experiments
-
-    def get(self, experiment=None):
-        if not experiment:
-            return self._data
-        else:
-            return list(filter(lambda d: d['group'] == experiment[0] and d['experiment'] == experiment[1],
-                               self._data))
+    def get(self):
+        db = tinydb.TinyDB(storage=tinydb.storages.MemoryStorage)
+        for entry in self._data:
+            db.insert(entry)
+        return db
 
 
 if __name__ == '__main__':
-    json_filename = sys.argv[1]
-    output_dir = sys.argv[2]
+    data_filename = sys.argv[1]
+    cfg_filename = sys.argv[2]
+    output_dir = sys.argv[3]
 
-    with open(json_filename, 'r') as json_file:
+    with open(data_filename, 'r') as json_file:
         json_data = json.load(json_file)
 
-    reader = DataReader(json_data)
-    experiments = reader.get_experiments()
-    for experiment in experiments:
-        group_name, experiment_name = experiment
-        experiment_data = reader.get(experiment)
-        plotter = ExperimentPlotter(experiment_data)
+    with open(cfg_filename, 'r') as cfg_file:
+        cfg = json.load(cfg_file)
 
-        output_filename = "{}_{}.pdf".format(group_name, experiment_name)
-        output_path = os.path.join(output_dir, output_filename)
-        plotter.plot(output_path)
+    reader = DataReader(json_data)
+    data = reader.get()
+    for plot_cfg in cfg:
+        p = ExperimentPlotter(output_dir, data, plot_cfg)
+        p.plot()
