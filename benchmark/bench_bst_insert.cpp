@@ -74,6 +74,35 @@ BENCHMARK_DEFINE_F(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
 REGISTER(InsertYggRBBSTFixtureArith, BM_BST_Insertion)
 
 /*
+ * Ygg's Red-Black Tree, with prefetching
+ */
+using InsertYggRBBSTFixturePF =
+    BSTFixture<YggRBTreeInterface<RBPrefetchTreeOptions>, InsertExperiment,
+               BSTInsertOptions>;
+BENCHMARK_DEFINE_F(InsertYggRBBSTFixturePF, BM_BST_Insertion)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (auto & n : this->experiment_nodes) {
+			this->t.insert(n);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+
+		for (auto & n : this->experiment_nodes) {
+			this->t.remove(n);
+		}
+		// TODO shuffling here?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(InsertYggRBBSTFixturePF, BM_BST_Insertion)
+
+/*
  * Ygg's Red-Black Tree, using color-compression
  */
 using InsertYggRBBSTFixtureCC =

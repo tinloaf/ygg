@@ -40,6 +40,32 @@ BENCHMARK_DEFINE_F(SearchYggRBBSTFixtureArith, BM_BST_Search)
 REGISTER(SearchYggRBBSTFixtureArith, BM_BST_Search)
 
 /*
+ * Ygg's Red-Black Tree, with prefetching
+ */
+using SearchYggRBBSTFixturePF =
+    BSTFixture<YggRBTreeInterface<RBPrefetchTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggRBBSTFixturePF, BM_BST_Search)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+		// TODO shuffling?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggRBBSTFixturePF, BM_BST_Search)
+
+/*
  * Ygg's Red-Black Tree
  */
 using SearchYggRBBSTFixture = BSTFixture<YggRBTreeInterface<BasicTreeOptions>,

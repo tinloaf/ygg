@@ -136,6 +136,44 @@ BENCHMARK_DEFINE_F(MoveYggRBBSTFixtureArith, BM_BST_Move)
 REGISTER(MoveYggRBBSTFixtureArith, BM_BST_Move)
 
 /*
+ * Ygg's Red-Black Tree, with prefetching
+ */
+using MoveYggRBBSTFixturePF =
+    BSTFixture<YggRBTreeInterface<RBPrefetchTreeOptions>, MoveExperiment,
+               BSTMoveOptions>;
+BENCHMARK_DEFINE_F(MoveYggRBBSTFixturePF, BM_BST_Move)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
+			auto * n = this->experiment_node_pointers[i];
+			auto new_val = this->experiment_values[i];
+
+			this->t.remove(*n);
+			NodeInterface::set_value(*n, new_val);
+			this->t.insert(*n);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+
+		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
+			auto * n = this->experiment_node_pointers[i];
+			auto old_val = this->fixed_values[i];
+
+			this->t.remove(*n);
+			NodeInterface::set_value(*n, old_val);
+			this->t.insert(*n);
+		}
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(MoveYggRBBSTFixturePF, BM_BST_Move)
+
+/*
  * Ygg's Weight-Balanced Tree
  */
 // Default gamma, delta / twopass

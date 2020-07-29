@@ -8,11 +8,11 @@
 #include "util.hpp"
 
 #include <cstddef>
-#include <limits>
-#include <type_traits>
-#include <string>
-#include <sstream>
 #include <iostream>
+#include <limits>
+#include <sstream>
+#include <string>
+#include <type_traits>
 
 namespace ygg {
 //@cond INTERNAL
@@ -285,6 +285,12 @@ public:
 	 * specific workload.
 	 */
 	class MICRO_AVOID_CONDITIONALS {
+	};
+
+	/**
+	 * @brief Force aggressive prefetching
+	 */
+	class MICRO_PREFETCH {
 	};
 
 	/******************************************************
@@ -624,6 +630,8 @@ public:
 	 **********************************************/
 	static constexpr bool micro_avoid_conditionals =
 	    OptPack::template has<TreeFlags::MICRO_AVOID_CONDITIONALS>();
+	static constexpr bool micro_prefetch =
+	    OptPack::template has<TreeFlags::MICRO_PREFETCH>();
 
 	/**********************************************
 	 * Benchmarking Helpers

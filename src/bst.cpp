@@ -691,6 +691,12 @@ BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>::find(
 	Node * last_left = nullptr;
 
 	while (cur != nullptr) {
+
+		if constexpr (Options::micro_prefetch) {
+			__builtin_prefetch(cur->NB::get_left());
+			__builtin_prefetch(cur->NB::get_right());
+		}
+
 		if constexpr (Options::micro_avoid_conditionals) {
 			(void)last_left;
 

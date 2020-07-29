@@ -93,6 +93,41 @@ BENCHMARK_DEFINE_F(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
 REGISTER(EraseYggRBBSTFixtureArith, BM_BST_Erasure)
 
 /*
+ * Ygg's Red-Black Tree, with prefetching
+ */
+using EraseYggRBBSTFixturePF =
+    BSTFixture<YggRBTreeInterface<RBPrefetchTreeOptions>, EraseExperiment,
+               BSTEraseOptions>;
+BENCHMARK_DEFINE_F(EraseYggRBBSTFixturePF, BM_BST_Erasure)
+(benchmark::State & state)
+{
+	std::vector<typename decltype(this->experiment_node_pointers)::value_type>
+	    erased_nodes;
+	erased_nodes.reserve(this->experiment_node_pointers.size());
+
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			erased_nodes.push_back(this->t.erase(n->get_value()));
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+
+		for (auto n : erased_nodes) {
+			//		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		erased_nodes.clear();
+		// TODO shuffling here?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(EraseYggRBBSTFixturePF, BM_BST_Erasure)
+
+/*
  * Ygg's Weight-Balanced Trees
  */
 // Default gamma, delta / twopass

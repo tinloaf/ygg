@@ -91,7 +91,6 @@ private:
 	}
 
 protected:
-	Node * _bst_children[2];
 	ParentContainer _bst_parent;
 
 	template <class InnerNode>
@@ -100,6 +99,7 @@ protected:
 	friend InnerNode * utilities::go_left_if(bool cond, InnerNode * parent);
 
 public:
+	Node * _bst_children[2];
 	[[gnu::always_inline]] inline void set_parent(Node * new_parent) noexcept;
 	[[gnu::always_inline, gnu::pure]] inline Node * get_parent() const noexcept;
 	template <class InnerPC = ParentContainer>

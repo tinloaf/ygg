@@ -234,6 +234,11 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 	while (cur != nullptr) {
 		parent = cur;
 
+		if constexpr (Options::micro_prefetch) {
+			__builtin_prefetch(cur->NB::get_left());
+			__builtin_prefetch(cur->NB::get_right());
+		}
+
 		if constexpr (Options::multiple) {
 			if constexpr (Options::micro_avoid_conditionals) {
 				cur = utilities::go_right_if(this->cmp(*cur, node), cur);

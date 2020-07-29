@@ -436,7 +436,12 @@ public:
 			cc = ",cc";
 		}
 
-		return std::string("RBTree[") + avc + cc + std::string("]");
+		std::string pf = "";
+		if constexpr (MyTreeOptions::micro_prefetch) {
+			pf = ",pf";
+		}
+
+		return std::string("RBTree[") + avc + cc + pf + std::string("]");
 	}
 
 	static int
@@ -872,6 +877,8 @@ using ArithTreeOptions =
 /* Variants of the red-black tree */
 using RBColorCompressTreeOptions =
     ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::COMPRESS_COLOR>;
+using RBPrefetchTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::MICRO_PREFETCH>;
 
 /* Variants of the zip tree */
 using ZRandomTreeOptions =
