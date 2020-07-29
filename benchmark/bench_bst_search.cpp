@@ -65,6 +65,32 @@ BENCHMARK_DEFINE_F(SearchYggRBBSTFixture, BM_BST_Search)
 REGISTER(SearchYggRBBSTFixture, BM_BST_Search)
 
 /*
+ * Ygg's Red-Black Tree, using color compression
+ */
+using SearchYggRBBSTFixtureCC =
+    BSTFixture<YggRBTreeInterface<RBColorCompressTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggRBBSTFixtureCC, BM_BST_Search)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+		// TODO shuffling?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggRBBSTFixtureCC, BM_BST_Search)
+
+/*
  * Ygg's weight-balanced tree, default parameters, two-pass
  */
 using SearchYggWBDefTPBSTFixture =
@@ -221,9 +247,9 @@ BENCHMARK_DEFINE_F(SearchYggWB32SPBSTFixture, BM_BST_Search)
 REGISTER(SearchYggWB32SPBSTFixture, BM_BST_Search)
 
 /*
- * Ygg's Zip Tree
+ * Ygg's Zip Tree, using randomness
  */
-using SearchYggZBSTFixture = BSTFixture<YggZTreeInterface<BasicTreeOptions>,
+using SearchYggZBSTFixture = BSTFixture<YggZTreeInterface<ZRandomTreeOptions>,
                                         SearchExperiment, BSTSearchOptions>;
 BENCHMARK_DEFINE_F(SearchYggZBSTFixture, BM_BST_Search)
 (benchmark::State & state)
@@ -242,6 +268,53 @@ BENCHMARK_DEFINE_F(SearchYggZBSTFixture, BM_BST_Search)
 	this->papi.report_and_reset(state);
 }
 REGISTER(SearchYggZBSTFixture, BM_BST_Search)
+
+/*
+ * Ygg's Zip Tree, using hashing + universalization
+ */
+using SearchYggZBSTFixtureHUL =
+    BSTFixture<YggZTreeInterface<ZUnivHashTreeOptions>, SearchExperiment,
+               BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggZBSTFixtureHUL, BM_BST_Search)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+	}
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggZBSTFixtureHUL, BM_BST_Search)
+
+/*
+ * Ygg's Zip Tree, using hashing
+ */
+using SearchYggZBSTFixtureHash = BSTFixture<YggZTreeInterface<ZHashTreeOptions>,
+                                            SearchExperiment, BSTSearchOptions>;
+BENCHMARK_DEFINE_F(SearchYggZBSTFixtureHash, BM_BST_Search)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (auto val : this->experiment_values) {
+			auto node = this->t.find(val);
+			benchmark::DoNotOptimize(node);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+	}
+	this->papi.report_and_reset(state);
+}
+REGISTER(SearchYggZBSTFixtureHash, BM_BST_Search)
 
 /*
  * Boost::Intrusive::Set

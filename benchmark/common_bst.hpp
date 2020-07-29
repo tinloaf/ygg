@@ -430,7 +430,13 @@ public:
 		if constexpr (MyTreeOptions::micro_avoid_conditionals) {
 			avc = "avc";
 		}
-		return std::string("RBTree[") + avc + std::string("]");
+
+		std::string cc = "";
+		if constexpr (MyTreeOptions::compress_color) {
+			cc = ",cc";
+		}
+
+		return std::string("RBTree[") + avc + cc + std::string("]");
 	}
 
 	static int
@@ -858,22 +864,25 @@ public:
 	}
 };
 
-using BasicTreeOptions =
-    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
-                     ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
-                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
-                         9859957398433823229ul>,
-                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
-                         std::numeric_limits<size_t>::max()>>;
-
+using BasicTreeOptions = ygg::TreeOptions<ygg::TreeFlags::MULTIPLE>;
 using ArithTreeOptions =
-    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
-                     ygg::TreeFlags::ZTREE_RANK_TYPE<uint8_t>,
-                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
-                         9859957398433823229ul>,
-                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_MODUL<
-                         std::numeric_limits<size_t>::max()>,
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
                      ygg::TreeFlags::MICRO_AVOID_CONDITIONALS>;
+
+/* Variants of the red-black tree */
+using RBColorCompressTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::COMPRESS_COLOR>;
+
+/* Variants of the zip tree */
+using ZRandomTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE,
+                     ygg::TreeFlags::ZTREE_RANK_TYPE<std::uint8_t>>;
+using ZHashTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH>;
+using ZUnivHashTreeOptions =
+    ygg::TreeOptions<ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::ZTREE_USE_HASH,
+                     ygg::TreeFlags::ZTREE_RANK_HASH_UNIVERSALIZE_COEFFICIENT<
+                         9859957398433823229ul>>;
 
 /* Variants of the weight-balanced tree */
 using WBTTwopassTreeOptions = ygg::TreeOptions<ygg::TreeFlags::MULTIPLE>;

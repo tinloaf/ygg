@@ -60,6 +60,44 @@ BENCHMARK_DEFINE_F(MoveYggRBBSTFixture, BM_BST_Move)
 REGISTER(MoveYggRBBSTFixture, BM_BST_Move)
 
 /*
+ * Ygg's Red-Black Tree, using color compression
+ */
+using MoveYggRBBSTFixtureCC =
+    BSTFixture<YggRBTreeInterface<RBColorCompressTreeOptions>, MoveExperiment,
+               BSTMoveOptions>;
+BENCHMARK_DEFINE_F(MoveYggRBBSTFixtureCC, BM_BST_Move)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
+			auto * n = this->experiment_node_pointers[i];
+			auto new_val = this->experiment_values[i];
+
+			this->t.remove(*n);
+			NodeInterface::set_value(*n, new_val);
+			this->t.insert(*n);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+
+		for (size_t i = 0; i < this->experiment_node_pointers.size(); i++) {
+			auto * n = this->experiment_node_pointers[i];
+			auto old_val = this->fixed_values[i];
+
+			this->t.remove(*n);
+			NodeInterface::set_value(*n, old_val);
+			this->t.insert(*n);
+		}
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(MoveYggRBBSTFixtureCC, BM_BST_Move)
+
+/*
  * Ygg's Red-Black Tree, avoiding conditional branches
  */
 using MoveYggRBBSTFixtureArith =

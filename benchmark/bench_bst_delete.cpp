@@ -52,6 +52,35 @@ BENCHMARK_DEFINE_F(DeleteYggRBBSTFixture, BM_BST_Deletion)
 REGISTER(DeleteYggRBBSTFixture, BM_BST_Deletion)
 
 /*
+ * Ygg's Red-Black Tree, using color compression
+ */
+using DeleteYggRBBSTFixtureCC =
+    BSTFixture<YggRBTreeInterface<RBColorCompressTreeOptions>, DeleteExperiment,
+               BSTDeleteOptions>;
+BENCHMARK_DEFINE_F(DeleteYggRBBSTFixtureCC, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggRBBSTFixtureCC, BM_BST_Deletion)
+
+/*
  * Ygg's Red-Black Tree, avoiding conditional branches
  */
 using DeleteYggRBBSTFixtureArith =
@@ -302,9 +331,9 @@ BENCHMARK_DEFINE_F(DeleteYggEBSTFixture, BM_BST_Deletion)
 REGISTER(DeleteYggEBSTFixture, BM_BST_Deletion)
 
 /*
- * Ygg's Zip Tree
+ * Ygg's Zip Tree, using randomness
  */
-using DeleteYggZBSTFixture = BSTFixture<YggZTreeInterface<BasicTreeOptions>,
+using DeleteYggZBSTFixture = BSTFixture<YggZTreeInterface<ZRandomTreeOptions>,
                                         DeleteExperiment, BSTDeleteOptions>;
 BENCHMARK_DEFINE_F(DeleteYggZBSTFixture, BM_BST_Deletion)
 (benchmark::State & state)
@@ -328,6 +357,64 @@ BENCHMARK_DEFINE_F(DeleteYggZBSTFixture, BM_BST_Deletion)
 	this->papi.report_and_reset(state);
 }
 REGISTER(DeleteYggZBSTFixture, BM_BST_Deletion)
+
+/*
+ * Ygg's Zip Tree, using hashing
+ */
+using DeleteYggZBSTFixtureHashing =
+    BSTFixture<YggZTreeInterface<ZHashTreeOptions>, DeleteExperiment,
+               BSTDeleteOptions>;
+BENCHMARK_DEFINE_F(DeleteYggZBSTFixtureHashing, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggZBSTFixtureHashing, BM_BST_Deletion)
+
+/*
+ * Ygg's Zip Tree, using hashing + universalization
+ */
+using DeleteYggZBSTFixtureHUL =
+    BSTFixture<YggZTreeInterface<ZUnivHashTreeOptions>, DeleteExperiment,
+               BSTDeleteOptions>;
+BENCHMARK_DEFINE_F(DeleteYggZBSTFixtureHUL, BM_BST_Deletion)
+(benchmark::State & state)
+{
+	Clock c;
+	for (auto _ : state) {
+		c.start();
+		this->papi.start();
+		for (auto n : this->experiment_node_pointers) {
+			this->t.remove(*n);
+		}
+		this->papi.stop();
+		state.SetIterationTime(c.get());
+
+		for (auto n : this->experiment_node_pointers) {
+			this->t.insert(*n);
+		}
+		// TODO shuffling here?
+	}
+
+	this->papi.report_and_reset(state);
+}
+REGISTER(DeleteYggZBSTFixtureHUL, BM_BST_Deletion)
 
 /*
  * Boost::Intrusive::Set
