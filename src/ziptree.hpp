@@ -210,7 +210,7 @@ public:
 	 **********************************************/
 	static_assert(
 	    Options::ztree_store_rank || Options::ztree_use_hash,
-	    "ZipTrees to have either ZTREE_RANK_TYPE or ZTREE_USE_HASH set");
+	    "ZipTrees need to have either ZTREE_RANK_TYPE or ZTREE_USE_HASH set");
 
 	/**
 	 * @brief Construct a new empty Zip Tree.
