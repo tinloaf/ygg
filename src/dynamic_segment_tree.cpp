@@ -576,9 +576,8 @@ Compare<InnerNode>::operator()(const typename InnerNode::KeyT & lhs,
 
 template <class InnerNode>
 bool
-Compare<InnerNode>::operator()(const InnerNode & lhs,
-                               const typename InnerNode::KeyT & rhs) const
-    noexcept
+Compare<InnerNode>::operator()(
+    const InnerNode & lhs, const typename InnerNode::KeyT & rhs) const noexcept
 {
 	//    std::cout << "B Comparing points: " << lhs.get_point() << " vs " <<
 	//    rhs << "\n";
@@ -771,7 +770,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::insert(Node & n)
+                   Tag>::insert(Node & n) noexcept(noexcept_ops)
 {
 #ifdef YGG_STORE_SEQUENCE_DST
 	this->bss.register_insert(
@@ -814,15 +813,15 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 
 template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
-DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::DynamicSegmentTree(MyClass && other)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector, Tag>::
+    DynamicSegmentTree(MyClass && other) noexcept(noexcept_ops)
     : t(std::move(other.t))
 {}
 
 template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::DynamicSegmentTree()
+                   Tag>::DynamicSegmentTree() noexcept(noexcept_ops)
     : t()
 {}
 
@@ -830,7 +829,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::remove(Node & n)
+                   Tag>::remove(Node & n) noexcept(noexcept_ops)
 {
 #ifdef YGG_STORE_SEQUENCE_DST
 	this->bss.register_delete(
@@ -861,6 +860,7 @@ void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                    Tag>::InnerTree::build_lca(InnerNode * left,
                                               InnerNode * right) const
+    noexcept(noexcept_ops)
 {
 	this->generation++;
 
@@ -933,7 +933,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::apply_interval(Node & n)
+                   Tag>::apply_interval(Node & n) noexcept(noexcept_ops)
 {
 	this->t.modify_contour(&n.NB::start, &n.NB::end, NodeTraits::get_value(n));
 }
@@ -942,7 +942,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::unapply_interval(Node & n)
+                   Tag>::unapply_interval(Node & n) noexcept(noexcept_ops)
 {
 	this->t.modify_contour(&n.NB::start, &n.NB::end,
 	                       -1 * NodeTraits::get_value(n));
@@ -951,10 +951,9 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
-DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::InnerTree::modify_contour(InnerNode * left,
-                                                   InnerNode * right,
-                                                   ValueT val)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector, Tag>::
+    InnerTree::modify_contour(InnerNode * left, InnerNode * right,
+                              ValueT val) noexcept(noexcept_ops)
 {
 	this->build_lca(left, right);
 
@@ -990,7 +989,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 bool
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::empty() const
+                   Tag>::empty() const noexcept
 {
 	return this->t.empty();
 }
@@ -999,7 +998,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::clear()
+                   Tag>::clear() noexcept(noexcept_ops)
 {
 	return this->t.clear();
 }
@@ -1153,6 +1152,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                                       const typename Node::KeyT & upper,
                                       bool lower_closed,
                                       bool upper_closed) const
+    noexcept(noexcept_ops)
 {
 	dyn_segtree_internal::Compare<InnerNode> cmp;
 
@@ -1302,6 +1302,7 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                                       const typename Node::KeyT & upper,
                                       bool lower_closed,
                                       bool upper_closed) const
+    noexcept(noexcept_ops)
 {
 	return this->get_combiner<Combiner>(lower, upper, lower_closed, upper_closed)
 	    .get();
@@ -1310,8 +1311,8 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 bool
-DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::InnerTree::rebuild_combiners_at(InnerNode * n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector, Tag>::
+    InnerTree::rebuild_combiners_at(InnerNode * n) noexcept(noexcept_ops)
 {
 	Combiners * cmb_left = nullptr;
 	if (n->get_left() != nullptr) {
@@ -1329,8 +1330,9 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 void
-DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::InnerTree::rebuild_combiners_recursively(InnerNode * n)
+DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector, Tag>::
+    InnerTree::rebuild_combiners_recursively(InnerNode * n) noexcept(
+        noexcept_ops)
 {
 	Combiners * cmb_left = nullptr;
 	if (n->get_left() != nullptr) {
@@ -1367,7 +1369,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::cbegin() const
+                   Tag>::cbegin() const noexcept
 {
 	return this->t.cbegin();
 }
@@ -1377,7 +1379,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::cend() const
+                   Tag>::cend() const noexcept
 {
 	return this->t.cend();
 }
@@ -1387,7 +1389,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::begin() const
+                   Tag>::begin() const noexcept
 {
 	return this->t.begin();
 }
@@ -1397,7 +1399,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::begin()
+                   Tag>::begin() noexcept
 {
 	return this->t.begin();
 }
@@ -1407,7 +1409,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::end()
+                   Tag>::end() noexcept
 {
 	return this->t.end();
 }
@@ -1417,7 +1419,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::end() const
+                   Tag>::end() const noexcept
 {
 	return this->t.end();
 }
@@ -1427,7 +1429,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<true>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::crbegin() const
+                   Tag>::crbegin() const noexcept
 {
 	return this->t.crbegin();
 }
@@ -1437,7 +1439,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<true>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::crend() const
+                   Tag>::crend() const noexcept
 {
 	return this->t.crend();
 }
@@ -1447,7 +1449,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<true>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::rbegin() const
+                   Tag>::rbegin() const noexcept
 {
 	return this->t.rbegin();
 }
@@ -1457,7 +1459,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template iterator<true>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::rbegin()
+                   Tag>::rbegin() noexcept
 {
 	return this->t.rbegin();
 }
@@ -1467,7 +1469,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template iterator<true>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::rend()
+                   Tag>::rend() noexcept
 {
 	return this->t.rend();
 }
@@ -1477,7 +1479,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<true>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::rend() const
+                   Tag>::rend() const noexcept
 {
 	return this->t.rend();
 }
@@ -1487,7 +1489,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::lower_bound_event(const KeyT & key) const
+                   Tag>::lower_bound_event(const KeyT & key) const noexcept
 {
 #ifdef YGG_STORE_SEQUENCE_DST
 	this->bss.register_lbound(reinterpret_cast<const void *>(&key), key);
@@ -1501,7 +1503,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::lower_bound_event(const KeyT & key)
+                   Tag>::lower_bound_event(const KeyT & key) noexcept
 {
 #ifdef YGG_STORE_SEQUENCE_DST
 	this->bss.register_lbound(reinterpret_cast<const void *>(&key), key);
@@ -1514,7 +1516,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template const_iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::upper_bound_event(const KeyT & key) const
+                   Tag>::upper_bound_event(const KeyT & key) const noexcept
 {
 #ifdef YGG_STORE_SEQUENCE_DST
 	this->bss.register_ubound(reinterpret_cast<const void *>(&key), key);
@@ -1527,7 +1529,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 typename DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
                             Tag>::template iterator<false>
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::upper_bound_event(const KeyT & key)
+                   Tag>::upper_bound_event(const KeyT & key) noexcept
 {
 #ifdef YGG_STORE_SEQUENCE_DST
 	this->bss.register_ubound(reinterpret_cast<const void *>(&key), key);
@@ -1540,7 +1542,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 template <class Combiner>
 Combiner
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::get_combiner() const
+                   Tag>::get_combiner() const noexcept(noexcept_ops)
 {
 	if (this->t.get_root() == nullptr) {
 		return Combiner();
@@ -1554,7 +1556,7 @@ template <class Node, class NodeTraits, class Combiners, class Options,
 template <class Combiner>
 typename Combiner::ValueT
 DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
-                   Tag>::get_combined() const
+                   Tag>::get_combined() const noexcept(noexcept_ops)
 {
 	return this->get_combiner<Combiner>().get();
 }
@@ -1614,15 +1616,16 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
  */
 
 template <class KeyT, class ValueT>
-RangedMaxCombiner<KeyT, ValueT>::RangedMaxCombiner()
+RangedMaxCombiner<KeyT, ValueT>::RangedMaxCombiner() noexcept
     : val(ValueT()), left_border(KeyT()), left_border_valid(false),
       right_border(KeyT()), right_border_valid(false)
 {}
 
 template <class KeyT, class ValueT>
 bool
-RangedMaxCombiner<KeyT, ValueT>::traverse_left_edge_up(KeyT new_point,
-                                                       ValueT edge_val)
+RangedMaxCombiner<KeyT, ValueT>::traverse_left_edge_up(
+    KeyT new_point,
+    ValueT edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	this->val += edge_val;
 
@@ -1639,8 +1642,9 @@ RangedMaxCombiner<KeyT, ValueT>::traverse_left_edge_up(KeyT new_point,
 
 template <class KeyT, class ValueT>
 bool
-RangedMaxCombiner<KeyT, ValueT>::traverse_right_edge_up(KeyT new_point,
-                                                        ValueT edge_val)
+RangedMaxCombiner<KeyT, ValueT>::traverse_right_edge_up(
+    KeyT new_point,
+    ValueT edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	this->val += edge_val;
 
@@ -1658,7 +1662,8 @@ template <class KeyT, class ValueT>
 bool
 RangedMaxCombiner<KeyT, ValueT>::collect_left(
     const KeyT my_point, const MyType * left_child_combiner,
-    const ValueT edge_val)
+    const ValueT
+        edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	const auto new_candidate_value = child_value(left_child_combiner) + edge_val;
 
@@ -1731,7 +1736,8 @@ template <class KeyT, class ValueT>
 bool
 RangedMaxCombiner<KeyT, ValueT>::collect_right(
     const KeyT my_point, const MyType * right_child_combiner,
-    const ValueT edge_val)
+    const ValueT
+        edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	const auto new_candidate_value = child_value(right_child_combiner) + edge_val;
 
@@ -1798,11 +1804,11 @@ RangedMaxCombiner<KeyT, ValueT>::get() const noexcept
 
 template <class KeyT, class ValueT>
 bool
-RangedMaxCombiner<KeyT, ValueT>::rebuild(KeyT my_point,
-                                         const MyType * left_child_combiner,
-                                         ValueT left_edge_val,
-                                         const MyType * right_child_combiner,
-                                         ValueT right_edge_val)
+RangedMaxCombiner<KeyT, ValueT>::rebuild(
+    KeyT my_point, const MyType * left_child_combiner, ValueT left_edge_val,
+    const MyType * right_child_combiner,
+    ValueT
+        right_edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	auto old_val = this->val;
 
@@ -1908,8 +1914,8 @@ RangedMaxCombiner<KeyT, ValueT>::rebuild(KeyT my_point,
 
 template <class KeyT, class ValueT>
 ValueT
-RangedMaxCombiner<KeyT, ValueT>::child_value(const MyType * child) const
-    noexcept
+RangedMaxCombiner<KeyT, ValueT>::child_value(
+    const MyType * child) const noexcept
 {
 	if (child == nullptr) {
 		return ValueT();
@@ -1955,8 +1961,10 @@ RangedMaxCombiner<KeyT, ValueT>::is_right_border_valid() const noexcept
 
 template <class KeyT, class ValueT>
 bool
-MaxCombiner<KeyT, ValueT>::traverse_left_edge_up(const KeyT new_point,
-                                                 const ValueT edge_val)
+MaxCombiner<KeyT, ValueT>::traverse_left_edge_up(
+    const KeyT new_point,
+    const ValueT
+        edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	(void)new_point;
 	this->val += edge_val;
@@ -1965,8 +1973,10 @@ MaxCombiner<KeyT, ValueT>::traverse_left_edge_up(const KeyT new_point,
 
 template <class KeyT, class ValueT>
 bool
-MaxCombiner<KeyT, ValueT>::traverse_right_edge_up(const KeyT new_point,
-                                                  const ValueT edge_val)
+MaxCombiner<KeyT, ValueT>::traverse_right_edge_up(
+    const KeyT new_point,
+    const ValueT
+        edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	(void)new_point;
 	this->val += edge_val;
@@ -1975,9 +1985,10 @@ MaxCombiner<KeyT, ValueT>::traverse_right_edge_up(const KeyT new_point,
 
 template <class KeyT, class ValueT>
 bool
-MaxCombiner<KeyT, ValueT>::collect_left(const KeyT my_point,
-                                        const MyType * left_child_combiner,
-                                        const ValueT edge_val)
+MaxCombiner<KeyT, ValueT>::collect_left(
+    const KeyT my_point, const MyType * left_child_combiner,
+    const ValueT
+        edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	(void)my_point;
 	this->val = std::max(this->val, child_value(left_child_combiner) + edge_val);
@@ -1986,9 +1997,9 @@ MaxCombiner<KeyT, ValueT>::collect_left(const KeyT my_point,
 
 template <class KeyT, class ValueT>
 bool
-MaxCombiner<KeyT, ValueT>::collect_right(KeyT my_point,
-                                         const MyType * right_child_combiner,
-                                         ValueT edge_val)
+MaxCombiner<KeyT, ValueT>::collect_right(
+    KeyT my_point, const MyType * right_child_combiner,
+    ValueT edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	(void)my_point;
 	this->val = std::max(this->val, child_value(right_child_combiner) + edge_val);
@@ -2004,11 +2015,11 @@ MaxCombiner<KeyT, ValueT>::get() const noexcept
 
 template <class KeyT, class ValueT>
 bool
-MaxCombiner<KeyT, ValueT>::rebuild(KeyT my_point,
-                                   const MyType * left_child_combiner,
-                                   ValueT left_edge_val,
-                                   const MyType * right_child_combiner,
-                                   ValueT right_edge_val)
+MaxCombiner<KeyT, ValueT>::rebuild(
+    KeyT my_point, const MyType * left_child_combiner, ValueT left_edge_val,
+    const MyType * right_child_combiner,
+    ValueT
+        right_edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>())
 {
 	(void)my_point;
 	auto old_val = this->val;
@@ -2024,8 +2035,8 @@ MaxCombiner<KeyT, ValueT>::rebuild(KeyT my_point,
 
 template <class KeyT, class ValueT>
 ValueT
-MaxCombiner<KeyT, ValueT>::child_value(const MaxCombiner::MyType * child) const
-    noexcept
+MaxCombiner<KeyT, ValueT>::child_value(
+    const MaxCombiner::MyType * child) const noexcept
 {
 	if (child == nullptr) {
 		return ValueT();
@@ -2043,11 +2054,12 @@ MaxCombiner<KeyT, ValueT>::child_value(const MaxCombiner::MyType * child) const
 
 template <class KeyT, class AggValueT, class... Combiners>
 bool
-CombinerPack<KeyT, AggValueT, Combiners...>::rebuild(KeyT my_point,
-                                                     const MyType * left_child,
-                                                     AggValueT left_edge_val,
-                                                     const MyType * right_child,
-                                                     AggValueT right_edge_val)
+CombinerPack<KeyT, AggValueT, Combiners...>::rebuild(
+    KeyT my_point, const MyType * left_child, AggValueT left_edge_val,
+    const MyType * right_child,
+    AggValueT right_edge_val) noexcept(dyn_segtree_internal::
+                                           noexcept_all_combiners<
+                                               AggValueT, Combiners...>())
 {
 	if constexpr (sizeof...(Combiners) == 0) {
 		(void)my_point;
@@ -2068,7 +2080,10 @@ CombinerPack<KeyT, AggValueT, Combiners...>::rebuild(KeyT my_point,
 template <class KeyT, class AggValueT, class... Combiners>
 bool
 CombinerPack<KeyT, AggValueT, Combiners...>::collect_left(
-    KeyT my_point, const MyType * left_child_combiner, AggValueT edge_val)
+    KeyT my_point, const MyType * left_child_combiner,
+    AggValueT edge_val) noexcept(dyn_segtree_internal::
+                                     noexcept_all_combiners<AggValueT,
+                                                            Combiners...>())
 {
 	// This is a fold expression with a comma operator!
 	(std::get<Combiners>(this->data)
@@ -2081,7 +2096,10 @@ CombinerPack<KeyT, AggValueT, Combiners...>::collect_left(
 template <class KeyT, class AggValueT, class... Combiners>
 bool
 CombinerPack<KeyT, AggValueT, Combiners...>::collect_right(
-    KeyT my_point, const MyType * right_child_combiner, AggValueT edge_val)
+    KeyT my_point, const MyType * right_child_combiner,
+    AggValueT edge_val) noexcept(dyn_segtree_internal::
+                                     noexcept_all_combiners<AggValueT,
+                                                            Combiners...>())
 {
 	// This is a fold expression with a comma operator!
 	(std::get<Combiners>(this->data)
@@ -2093,8 +2111,9 @@ CombinerPack<KeyT, AggValueT, Combiners...>::collect_right(
 
 template <class KeyT, class AggValueT, class... Combiners>
 bool
-CombinerPack<KeyT, AggValueT, Combiners...>::traverse_left_edge_up(
-    KeyT new_point, AggValueT edge_val)
+CombinerPack<KeyT, AggValueT, Combiners...>::
+    traverse_left_edge_up(KeyT new_point, AggValueT edge_val) noexcept(
+        dyn_segtree_internal::noexcept_all_combiners<AggValueT, Combiners...>())
 {
 	// This is a fold expression with a comma operator!
 	(std::get<Combiners>(this->data).traverse_left_edge_up(new_point, edge_val),
@@ -2104,8 +2123,9 @@ CombinerPack<KeyT, AggValueT, Combiners...>::traverse_left_edge_up(
 
 template <class KeyT, class AggValueT, class... Combiners>
 bool
-CombinerPack<KeyT, AggValueT, Combiners...>::traverse_right_edge_up(
-    KeyT new_point, AggValueT edge_val)
+CombinerPack<KeyT, AggValueT, Combiners...>::
+    traverse_right_edge_up(KeyT new_point, AggValueT edge_val) noexcept(
+        dyn_segtree_internal::noexcept_all_combiners<AggValueT, Combiners...>())
 {
 	// This is a fold expression with a comma operator!
 	(std::get<Combiners>(this->data).traverse_right_edge_up(new_point, edge_val),
@@ -2116,7 +2136,7 @@ CombinerPack<KeyT, AggValueT, Combiners...>::traverse_right_edge_up(
 template <class KeyT, class AggValueT, class... Combiners>
 template <class Combiner>
 typename Combiner::ValueT
-CombinerPack<KeyT, AggValueT, Combiners...>::get() const
+CombinerPack<KeyT, AggValueT, Combiners...>::get() const noexcept
 {
 	return std::get<Combiner>(this->data).get();
 }
@@ -2125,7 +2145,7 @@ template <class KeyT, class AggValueT, class... Combiners>
 template <class Combiner>
 const Combiner *
 CombinerPack<KeyT, AggValueT, Combiners...>::child_combiner(
-    const CombinerPack::MyType * child) const
+    const CombinerPack::MyType * child) const noexcept
 {
 	if (child == nullptr) {
 		return nullptr;
@@ -2137,7 +2157,7 @@ CombinerPack<KeyT, AggValueT, Combiners...>::child_combiner(
 template <class KeyT, class AggValueT, class... Combiners>
 template <class Combiner>
 const Combiner &
-CombinerPack<KeyT, AggValueT, Combiners...>::get_combiner() const
+CombinerPack<KeyT, AggValueT, Combiners...>::get_combiner() const noexcept
 {
 	return std::get<Combiner>(this->data);
 }

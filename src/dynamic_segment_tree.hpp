@@ -14,14 +14,100 @@
 #include "wbtree.hpp"
 #include "ziptree.hpp"
 
+#include <algorithm>
+#include <type_traits>
+
 namespace ygg {
 
 // Forwards
 template <class Node, class NodeTraits, class Combiners, class Options,
           class TreeSelector, class Tag>
 class DynamicSegmentTree;
+template <class KeyT, class AggValueT, class... Combiners>
+class CombinerPack;
 
 namespace dyn_segtree_internal {
+
+template <class T>
+constexpr bool
+noexcept_math()
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	return std::is_nothrow_constructible_v<T> &&
+	       std::is_nothrow_assignable_v<T, T> && // Creation & assignment
+	       noexcept(std::declval<T>() + std::declval<T>()) && noexcept(
+	           std::declval<T>() - std::declval<T>()) && // basic arithmetic
+	       noexcept(std::declval<T>() * std::declval<T>()) && noexcept(
+	           std::declval<T>() / std::declval<T>()) && //
+	       noexcept(std::declval<T>() > std::declval<T>()) && noexcept(
+	           std::declval<T>() >= std::declval<T>()) && // comparison
+	       noexcept(std::declval<T>() < std::declval<T>()) && noexcept(
+	           std::declval<T>() <= std::declval<T>()) && //
+	       noexcept(std::declval<T>() == std::declval<T>()) && noexcept(
+	           std::declval<T>() != std::declval<T>());
+#pragma GCC diagnostic pop
+}
+
+template <class T1, class T2>
+constexpr bool
+noexcept_math_ordered_pair()
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+	return noexcept(std::declval<T1>() * std::declval<T2>()) && noexcept(
+	    std::declval<T1>() / std::declval<T2>()) && // basic arithmetic
+	    noexcept(std::declval<T1>() > std::declval<T2>()) && noexcept(
+	        std::declval<T1>() >= std::declval<T2>()) && // comparison
+	    noexcept(std::declval<T1>() < std::declval<T2>()) && noexcept(
+	        std::declval<T1>() <= std::declval<T2>()) && //
+	    noexcept(std::declval<T1>() == std::declval<T2>()) && noexcept(
+	        std::declval<T1>() != std::declval<T2>());
+#pragma GCC diagnostic pop
+}
+
+template <class T1, class T2>
+constexpr bool
+noexcept_math()
+{
+	return noexcept_math<T1>() && noexcept_math<T2>() &&
+	       noexcept_math_ordered_pair<T1, T2>() &&
+	       noexcept_math_ordered_pair<T2, T1>();
+}
+
+template <class AggValueT, class... Combiners>
+constexpr bool
+noexcept_all_combiners()
+{
+	return (... && noexcept_math<typename Combiners::ValueT>()) &&
+	       (... && noexcept_math<AggValueT, typename Combiners::ValueT>());
+}
+
+/* noexcept_dst* checks if all operations needed by the DST are noexcept.
+ * This especially concerns operations on the combiners.
+ */
+template <class CombinerPackParam>
+struct noexcept_dst_impl
+{
+};
+
+template <template <class, class, class...> class CombinerPackParam, class KeyT,
+          class AggValueT, class... Combiners>
+struct noexcept_dst_impl<CombinerPackParam<KeyT, AggValueT, Combiners...>>
+{
+	static constexpr bool
+	get()
+	{
+		return noexcept_all_combiners<AggValueT, Combiners...>();
+	}
+};
+
+template <class ValueT, class CombinerPackParam>
+constexpr bool
+noexcept_dst()
+{
+	return noexcept_dst_impl<CombinerPackParam>::get() && noexcept_math<ValueT>();
+};
 
 /* Interface for when modification sequences of the underlying BST should be
  * stored for benchmarking purposes */
@@ -170,11 +256,13 @@ struct UseZipTree
 		class Base : public ZTreeNodeBase<InnerNodeCRTP,
 		                                  Options<InnerNodeCRTP, KeyT>, Tag> {
 		public:
-			using MyBase = ZTreeNodeBase<InnerNodeCRTP, Options<InnerNodeCRTP, KeyT>,
-			                             Tag>;
+			using MyBase =
+			    ZTreeNodeBase<InnerNodeCRTP, Options<InnerNodeCRTP, KeyT>, Tag>;
 
 			// Export to public, so that we can update ranks
-			void update_rank() noexcept {
+			void
+			update_rank() noexcept
+			{
 				this->MyBase::update_rank();
 			}
 		};
@@ -318,10 +406,10 @@ public:
 	void before_zip_from_right(InnerNode * right_head) noexcept;
 	void before_zip_tree_from_left(InnerNode * left_head) const noexcept;
 	void before_zip_tree_from_right(InnerNode * right_head) const noexcept;
-	void zipping_ended_left_without_tree(InnerNode * prev_left_head) const
-	    noexcept;
-	void zipping_ended_right_without_tree(InnerNode * prev_right_head) const
-	    noexcept;
+	void
+	zipping_ended_left_without_tree(InnerNode * prev_left_head) const noexcept;
+	void
+	zipping_ended_right_without_tree(InnerNode * prev_right_head) const noexcept;
 	void zipping_done(InnerNode * head, InnerNode * tail) const noexcept;
 	void delete_without_zipping(const InnerNode * to_be_deleted) const noexcept;
 
@@ -389,10 +477,10 @@ public:
 	                const InnerNode & rhs) const noexcept;
 	bool operator()(const InnerNode & lhs,
 	                const typename InnerNode::KeyT & rhs) const noexcept;
-	bool operator()(const PointDescription & lhs, const InnerNode & rhs) const
-	    noexcept;
-	bool operator()(const InnerNode & lhs, const PointDescription & rhs) const
-	    noexcept;
+	bool operator()(const PointDescription & lhs,
+	                const InnerNode & rhs) const noexcept;
+	bool operator()(const InnerNode & lhs,
+	                const PointDescription & rhs) const noexcept;
 };
 
 /*
@@ -485,6 +573,8 @@ public:
 	using KeyT = KeyType;
 	using MyType = MaxCombiner<KeyT, ValueT>;
 
+	MaxCombiner() noexcept = default;
+
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
 	 * @brief Combines this MaxCombiner with a value, possibly of a child node
@@ -505,8 +595,10 @@ public:
 	 * left edge going out of this node
 	 * @return FIXME ignored for now
 	 */
-	bool collect_left(const KeyT my_point, const MyType * left_child_combiner,
-	                  const ValueType edge_val);
+	bool collect_left(
+	    const KeyT my_point, const MyType * left_child_combiner,
+	    const ValueType
+	        edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>());
 	/**
 	 * @brief Combines this MaxCombiner with a value, possibly of a child node
 	 *
@@ -527,8 +619,10 @@ public:
 	 * @return FIXME ignored for now
 	 */
 	// TODO make all keys / values references?
-	bool collect_right(const KeyT my_point, const MyType * right_child_combiner,
-	                   const ValueType edge_val);
+	bool collect_right(
+	    const KeyT my_point, const MyType * right_child_combiner,
+	    const ValueType
+	        edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>());
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
@@ -543,7 +637,9 @@ public:
 	 * traversed
 	 * @return FIXME ignored for now
 	 */
-	bool traverse_left_edge_up(const KeyT new_point, const ValueT edge_val);
+	bool
+	traverse_left_edge_up(const KeyT new_point, const ValueT edge_val) noexcept(
+	    dyn_segtree_internal::noexcept_math<ValueT>());
 	/**
 	 * @brief Aggregates a value into the max value stored in this combiner
 	 *
@@ -556,7 +652,9 @@ public:
 	 * traversed
 	 * @return FIXME ignored for now
 	 */
-	bool traverse_right_edge_up(const KeyT new_point, const ValueT edge_val);
+	bool
+	traverse_right_edge_up(const KeyT new_point, const ValueT edge_val) noexcept(
+	    dyn_segtree_internal::noexcept_math<ValueT>());
 
 	// bool aggregate_with(ValueT a);
 
@@ -582,7 +680,8 @@ public:
 	 */
 	bool rebuild(KeyT my_point, const MyType * left_child_combiner,
 	             ValueT left_edge_val, const MyType * right_child_combiner,
-	             ValueT right_edge_val);
+	             ValueT right_edge_val) noexcept(dyn_segtree_internal::
+	                                                 noexcept_math<ValueT>());
 
 	/**
 	 * @brief Returns the currently stored combined value in this combiner
@@ -629,7 +728,7 @@ public:
 	using KeyT = KeyType;
 	using MyType = RangedMaxCombiner<KeyT, ValueT>;
 
-	RangedMaxCombiner();
+	RangedMaxCombiner() noexcept;
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
@@ -652,8 +751,10 @@ public:
 	 * left edge going out of this node
 	 * @return FIXME ignored for now
 	 */
-	bool collect_left(KeyT my_point, const MyType * left_child_combiner,
-	                  ValueType edge_val);
+	bool collect_left(
+	    KeyT my_point, const MyType * left_child_combiner,
+	    ValueType
+	        edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>());
 	/**
 	 * @brief Combines this RangedMaxCombiner with a value, possibly of a child
 	 * node
@@ -674,8 +775,10 @@ public:
 	 * right edge going out of this node
 	 * @return FIXME ignored for now
 	 */
-	bool collect_right(KeyT my_point, const MyType * right_child_combiner,
-	                   ValueType edge_val);
+	bool collect_right(
+	    KeyT my_point, const MyType * right_child_combiner,
+	    ValueType
+	        edge_val) noexcept(dyn_segtree_internal::noexcept_math<ValueT>());
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
@@ -690,7 +793,8 @@ public:
 	 * traversed
 	 * @return FIXME ignored for now
 	 */
-	bool traverse_left_edge_up(KeyT new_point, ValueT edge_val);
+	bool traverse_left_edge_up(KeyT new_point, ValueT edge_val) noexcept(
+	    dyn_segtree_internal::noexcept_math<ValueT>());
 	/**
 	 * @brief Aggregates a value into the max value stored in this combiner
 	 *
@@ -703,7 +807,8 @@ public:
 	 * traversed
 	 * @return FIXME ignored for now
 	 */
-	bool traverse_right_edge_up(KeyT new_point, ValueT edge_val);
+	bool traverse_right_edge_up(KeyT new_point, ValueT edge_val) noexcept(
+	    dyn_segtree_internal::noexcept_math<ValueT>());
 
 	// bool aggregate_with(ValueT a);
 
@@ -729,7 +834,8 @@ public:
 	 */
 	bool rebuild(KeyT my_point, const MyType * left_child_combiner,
 	             ValueT left_edge_val, const MyType * right_child_combiner,
-	             ValueT right_edge_val);
+	             ValueT right_edge_val) noexcept(dyn_segtree_internal::
+	                                                 noexcept_math<ValueT>());
 
 	/**
 	 * @brief Returns the currently stored combined value in this combiner
@@ -847,7 +953,7 @@ class CombinerPack {
 public:
 	using MyType = CombinerPack<KeyT, AggValueT, Combiners...>;
 
-	CombinerPack() = default;
+	CombinerPack() noexcept = default;
 
 	/**
 	 * @brief Rebuilds all combiners at this node from its children's combiners
@@ -865,19 +971,31 @@ public:
 	 * @param right_edge_val	The agg_right value of this node
 	 * @return TODO IGNORED
 	 */
-	bool rebuild(KeyT my_point, const MyType * left_child,
-	             AggValueT left_edge_val, const MyType * right_child,
-	             AggValueT right_edge_val);
+	bool rebuild(
+	    KeyT my_point, const MyType * left_child, AggValueT left_edge_val,
+	    const MyType * right_child,
+	    AggValueT right_edge_val) noexcept(dyn_segtree_internal::
+	                                           noexcept_all_combiners<
+	                                               AggValueT, Combiners...>());
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
-	bool collect_left(KeyT my_point, const MyType * left_child_combiner,
-	                  AggValueT edge_val);
-	bool collect_right(KeyT my_point, const MyType * right_child_combiner,
-	                   AggValueT edge_val);
+	bool collect_left(
+	    KeyT my_point, const MyType * left_child_combiner,
+	    AggValueT edge_val) noexcept(dyn_segtree_internal::
+	                                     noexcept_all_combiners<AggValueT,
+	                                                            Combiners...>());
+	bool collect_right(
+	    KeyT my_point, const MyType * right_child_combiner,
+	    AggValueT edge_val) noexcept(dyn_segtree_internal::
+	                                     noexcept_all_combiners<AggValueT,
+	                                                            Combiners...>());
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
-	bool traverse_left_edge_up(KeyT new_point, AggValueT edge_val);
-	bool traverse_right_edge_up(KeyT new_point, AggValueT edge_val);
+	bool traverse_left_edge_up(KeyT new_point, AggValueT edge_val) noexcept(
+	    dyn_segtree_internal::noexcept_all_combiners<AggValueT, Combiners...>());
+
+	bool traverse_right_edge_up(KeyT new_point, AggValueT edge_val) noexcept(
+	    dyn_segtree_internal::noexcept_all_combiners<AggValueT, Combiners...>());
 
 	/**
 	 * @brief Returns the combined value of a combiner contained in this
@@ -888,8 +1006,9 @@ public:
 	 * @return The combined value of the combiner specified in the Combiner
 	 * template parameter
 	 */
+	// TODO find the correct noexcept specification
 	template <class Combiner>
-	typename Combiner::ValueT get() const;
+	typename Combiner::ValueT get() const noexcept;
 
 	/**
 	 * @brief Returns a combiner contained in this CombinerPack
@@ -898,13 +1017,13 @@ public:
 	 * @return The combiner specified in the Combiner template parameter
 	 */
 	template <class Combiner>
-	const Combiner & get_combiner() const;
+	const Combiner & get_combiner() const noexcept;
 
 	using pack = std::tuple<Combiners...>;
 
 private:
 	template <class Combiner>
-	const Combiner * child_combiner(const MyType * child) const;
+	const Combiner * child_combiner(const MyType * child) const noexcept;
 
 	std::tuple<Combiners...> data;
 };
@@ -965,8 +1084,8 @@ public:
 
 	/* Methods to be used for benchmarking purposes only! */
 	template <class Dummy = TreeSelector>
-std::enable_if_t<utilities::is_specialization<Dummy, UseZipTree>{}, void>
-		benchmark_update_inner_ranks() noexcept
+	std::enable_if_t<utilities::is_specialization<Dummy, UseZipTree>{}, void>
+	benchmark_update_inner_ranks() noexcept
 	{
 		this->start.update_rank();
 		this->end.update_rank();
@@ -1117,6 +1236,9 @@ private:
 	static_assert(Options::multiple,
 	              "DynamicSegmentTree always allows multiple equal intervals.");
 
+	static constexpr bool noexcept_ops =
+	    dyn_segtree_internal::noexcept_dst<typename Node::ValueT, Combiners>();
+
 public:
 	using KeyT = typename Node::KeyT;
 	using ValueT = typename Node::ValueT;
@@ -1135,14 +1257,17 @@ private:
 
 		using BaseTree::BaseTree;
 
-		void modify_contour(InnerNode * left, InnerNode * right, ValueT val);
+		void modify_contour(InnerNode * left, InnerNode * right,
+		                    ValueT val) noexcept(noexcept_ops);
 
 		using Contour =
 		    std::pair<std::vector<InnerNode *>, std::vector<InnerNode *>>;
-		void build_lca(InnerNode * left, InnerNode * right) const;
+		void build_lca(InnerNode * left, InnerNode * right) const
+		    noexcept(noexcept_ops);
 
-		static bool rebuild_combiners_at(InnerNode * n);
-		static void rebuild_combiners_recursively(InnerNode * n);
+		static bool rebuild_combiners_at(InnerNode * n) noexcept(noexcept_ops);
+		static void
+		rebuild_combiners_recursively(InnerNode * n) noexcept(noexcept_ops);
 
 	private:
 		// Generation to be used to tag nodes during LCA search
@@ -1175,12 +1300,12 @@ public:
 	/**
 	 * @brief Move constructor
 	 **/
-	DynamicSegmentTree(MyClass && other);
+	DynamicSegmentTree(MyClass && other) noexcept(noexcept_ops);
 
 	/**
 	 * @brief Default constructor
 	 **/
-	DynamicSegmentTree();
+	DynamicSegmentTree() noexcept(noexcept_ops);
 
 	/**
 	 * @brief Insert an interval into the dynamic segment tree
@@ -1190,7 +1315,7 @@ public:
 	 *
 	 * @param n		The node representing the interval being inserted
 	 */
-	void insert(Node & n);
+	void insert(Node & n) noexcept(noexcept_ops);
 
 	/**
 	 * @brief Removes an intervals from the dynamic segment tree
@@ -1199,7 +1324,7 @@ public:
 	 *
 	 * @param n 	The node to be removed
 	 */
-	void remove(Node & n);
+	void remove(Node & n) noexcept(noexcept_ops);
 
 	/**
 	 * @brief Returns whether the dynamic segment tree is empty
@@ -1208,7 +1333,7 @@ public:
 	 *
 	 * @return true if the dynamic segment tree is empty, false otherwise
 	 */
-	bool empty() const;
+	bool empty() const noexcept;
 
 	/**
 	 * @brief Perform a stabbing query at point x
@@ -1222,22 +1347,23 @@ public:
 	AggValueT query(const typename Node::KeyT & x) const noexcept;
 
 	template <class Combiner>
-	Combiner get_combiner() const;
+	Combiner get_combiner() const noexcept(noexcept_ops);
 
 	template <class Combiner>
 	Combiner get_combiner(const typename Node::KeyT & lower,
 	                      const typename Node::KeyT & upper,
 	                      bool lower_closed = true,
-	                      bool upper_closed = false) const;
+	                      bool upper_closed = false) const noexcept(noexcept_ops);
 
 	template <class Combiner>
-	typename Combiner::ValueT get_combined() const;
+	typename Combiner::ValueT get_combined() const noexcept(noexcept_ops);
 
 	template <class Combiner>
 	typename Combiner::ValueT get_combined(const typename Node::KeyT & lower,
 	                                       const typename Node::KeyT & upper,
 	                                       bool lower_closed = true,
-	                                       bool upper_closed = false) const;
+	                                       bool upper_closed = false) const
+	    noexcept(noexcept_ops);
 
 	/*
 	 * Iteration
@@ -1255,56 +1381,56 @@ public:
 	 * dyn_segtree_internal::InnerNode "InnerNode" representing a start or end
 	 * event.
 	 */
-	const_iterator<false> cbegin() const;
+	const_iterator<false> cbegin() const noexcept;
 	/**
 	 * Returns an iterator pointing after the largest \ref
 	 * dyn_segtree_internal::InnerNode "InnerNode" representing a start or end
 	 * event.
 	 */
-	const_iterator<false> cend() const;
+	const_iterator<false> cend() const noexcept;
 	/**
 	 * Returns an iterator pointing to the smallest \ref
 	 * dyn_segtree_internal::InnerNode "InnerNode" representing a start or end
 	 * event.
 	 */
-	const_iterator<false> begin() const;
-	iterator<false> begin();
+	const_iterator<false> begin() const noexcept;
+	iterator<false> begin() noexcept;
 
 	/**
 	 * Returns an iterator pointing after the largest \ref
 	 * dyn_segtree_internal::InnerNode "InnerNode" representing a start or end
 	 * event.
 	 */
-	const_iterator<false> end() const;
-	iterator<false> end();
+	const_iterator<false> end() const noexcept;
+	iterator<false> end() noexcept;
 
 	/**
 	 * Returns an reverse iterator pointing to the largest \ref
 	 * dyn_segtree_internal::InnerNode "InnerNode" representing a start or end
 	 * event.
 	 */
-	const_iterator<true> crbegin() const;
+	const_iterator<true> crbegin() const noexcept;
 	/**
 	 * Returns an reverse iterator pointing before the smallest \ref
 	 * dyn_segtree_internal::InnerNode "InnerNode" representing a start or end
 	 * event.
 	 */
-	const_iterator<true> crend() const;
+	const_iterator<true> crend() const noexcept;
 	/**
 	 * Returns an reverse iterator pointing to the largest \ref
 	 * dyn_segtree_internal::InnerNode "InnerNode" representing a start or end
 	 * event.
 	 */
-	const_iterator<true> rbegin() const;
-	iterator<true> rbegin();
+	const_iterator<true> rbegin() const noexcept;
+	iterator<true> rbegin() noexcept;
 
 	/**
 	 * Returns an reverse iterator pointing before the smallest \ref
 	 * dyn_segtree_internal::InnerNode "InnerNode" representing a start or end
 	 * event.
 	 */
-	const_iterator<true> rend() const;
-	iterator<true> rend();
+	const_iterator<true> rend() const noexcept;
+	iterator<true> rend() noexcept;
 
 	/**
 	 * Returns an iterator to the first event the key of which is not less than
@@ -1315,8 +1441,8 @@ public:
 	 * <key>
 	 */
 	const_iterator<false>
-	lower_bound_event(const typename Node::KeyT & key) const;
-	iterator<false> lower_bound_event(const typename Node::KeyT & key);
+	lower_bound_event(const typename Node::KeyT & key) const noexcept;
+	iterator<false> lower_bound_event(const typename Node::KeyT & key) noexcept;
 
 	/**
 	 * Returns an iterator to the first event the key of which is greater than
@@ -1327,8 +1453,8 @@ public:
 	 * <key>
 	 */
 	const_iterator<false>
-	upper_bound_event(const typename Node::KeyT & key) const;
-	iterator<false> upper_bound_event(const typename Node::KeyT & key);
+	upper_bound_event(const typename Node::KeyT & key) const noexcept;
+	iterator<false> upper_bound_event(const typename Node::KeyT & key) noexcept;
 
 	/**
 	 * @brief Removes all elements from the tree.
@@ -1337,7 +1463,7 @@ public:
 	 *
 	 * Removes all elements from the tree.
 	 */
-	void clear();
+	void clear() noexcept(noexcept_ops);
 
 	/*
 	 * DEBUGGING
@@ -1373,8 +1499,8 @@ public:
 	std::stringstream & dbg_get_dot() const;
 
 private:
-	void apply_interval(Node & n);
-	void unapply_interval(Node & n);
+	void apply_interval(Node & n) noexcept(noexcept_ops);
+	void unapply_interval(Node & n) noexcept(noexcept_ops);
 
 	InnerTree t;
 
