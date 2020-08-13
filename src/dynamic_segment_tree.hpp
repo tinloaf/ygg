@@ -35,7 +35,8 @@ noexcept_math()
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 	return std::is_nothrow_constructible_v<T> &&
-	       std::is_nothrow_assignable_v<T, T> && // Creation & assignment
+	       std::is_nothrow_assignable_v<std::add_lvalue_reference_t<T>,
+	                                    T> && // Creation & assignment
 	       noexcept(std::declval<T>() + std::declval<T>()) && noexcept(
 	           std::declval<T>() - std::declval<T>()) && // basic arithmetic
 	       noexcept(std::declval<T>() * std::declval<T>()) && noexcept(
@@ -107,7 +108,7 @@ constexpr bool
 noexcept_dst()
 {
 	return noexcept_dst_impl<CombinerPackParam>::get() && noexcept_math<ValueT>();
-};
+}
 
 /* Interface for when modification sequences of the underlying BST should be
  * stored for benchmarking purposes */
@@ -952,8 +953,6 @@ template <class KeyT, class AggValueT, class... Combiners>
 class CombinerPack {
 public:
 	using MyType = CombinerPack<KeyT, AggValueT, Combiners...>;
-
-	CombinerPack() noexcept = default;
 
 	/**
 	 * @brief Rebuilds all combiners at this node from its children's combiners
