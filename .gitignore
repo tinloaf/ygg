@@ -3,7 +3,10 @@ docs/output
 
 *~
 \#*
+.dir-locals.el
 
 # Stuff generated for emacs
 .cquery_cached_index/**
 compile_commands.json
+.clangd/*
+.cache/*
