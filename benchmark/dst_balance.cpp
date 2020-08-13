@@ -176,6 +176,8 @@ using ZRTree = ygg::DynamicSegmentTree<ZRDSTNode, ZRDSTNodeTraits,
 int
 main(int argc, char ** argv)
 {
+	(void)argc;
+
 	std::string out_fname = argv[1];
 	std::ofstream out_stream(out_fname, std::ios::trunc);
 	out_stream << "Name,Seed,Size,AvgDepth,MaxDepth\n";
@@ -187,7 +189,8 @@ main(int argc, char ** argv)
 
 	for (size_t seed = seed_start; seed < seed_start + seed_count; seed++) {
 		for (size_t doubling = 1; doubling <= doublings; doubling++) {
-			size_t size = static_cast<size_t>(base_size * std::pow(2, doubling));
+			size_t size = static_cast<size_t>(static_cast<double>(base_size) *
+			                                  std::pow(2, doubling));
 
 			BalanceAnalyzer<RBTTree, RBDSTNode> rbt_analyzer(size,
 			                                                 static_cast<int>(seed));
