@@ -44,16 +44,38 @@
 				{"kind": "set",
 				 "field": "full_algo",
 				 "set": [
-						 "std::multiset.*",
-						 "boost::intrusive::multiset.*",
-						 "RBTree.*",
-						 "ZipTree \\[H,UL\\]",
-						 "WBTree \\[3,4/3,SP\\]"
+						 "RBTree.*"
 				 ]}
 		],
-		 "filename": "bst_usvsthem_insert.pdf"
+		 "filename": "bst_rbtrees_insert.pdf"
 		},
-
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
+				 "match": "Delete"},
+				{"kind": "set",
+				 "field": "full_algo",
+				 "set": [
+						 "RBTree.*"
+				 ]}
+		],
+		 "filename": "bst_rbtrees_delete.pdf"
+		},
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
+				 "match": "Search"},
+				{"kind": "set",
+				 "field": "full_algo",
+				 "set": [
+						 "RBTree.*"
+				 ]}
+		],
+		 "filename": "bst_rbtrees_search.pdf"
+		},
+		
 		
 		{"filters": [
 				{"field": "group",
@@ -77,18 +99,53 @@
 				{"field": "group",
 				 "match": "BST"},
 				{"field": "experiment",
+				 "match": "Insert"},
+				{"kind": "set",
+				 "field": "full_algo",
+				 "set": [
+						 "std::multiset.*",
+						 "boost::intrusive::multiset.*",
+						 "RBTree \\[avc\\]",
+						 "ZipTree \\[H,UL\\]",
+						 "WBTree \\[3,4/3,SP\\]"
+				 ]}
+		],
+		 "filename": "bst_usvsthem_insert.pdf"
+		},
+
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
 				 "match": "Delete"},
 				{"kind": "set",
 				 "field": "full_algo",
 				 "set": [
 						 "std::multiset.*",
 						 "boost::intrusive::multiset.*",
-						 "RBTree.*",
+						 "RBTree \\[avc\\]",
 						 "ZipTree \\[H,UL\\]",
 						 "WBTree \\[3,4/3,SP\\]"
 				 ]}
 		],
 		 "filename": "bst_usvsthem_delete.pdf"
+		},
+		{"filters": [
+				{"field": "group",
+				 "match": "BST"},
+				{"field": "experiment",
+				 "match": "Search"},
+				{"kind": "set",
+				 "field": "full_algo",
+				 "set": [
+						 "std::multiset.*",
+						 "boost::intrusive::multiset.*",
+						 "RBTree \\[avc\\]",
+						 "ZipTree \\[H,UL\\]",
+						 "WBTree.*,SP\\]"
+				 ]}
+		],
+		 "filename": "bst_usvsthem_search.pdf"
 		},
 
 		
