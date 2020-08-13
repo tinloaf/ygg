@@ -27,7 +27,7 @@ BuildRange(::benchmark::internal::Benchmark * b)
 				    std::min(static_cast<long int>(std::round(
 				                 static_cast<double>(CFG.base_size << doubling) *
 				                 CFG.relative_experiment_size)),
-				             CFG.experiment_size);
+				             static_cast<long int>(CFG.experiment_size));
 				b->Args({CFG.base_size << doubling, experiment_size, seed});
 			} else if (CFG.use_relative_size) {
 				b->Args({CFG.base_size << doubling,
