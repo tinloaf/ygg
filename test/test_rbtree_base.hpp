@@ -115,6 +115,26 @@ TEST(__RBT_BASENAME(RBTreeTest), TrivialInsertionTest)
 	tree.dbg_verify();
 }
 
+TEST(__RBT_BASENAME(RBTreeTest), TrivialHintedInsertionTest)
+{
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
+
+	Node n1;
+	Node n2;
+	Node n3;
+	n1.data = 1;
+	n2.data = 2;
+	n3.data = 3;
+	
+	tree.insert(n3);
+	tree.dbg_print_tree();
+	tree.insert(n2, n3);
+	tree.dbg_print_tree();
+	tree.dbg_verify();
+	tree.insert(n1, n2);
+	tree.dbg_verify();
+}
+
 TEST(__RBT_BASENAME(RBTreeTest), TrivialSizeTest)
 {
 	auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
@@ -178,102 +198,6 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionTest)
 	}
 }
 
-/* Hinted is broken
-TEST(__RBT_BASENAME(RBTreeTest), HintedPostEqualInsertionTest)
-{
-  auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
-
-  MultiNode n_insert_before(1, 0);
-  MultiNode n_pre(1, 1);
-  MultiNode n_insert_between(1, 2);
-  MultiNode n_post(2, 3);
-
-  tree.insert(n_pre);
-  tree.insert(n_post);
-
-  tree.dbg_verify();
-
-  // should be inserted before pre
-  tree.insert(n_insert_before);
-  tree.dbg_verify();
-
-  // TODO once hinted insertion is fixed, check that the order is upheld
-  // if not using the _*_leaning versions, but the hinted version
-
-  auto it = tree.begin();
-  ASSERT_EQ(it->sub_data, 0);
-  it++;
-  ASSERT_EQ(it->sub_data, 1);
-  it++;
-  ASSERT_EQ(it->sub_data, 2);
-  it++;
-  ASSERT_EQ(it->sub_data, 3);
-  it++;
-  ASSERT_EQ(it, tree.end());
-}
-*/
-
-/*
-  TODO re-enable once hinted insertion is fixed.
-TEST(__RBT_BASENAME(RBTreeTest), RepeatedHintedPostEqualInsertionTest)
-{
-auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
-
-MultiNode nodes_pre[RBTREE_TESTSIZE];
-MultiNode nodes_post[RBTREE_TESTSIZE];
-MultiNode nodes_between[RBTREE_TESTSIZE];
-MultiNode node_border_small(1, RBTREE_TESTSIZE + 2);
-MultiNode node_border_large(2, RBTREE_TESTSIZE + 2);
-
-for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  nodes_pre[i] = MultiNode(1, static_cast<int>(i));
-  nodes_post[i] = MultiNode(2, static_cast<int>(i));
-  nodes_between[i] = MultiNode(1, (int)RBTREE_TESTSIZE + 1);
-}
-
-for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  tree.insert(nodes_post[i], tree.end()); // insert in order
-}
-
-tree.insert(nodes_pre[RBTREE_TESTSIZE - 1], nodes_post[0]);
-
-for (int i = RBTREE_TESTSIZE - 2; i >= 0; --i) {
-  tree.insert(nodes_pre[i], nodes_pre[i + 1]);
-  ASSERT_EQ(tree.begin()->sub_data, i);
-}
-
-for (int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  tree.insert(nodes_between[i], nodes_pre[i]);
-}
-
-tree.insert(node_border_large, nodes_post[0]);
-tree.insert(node_border_small, node_border_large);
-tree.dbg_verify();
-
-auto it = tree.begin();
-for (int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  ASSERT_EQ(it->data, 1);
-  ASSERT_EQ(it->sub_data, RBTREE_TESTSIZE + 1); // first, the 'between' node
-  it++;
-  ASSERT_EQ(it->data, 1);
-  ASSERT_EQ(it->sub_data, i); // now, the pre-node
-  it++;
-}
-
-ASSERT_EQ(it->data, 1);
-ASSERT_EQ(it->sub_data, RBTREE_TESTSIZE + 2); // small border
-it++;
-ASSERT_EQ(it->data, 2);
-ASSERT_EQ(it->sub_data, RBTREE_TESTSIZE + 2); // large border
-it++;
-
-for (int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  ASSERT_EQ(it->data, 2);
-  ASSERT_EQ(it->sub_data, i); // post-nodes
-  it++;
-}
-}
-
 TEST(__RBT_BASENAME(RBTreeTest), LinearEndHintedInsertionTest)
 {
 auto tree =
@@ -299,46 +223,6 @@ for (const auto & n : tree) {
 }
 }
 
-
-TEST(__RBT_BASENAME(RBTreeTest), HintedOrderPreservationTest)
-{
-auto tree = RBTree<MultiNode, MultiNodeTraits, __RBT_MULTIPLE<>>();
-
-MultiNode nodes[3 * RBTREE_TESTSIZE];
-
-for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  nodes[3 * i] = MultiNode(static_cast<int>(i), 0);
-  nodes[3 * i + 1] = MultiNode(static_cast<int>(i), 1);
-  nodes[3 * i + 2] = MultiNode(static_cast<int>(i), 2);
-}
-
-// insert the middles
-for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  tree.insert(nodes[3 * i + 1]);
-}
-
-tree.verify_integrity();
-
-// insert the prefix, using a hint
-for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  tree.insert(nodes[3 * i], nodes[3 * i + 1]);
-}
-
-tree.verify_integrity();
-
-// insert the postfix, using a hint
-for (unsigned int i = 0; i < RBTREE_TESTSIZE - 1; ++i) {
-  tree.insert(nodes[3 * i + 2], nodes[3 * i + 3]);
-}
-
-unsigned int i = 0;
-for (auto & n : tree) {
-  ASSERT_EQ(n.data, i / 3);
-  ASSERT_EQ(n.sub_data, i % 3);
-  ++i;
-}
-}
-*/
 TEST(__RBT_BASENAME(RBTreeTest), EqualityInsertionSizeTest)
 {
 	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();

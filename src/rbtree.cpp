@@ -468,16 +468,63 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node,
 	this->bss.register_insert(reinterpret_cast<const void *>(&node),
 	                          Options::SequenceInterface::get_key(node));
 #endif
+	this->s.add(1);
 
 	/* TODO this code does not work. We need to traverse the path up until
 	 * we have seen at least one smaller-than and one larger-than node.
 	 * Is this really faster? For now, fall back to normal insertion.
 	 */
-	(void)hint;
-	this->insert(node);
+	//(void)hint;
+	// this->insert(node);
 
 	// find parent
-	// Node * parent = &hint;
+	Node * parent = &hint;
+	Node * cur = parent;
+
+	/* We can be sure that *parent is the root of a subtree in which node is
+	 * supposed to be inserted if the path from *parent to the root contains only
+	 * "correct decisions" wrt. node.
+	 *
+	 * If we walk up the path and see one correctly taken right, and one correctly
+	 * taken left, we can be sure that the path above that is okay.
+	 */
+
+	bool left_seen;
+	bool right_seen;
+
+	// Below the hint itself, we can choose left/right
+	left_seen = this->cmp(node, hint);
+	right_seen = !left_seen;
+
+	while (!(left_seen && right_seen)) {
+		const Node * const prev = cur;
+		cur = cur->NB::get_parent();
+
+		if (__builtin_expect(cur == nullptr, 0)) {
+			parent = this->root;
+			break;
+		}
+
+		const bool ascended_left = (cur->NB::get_left() == prev);
+		const bool should_go_left = this->cmp(node, *cur);
+		left_seen |= ascended_left;
+		right_seen |= !ascended_left;
+
+		// If we took a wrong turn, reset left_seen and right_seen and set new
+		// parent
+		if (ascended_left && !should_go_left) {
+			// goes right below cur
+			right_seen = true;
+			left_seen = false;
+			parent = cur;
+		} else if (!ascended_left && should_go_left) {
+			right_seen = false;
+			left_seen = true;
+			parent = cur;
+		}
+	}
+
+	this->insert_leaf_base(node, parent);
 
 	/* We need to walk up if:
 	 *  - we're larger than the parent and in its left subtree
@@ -516,27 +563,23 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 	this->bss.register_insert(reinterpret_cast<const void *>(&node),
 	                          Options::SequenceInterface::get_key(node));
 #endif
+	this->s.add(1);
 
-	this->insert(node);
-	(void)hint;
-	/* TODO see above.*/
-	/*
 	if (hint == this->end()) {
-	  // special case: insert at the end
-	  Node * parent = this->root;
+		// special case: insert at the end
+		Node * parent = this->root;
 
-	  if (parent == nullptr) {
-	    this->insert_leaf_base<false>(node, parent);
-	  } else {
-	    while (parent->NB::get_right() != nullptr) {
-	      parent = parent->NB::get_right();
-	    }
-	    this->insert_leaf_base<false>(node, parent);
-	  }
+		if (parent == nullptr) {
+			this->insert_leaf_base<false>(node, parent);
+		} else {
+			while (parent->NB::get_right() != nullptr) {
+				parent = parent->NB::get_right();
+			}
+			this->insert_leaf_base<false>(node, parent);
+		}
 	} else {
-	  this->insert(node, *hint);
+		this->insert(node, *hint);
 	}
-	*/
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
