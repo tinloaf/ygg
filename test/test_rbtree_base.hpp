@@ -125,11 +125,9 @@ TEST(__RBT_BASENAME(RBTreeTest), TrivialHintedInsertionTest)
 	n1.data = 1;
 	n2.data = 2;
 	n3.data = 3;
-	
+
 	tree.insert(n3);
-	tree.dbg_print_tree();
 	tree.insert(n2, n3);
-	tree.dbg_print_tree();
 	tree.dbg_verify();
 	tree.insert(n1, n2);
 	tree.dbg_verify();
@@ -200,27 +198,26 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionTest)
 
 TEST(__RBT_BASENAME(RBTreeTest), LinearEndHintedInsertionTest)
 {
-auto tree =
-    RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
 
-Node nodes[RBTREE_TESTSIZE];
+	Node nodes[RBTREE_TESTSIZE];
 
-for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
-  nodes[i] = Node(static_cast<int>(i));
-}
+	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
+		nodes[i] = Node(static_cast<int>(i));
+	}
 
-tree.insert(nodes[RBTREE_TESTSIZE - 1]);
+	tree.insert(nodes[RBTREE_TESTSIZE - 1]);
 
-for (int i = RBTREE_TESTSIZE - 2; i >= 0; --i) {
-  tree.insert(nodes[i], nodes[RBTREE_TESTSIZE - 1]);
-  tree.dbg_verify();
-}
+	for (int i = RBTREE_TESTSIZE - 2; i >= 0; --i) {
+		tree.insert(nodes[i], nodes[RBTREE_TESTSIZE - 1]);
+		tree.dbg_verify();
+	}
 
-int i = 0;
-for (const auto & n : tree) {
-  ASSERT_EQ(n.data, i);
-  i++;
-}
+	int i = 0;
+	for (const auto & n : tree) {
+		ASSERT_EQ(n.data, i);
+		i++;
+	}
 }
 
 TEST(__RBT_BASENAME(RBTreeTest), EqualityInsertionSizeTest)
