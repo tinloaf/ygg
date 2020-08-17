@@ -4,13 +4,27 @@
 #include "../src/intervaltree.hpp"
 #include "randomizer.hpp"
 
+#include <unordered_set>
+
 namespace ygg {
 namespace testing {
 namespace intervaltree {
 
+// necessary to build a unordered set of pairs.
+// Since both values will always come from a random distribution anyways, we
+// don't need a good hash function here
+struct pair_hash
+{
+	inline std::size_t
+	operator()(const std::pair<unsigned int, unsigned int> & v) const
+	{
+		return v.first * 31 + v.second;
+	}
+};
+
 using namespace ygg;
 
-constexpr int IT_TESTSIZE = 2000;
+constexpr int IT_TESTSIZE = 1500;
 
 using Interval = std::pair<unsigned int, unsigned int>;
 
@@ -62,6 +76,23 @@ public:
 	ITNode(const ITNode & other)
 	    : data(other.data), lower(other.lower), upper(other.upper){};
 	ITNode & operator=(const ITNode & other) = default;
+};
+
+template <class Options>
+class ITNodeOpt
+    : public ITreeNodeBase<ITNodeOpt<Options>, MyNodeTraits<ITNodeOpt<Options>>,
+                           Options> {
+public:
+	int data;
+	unsigned int lower;
+	unsigned int upper;
+
+	ITNodeOpt() : data(0), lower(0), upper(0){};
+	explicit ITNodeOpt(unsigned int lower_in, unsigned int upper_in, int data_in)
+	    : data(data_in), lower(lower_in), upper(upper_in){};
+	ITNodeOpt(const ITNodeOpt<Options> & other)
+	    : data(other.data), lower(other.lower), upper(other.upper){};
+	ITNodeOpt<Options> & operator=(const ITNodeOpt<Options> & other) = default;
 };
 
 TEST(ITreeTest, TrivialInsertionTest)
@@ -395,6 +426,96 @@ TEST(ITreeTest, RandomEqualInsertionRandomDeletionTest)
 	for (unsigned int i = 0; i < 5 * IT_TESTSIZE; ++i) {
 		tree.remove(nodes[indices[i]]);
 		ASSERT_TRUE(tree.verify_integrity());
+	}
+}
+
+TEST(ITreeTest, SlowFindTest)
+{
+	auto tree = IntervalTree<ITNode, MyNodeTraits<ITNode>>();
+
+	ITNode nodes[IT_TESTSIZE];
+	std::mt19937 rng(4); // chosen by fair xkcd
+	std::unordered_set<std::pair<unsigned int, unsigned int>, pair_hash> seen;
+
+	for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(
+		    0, std::numeric_limits<unsigned int>::max() / 2);
+		unsigned int lower = bounds_distr(rng);
+		unsigned int upper = lower + bounds_distr(rng);
+		nodes[i] = ITNode(lower, upper, i);
+		seen.emplace(lower, upper);
+		tree.insert(nodes[i]);
+	}
+
+	ITNode query_nodes[IT_TESTSIZE];
+	for (unsigned int i = 0; i < IT_TESTSIZE;) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(
+		    0, std::numeric_limits<unsigned int>::max() / 2);
+		unsigned int lower = bounds_distr(rng);
+		unsigned int upper = lower + bounds_distr(rng);
+
+		if (seen.find({lower, upper}) == seen.end()) {
+			query_nodes[i] = ITNode(lower, upper, i);
+			i++;
+		}
+	}
+
+	ASSERT_TRUE(tree.verify_integrity());
+
+	for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
+		auto it = tree.find(nodes[i]);
+		ASSERT_NE(it, tree.end());
+		ASSERT_EQ(it->data, i);
+
+		it = tree.find(query_nodes[i]);
+		ASSERT_EQ(it, tree.end());
+	}
+}
+
+TEST(ITreeTest, FastFindTest)
+{
+	using Options =
+	    ygg::TreeOptions<TreeFlags::MULTIPLE, TreeFlags::CONSTANT_TIME_SIZE,
+	                     ygg::TreeFlags::ITREE_FAST_FIND>;
+	auto tree = IntervalTree<ITNodeOpt<Options>, MyNodeTraits<ITNodeOpt<Options>>,
+	                         Options>();
+
+	ITNodeOpt<Options> nodes[IT_TESTSIZE];
+	std::mt19937 rng(4); // chosen by fair xkcd
+	std::unordered_set<std::pair<unsigned int, unsigned int>, pair_hash> seen;
+
+	for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(
+		    0, std::numeric_limits<unsigned int>::max() / 2);
+		unsigned int lower = bounds_distr(rng);
+		unsigned int upper = lower + bounds_distr(rng);
+		nodes[i] = ITNodeOpt<Options>(lower, upper, i);
+		seen.emplace(lower, upper);
+		tree.insert(nodes[i]);
+	}
+
+	ITNodeOpt<Options> query_nodes[IT_TESTSIZE];
+	for (unsigned int i = 0; i < IT_TESTSIZE;) {
+		std::uniform_int_distribution<unsigned int> bounds_distr(
+		    0, std::numeric_limits<unsigned int>::max() / 2);
+		unsigned int lower = bounds_distr(rng);
+		unsigned int upper = lower + bounds_distr(rng);
+
+		if (seen.find({lower, upper}) == seen.end()) {
+			query_nodes[i] = ITNodeOpt<Options>(lower, upper, i);
+			i++;
+		}
+	}
+
+	ASSERT_TRUE(tree.verify_integrity());
+
+	for (unsigned int i = 0; i < IT_TESTSIZE; ++i) {
+		auto it = tree.find(nodes[i]);
+		ASSERT_NE(it, tree.end());
+		ASSERT_EQ(it->data, i);
+
+		it = tree.find(query_nodes[i]);
+		ASSERT_EQ(it, tree.end());
 	}
 }
 

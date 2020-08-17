@@ -19,7 +19,7 @@ public:
 	DummyRange(KeyType lower, KeyType upper);
 };
 
-template <class Node, class NodeTraits>
+template <class Node, class NodeTraits, bool sort_upper>
 class IntervalCompare {
 public:
 	template <class T1, class T2>
@@ -128,7 +128,8 @@ class IntervalTree
           intervaltree_internal::ExtendedNodeTraits<
               Node, ITreeNodeBase<Node, NodeTraits, Options, Tag>, NodeTraits>,
           Options, Tag,
-          intervaltree_internal::IntervalCompare<Node, NodeTraits>> {
+          intervaltree_internal::IntervalCompare<Node, NodeTraits,
+                                                 Options::itree_fast_find>> {
 public:
 	using Key = typename NodeTraits::key_type;
 	using MyClass = IntervalTree<Node, NodeTraits, Options, Tag>;
@@ -142,9 +143,12 @@ public:
 
 	using ENodeTraits =
 	    intervaltree_internal::ExtendedNodeTraits<Node, INB, NodeTraits>;
-	using BaseTree = RBTree<
-	    Node, intervaltree_internal::ExtendedNodeTraits<Node, INB, NodeTraits>,
-	    Options, Tag, intervaltree_internal::IntervalCompare<Node, NodeTraits>>;
+	using BaseTree =
+	    RBTree<Node,
+	           intervaltree_internal::ExtendedNodeTraits<Node, INB, NodeTraits>,
+	           Options, Tag,
+	           intervaltree_internal::IntervalCompare<Node, NodeTraits,
+	                                                  Options::itree_fast_find>>;
 
 	IntervalTree();
 
@@ -217,6 +221,31 @@ public:
 	template <class Comparable>
 	QueryResult<Comparable> query(const Comparable & q) const;
 
+	/**
+	 * @brief Checks if a specified interval is contained in the interval tree
+	 *
+	 * This method queries whether a specified interval is contained in the tree.
+	 * Note that it only returns an interval that has the *exact* same borders as
+	 * the supplied query. To query for overlap, see the query method.
+	 *
+	 * The return value is an iterator to a found interval in the tree, or end()
+	 * if no such interval is in the tree.
+	 *
+	 * This method runs in O(log n) if the ITREE_FAST_FIND option is set,
+	 * and in O(log n + k) otherwise (with k being the number of intervals
+	 * overlapping the query).
+	 *
+	 * @param q Anything that is comparable (i.e., has get_lower() and get_upper()
+	 * methods in NodeTraits) to an interval
+	 * @result An iterator pointing to the requested interval, or end() if no such
+	 *  interval exists.
+	 */
+	template <class Comparable>
+	typename BaseTree::template const_iterator<false>
+	find(const Comparable & q) const;
+	template <class Comparable>
+	typename BaseTree::template iterator<false> find(const Comparable & q);
+
 	template <class Comparable>
 	typename BaseTree::template const_iterator<false>
 	interval_upper_bound(const Comparable & query_range) const;
@@ -230,6 +259,12 @@ public:
 
 private:
 	bool verify_maxima(Node * n) const;
+
+	template <class Comparable>
+	typename BaseTree::template iterator<false> find_slow(const Comparable & q);
+
+	template <class Comparable>
+	typename BaseTree::template iterator<false> find_fast(const Comparable & q);
 };
 
 } // namespace ygg

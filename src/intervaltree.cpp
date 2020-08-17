@@ -4,19 +4,23 @@
 namespace ygg {
 namespace intervaltree_internal {
 
-template <class Node, class NodeTraits>
+template <class Node, class NodeTraits, bool sort_upper>
 template <class T1, class T2>
 bool
-IntervalCompare<Node, NodeTraits>::operator()(const T1 & lhs,
-                                              const T2 & rhs) const
+IntervalCompare<Node, NodeTraits, sort_upper>::operator()(const T1 & lhs,
+                                                          const T2 & rhs) const
 {
-	if (NodeTraits::get_lower(lhs) < NodeTraits::get_lower(rhs)) {
-		return true;
-	} else if ((NodeTraits::get_lower(lhs) == NodeTraits::get_lower(rhs)) &&
-	           (NodeTraits::get_upper(lhs) < NodeTraits::get_upper(rhs))) {
-		return true;
+	if constexpr (sort_upper) {
+		if (NodeTraits::get_lower(lhs) < NodeTraits::get_lower(rhs)) {
+			return true;
+		} else if ((NodeTraits::get_lower(lhs) == NodeTraits::get_lower(rhs)) &&
+		           (NodeTraits::get_upper(lhs) < NodeTraits::get_upper(rhs))) {
+			return true;
+		} else {
+			return false;
+		}
 	} else {
-		return false;
+		return NodeTraits::get_lower(lhs) < NodeTraits::get_lower(rhs);
 	}
 }
 
@@ -216,6 +220,138 @@ IntervalTree<Node, NodeTraits, Options, Tag>::query(const Comparable & q) const
 	}
 
 	return QueryResult<Comparable>(hit, q);
+}
+
+template <class Node, class NodeTraits, class Options, class Tag>
+template <class Comparable>
+typename IntervalTree<Node, NodeTraits, Options,
+                      Tag>::BaseTree::template iterator<false>
+IntervalTree<Node, NodeTraits, Options, Tag>::find(const Comparable & q)
+{
+	// dispatch based on whether intervals are also sorted by upper bound
+	if (Options::itree_fast_find) {
+		return this->find_fast(q);
+	} else {
+		return this->find_slow(q);
+	}
+}
+
+template <class Node, class NodeTraits, class Options, class Tag>
+template <class Comparable>
+typename IntervalTree<Node, NodeTraits, Options,
+                      Tag>::BaseTree::template const_iterator<false>
+IntervalTree<Node, NodeTraits, Options, Tag>::find(const Comparable & q) const
+{
+	return const_cast<std::remove_const_t<decltype(this)>>(this)->contains(q);
+}
+
+template <class Node, class NodeTraits, class Options, class Tag>
+template <class Comparable>
+typename IntervalTree<Node, NodeTraits, Options,
+                      Tag>::BaseTree::template iterator<false>
+IntervalTree<Node, NodeTraits, Options, Tag>::find_fast(const Comparable & q)
+{
+	Node * cur = this->root;
+	Node * last_left = nullptr;
+
+	const auto & q_lower = NodeTraits::get_lower(q);
+	const auto & q_upper = NodeTraits::get_upper(q);
+
+	// Step 1: Search on lower bounds
+	while (cur != nullptr) {
+		if constexpr (Options::micro_prefetch) {
+			__builtin_prefetch(cur->INB::get_left());
+			__builtin_prefetch(cur->INB::get_right());
+		}
+
+		if constexpr (Options::micro_avoid_conditionals) {
+			(void)last_left;
+
+			if (__builtin_expect(q_lower == NodeTraits::get_lower(*cur), false)) {
+				// Found a node with the correct lower bound. All nodes with the same
+				// lower bound must live in this subtree. Start the upper-bound search
+				// here.
+				break;
+			}
+			cur = utilities::go_right_if(NodeTraits::get_lower(*cur) < q_lower, cur);
+		} else {
+			// Two-way search with the last_left-trick, analogous to find() in bst.cpp
+			if (NodeTraits::get_lower(*cur) < q_lower) {
+				cur = cur->INB::get_right();
+			} else {
+				last_left = cur;
+				cur = cur->INB::get_left();
+			}
+		}
+	}
+
+	// If we use the last_left trick, we need to check if we found
+	// a match the last time we went left
+	if constexpr (!Options::micro_avoid_conditionals) {
+		if ((last_left != nullptr) &&
+		    (q_lower == NodeTraits::get_lower(*last_left))) {
+			// Yep, found! Set cur to continue upper-search from there
+			cur = last_left;
+		}
+	}
+
+	// Step 2: Search on upper bounds. Esentially the same as before, but we must
+	// make sure never to leave the range of nodes with correct lower bounds.
+	while ((cur != nullptr) && (NodeTraits::get_lower(*cur) == q_lower)) {
+		if constexpr (Options::micro_prefetch) {
+			__builtin_prefetch(cur->INB::get_left());
+			__builtin_prefetch(cur->INB::get_right());
+		}
+
+		if constexpr (Options::micro_avoid_conditionals) {
+			(void)last_left;
+
+			if (__builtin_expect(q_upper == NodeTraits::get_upper(*cur), false)) {
+				// Upper and lower bound check out
+				return typename BaseTree::template iterator<false>(*cur);
+			}
+			cur = utilities::go_right_if(NodeTraits::get_upper(*cur) < q_upper, cur);
+		} else {
+			// Two-way search with the last_left-trick, analogous to find() in bst.cpp
+			if (NodeTraits::get_upper(*cur) < q_upper) {
+				cur = cur->INB::get_right();
+			} else {
+				last_left = cur;
+				cur = cur->INB::get_left();
+			}
+		}
+	}
+
+	if constexpr (!Options::micro_avoid_conditionals) {
+		if ((last_left != nullptr) &&
+		    (q_upper == NodeTraits::get_upper(*last_left))) {
+			return typename BaseTree::template iterator<false>(last_left);
+		}
+	}
+
+	return this->end();
+}
+
+template <class Node, class NodeTraits, class Options, class Tag>
+template <class Comparable>
+typename IntervalTree<Node, NodeTraits, Options,
+                      Tag>::BaseTree::template iterator<false>
+IntervalTree<Node, NodeTraits, Options, Tag>::find_slow(const Comparable & q)
+{
+	const auto & q_lower = NodeTraits::get_lower(q);
+	const auto & q_upper = NodeTraits::get_upper(q);
+
+	// TODO remove the const-away-cast below once non-const
+	// queries are implemented
+	for (auto & hit : this->query(q)) {
+		if ((NodeTraits::get_lower(hit) == q_lower) &&
+		    (NodeTraits::get_upper(hit) == q_upper)) {
+			return
+			    typename BaseTree::template iterator<false>(const_cast<Node *>(&hit));
+		}
+	}
+
+	return this->end();
 }
 
 template <class Node, class NodeTraits, class Options, class Tag>

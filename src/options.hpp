@@ -268,7 +268,29 @@ public:
 		constexpr static size_t value = gamma_denominator;
 	};
 
+	/**
+	 * @brief Rebalance weight-balanced trees using the top-down instead of the
+	 *  bottom-up algorithm
+	 *
+	 * Setting this option causes the weight-balanced tree to be rebalanced with a
+	 * top-down algorithm. This can significantly improve performance, since the
+	 * search path must only be visited once. However, setting gamma end delta
+	 * such that balance is guaranteed is mory tricky.
+	 *
+	 * See https://arxiv.org/abs/1910.07849 for more details.
+	 */
 	class WBT_SINGLE_PASS {
+	};
+
+	/**
+	 * @brief Causes the IntervalTrees's find() queries to run in O(log n)
+	 *
+	 * Setting this flag causes all intervals in the IntervalTree to be sorted by
+	 * their upper bounds as secondary criterion. This causes some operations to
+	 * be slower (because a second comparison has to be done), but allows
+	 * a find() query to run in O(log n) instead of O(log n + k) time.
+	 */
+	class ITREE_FAST_FIND {
 	};
 
 	/******************************************************
@@ -624,6 +646,9 @@ public:
 
 	static constexpr bool wbt_single_pass =
 	    OptPack::template has<TreeFlags::WBT_SINGLE_PASS>();
+
+	static constexpr bool itree_fast_find =
+	    OptPack::template has<TreeFlags::ITREE_FAST_FIND>();
 
 	/**********************************************
 	 * Micro-Optimization
