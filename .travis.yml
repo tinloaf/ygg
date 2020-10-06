@@ -35,7 +35,7 @@ jobs:
         - travis_wait 30 python /usr/bin/gtest_parallel.py -w 2 --print_test_times ./run_tests 
 
       after_success:
-        - cd ../.. && coveralls --root . -E '/usr/*' -E '.*gtest.*' -e benchmark -e build -e examples -e test --build-root=./build
+        - cd ../.. && coveralls --root . -E '/usr/*' -E '.*gtest.*' -e benchmark -e build -e examples --build-root=./build
 
     # Secondary job: clang 7 on Ubuntu
     - addons:
