@@ -128,6 +128,7 @@ class BinarySearchTree {
 public:
 	using MyClass =
 	    BinarySearchTree<Node, Options, Tag, Compare, ParentContainer>;
+	using MyNode = Node;
 	// Node Base
 	using NB = BSTNodeBase<Node, Options, Tag, ParentContainer>;
 	static_assert(std::is_base_of<NB, Node>::value,
