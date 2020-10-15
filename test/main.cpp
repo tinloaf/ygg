@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "test_dynamic_segment_tree.hpp"
-#include "test_intervalmap.hpp"
 #include "test_intervaltree.hpp"
 #include "test_list.hpp"
 #include "test_multi_rbtree.hpp"
