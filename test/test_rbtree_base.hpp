@@ -1,3 +1,4 @@
+#include "test_rbtree.hpp"
 template <class AdditionalOption = NonOptionDummy>
 class NodeBase : public RBTreeNodeBase<
                      NodeBase<AdditionalOption>,
@@ -193,6 +194,28 @@ TEST(__RBT_BASENAME(RBTreeTest), LinearInsertionTest)
 		tree.insert(nodes[i]);
 
 		tree.dbg_verify();
+	}
+}
+
+TEST(__RBT_BASENAME(RBTreeTest), BlockedInsertionTest)
+{
+	auto tree = RBTree<Node, NodeTraits, __RBT_NONMULTIPLE<>>();
+
+	Node nodes[RBTREE_TESTSIZE];
+	Node node_duplicates[RBTREE_TESTSIZE];
+
+	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
+		nodes[i] = Node(static_cast<int>(i));
+		node_duplicates[i] = Node(static_cast<int>(i));
+
+		auto it = tree.insert(nodes[i]);
+		ASSERT_EQ(&*it, &nodes[i]);
+	}
+
+	for (unsigned int i = 0; i < RBTREE_TESTSIZE; ++i) {
+		auto it = tree.insert(node_duplicates[i]);
+		ASSERT_EQ(&*it, &nodes[i]);
+		ASSERT_EQ(tree.size(), RBTREE_TESTSIZE);
 	}
 }
 

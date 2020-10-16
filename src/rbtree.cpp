@@ -220,7 +220,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::RBTree(
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-void
+typename RBTree<Node, NodeTraits, Options, Tag, Compare>::template iterator<false>
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
                                                                   Node * start)
     CMP_NOEXCEPT(node)
@@ -259,7 +259,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 					// Same as existing. Reduce size (because we increased it earlier)
 					// and exit.
 					this->s.reduce(1);
-					return;
+					return this->iterator_to(*cur);
 				}
 
 				cur = utilities::go_left_if(this->cmp(node, *cur), cur);
@@ -272,7 +272,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 					// Same as existing. Reduce size (because we increased it earlier)
 					// and exit.
 					this->s.reduce(1);
-					return;
+					return this->iterator_to(*cur);
 				}
 			}
 		}
@@ -300,7 +300,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 			if constexpr (!Options::multiple) {
 				// We already added to the size, subtract it again!
 				this->s.reduce(1);
-				return;
+				return this->iterator_to(*parent);
 			} else {
 				parent->NB::set_left(&node);
 			}
@@ -310,7 +310,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert_leaf_base(Node & node,
 		this->fixup_after_insert(&node);
 	}
 
-	return;
+	return this->iterator_to(node);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
@@ -445,7 +445,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::fixup_after_insert(
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-void
+typename RBTree<Node, NodeTraits, Options, Tag,
+                Compare>::template iterator<false>
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node)
     CMP_NOEXCEPT(node)
 {
@@ -455,11 +456,12 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node)
 #endif
 	// TODO merge this
 	this->s.add(1);
-	this->insert_leaf_base(node, this->root);
+	return this->insert_leaf_base(node, this->root);
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-void
+typename RBTree<Node, NodeTraits, Options, Tag,
+                Compare>::template iterator<false>
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node,
                                                         Node & hint)
     CMP_NOEXCEPT(node)
@@ -524,7 +526,7 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node,
 		}
 	}
 
-	this->insert_leaf_base(node, parent);
+	return this->insert_leaf_base(node, parent);
 
 	/* We need to walk up if:
 	 *  - we're larger than the parent and in its left subtree
@@ -553,7 +555,8 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(Node & node,
 }
 
 template <class Node, class NodeTraits, class Options, class Tag, class Compare>
-void
+typename RBTree<Node, NodeTraits, Options, Tag,
+                Compare>::template iterator<false>
 RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(
     Node & node,
     RBTree<Node, NodeTraits, Options, Tag, Compare>::iterator<false> hint)
@@ -570,15 +573,15 @@ RBTree<Node, NodeTraits, Options, Tag, Compare>::insert(
 		Node * parent = this->root;
 
 		if (parent == nullptr) {
-			this->insert_leaf_base<false>(node, parent);
+			return this->insert_leaf_base<false>(node, parent);
 		} else {
 			while (parent->NB::get_right() != nullptr) {
 				parent = parent->NB::get_right();
 			}
-			this->insert_leaf_base<false>(node, parent);
+			return this->insert_leaf_base<false>(node, parent);
 		}
 	} else {
-		this->insert(node, *hint);
+		return this->insert(node, *hint);
 	}
 }
 

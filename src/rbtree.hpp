@@ -243,10 +243,12 @@ public:
 	 * @warning Not available for explicitly ordered trees
 	 *
 	 * @param   Node  The node to be inserted.
+	 * @return An iterator to the inserted node if insertion was successfull, an
+	 *         iterator to the blocking node otherwise.
 	 */
-	void insert(Node & node) CMP_NOEXCEPT(node);
-	void insert(Node & node, Node & hint) CMP_NOEXCEPT(node);
-	void insert(Node & node, iterator<false> hint) CMP_NOEXCEPT(node);
+	iterator<false> insert(Node & node) CMP_NOEXCEPT(node);
+	iterator<false> insert(Node & node, Node & hint) CMP_NOEXCEPT(node);
+	iterator<false> insert(Node & node, iterator<false> hint) CMP_NOEXCEPT(node);
 
 	// TODO document hinted inserts
 	// TODO should order be preserved on hints?
@@ -316,7 +318,8 @@ protected:
 	void remove_to_leaf(Node & node) CMP_NOEXCEPT(node);
 	void fixup_after_delete(Node * parent, bool deleted_left) noexcept;
 
-	void insert_leaf_base(Node & node, Node * start) CMP_NOEXCEPT(node);
+	iterator<false> insert_leaf_base(Node & node, Node * start)
+	    CMP_NOEXCEPT(node);
 
 	void fixup_after_insert(Node * node) noexcept;
 	void rotate_left(Node * parent) noexcept;
