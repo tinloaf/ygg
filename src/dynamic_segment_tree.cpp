@@ -1197,7 +1197,6 @@ DynamicSegmentTree<Node, NodeTraits, Combiners, Options, TreeSelector,
 	this->t.build_lca(lower_node, upper_node);
 
 	// TODO inefficient: We don't need to build all the combiners!
-	Combiners dummy_cp;
 	Combiners cp;
 
 	decltype(InnerNode().get_point()) topmost_point;
