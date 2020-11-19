@@ -574,7 +574,7 @@ public:
 	using KeyT = KeyType;
 	using MyType = MaxCombiner<KeyT, ValueT>;
 
-	MaxCombiner() noexcept = default;
+	MaxCombiner() = default;
 
 	// TODO the bool is only returned for sake of expansion! Fix that!
 	/**
