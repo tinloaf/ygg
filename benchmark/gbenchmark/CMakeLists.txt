@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 ExternalProject_Add(gbenchmark
   GIT_REPOSITORY    https://github.com/google/benchmark.git
-	GIT_TAG           b8ca0c42179b7b5d656494e61dda8b861057122f
+	GIT_TAG           b177433f3ee2513b1075140c723d73ab8901790f
   CMAKE_ARGS       -DBENCHMARK_ENABLE_GTEST_TESTS=OFF
 	                 -DCMAKE_BUILD_TYPE=Release
 	PREFIX           "${CMAKE_CURRENT_BINARY_DIR}"
