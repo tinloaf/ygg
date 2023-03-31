@@ -1,7 +1,7 @@
 #ifndef BENCH_COMMON_HPP
 #define BENCH_COMMON_HPP
 
-#include "benchmark.h"
+#include "benchmark/benchmark.h"
 #include "benchmark_config.hpp"
 
 #include <algorithm>

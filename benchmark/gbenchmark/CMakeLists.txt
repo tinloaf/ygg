@@ -16,7 +16,7 @@ ExternalProject_Add(gbenchmark
 
 # Specify include dir
 ExternalProject_Get_Property(gbenchmark source_dir)
-set(GBENCHMARK_INCLUDE_DIRS ${source_dir}/include/benchmark PARENT_SCOPE)
+set(GBENCHMARK_INCLUDE_DIRS ${source_dir} PARENT_SCOPE)
 
 # Specify link libraries
 ExternalProject_Get_Property(gbenchmark binary_dir)

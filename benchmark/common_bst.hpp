@@ -2,7 +2,7 @@
 #define BENCH_COMMON_BST_HPP
 
 #include "../src/ygg.hpp"
-#include "benchmark.h"
+#include "benchmark/benchmark.h"
 #include "common.hpp"
 #include "random.hpp"
 
