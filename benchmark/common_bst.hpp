@@ -2,11 +2,11 @@
 #define BENCH_COMMON_BST_HPP
 
 #include "../src/ygg.hpp"
-#include "benchmark/benchmark.h"
 #include "common.hpp"
 #include "random.hpp"
 
 #include <algorithm>
+#include <benchmark/benchmark.h>
 #include <boost/intrusive/set.hpp>
 #include <cstdlib>
 #include <draup.hpp>

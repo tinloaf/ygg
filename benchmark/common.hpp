@@ -1,10 +1,10 @@
 #ifndef BENCH_COMMON_HPP
 #define BENCH_COMMON_HPP
 
-#include "benchmark/benchmark.h"
 #include "benchmark_config.hpp"
 
 #include <algorithm>
+#include <benchmark/benchmark.h>
 #include <boost/intrusive/set.hpp>
 #include <chrono>
 #include <draup.hpp>

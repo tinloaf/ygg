@@ -3,7 +3,7 @@
 
 #include "common_bst.hpp"
 
-#include "benchmark/benchmark.h"
+#include <benchmark/benchmark.h>
 #include <boost/math/distributions/binomial.hpp>
 #include <chrono>
 #include <cmath>

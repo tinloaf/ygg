@@ -2,10 +2,10 @@
 #define BENCH_COMMON_DST_HPP
 
 #include "../src/ygg.hpp"
-#include "benchmark/benchmark.h"
 #include "common.hpp"
 
 #include <algorithm>
+#include <benchmark/benchmark.h>
 #include <draup.hpp>
 #include <random>
 #include <vector>
