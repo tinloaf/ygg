@@ -55,7 +55,7 @@ The benchmark name contains the following information:
 	* The number of times the benchmarked operation (insert) is executed on that tree (1000 in this case)
 	* The random seed used (4)
 	
-The two other colums list the wall time elapsed, the CPU time elapsed, and the number of times that the Google Benchmark framework executed the benchmark.
+The two other columns list the wall time elapsed, the CPU time elapsed, and the number of times that the Google Benchmark framework executed the benchmark.
 
 Several parameters can be controlled via command-line switches. The binaries accept all parameters usually acceptey by Google Benchmark [2] - see the respective documentation especially on how to control output format. Additional command-line parameters are:
 
@@ -66,7 +66,7 @@ Several parameters can be controlled via command-line switches. The binaries acc
 	* --experiment_size: The number of times that the operation to be benchmarked should be executed on the initially generated tree. Note that for some operations (delete, erase), it does not make sense to set experiment_size larger than base_size.
 	* --filter: Allows to specify a regular expression on the 'benchmark name' field to filter benchmarks.
 	
-So, for example, running `--base_size 1024 --doublings 3 --seed_start 42 --seed_count 2` would execute each bechmark eight times: For tree sizes of 1024, 2048, 4096 and 8192, each with the seeds 42 and 43.
+So, for example, running `--base_size 1024 --doublings 3 --seed_start 42 --seed_count 2` would execute each benchmark eight times: For tree sizes of 1024, 2048, 4096 and 8192, each with the seeds 42 and 43.
 
 
 Troubleshooting

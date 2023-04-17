@@ -295,7 +295,7 @@ IntervalTree<Node, NodeTraits, Options, Tag>::find_fast(const Comparable & q)
 		}
 	}
 
-	// Step 2: Search on upper bounds. Esentially the same as before, but we must
+	// Step 2: Search on upper bounds. Essentially the same as before, but we must
 	// make sure never to leave the range of nodes with correct lower bounds.
 	while ((cur != nullptr) && (NodeTraits::get_lower(*cur) == q_lower)) {
 		if constexpr (Options::micro_prefetch) {
@@ -383,7 +383,7 @@ Node *
 find_next_overlapping(Node * cur, const Comparable & q)
 {
 	// We search for the next bigger node, pruning the search as necessary. When
-	// Pruning occurrs, we need to restart the search for the next larger node.
+	// Pruning occurs, we need to restart the search for the next larger node.
 
 	do {
 		// We make sure that at the start of the loop, the lower of cur is smaller

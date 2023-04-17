@@ -150,7 +150,7 @@ TEST(__DST_BASENAME(DynSegTreeTest), TestEventBounding)
 	it = agg.upper_bound_event(2);
 	ASSERT_EQ(it, agg.begin() + 1);
 
-	// Note that the 5) border is open - thus, lower-bouding on 5 actually
+	// Note that the 5) border is open - thus, lower-bounding on 5 actually
 	// correctly gives the end iterator!
 	it = agg.lower_bound_event(5);
 	ASSERT_EQ(it, agg.end());
