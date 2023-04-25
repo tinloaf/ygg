@@ -104,7 +104,7 @@ ZipfDistr::ZipfSampler::h_integral_inverse(double x) const noexcept
 double
 ZipfDistr::ZipfSampler::helper1(double x) const noexcept
 {
-	// Originial implementation uses a tailor expansion for small x
+	// Original implementation uses a tailor expansion for small x
 	if (std::abs(x) > 1e-8) {
 		return std::log1p(x) / x;
 	} else {

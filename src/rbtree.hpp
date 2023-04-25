@@ -238,7 +238,7 @@ public:
 	 * *Warning*: Please note that after calling insert() on a node (and before
 	 * removing that node again), that node *may not move in memory*. A common
 	 * pitfall is to store nodes in a std::vector (or other STL container), which
-	 * reallocates (and thereby moves objecs around).
+	 * reallocates (and thereby moves objects around).
 	 *
 	 * @warning Not available for explicitly ordered trees
 	 *

@@ -238,7 +238,7 @@ public:
 	 * https://www.cambridge.org/core/journals/journal-of-functional-programming/article/balancing-weightbalanced-trees/7281C4DE7E56B74F2D13F06E31DCBC5B
 	 * for information on Delta.
 	 *
-	 * Note that setting this to 1 (i.e., chosing an integral Delta) improves
+	 * Note that setting this to 1 (i.e., choosing an integral Delta) improves
 	 * performance.
 	 *
 	 * @tparam delta_numerator The denominator of Delta
@@ -257,7 +257,7 @@ public:
 	 * https://www.cambridge.org/core/journals/journal-of-functional-programming/article/balancing-weightbalanced-trees/7281C4DE7E56B74F2D13F06E31DCBC5B
 	 * for information on Gamma.
 	 *
-	 * Note that setting this to 1 (i.e., chosing an integral Gamma) improves
+	 * Note that setting this to 1 (i.e., choosing an integral Gamma) improves
 	 * performance.
 	 *
 	 * @tparam delta_numerator The denominator of Gamma
@@ -301,7 +301,7 @@ public:
 	 *
 	 * Enabling this will cause the various data structures to enable tricks to
 	 * avoid conditional branching, using e.g. pointer arithmetic instead. This
-	 * can siginificantly increase performance on certain architectures, e.g.
+	 * can significantly increase performance on certain architectures, e.g.
 	 * modern SkyLake CPUs. However, if you enable this, make sure you profile
 	 * your performance to determine whether this actually helps with your
 	 * specific workload.

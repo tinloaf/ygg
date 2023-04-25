@@ -1169,7 +1169,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		// std::cout << "-- Deleting from left.\n";
 
 		Node * n_l = cur->NB::get_left();
-		size_t s_left = n_l->NB::_wbt_size - 1; // deletion occurrs here
+		size_t s_left = n_l->NB::_wbt_size - 1; // deletion occurs here
 		cur->NB::_wbt_size -= 1;
 		s_cur = cur->NB::_wbt_size;
 		size_t s_right = s_cur - s_left;
@@ -1207,7 +1207,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 			}
 		}
 
-		// We descend to the left, as decided ealier.
+		// We descend to the left, as decided earlier.
 		cur = n_l;
 		s_cur = s_left;
 
@@ -1261,7 +1261,7 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 		// std::cout << "-- Deleting from right.\n";
 
 		Node * n_r = cur->NB::get_right();
-		size_t s_right = n_r->NB::_wbt_size - 1; // deletion occurrs here
+		size_t s_right = n_r->NB::_wbt_size - 1; // deletion occurs here
 		cur->NB::_wbt_size -= 1;
 		s_cur = cur->NB::_wbt_size;
 		size_t s_l = s_cur - s_right;
@@ -1290,14 +1290,14 @@ WBTree<Node, NodeTraits, Options, Tag, Compare>::remove_onepass(Node & node)
 				this->rotate_right(cur);
 
 			} else {
-				// Sinlge Rotation
+				// Single Rotation
 				// std::cout << " ---- Single rotation around " << std::hex << cur
 				// << std::dec << ".\n";
 				this->rotate_right(cur);
 			}
 		}
 
-		// We descend to the right, as decided ealier.
+		// We descend to the right, as decided earlier.
 		cur = n_r;
 		s_cur = s_right;
 
