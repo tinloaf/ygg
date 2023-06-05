@@ -130,21 +130,4 @@ private:
 	std::vector<std::pair<double, double>> results;
 };
 
-// Hacky hack. Define functions that the reuse of the google benchmark fixture
-// pulls in.
-namespace benchmark {
-namespace internal {
-
-int
-InitializeStreams()
-{
-	return 0;
-}
-
-Benchmark::Benchmark(char const *) {}
-Benchmark::~Benchmark() {}
-
-} // namespace internal
-} // namespace benchmark
-
 #endif
